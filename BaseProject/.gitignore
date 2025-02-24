@@ -1,0 +1,10 @@
+﻿/**/bin/
+/**/obj/
+/.vs
+/.vscode
+/.idea
+/**.sln.DotSettings.user
+/logs/
+/.config/
+/**/appsettings.json
+/**/appsettings.*.json

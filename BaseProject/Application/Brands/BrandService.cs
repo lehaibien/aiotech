@@ -1,0 +1,186 @@
+﻿using System.Data;
+using Application.Brands.Dtos;
+using Application.Images;
+using AutoDependencyRegistration.Attributes;
+using AutoMapper;
+using Domain.Entities;
+using Domain.UnitOfWork;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Shared;
+
+namespace Application.Brands;
+
+[RegisterClassAsScoped]
+public class BrandService : IBrandService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IImageService _imageService;
+    private const string FolderUpload = "brand";
+
+    public BrandService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IHttpContextAccessor contextAccessor,
+        IImageService imageService
+    )
+    {
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _contextAccessor = contextAccessor;
+        _imageService = imageService;
+    }
+
+    public async Task<Result<PaginatedList>> GetList(GetListRequest request)
+    {
+        SqlParameter totalRow = new()
+        {
+            ParameterName = "@oTotalRow",
+            SqlDbType = SqlDbType.BigInt,
+            Direction = ParameterDirection.Output,
+        };
+        var parameters = new SqlParameter[]
+        {
+            new("@iTextSearch", request.TextSearch),
+            new("@iPageIndex", request.PageIndex),
+            new("@iPageSize", request.PageSize),
+            totalRow,
+        };
+        var result = await _unitOfWork
+            .GetRepository<BrandResponse>()
+            .ExecuteStoredProcedureAsync(StoredProcedure.GetListBrand, parameters);
+        var response = new PaginatedList
+        {
+            PageIndex = request.PageIndex,
+            PageSize = request.PageSize,
+            TotalCount = Convert.ToInt32(totalRow.Value),
+            Items = result,
+        };
+        return Result<PaginatedList>.Success(response);
+    }
+
+    public async Task<Result<BrandResponse>> GetById(Guid id)
+    {
+        var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
+        if (entity is null)
+        {
+            return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
+        }
+
+        var response = _mapper.Map<BrandResponse>(entity);
+        return Result<BrandResponse>.Success(response);
+    }
+
+    public async Task<Result<BrandResponse>> Create(CreateBrandRequest request)
+    {
+        var isExists = await _unitOfWork
+            .GetRepository<Brand>()
+            .FindAsync(x => x.Name == request.Name);
+        if (isExists != null)
+        {
+            return Result<BrandResponse>.Failure("Thương hiệu đã tồn tại");
+        }
+        var entity = _mapper.Map<Brand>(request);
+        entity.Id = Guid.NewGuid();
+        entity.CreatedDate = DateTime.Now;
+        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        var uploadResult = await _imageService.UploadAsync(
+            request.Image,
+            Path.Combine(FolderUpload, entity.Id.ToString())
+        );
+        if (uploadResult.IsFailure)
+        {
+            return Result<BrandResponse>.Failure(uploadResult.Message);
+        }
+        _unitOfWork.GetRepository<Brand>().Add(entity);
+        await _unitOfWork.SaveChangesAsync();
+        var response = _mapper.Map<BrandResponse>(entity);
+        return Result<BrandResponse>.Success(response);
+    }
+
+    public async Task<Result<BrandResponse>> Update(UpdateBrandRequest request)
+    {
+        var isExists = await _unitOfWork
+            .GetRepository<Brand>()
+            .AnyAsync(x => x.Name == request.Name && x.Id != request.Id);
+        if (isExists)
+        {
+            return Result<BrandResponse>.Failure("Thương hiệu đã tồn tại");
+        }
+        var entity = await _unitOfWork.GetRepository<Brand>().FindAsync(x => x.Id == request.Id);
+        if (entity is null)
+        {
+            return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
+        }
+        _mapper.Map(request, entity);
+        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        if (entity.ImageUrl is not null)
+        {
+            var deleteResult = await _imageService.Delete(entity.ImageUrl);
+            if (deleteResult.IsFailure)
+            {
+                return Result<BrandResponse>.Failure(deleteResult.Message);
+            }
+        }
+
+        var uploadResult = await _imageService.UploadAsync(
+            request.Image,
+            Path.Combine(FolderUpload, entity.Id.ToString())
+        );
+        if (uploadResult.IsFailure)
+        {
+            return Result<BrandResponse>.Failure(uploadResult.Message);
+        }
+        _unitOfWork.GetRepository<Brand>().Update(entity);
+        await _unitOfWork.SaveChangesAsync();
+        var response = _mapper.Map<BrandResponse>(entity);
+        return Result<BrandResponse>.Success(response);
+    }
+
+    public async Task<Result<string>> Delete(Guid id)
+    {
+        var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
+        if (entity is null)
+        {
+            return Result<string>.Failure("Thương hiệu không tồn tại");
+        }
+        entity.DeletedDate = DateTime.Now;
+        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.IsDeleted = true;
+        _unitOfWork.GetRepository<Brand>().Update(entity);
+        await _unitOfWork.SaveChangesAsync();
+        return Result<string>.Success("Xóa thành công");
+    }
+
+    public async Task<Result<string>> DeleteList(List<Guid> ids)
+    {
+        foreach (var id in ids)
+        {
+            var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
+            if (entity is null)
+            {
+                return Result<string>.Failure("Thương hiệu không tồn tại");
+            }
+            entity.DeletedDate = DateTime.Now;
+            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.IsDeleted = true;
+            _unitOfWork.GetRepository<Brand>().Update(entity);
+        }
+        await _unitOfWork.SaveChangesAsync();
+        return Result<string>.Success("Xóa thành công");
+    }
+
+    public async Task<Result<List<ComboBoxItem>>> GetComboBox()
+    {
+        var result = await _unitOfWork
+            .GetRepository<Brand>()
+            .GetAll(x => x.IsDeleted == false)
+            .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
+            .ToListAsync();
+        return Result<List<ComboBoxItem>>.Success(result);
+    }
+}

@@ -1,0 +1,39 @@
+name: aiotech_api_only_dev
+services:
+  backend:
+    build: .
+    container_name: aiotech_api_only
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - BE_StaticUrl=http://+:5554/static
+    ports:
+      - "5554:80"
+    depends_on:
+      - database
+    networks:
+      - backend
+    volumes:
+      - wwwroot:/app/wwwroot
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: aiotech_db_only
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "S3cr3tP@ssw0rd"
+      ACCEPT_EULA: "Y"
+    networks:
+      - backend
+    volumes:
+      - database-data:/var/opt/mssql
+
+volumes:
+  database-data:
+  wwwroot:
+
+networks:
+  backend:
+    driver: bridge

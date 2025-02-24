@@ -1,0 +1,86 @@
+name: aiotech_prod
+services:
+  frontend:
+    build: ./base-next-mui
+    container_name: aiotech_web
+    networks:
+      - reverse-proxy
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:5554/api/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
+  backend:
+    build: ./BaseProject/
+    container_name: aiotech_api
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5554
+      - BE_StaticUrl=https://aiotech.cloud:5554/static
+    depends_on:
+      - database
+    networks:
+      - backend
+    volumes:
+      - wwwroot:/app/wwwroot
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=5554"
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: aiotech_db
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "S3cr3tP@ssw0rd"
+      ACCEPT_EULA: "Y"
+    networks:
+      - backend
+    volumes:
+      - database-data:/var/opt/mssql
+
+  reverse-proxy:
+    image: traefik:v3.1
+    container_name: aiotech-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=lehaibien@aiotech.cloud"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+      # for traefik dashboard
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt:/letsencrypt
+    networks:
+      - backend
+      - reverse-proxy
+
+volumes:
+  database-data:
+  wwwroot:
+  letsencrypt:
+
+
+networks:
+  backend:
+    driver: bridge
+  reverse-proxy:
+    driver: bridge

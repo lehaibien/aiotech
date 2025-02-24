@@ -1,0 +1,56 @@
+export const API_URL = {
+  // auth
+  socialLogin: "auth/social-login",
+  login: "auth/login",
+  register: "auth/register",
+  refreshToken: "auth/refresh-token",
+  changePassword: "auth/change-password",
+
+  // user
+  user: "user",
+  userByName: "user/name",
+  userProfile: "user/profile",
+
+  // role
+  role: "role",
+  roleComboBox: "role/combo-box",
+
+  // category
+  category: "category",
+  categoryComboBox: "category/combo-box",
+
+  // brand
+  brand: "brand",
+  brandComboBox: "brand/combo-box",
+
+  // product
+  product: "product",
+  productRequest: "product/request",
+  productTop: "product/top",
+  productSearch: "product/search",
+
+  // cart
+  cart: "cart",
+
+  // order
+  order: "order",
+  orderCancel: "order/cancel",
+  orderStatus: "order/status",
+  createOrderUrl: "order/url",
+
+  // review
+  review: "review",
+  reviewByProduct: "review/product",
+
+  // report
+  saleReport: "report/sale",
+  orderReport: "report/order",
+
+  // post
+  post: "post",
+  postPreview: "post/preview",
+
+  // configuration
+  bannerConfig: "configuration/banner",
+  emailConfig: "configuration/email",
+};

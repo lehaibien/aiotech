@@ -1,0 +1,13 @@
+Migration:
+dotnet ef migrations add --project Infrastructure\Infrastructure.csproj --startup-project WebApi\WebApi.csproj --context Infrastructure.Persistent.ApplicationDbContext --configuration Debug --output-dir Migrations [Name]
+
+dotnet ef migrations remove --project Infrastructure\Infrastructure.csproj --startup-project WebApi\WebApi.csproj --context Infrastructure.Persistent.ApplicationDbContext --configuration Debug
+
+Update Database:
+dotnet ef database update --project Infrastructure\Infrastructure.csproj --startup-project WebApi\WebApi.csproj --context Infrastructure.Persistent.ApplicationDbContext --configuration Debug
+
+dotnet ef database update --project Infrastructure\Infrastructure.csproj --startup-project WebApi\WebApi.csproj --context Infrastructure.Persistent.ApplicationDbContext --configuration Debug [MigrationName]
+
+
+
+docker compose -f .\docker-compose.development.yaml up --build

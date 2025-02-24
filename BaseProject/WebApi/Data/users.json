@@ -1,0 +1,182 @@
+[
+  {
+    "Id": "0cf5ffc4-f742-4efb-bb10-b013ed68afee",
+    "UserName": "admin",
+    "FamilyName": "Nguyen",
+    "GivenName": "Van A",
+    "Email": "admin@ecommerce.vn",
+    "PhoneNumber": "0901234567",
+    "Password": "admin"
+  },
+  {
+    "Id": "c8c3dabb-284a-41d2-90f9-d9d18ef909dc",
+    "UserName": "user",
+    "FamilyName": "Tran",
+    "GivenName": "Thi B",
+    "Email": "user@ecommerce.vn",
+    "PhoneNumber": "0912345678",
+    "Password": "user"
+  },
+  {
+    "Id": "ee442219-d730-4ae3-ba31-8316c5ea5202",
+    "UserName": "hoangminh",
+    "FamilyName": "Hoang",
+    "GivenName": "Minh",
+    "Email": "hoangminh@ecommerce.vn",
+    "PhoneNumber": "0923456789",
+    "Password": "hoangminh"
+  },
+  {
+    "Id": "14c77df2-eca3-46e1-b65d-f4835921ddbd",
+    "UserName": "lethanh",
+    "FamilyName": "Le",
+    "GivenName": "Thanh",
+    "Email": "lethanh@ecommerce.vn",
+    "PhoneNumber": "0934567890",
+    "Password": "lethanh"
+  },
+  {
+    "Id": "38506a94-9c39-491f-b454-e19ead0b2d67",
+    "UserName": "phamquang",
+    "FamilyName": "Pham",
+    "GivenName": "Quang",
+    "Email": "phamquang@ecommerce.vn",
+    "PhoneNumber": "0945678901",
+    "Password": "phamquang"
+  },
+  {
+    "Id": "9a1cd226-8d93-4c90-9f75-99cf1fd3677b",
+    "UserName": "nguyenhoa",
+    "FamilyName": "Nguyen",
+    "GivenName": "Hoa",
+    "Email": "nguyenhoa@ecommerce.vn",
+    "PhoneNumber": "0956789012",
+    "Password": "nguyenhoa"
+  },
+  {
+    "Id": "28fe6aaa-8718-4e96-af6f-92adf6b68a7a",
+    "UserName": "trananh",
+    "FamilyName": "Tran",
+    "GivenName": "Anh",
+    "Email": "trananh@ecommerce.vn",
+    "PhoneNumber": "0967890123",
+    "Password": "trananh"
+  },
+  {
+    "Id": "b8b71d37-6002-4509-883f-e8beaabf22d6",
+    "UserName": "lehoa",
+    "FamilyName": "Le",
+    "GivenName": "Hoa",
+    "Email": "lehoa@ecommerce.vn",
+    "PhoneNumber": "0978901234",
+    "Password": "lehoa"
+  },
+  {
+    "Id": "8253bb67-0775-4d8b-bd4b-3688bc2efa39",
+    "UserName": "phamminh",
+    "FamilyName": "Pham",
+    "GivenName": "Minh",
+    "Email": "phamminh@ecommerce.vn",
+    "PhoneNumber": "0989012345",
+    "Password": "phamminh"
+  },
+  {
+    "Id": "2c3def0c-d5d5-46a2-9e75-3e207276cced",
+    "UserName": "nguyenquang",
+    "FamilyName": "Nguyen",
+    "GivenName": "Quang",
+    "Email": "nguyenquang@ecommerce.vn",
+    "PhoneNumber": "0990123456",
+    "Password": "nguyenquang"
+  },
+  {
+    "Id": "0849e5a1-ce0d-4e7f-9283-74b2c957a954",
+    "UserName": "tranhoa",
+    "FamilyName": "Tran",
+    "GivenName": "Hoa",
+    "Email": "tranhoa@ecommerce.vn",
+    "PhoneNumber": "0901123456",
+    "Password": "tranhoa"
+  },
+  {
+    "Id": "c6baaa11-b074-46df-a97d-893d37bc45f2",
+    "UserName": "leminh",
+    "FamilyName": "Le",
+    "GivenName": "Minh",
+    "Email": "leminh@ecommerce.vn",
+    "PhoneNumber": "0912234567",
+    "Password": "leminh"
+  },
+  {
+    "Id": "221047a8-cba8-4158-b630-fc0534b86153",
+    "UserName": "phamhoa",
+    "FamilyName": "Pham",
+    "GivenName": "Hoa",
+    "Email": "phamhoa@ecommerce.vn",
+    "PhoneNumber": "0923345678",
+    "Password": "phamhoa"
+  },
+  {
+    "Id": "ccd6efec-8d05-4e03-83c8-32ee42476abe",
+    "UserName": "nguyenminh",
+    "FamilyName": "Nguyen",
+    "GivenName": "Minh",
+    "Email": "nguyenminh@ecommerce.vn",
+    "PhoneNumber": "0934456789",
+    "Password": "nguyenminh"
+  },
+  {
+    "Id": "1b6f6be9-58dc-4f90-aad8-c3be5e57ed61",
+    "UserName": "tranquang",
+    "FamilyName": "Tran",
+    "GivenName": "Quang",
+    "Email": "tranquang@ecommerce.vn",
+    "PhoneNumber": "0945567890",
+    "Password": "tranquang"
+  },
+  {
+    "Id": "758de09e-a421-42d1-a7c7-69474c1503d2",
+    "UserName": "lehoa2",
+    "FamilyName": "Le",
+    "GivenName": "Hoa",
+    "Email": "lehoa2@ecommerce.vn",
+    "PhoneNumber": "0956678901",
+    "Password": "lehoa2"
+  },
+  {
+    "Id": "c474a73d-a3f4-46cf-be59-da24606baf80",
+    "UserName": "phamminh2",
+    "FamilyName": "Pham",
+    "GivenName": "Minh",
+    "Email": "phamminh2@ecommerce.vn",
+    "PhoneNumber": "0967789012",
+    "Password": "phamminh2"
+  },
+  {
+    "Id": "9570be4e-c039-4652-9d6b-28879fd57c59",
+    "UserName": "nguyenquang2",
+    "FamilyName": "Nguyen",
+    "GivenName": "Quang",
+    "Email": "nguyenquang2@ecommerce.vn",
+    "PhoneNumber": "0978890123",
+    "Password": "nguyenquang2"
+  },
+  {
+    "Id": "392a4f77-c9f8-41f9-a1b2-5af9f3aec2dc",
+    "UserName": "tranhoa2",
+    "FamilyName": "Tran",
+    "GivenName": "Hoa",
+    "Email": "tranhoa2@ecommerce.vn",
+    "PhoneNumber": "0989901234",
+    "Password": "tranhoa2"
+  },
+  {
+    "Id": "7f1e721b-d6d0-4cf6-bcde-d5a6bbc7e8d3",
+    "UserName": "leminh2",
+    "FamilyName": "Le",
+    "GivenName": "Minh",
+    "Email": "leminh2@ecommerce.vn",
+    "PhoneNumber": "0990012345",
+    "Password": "leminh2"
+  }
+]
