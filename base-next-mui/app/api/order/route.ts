@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const queryString = toQueryString(searchParams);
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}order/callback?${queryString}`
+      `${process.env.NEXT_PUBLIC_API_URL}order/callback?${queryString}`
     );
     const json = (await response.json()) as ApiResponse;
     if (json.success) {

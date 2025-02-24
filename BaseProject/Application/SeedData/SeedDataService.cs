@@ -13,6 +13,8 @@ public class SeedDataService
     private readonly Random _rng = new();
     private readonly Guid _adminRoleId = Guid.Parse("85844E35-F6A0-4F8E-90C4-071366BF5FF6");
     private readonly Guid _userRoleId = Guid.Parse("A8B42A83-B1BC-4937-99D9-0AAA70B896E5");
+    private readonly string BaseStaticUrl =
+        Environment.GetEnvironmentVariable("BE_StaticUrl") ?? "http://localhost:5554/static";
 
     public SeedDataService(IUnitOfWork unitOfWork)
     {
@@ -48,7 +50,7 @@ public class SeedDataService
         var brandData = JsonConvert.DeserializeObject<List<Brand>>(brands);
         brandData?.ForEach(x =>
         {
-            x.ImageUrl = "http://localhost:5554/static/images/brands/asus/asus-logo.jpg";
+            x.ImageUrl = $"{BaseStaticUrl}/images/brands/asus/asus-logo.jpg";
             x.CreatedDate = DateTime.UtcNow.AddDays(-1 * _rng.Next(1, 101));
             x.CreatedBy = "seedservice";
         });
@@ -67,7 +69,7 @@ public class SeedDataService
         var categoryData = JsonConvert.DeserializeObject<List<Category>>(categories);
         categoryData?.ForEach(x =>
         {
-            x.ImageUrl = "http://localhost:5554/static/images/brands/asus/asus-logo.jpg";
+            x.ImageUrl = $"{BaseStaticUrl}/images/brands/asus/asus-logo.jpg";
             x.CreatedDate = DateTime.UtcNow.AddDays(-1 * _rng.Next(1, 101));
             x.CreatedBy = "seedservice";
         });
@@ -105,8 +107,8 @@ public class SeedDataService
             x.Tags = tags.OrderBy(f => Guid.NewGuid()).Take(3).ToList();
             x.ImageUrls =
             [
-                "http://localhost:5554/static/images/products/test/firstimage.png",
-                "http://localhost:5554/static/images/products/test/secondimage.png",
+                $"{BaseStaticUrl}/images/products/test/firstimage.png",
+                $"{BaseStaticUrl}/images/products/test/secondimage.png",
             ];
         });
         if (productData is null || productData.Count == 0)
@@ -160,7 +162,7 @@ public class SeedDataService
         var postData = JsonConvert.DeserializeObject<List<Post>>(posts);
         postData?.ForEach(x =>
         {
-            x.ImageUrl = "http://localhost:5554/static/images/posts/NotebookLM.webp";
+            x.ImageUrl = $"{BaseStaticUrl}/images/posts/NotebookLM.webp";
             x.CreatedDate = DateTime.UtcNow.AddDays(-1 * _rng.Next(1, 101));
             x.CreatedBy = "seedservice";
         });

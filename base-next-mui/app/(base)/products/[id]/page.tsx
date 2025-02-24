@@ -3,7 +3,6 @@ import "server-only";
 import ImageGallery from "@/components/base/single-product/ImageGallery";
 import ProductInfo from "@/components/base/single-product/ProductInfo";
 import ProductTabSection from "@/components/base/single-product/ProductTabSection";
-import RelatedProducts from "@/components/base/single-product/RelatedProductSection";
 import { API_URL } from "@/constant/apiUrl";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
@@ -69,10 +68,10 @@ export default async function ProductDetail({
             id={product.id}
             description={product.description}
           />
-          <RelatedProducts
+          {/* <RelatedProducts
             category={product.category}
             currentProductId={product.id}
-          />
+          /> */}
         </>
       ) : (
         <ProductNotFound />

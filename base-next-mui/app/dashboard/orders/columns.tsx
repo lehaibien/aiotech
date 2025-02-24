@@ -32,6 +32,7 @@ export const createColumns = (
     field: "totalPrice",
     headerName: "Tổng tiền",
     flex: 1,
+    minWidth: 200,
     headerAlign: "right",
     align: "right",
     valueFormatter: (params) => formatNumberWithSeperator(params as number),

@@ -4,6 +4,8 @@ import { BannerConfiguration, EmailConfiguration } from "@/types/config";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
 
+
+
 export default async function ConfigurationPage() {
   let banner: BannerConfiguration = {
     title: "",

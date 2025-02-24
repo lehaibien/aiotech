@@ -412,16 +412,16 @@ public class OrderService : IOrderService
             return Result.Failure("Đơn hàng không tồn tại");
         }
         if (
-            order.Status == OrderStatus.Pending
-            || order.Status == OrderStatus.Paid
-            || order.Status == OrderStatus.Processing
+            order.Status != OrderStatus.Pending
+            && order.Status != OrderStatus.Paid
+            && order.Status != OrderStatus.Processing
         )
         {
             return Result.Failure("Không thể hủy đơn hàng");
         }
         if (order.Status == OrderStatus.Cancelled)
         {
-            return Result.Failure("Đơn hàng đã được  hủy");
+            return Result.Failure("Đơn hàng đã được hủy");
         }
         order.Status = OrderStatus.Cancelled;
         order.CancelReason = request.Reason;
