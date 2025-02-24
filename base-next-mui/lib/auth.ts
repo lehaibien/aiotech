@@ -185,7 +185,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
           process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/refresh-token`,
+            `${process.env.NEXT_PUBLIC_API_URL}auth/refresh-token`,
             {
               method: "POST",
               headers: {

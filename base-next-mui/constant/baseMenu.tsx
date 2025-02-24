@@ -1,8 +1,6 @@
 import {
-  DashboardOutlined,
-  HomeOutlined,
   StoreOutlined
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 export interface BaseNavigation {
   name: string;
@@ -11,19 +9,19 @@ export interface BaseNavigation {
 }
 
 export const BaseNavigation: BaseNavigation[] = [
-  {
-    name: 'Trang chủ',
-    icon: <HomeOutlined />,
-    path: '/',
-  },
+  // {
+  //   name: 'Trang chủ',
+  //   icon: <HomeOutlined />,
+  //   path: '/',
+  // },
   // {
   //   name: 'Dashboard',
   //   icon: <DashboardOutlined />,
   //   path: '/dashboard',
   // },
   {
-    name: 'Cửa hàng',
+    name: "Cửa hàng",
     icon: <StoreOutlined />,
-    path: '/products',
-  }
+    path: "/products",
+  },
 ];

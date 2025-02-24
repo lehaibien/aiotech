@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           variant="text"
           startIcon={<ArrowBackIcon />}
           LinkComponent={Link}
-          href="/profile?tab=2"
+          href="/dashboard/orders"
           sx={{
             fontWeight: "400",
           }}

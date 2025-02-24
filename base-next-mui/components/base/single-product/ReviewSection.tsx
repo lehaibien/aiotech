@@ -65,7 +65,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
 
   const totalRating = useMemo(
     () =>
-      data
+      data && data.length > 0
         ? data.reduce((acc, review) => acc + review.rating, 0) / data.length
         : 0,
     [data]

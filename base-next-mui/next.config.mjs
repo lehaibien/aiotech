@@ -4,32 +4,16 @@
 const nextConfig = {
   images: {
     remotePatterns: [
-      // {
-      //   protocol: "https",
-      //   hostname: "localhost",
-      //   port: "5555",
-      //   pathname: "/static/images/**",
-      // },
-      // {
-      //   protocol: "http",
-      //   hostname: "localhost",
-      //   port: "5554",
-      //   pathname: "/static/images/**",
-      // },
-      // {
-      //   protocol: "http",
-      //   hostname: "localhost",
-      //   port: "3000",
-      //   pathname: "/**",
-      // },
       {
         protocol: "http",
-        hostname: "**"
+        hostname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "**"
-      }
+        hostname: "**",
+        pathname: "/**",
+      },
     ],
   },
   reactStrictMode: true,

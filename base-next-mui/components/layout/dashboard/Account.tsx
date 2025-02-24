@@ -7,7 +7,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -63,14 +62,12 @@ export default function AccountSection({
             {session?.user.name ?? "unknown"}
           </Typography>
         )}
-        <Avatar sizes="small" sx={{ width: 36, height: 36 }}>
-          <Image
-            alt={session?.user.name ?? "user-avatar"}
-            src={"/user-avatar.png"}
-            width={36}
-            height={36}
-          />
-        </Avatar>
+        <Avatar
+          sizes="small"
+          alt={session?.user.name ?? "user-avatar"}
+          src={session?.user.image ?? "/user-avatar.png"}
+          sx={{ width: 36, height: 36 }}
+        />
       </IconButton>
       <Menu
         id="basic-menu"

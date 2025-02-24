@@ -18,7 +18,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5554
-      - BE_StaticUrl=http://+:5554/static
+      - BE_StaticUrl=http://localhost:5554/static
     depends_on:
       - database
     ports:
