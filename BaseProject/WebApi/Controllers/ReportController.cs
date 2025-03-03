@@ -1,7 +1,6 @@
 ﻿using Application.Reports;
 using Application.Reports.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
 using WebApi.Model;
 
 namespace WebApi.Controllers;
@@ -50,12 +49,82 @@ public class ReportController : ControllerBase
     }
 
     [HttpGet("product-rating")]
-    public async Task<IActionResult> GetLowRatingProductReportAsync(
-        [FromQuery] LowRatingProductReportRequest request
+    public async Task<IActionResult> GetLowRatingProductReportAsync()
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetProductRatingReportAsync();
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("out-of-stock")]
+    public async Task<IActionResult> GetOutOfStockReportAsync(
+        [FromQuery] OutOfStockReportRequest request
     )
     {
         var response = new ApiResponse();
-        var result = await _service.GetLowRatingProductsAsync(request);
+        var result = await _service.GetOutOfStockReportAsync(request);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("brand-performance")]
+    public async Task<IActionResult> GetBrandPerformanceReportAsync(
+        [FromQuery] BrandPerformanceReportRequest request
+    )
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetBrandPerformanceReportAsync(request);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("category-performance")]
+    public async Task<IActionResult> GetCategoryPerformanceReportAsync(
+        [FromQuery] CategoryPerformanceReportRequest request
+    )
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetCategoryPerformanceReportAsync(request);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("top-customer")]
+    public async Task<IActionResult> GetTopCustomerReportAsync(
+        [FromQuery] GetTopCustomerReportRequest request
+    )
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetTopCustomerReportAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

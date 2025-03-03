@@ -5,7 +5,7 @@ import CustomDataGrid, {
 } from "@/components/core/CustomDataGrid";
 import { API_URL } from "@/constant/apiUrl";
 import { getListApi } from "@/lib/apiClient";
-import { GetListRequest, PaginatedList, PostResponse } from "@/types";
+import { BaseGetListRequest, PaginatedList, PostResponse } from "@/types";
 import { useCallback, useRef } from "react";
 import { columns } from "./columns";
 import { ToolBar } from "./ToolBar";
@@ -18,7 +18,7 @@ export function PostView() {
       page: number,
       pageSize: number
     ): Promise<PaginatedList<PostResponse>> => {
-      const getListRequest: GetListRequest = {
+      const getListRequest: BaseGetListRequest = {
         pageIndex: page,
         pageSize,
         textSearch: searchTerm.current,

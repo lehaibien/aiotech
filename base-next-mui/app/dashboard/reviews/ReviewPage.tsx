@@ -5,7 +5,7 @@ import CustomDataGrid, {
 } from '@/components/core/CustomDataGrid';
 import { API_URL } from '@/constant/apiUrl';
 import { getListApi } from '@/lib/apiClient';
-import { GetListRequest, PaginatedList, ReviewResponse } from '@/types';
+import { BaseGetListRequest, PaginatedList, ReviewResponse } from '@/types';
 import { useCallback, useRef } from 'react';
 import ReviewGridToolbar from './ReviewGridToolbar';
 import { columns } from './columns';
@@ -18,7 +18,7 @@ export default function ReviewPage() {
       page: number,
       pageSize: number
     ): Promise<PaginatedList<ReviewResponse>> => {
-      const getListRequest: GetListRequest = {
+      const getListRequest: BaseGetListRequest = {
         pageIndex: page,
         pageSize,
         textSearch: searchTerm.current,

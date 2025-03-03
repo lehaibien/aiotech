@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 import { z } from "zod";
-import { BaseResponse, GetListRequest } from "./base";
+import { BaseResponse, BaseGetListRequest } from "./base";
 
 /*
 export function mapOrderStatus(status: string) {
@@ -62,7 +62,8 @@ export type OrderGetListRequest = {
   customerId?: UUID;
   fromDate?: Date;
   toDate?: Date;
-} & GetListRequest;
+  statuses?: OrderStatus[];
+} & BaseGetListRequest;
 
 export type OrderCancelRequest = {
   id: UUID;

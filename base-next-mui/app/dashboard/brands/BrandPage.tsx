@@ -5,7 +5,7 @@ import CustomDataGrid, {
 } from '@/components/core/CustomDataGrid';
 import { API_URL } from '@/constant/apiUrl';
 import { getListApi } from '@/lib/apiClient';
-import { BrandResponse, GetListRequest, PaginatedList } from '@/types';
+import { BrandResponse, BaseGetListRequest, PaginatedList } from '@/types';
 import { useCallback, useRef } from 'react';
 import BrandGridToolbar from './BrandGridToolbar';
 import { columns } from './columns';
@@ -18,7 +18,7 @@ export default function BrandPage() {
       page: number,
       pageSize: number
     ): Promise<PaginatedList<BrandResponse>> => {
-      const getListRequest: GetListRequest = {
+      const getListRequest: BaseGetListRequest = {
         pageIndex: page,
         pageSize,
         textSearch: searchTerm.current,

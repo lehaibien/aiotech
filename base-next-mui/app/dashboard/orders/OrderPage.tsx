@@ -7,7 +7,7 @@ import { API_URL } from "@/constant/apiUrl";
 import { getListApi, putApi } from "@/lib/apiClient";
 import { OrderGetListRequest, OrderResponse, PaginatedList } from "@/types";
 import { useCallback, useRef } from "react";
-import { OrderToolbar } from "@/components/dashboard/orders/OrderToolBar";
+import { OrderToolbar } from "@/features/dashboard/orders/OrderToolBar";
 import { createColumns } from "./columns";
 import { useSnackbar } from "notistack";
 

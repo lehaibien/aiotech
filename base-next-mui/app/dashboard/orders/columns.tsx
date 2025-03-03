@@ -17,7 +17,7 @@ export const createColumns = (
   },
   {
     field: "name",
-    headerName: "Tên khách hàng",
+    headerName: "Khách hàng",
     width: 150,
   },
   {
@@ -43,26 +43,32 @@ export const createColumns = (
     width: 200,
     headerAlign: "center",
     align: "center",
-    renderCell: (params) => (
-      <>
-        <Select
-          value={params.value}
-          onChange={(e) => onUpdateStatus(params.row.id, e.target.value)}
-          size="small"
-        >
-          {Object.keys(OrderStatus)
-            .filter((key) => isNaN(Number(key))) // Filter out numeric keys
-            .map((status) => (
-              <MenuItem key={status} value={status}>
-                {mapOrderStatus(status)}
-              </MenuItem>
-            ))}
-        </Select>
-      </>
-    ),
+    renderCell: (params) => {
+      if (params.value === "Completed" || params.value === "Cancelled") {
+        return mapOrderStatus(params.value);
+      }
+      return (
+        <>
+          <Select
+            value={params.value}
+            onChange={(e) => onUpdateStatus(params.row.id, e.target.value)}
+            size="small"
+          >
+            {Object.keys(OrderStatus)
+              .filter((key) => isNaN(Number(key))) // Filter out numeric keys
+              .filter((key) => key != "Completed" && key != "Cancelled")
+              .map((status) => (
+                <MenuItem key={status} value={status}>
+                  {mapOrderStatus(status)}
+                </MenuItem>
+              ))}
+          </Select>
+        </>
+      );
+    },
   },
   {
-    field: "shippedDate",
+    field: "deliveryDate",
     headerName: "Ngày giao hàng",
     width: 200,
     headerAlign: "center",

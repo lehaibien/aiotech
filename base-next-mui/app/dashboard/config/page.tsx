@@ -3,8 +3,18 @@ import { ConfigurationForm } from "./ConfigurationForm";
 import { BannerConfiguration, EmailConfiguration } from "@/types/config";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
+import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
 
-
+const breadcrums = [
+  {
+    label: "",
+    href: "dashboard",
+  },
+  {
+    label: "Cài đặt hệ thống",
+    href: "?",
+  },
+];
 
 export default async function ConfigurationPage() {
   let banner: BannerConfiguration = {
@@ -35,6 +45,7 @@ export default async function ConfigurationPage() {
   }
   return (
     <Stack gap={2}>
+      <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h5">Cài đặt hệ thống</Typography>
       <ConfigurationForm banner={banner} email={email} />
     </Stack>

@@ -18,7 +18,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5554
-      - BE_StaticUrl=http://localhost:5554/static
+      - BE_StaticUrl=http://host.docker.internal:5554/static
     depends_on:
       - database
     ports:
@@ -28,6 +28,19 @@ services:
       - reverse-proxy
     volumes:
       - wwwroot:/app/wwwroot
+
+  redis:
+    image: redis:latest
+    container_name: aiotech_redis
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_DATABASES: 16
+      REDIS_MAXMEMORY: 1gb
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -45,7 +58,7 @@ services:
 volumes:
   database-data:
   wwwroot:
-
+  redis_data:
 
 networks:
   backend:

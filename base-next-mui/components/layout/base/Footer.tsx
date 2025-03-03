@@ -1,6 +1,7 @@
 import { Facebook, Instagram, X, YouTube } from "@mui/icons-material";
-import { Box, Grid, Link, Typography } from "@mui/material";
+import { Box, Grid2 as Grid, Link, Typography } from "@mui/material";
 import Image from "next/image";
+import 'server-only';
 
 export default function Footer() {
   return (
@@ -16,7 +17,7 @@ export default function Footer() {
     >
       <Grid container spacing={2} maxWidth="lg" mx="auto">
         {/* Về chúng tôi */}
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Typography variant="h6" gutterBottom color="text.primary">
             AioTech
           </Typography>
@@ -47,7 +48,7 @@ export default function Footer() {
         </Grid>
 
         {/* Hỗ trợ khách hàng */}
-        <Grid item xs={6} md={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <Typography variant="h6" gutterBottom color="text.primary">
             Hỗ trợ
           </Typography>
@@ -66,7 +67,7 @@ export default function Footer() {
         </Grid>
 
         {/* Chính sách */}
-        <Grid item xs={6} md={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <Typography variant="h6" gutterBottom color="text.primary">
             Chính sách
           </Typography>
@@ -85,7 +86,7 @@ export default function Footer() {
         </Grid>
 
         {/* Liên hệ */}
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Typography variant="h6" gutterBottom color="text.primary">
             Kết nối với chúng tôi
           </Typography>
@@ -116,7 +117,7 @@ export default function Footer() {
         </Grid>
 
         {/* Bản quyền */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant="body2" textAlign="center">
             © {new Date().getFullYear()} AioTech.
           </Typography>

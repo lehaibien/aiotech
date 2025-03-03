@@ -1,6 +1,6 @@
 "use client";
 
-import { useSignalR } from "@/components/providers/SignalRProvider";
+import { useSignalR } from "@/providers/SignalRProvider";
 import { generateUUID } from "@/lib/utils";
 import { NotificationItem } from "@/types";
 import { Visibility, VisibilityOff } from "@mui/icons-material";

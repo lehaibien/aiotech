@@ -1,10 +1,8 @@
-'use client';
-
-import KPISection from '@/components/dashboard/home/KPISection';
-import RecentOrders from '@/components/dashboard/home/RecentOrder';
-import RevenueChart from '@/components/dashboard/home/RevenueChart';
-import StockAlert from '@/components/dashboard/home/StockAlert';
-import TopSelling from '@/components/dashboard/home/TopSelling';
+import KPISection from '@/features/dashboard/KPISection';
+import RecentOrders from '@/features/dashboard/RecentOrder';
+import RevenueChart from '@/features/dashboard/RevenueChart';
+import StockAlert from '@/features/dashboard/StockAlert';
+import TopSelling from '@/features/dashboard/TopSelling';
 import { Grid2 as Grid, Paper, Typography } from '@mui/material';
 
 export default function Page() {
@@ -18,7 +16,7 @@ export default function Page() {
           <KPISection />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper elevation={2} className='p-4 h-full'>
             <Typography variant='h6' gutterBottom>
               Biểu đồ doanh thu
@@ -26,7 +24,7 @@ export default function Page() {
             <RevenueChart />
           </Paper>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Paper elevation={2} className='p-4 h-full'>
             <Typography variant='h6' gutterBottom>
               Danh sách sản phẩm bán chạy
@@ -34,7 +32,7 @@ export default function Page() {
             <TopSelling />
           </Paper>
         </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper elevation={2} className='p-4'>
             <Typography variant='h6' gutterBottom>
               Đơn hàng gần đây
@@ -42,7 +40,7 @@ export default function Page() {
             <RecentOrders />
           </Paper>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Paper elevation={2} className='p-4'>
             <Typography variant='h6' gutterBottom>
               Cảnh báo hàng tồn kho

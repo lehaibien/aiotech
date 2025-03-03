@@ -1,10 +1,10 @@
 import 'server-only';
 
 import Footer from '@/components/layout/base/Footer';
-import Header from '@/components/layout/base/Header';
 import { Box, Container } from '@mui/material';
 import { Metadata } from 'next';
 import React from 'react';
+import Header from '@/components/layout/base/Header';
 
 export const metadata: Metadata = {
   title: {

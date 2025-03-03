@@ -6,7 +6,7 @@ import { Menu } from "@mui/icons-material";
 import { Box, IconButton, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import * as React from "react";
-import { DashboardMenuContext } from "../../dashboard/context/DashboardMenuContext";
+import { DashboardMenuContext } from "../../../providers/DashboardMenuProvider";
 import AccountSection from "./Account";
 import Searchbar from "./SearchBar";
 

@@ -2,20 +2,17 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PaymentIcon from "@mui/icons-material/Payment";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { Grid2 as Grid, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
-export default function SiteInfo() {
+export function SiteInfo() {
   return (
-    <Grid
-      container
-      spacing={1}
-      display={{ md: "none", lg: "flex" }}
+    <Box
+      display={{ xs: "none", md: "flex" }}
+      gap={2}
+      justifyContent="flex-end"
       alignItems="center"
-      sx={{
-        flexGrow: 1,
-        px: 4,
-        py: 0,
-      }}
+      flexGrow={1}
+      maxWidth="65%"
     >
       {[
         "Đổi trả 7 ngày",
@@ -23,14 +20,12 @@ export default function SiteInfo() {
         "Trả góp 0%",
         "Bảo hành chính hãng",
       ].map((service) => (
-        <Grid
+        <Box
           key={service}
-          size={{ xs: 6, md: 3 }}
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 1,
-            p: 1,
           }}
         >
           {service === "Đổi trả 7 ngày" && (
@@ -43,9 +38,16 @@ export default function SiteInfo() {
           {service === "Bảo hành chính hãng" && (
             <VerifiedIcon fontSize="small" />
           )}
-          <Typography variant="body2">{service}</Typography>
-        </Grid>
+          <Typography
+            variant="body2"
+            whiteSpace="nowrap"
+            textOverflow="ellipsis"
+            overflow="hidden"
+          >
+            {service}
+          </Typography>
+        </Box>
       ))}
-    </Grid>
+    </Box>
   );
 }

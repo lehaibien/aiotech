@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Security.Claims;
+using Application.Discounts;
 using Application.Helpers;
 using Application.Mail;
 using Application.Notification;
@@ -24,6 +26,8 @@ public class OrderService : IOrderService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
+
+    // private readonly IDiscountService _discountService;
     private readonly VnPayOption _option;
     private readonly IEmailService _emailService;
     private readonly IHubContext<NotificationHub, INotificationClient> _notificationHubContext;
@@ -35,6 +39,7 @@ public class OrderService : IOrderService
         IOptions<VnPayOption> option,
         IEmailService emailService,
         IHubContext<NotificationHub, INotificationClient> notificationHubContext
+    // IDiscountService discountService
     )
     {
         _unitOfWork = unitOfWork;
@@ -43,10 +48,12 @@ public class OrderService : IOrderService
         _option = option.Value;
         _emailService = emailService;
         _notificationHubContext = notificationHubContext;
+        // _discountService = discountService;
     }
 
     public async Task<Result<PaginatedList>> GetList(OrderGetListRequest request)
     {
+        var statuses = request.Statuses.Select(x => x.ToString());
         SqlParameter totalRow = new()
         {
             ParameterName = "@oTotalRow",
@@ -59,8 +66,7 @@ public class OrderService : IOrderService
                 "@iCustomerId",
                 request.CustomerId.HasValue ? request.CustomerId.Value : DBNull.Value
             ),
-            // new("@iFromDate", request.FromDate.HasValue ? request.FromDate.Value : DBNull.Value),
-            // new("@iToDate", request.ToDate.HasValue ? request.ToDate.Value : DBNull.Value),
+            new("@iStatuses", string.Join(",", statuses)),
             new("@iTextSearch", request.TextSearch),
             new("@iPageIndex", request.PageIndex),
             new("@iPageSize", request.PageSize),
@@ -142,14 +148,7 @@ public class OrderService : IOrderService
 
     public async Task<Result<string>> CreateUrl(OrderCheckoutRequest request)
     {
-        // var isExists = await _unitOfWork.GetRepository<Domain.Entities.Order>()
-        //     .FindAsync();
-        // if (isExists != null)
-        // {
-        //     return Result<OrderResponse>.Failure("Đơn hàng đã tồn tại");
-        // }
         var productIds = request.OrderItems.Select(x => x.ProductId);
-        // Check if there are any products that are deleted or stock is more or equal to OrderItem quantity
         var products = _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => productIds.Contains(x.Id))
@@ -177,18 +176,33 @@ public class OrderService : IOrderService
 
         entity.CreatedDate = DateTime.Now;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        // if (!string.IsNullOrWhiteSpace(request.CouponCode))
+        // {
+        //     var discount = await _discountService.GetDiscountByCode(request.CouponCode);
+        //     if (discount.IsSuccess)
+        //     {
+        //         var disc = discount.Data;
+        //         var discountPercentage = disc.DiscountPercentage;
+        //         if (entity.TotalPrice > disc.MinimumOrderAmount)
+        //         {
+        //             var orderDiscount = entity.TotalPrice * discountPercentage / 100;
+        //             if (orderDiscount > disc.MaximumDiscountAmount)
+        //             {
+        //                 entity.TotalPrice -= disc.MaximumDiscountAmount ?? 0;
+        //             }
+        //             else
+        //             {
+        //                 entity.TotalPrice -= orderDiscount;
+        //             }
+        //         }
+        //     }
+        // }
         _unitOfWork.GetRepository<Order>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        var order = await _unitOfWork
-            .GetRepository<Order>()
-            .GetAll()
-            .Include(x => x.Customer)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == entity.Id);
         var url = request.Provider switch
         {
             PaymentProvider.VnPay => VnPayLibrary.CreatePaymentUrl(
-                order,
+                entity,
                 _option,
                 _contextAccessor.HttpContext
             ),
@@ -276,18 +290,48 @@ public class OrderService : IOrderService
 
     public async Task<Result> ChangeStatus(OrderUpdateStatusRequest request)
     {
+        var role = _contextAccessor
+            .HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)
+            ?.Value;
+        if (role == "Shipper" && request.Status != OrderStatus.Delivered)
+        {
+            return Result.Failure("Bạn không có quyền thực hiện hành động này");
+        }
+        if (role != "Admin" && role != "Shipper")
+        {
+            return Result.Failure("Bạn không có quyền thực hiện hành động này");
+        }
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
         if (entity is null)
+        {
             return Result.Failure("Đơn hàng không tồn tại");
-        entity.Status = request.Status;
-        if (entity.Status == OrderStatus.Delivered)
+        }
+        if (entity.Status == OrderStatus.Cancelled)
+        {
+            return Result.Failure("Đơn hàng đã bị hủy");
+        }
+        if (request.Status == OrderStatus.Delivered)
         {
             entity.DeliveryDate = DateTime.Now;
         }
+        if (
+            entity.Status == OrderStatus.Delivered
+            && request.Status != OrderStatus.Delivered
+            && entity.Status != OrderStatus.Completed
+        )
+        {
+            entity.DeliveryDate = null;
+        }
+        entity.Status = request.Status;
         entity.UpdatedDate = DateTime.Now;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
+        await _notificationHubContext.Clients.All.ReceiveNotification(
+            new NotificationModel(
+                $"Đơn hàng {entity.TrackingNumber} đã được cập nhật sang trạng thái {Utilities.GetOrderStatusText(entity.Status)}"
+            )
+        );
         return Result.Success();
     }
 
@@ -388,7 +432,7 @@ public class OrderService : IOrderService
                     }
                 );
                 await _notificationHubContext.Clients.All.ReceiveNotification(
-                    new NotificationModel($"Có 1 đơn hàng mới")
+                    new NotificationModel("Có 1 đơn hàng mới")
                 );
             }
             else
@@ -435,10 +479,32 @@ public class OrderService : IOrderService
         return Result.Success();
     }
 
+    public async Task<Result> Confirm(Guid id)
+    {
+        var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
+        if (order is null)
+        {
+            return Result.Failure("Đơn hàng không tồn tại");
+        }
+        if (order.Status != OrderStatus.Delivered)
+        {
+            return Result.Failure("Không thể xác nhận đơn hàng");
+        }
+        order.Status = OrderStatus.Completed;
+        order.UpdatedDate = DateTime.Now;
+        order.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        _unitOfWork.GetRepository<Order>().Update(order);
+        await _unitOfWork.SaveChangesAsync();
+        await _notificationHubContext.Clients.All.ReceiveNotification(
+            new NotificationModel($"Đơn hàng #{order.TrackingNumber} đã nhận hàng")
+        );
+        return Result.Success();
+    }
+
     private string GenerateTrackingNumber()
     {
         var random = new Random();
-        string prefix = "ORD";
+        const string prefix = "ORD";
         string dateTimePart = DateTime.Now.ToString("yyyyMMddHHmmss");
         int randomNumber = random.Next(100, 1000);
         string trackingNumber = $"{prefix}{dateTimePart}{randomNumber}";

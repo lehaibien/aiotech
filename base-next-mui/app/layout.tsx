@@ -1,6 +1,6 @@
 import "server-only";
 
-import RootClientProvider from "@/components/providers/RootClientProvider";
+import RootClientProvider from "@/providers/RootClientProvider";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Be_Vietnam_Pro } from "next/font/google";

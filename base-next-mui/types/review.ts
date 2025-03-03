@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { BaseResponse, GetListRequest } from "./base";
+import { BaseResponse, BaseGetListRequest } from "./base";
 import { z } from "zod";
 
 export type ReviewResponse = {
@@ -21,7 +21,7 @@ export type ReviewProductResponse = {
 
 export type GetListReviewByProductIdRequest = {
   productId: UUID;
-} & GetListRequest;
+} & BaseGetListRequest;
 
 export const ReviewRequestSchema = z.object({
   productID: z.string().uuid(),

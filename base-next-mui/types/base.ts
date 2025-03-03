@@ -1,10 +1,18 @@
 import { UUID } from "crypto";
 
-export type GetListRequest = {
+export type BaseGetListRequest = {
   textSearch: string;
   pageIndex: number;
   pageSize: number;
 };
+
+export type GetListRequest = {
+  pageIndex: number;
+  pageSize: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  textSearch: string;
+}
 
 export type GetByIdRequest = {
   id: UUID;

@@ -1,5 +1,4 @@
 import "server-only";
-import OrderDetail from "@/components/base/profile/OrderDetail";
 import { parseUUID } from "@/lib/utils";
 import { EMPTY_UUID } from "@/constant/common";
 import { getByIdApi } from "@/lib/apiClient";
@@ -8,7 +7,8 @@ import { API_URL } from "@/constant/apiUrl";
 import { Box, Button } from "@mui/material";
 import Link from "next/link";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { OrderDetailAction } from "@/components/base/profile/OrderDetailAction";
+import { OrderDetailAction } from "@/features/profile/OrderDetailAction";
+import OrderDetail from "@/features/profile/OrderDetail";
 
 export default async function OrderDetailPage({
   params,
@@ -48,6 +48,7 @@ export default async function OrderDetailPage({
         <OrderDetailAction
           id={order?.id || EMPTY_UUID}
           isCancel={order?.status === "Cancelled"}
+          isDelivered={order?.status === "Delivered"}
         />
       </Box>
       <OrderDetail order={order} />

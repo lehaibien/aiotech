@@ -1,7 +1,7 @@
 "use client";
 
-import ProductSearchList from "@/components/base/search/ProductSearchList";
 import { API_URL } from "@/constant/apiUrl";
+import ProductSearchList from "@/features/search/ProductSearchList";
 import { getApiQuery } from "@/lib/apiClient";
 import { ComboBoxItem, ProductResponse } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -9,7 +9,6 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
-  Button,
   debounce,
   Dialog,
   DialogContent,
@@ -20,92 +19,93 @@ import {
   Select,
   SelectChangeEvent,
   Typography,
+  useTheme,
 } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type SearchBarProps = {
   categories: ComboBoxItem[];
 };
 
-export default function SearchBar({ categories }: SearchBarProps) {
+export function SearchBar({ categories }: SearchBarProps) {
+  const theme = useTheme();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<ProductResponse[]>([]);
-  const productSearchList = products.map((product) => {
-    return {
-      id: product.id,
-      name: product.name,
-      image: product.imageUrls[0],
-      price: product.price,
-      brand: product.brand,
-    };
-  });
+  const [, setLoading] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
   const [category, setCategory] = useState("All Categories");
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const productSearchList = useMemo(
+    () =>
+      products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        image: product.imageUrls[0],
+        price: product.price,
+        brand: product.brand,
+      })),
+    [products]
+  );
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const fetchSearch = useCallback(
+    async (query: string, category: string | undefined) => {
+      if (!query.trim()) {
+        setProducts([]);
+        return;
+      }
 
-  const handleSearch = () => {
-    console.log("Searching for:", searchQuery, "in category:", category);
-  };
-
-  const fetchSearch = (query: string, category: string | undefined) => {
-    getApiQuery(API_URL.productSearch, {
-      textSearch: query,
-      category: category,
-      searchLimit: 8,
-    })
-      .then((res) => {
+      setLoading(true);
+      try {
+        const res = await getApiQuery(API_URL.productSearch, {
+          textSearch: query,
+          category: category,
+          searchLimit: 8,
+        });
         if (res.success) setProducts(res.data as ProductResponse[]);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
-      });
-  };
-
-  const handleSearchQueryChange = useCallback(
-    (query: string, category: string) => {
-      const trimmedQuery = query.trim();
-      if (trimmedQuery === "") return;
-      const cat = category === "All Categories" ? undefined : category;
-      fetchSearch(trimmedQuery, cat);
+      } finally {
+        setLoading(false);
+      }
     },
     []
   );
 
   const debouncedSearch = useMemo(
-    () => debounce(handleSearchQueryChange, 500),
-    [handleSearchQueryChange]
+    () => debounce(fetchSearch, 500),
+    [fetchSearch]
   );
 
-  const handleFocus = () => {
-    setIsFocus(true);
-    // refetch
-    const cat = category === "All Categories" ? undefined : category;
-    fetchSearch(searchQuery, cat);
+  useEffect(() => {
+    return () => {
+      debouncedSearch.clear();
+    };
+  }, [debouncedSearch]);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    params.set("q", searchQuery);
+    if (category !== "All Categories") params.set("category", category);
+    router.push(`/products?${params.toString()}`);
+    setOpen(false);
   };
 
-  const handleBlur = () => {
-    setIsFocus(false);
-    // clear
-    setProducts([]);
+  const handleSearchQueryChange = (value: string) => {
+    setSearchQuery(value);
+    const cat = category === "All Categories" ? undefined : category;
+    debouncedSearch(value, cat);
   };
 
   const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
-    const cat =
-      event.target.value === "All Categories" ? undefined : event.target.value;
-    fetchSearch(searchQuery, cat);
-  };
-
-  const handleCategoryBlur = () => {
-    setProducts([]);
+    const newCategory = event.target.value;
+    setCategory(newCategory);
+    const cat = newCategory === "All Categories" ? undefined : newCategory;
+    if (searchQuery.trim()) {
+      fetchSearch(searchQuery, cat);
+    }
   };
 
   const handleClear = () => {
@@ -114,67 +114,59 @@ export default function SearchBar({ categories }: SearchBarProps) {
     setProducts([]);
   };
 
+  const handleSearchClick = () => {
+    setSearchQuery("");
+    if (open) {
+      setOpen(false);
+    }
+  };
+
   const searchInput = (
-    <Box
-      sx={{
-        position: "relative",
-        width: "100%",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+    <Box sx={{ position: "relative", width: "100%" }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Tìm kiếm sản phẩm..."
-          inputProps={{ "aria-label": "search" }}
-          value={searchQuery}
-          color="primary"
-          onChange={(event) => {
-            setSearchQuery((prev) =>
-              prev === event.target.value ? prev : event.target.value
-            );
-            debouncedSearch(event.target.value, category);
+          sx={{
+            ml: 1,
+            flex: 1,
+            "& .MuiInputBase-input": {
+              py: 1,
+              transition: theme.transitions.create("width"),
+            },
           }}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          placeholder="Tìm kiếm sản phẩm..."
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => handleSearchQueryChange(e.target.value)}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setTimeout(() => setIsFocus(false), 200)}
           startAdornment={
-            <SearchIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+            <SearchIcon
+              sx={{
+                color: "action.active",
+                mr: 1,
+                transition: "color 0.2s",
+                ...(isFocus && { color: "primary.main" }),
+              }}
+            />
           }
           endAdornment={
-            searchQuery !== "" && (
-              <IconButton
-                size="large"
-                aria-label="search"
-                color="inherit"
-                onClick={() => handleClear()}
-              >
-                <CloseIcon />
+            searchQuery && (
+              <IconButton size="small" onClick={handleClear} sx={{ mr: 0.5 }}>
+                <CloseIcon fontSize="small" />
               </IconButton>
             )
           }
+          onKeyPress={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
         />
         <Select
           value={category}
           onChange={handleCategoryChange}
-          onBlur={handleCategoryBlur}
           displayEmpty
-          inputProps={{ "aria-label": "Without label" }}
-          MenuProps={{
-            sx: {
-              maxHeight: "32rem",
-            },
-          }}
           sx={(theme) => ({
-            display: {
-              xs: "none",
-              md: "inline-flex",
-            },
+            display: { xs: "none", md: "inline-flex" },
             width: { sm: 100, md: 200 },
-            textAlign: "center",
             "& .MuiSelect-select": {
               py: 1,
               pr: 4,
@@ -196,39 +188,41 @@ export default function SearchBar({ categories }: SearchBarProps) {
           ))}
         </Select>
       </Box>
-      <ProductSearchList products={productSearchList} />
+      {isFocus && <ProductSearchList products={productSearchList} />}
     </Box>
   );
 
   return (
-    <Box sx={{ width: "50%" }}>
+    <Box sx={{}}>
       <IconButton
-        onClick={handleClickOpen}
+        onClick={() => setOpen(true)}
         color="inherit"
         aria-label="search"
         sx={{
-          display: {
-            xs: "block",
-            md: "none",
+          display: { xs: "block", md: "none" },
+          backgroundColor: theme.palette.grey[100],
+          "&:hover": {
+            backgroundColor: theme.palette.grey[200],
           },
         }}
       >
         <SearchIcon />
       </IconButton>
+
       <Box
-        sx={(theme) => ({
-          display: {
-            xs: "none",
-            md: "flex",
-          },
+        sx={{
+          display: { xs: "none", md: "flex" },
           alignItems: "center",
           borderRadius: 2,
-          border: isFocus
-            ? `1px solid ${theme.palette.primary.main}`
-            : `1px solid ${theme.palette.divider}`,
+          border: `1px solid ${
+            isFocus ? theme.palette.primary.main : theme.palette.divider
+          }`,
           p: "2px 4px",
-          order: 1,
-        })}
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          },
+        }}
       >
         {searchInput}
       </Box>
@@ -236,20 +230,15 @@ export default function SearchBar({ categories }: SearchBarProps) {
       <Dialog
         fullScreen
         open={open}
-        onClose={handleClose}
+        onClose={() => setOpen(false)}
+        TransitionProps={{ timeout: 300 }}
         PaperProps={{
           sx: {
             width: "100%",
             maxWidth: "100%",
-            height: {
-              xs: "100%",
-              lg: "auto",
-            },
+            height: { xs: "100%", lg: "auto" },
             m: 0,
-            borderRadius: {
-              xs: 0,
-              md: 2,
-            },
+            borderRadius: { xs: 0, md: 2 },
           },
         }}
       >
@@ -260,42 +249,138 @@ export default function SearchBar({ categories }: SearchBarProps) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Typography>Tìm kiếm sản phẩm</Typography>
+          <Typography variant="h6">Tìm kiếm sản phẩm</Typography>
           <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{ color: (theme) => theme.palette.grey[500] }}
+            onClick={() => setOpen(false)}
+            sx={{
+              color: theme.palette.grey[500],
+              transition: "color 0.2s",
+              "&:hover": {
+                color: theme.palette.grey[800],
+              },
+            }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
+
         <DialogContent sx={{ p: 2 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              position: "relative",
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                mb: 2,
-                bgcolor: "#f5f5f5",
+                bgcolor: theme.palette.grey[100],
                 borderRadius: 1,
                 p: "2px 4px",
+                transition: "all 0.2s ease-in-out",
+                "&:focus-within": {
+                  bgcolor: "#fff",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                },
               }}
             >
-              {searchInput}
+              <Box sx={{ position: "relative", width: "100%" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <InputBase
+                    sx={{
+                      ml: 1,
+                      flex: 1,
+                      "& .MuiInputBase-input": {
+                        py: 1,
+                        transition: theme.transitions.create("width"),
+                      },
+                    }}
+                    placeholder="Tìm kiếm sản phẩm..."
+                    fullWidth
+                    value={searchQuery}
+                    onChange={(e) => handleSearchQueryChange(e.target.value)}
+                    onFocus={() => setIsFocus(true)}
+                    startAdornment={
+                      <SearchIcon
+                        sx={{
+                          color: "action.active",
+                          mr: 1,
+                          transition: "color 0.2s",
+                          ...(isFocus && { color: "primary.main" }),
+                        }}
+                      />
+                    }
+                    endAdornment={
+                      searchQuery && (
+                        <IconButton
+                          size="small"
+                          onClick={handleClear}
+                          sx={{ mr: 0.5 }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      )
+                    }
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") handleSearch();
+                    }}
+                  />
+                  <Select
+                    value={category}
+                    onChange={handleCategoryChange}
+                    displayEmpty
+                    sx={(theme) => ({
+                      width: { xs: 120, sm: 160 },
+                      "& .MuiSelect-select": {
+                        py: 1,
+                        pr: 4,
+                        pl: 1,
+                      },
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        border: "none",
+                        borderRadius: 0,
+                        borderLeft: `1px solid ${theme.palette.divider}`,
+                      },
+                    })}
+                    IconComponent={KeyboardArrowDownIcon}
+                  >
+                    <MenuItem value="All Categories">Tất cả danh mục</MenuItem>
+                    {categories.map((category) => (
+                      <MenuItem key={category.value} value={category.text}>
+                        {category.text}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+                {isFocus && products.length > 0 && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      right: 0,
+                      zIndex: 1,
+                      mt: 1,
+                      bgcolor: "background.paper",
+                      borderRadius: 1,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    <ProductSearchList
+                      products={productSearchList}
+                      isDrawer={true}
+                      onClick={handleSearchClick}
+                    />
+                  </Box>
+                )}
+              </Box>
             </Box>
-            <Button
-              variant="contained"
-              onClick={handleSearch}
-              sx={(theme) => ({
-                bgcolor: theme.palette.primary.main,
-                "&:hover": { bgcolor: theme.palette.primary.dark },
-                alignSelf: "stretch",
-              })}
-            >
-              Tìm kiếm
-            </Button>
           </Box>
         </DialogContent>
       </Dialog>

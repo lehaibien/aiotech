@@ -3,18 +3,30 @@
 import CustomDataGrid, {
   CustomDataGridRef,
 } from "@/components/core/CustomDataGrid";
-import { DashboardDeleteButton } from "@/components/dashboard/DashboardDeleteButton";
-import { DashboardSearchBar } from "@/components/dashboard/DashboardSearchBar";
+import { DashboardDeleteButton } from "@/features/dashboard/DashboardDeleteButton";
+import { DashboardSearchBar } from "@/features/dashboard/DashboardSearchBar";
 import { API_URL } from "@/constant/apiUrl";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { getListApi } from "@/lib/apiClient";
-import { CategoryResponse, GetListRequest, PaginatedList } from "@/types";
+import { CategoryResponse, BaseGetListRequest, PaginatedList } from "@/types";
 import { AddRounded, EditRounded } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useCallback, useRef } from "react";
 import { columns } from "./columns";
+import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
+
+const breadcrums = [
+  {
+    label: "",
+    href: "dashboard",
+  },
+  {
+    label: "Quản lý danh mục sản phẩm",
+    href: "?",
+  },
+];
 
 export default function Page() {
   const { enqueueSnackbar } = useSnackbar();
@@ -26,7 +38,7 @@ export default function Page() {
       page: number,
       pageSize: number
     ): Promise<PaginatedList<CategoryResponse>> => {
-      const getListRequest: GetListRequest = {
+      const getListRequest: BaseGetListRequest = {
         pageIndex: page,
         pageSize,
         textSearch: textSearch.current,
@@ -64,6 +76,7 @@ export default function Page() {
   }
   return (
     <Stack gap={2}>
+      <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h5">Quản lý danh mục sản phẩm</Typography>
       <Stack>
         <Box

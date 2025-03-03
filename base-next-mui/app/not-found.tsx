@@ -11,7 +11,7 @@ export default function Custom404() {
   return (
     <>
       <Head>
-        <title>404 | Tech Desk</title>
+        <title>404 | AioTech</title>
         <meta name="description" content="Trang bạn đang tìm kiếm không tồn tại." />
       </Head>
       <Container maxWidth="md">

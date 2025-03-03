@@ -1,6 +1,6 @@
 "use client";
 
-import useCart from "@/components/hooks/useCart";
+import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";

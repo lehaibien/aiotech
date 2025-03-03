@@ -12,33 +12,37 @@ namespace Application.Helpers;
 
 public class VnPayLibrary
 {
-    private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
-    private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
+    private readonly SortedList<string, string> _requestData = new SortedList<string, string>(
+        new VnPayCompare()
+    );
+    private readonly SortedList<string, string> _responseData = new SortedList<string, string>(
+        new VnPayCompare()
+    );
 
     public static string CreatePaymentUrl(Order order, VnPayOption option, HttpContext context)
     {
-            var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(option.TimeZoneId);
-            var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
-            var pay = new VnPayLibrary();
-            var urlCallBack = option.ReturnUrl;
+        var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(option.TimeZoneId);
+        var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
+        var pay = new VnPayLibrary();
+        var urlCallBack = option.ReturnUrl;
 
-            pay.AddRequestData("vnp_Version", option.Version);
-            pay.AddRequestData("vnp_Command", option.Command);
-            pay.AddRequestData("vnp_TmnCode", option.TmnCode);
-            pay.AddRequestData("vnp_Amount", (Convert.ToInt64(order.TotalPrice) * 100).ToString());
-            pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
-            pay.AddRequestData("vnp_CurrCode", option.CurrCode);
-            pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
-            pay.AddRequestData("vnp_Locale", option.Locale);
-            pay.AddRequestData("vnp_OrderInfo", $"Đơn hàng #{order.TrackingNumber} - {order.Customer.UserName}: {order.TotalPrice}");
-            pay.AddRequestData("vnp_OrderType", 130000.ToString());
-            pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
-            pay.AddRequestData("vnp_TxnRef", order.Id.ToString());
+        pay.AddRequestData("vnp_Version", option.Version);
+        pay.AddRequestData("vnp_Command", option.Command);
+        pay.AddRequestData("vnp_TmnCode", option.TmnCode);
+        pay.AddRequestData("vnp_Amount", (Convert.ToInt64(order.TotalPrice) * 100).ToString());
+        pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
+        pay.AddRequestData("vnp_CurrCode", option.CurrCode);
+        pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
+        pay.AddRequestData("vnp_Locale", option.Locale);
+        pay.AddRequestData(
+            "vnp_OrderInfo",
+            $"Đơn hàng #{order.TrackingNumber} - {order.Name}: {order.TotalPrice}"
+        );
+        pay.AddRequestData("vnp_OrderType", 130000.ToString());
+        pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
+        pay.AddRequestData("vnp_TxnRef", order.Id.ToString());
 
-            var paymentUrl =
-                pay.CreateRequestUrl(option.BaseUrl, option.HashSecret);
-
-            return paymentUrl;
+        return pay.CreateRequestUrl(option.BaseUrl, option.HashSecret);
     }
 
     public VnPayResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
@@ -54,22 +58,21 @@ public class VnPayLibrary
         }
 
         var orderAmouth = Convert.ToInt64(vnPay.GetResponseData("vnp_Amount")) / 100; // divided by 100 because the VNPay said so
-        var payDate = DateTime.ParseExact(vnPay.GetResponseData("vnp_PayDate"), "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+        var payDate = DateTime.ParseExact(
+            vnPay.GetResponseData("vnp_PayDate"),
+            "yyyyMMddHHmmss",
+            CultureInfo.InvariantCulture
+        );
         var orderId = vnPay.GetResponseData("vnp_TxnRef");
         var vnPayTranId = Convert.ToInt64(vnPay.GetResponseData("vnp_TransactionNo"));
         var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
-        var vnpSecureHash =
-            collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về
+        var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về
         var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
 
-        var checkSignature =
-            vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
+        var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
 
         if (!checkSignature)
-            return new VnPayResponse()
-            {
-                Success = false
-            };
+            return new VnPayResponse() { Success = false };
 
         return new VnPayResponse()
         {
@@ -82,9 +85,10 @@ public class VnPayLibrary
             Amount = orderAmouth,
             PayDate = payDate,
             Token = vnpSecureHash,
-            VnPayResponseCode = vnpResponseCode
+            VnPayResponseCode = vnpResponseCode,
         };
     }
+
     public string GetIpAddress(HttpContext context)
     {
         var ipAddress = string.Empty;
@@ -102,15 +106,18 @@ public class VnPayLibrary
                 else if (remoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
                 {
                     // If it's a pure IPv6 address, try to get an IPv4 address if available
-                    var ipv4Address = Dns.GetHostEntry(remoteIpAddress).AddressList
-                        .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+                    var ipv4Address = Dns.GetHostEntry(remoteIpAddress)
+                        .AddressList.FirstOrDefault(x =>
+                            x.AddressFamily == AddressFamily.InterNetwork
+                        );
                     if (ipv4Address != null)
                     {
                         remoteIpAddress = ipv4Address;
                     }
                 }
 
-                if (remoteIpAddress != null) ipAddress = remoteIpAddress.ToString();
+                if (remoteIpAddress != null)
+                    ipAddress = remoteIpAddress.ToString();
 
                 return ipAddress;
             }
@@ -123,7 +130,7 @@ public class VnPayLibrary
 
         return "127.0.0.1";
     }
-    
+
     public void AddRequestData(string key, string value)
     {
         if (!string.IsNullOrEmpty(value))
@@ -225,9 +232,12 @@ public class VnPayCompare : IComparer<string>
 {
     public int Compare(string x, string y)
     {
-        if (x == y) return 0;
-        if (x == null) return -1;
-        if (y == null) return 1;
+        if (x == y)
+            return 0;
+        if (x == null)
+            return -1;
+        if (y == null)
+            return 1;
         var vnpCompare = CompareInfo.GetCompareInfo("en-US");
         return vnpCompare.Compare(x, y, CompareOptions.Ordinal);
     }
@@ -240,7 +250,7 @@ public class VnPayResponse
     public string OrderId { get; set; } = null!;
     public string PaymentMethod { get; set; } = null!;
     public string PaymentId { get; set; } = null!;
-    public decimal Amount {get ;set;} = 0m;
+    public decimal Amount { get; set; } = 0m;
     public DateTime PayDate { get; set; }
     public bool Success { get; set; }
     public string Token { get; set; } = null!;

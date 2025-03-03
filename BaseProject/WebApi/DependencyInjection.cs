@@ -1,19 +1,8 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Application.Jwt.Options;
-using Application.Mail;
-using Application.Notification;
 using Application.Options;
-using Application.SeedData;
-using Application.Users;
 using AutoDependencyRegistration;
-using AutoMapper;
-using Domain.UnitOfWork;
-using Infrastructure.Mail;
 using Infrastructure.Persistent;
-using Infrastructure.UnitOfWork;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.EntityFrameworkCore;
@@ -24,29 +13,22 @@ namespace WebApi;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection ConfigureServices(
+    public static IServiceCollection AddDefaultConfig(
         this IServiceCollection services,
         IConfiguration configuration
     )
     {
         services.AddSingleton(configuration);
         services.AddHttpContextAccessor();
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.ConfigureExceptionHandler();
-        services.ConfigureAuthentication(configuration);
-        services.ConfigureAuthorization();
+        services.ConfigureAuthentication(configuration).ConfigureAuthorization();
         services.ConfigureCors(configuration);
-        services.ConfigureDatabase(configuration);
-        services.ConfigureMapper();
         services.AutoRegisterDependencies();
         //CONFIGURATION
-        services.Configure<JwtOption>(configuration.GetSection("Jwt"));
-        services.Configure<VnPayOption>(configuration.GetSection("VnPay"));
-        services.Configure<MailSettingsOption>(configuration.GetSection("MailSettings"));
-        // SEED DATA, SHOULD BE REMOVED IN PRODUCTION
-        // WARN: This is for development only
-        services.AddScoped<SeedDataService>();
-        services.AddScoped<IEmailService, EmailService>();
+        services
+            .Configure<JwtOption>(configuration.GetSection("Jwt"))
+            .Configure<VnPayOption>(configuration.GetSection("VnPay"))
+            .Configure<MailSettingsOption>(configuration.GetSection("MailSettings"));
         return services;
     }
 
@@ -76,7 +58,7 @@ public static class DependencyInjection
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials()
-                        .SetIsOriginAllowed(hostName => true);
+                        .SetIsOriginAllowed(_ => true);
                 }
             );
         });
@@ -114,68 +96,17 @@ public static class DependencyInjection
 
     private static IServiceCollection ConfigureAuthorization(this IServiceCollection services)
     {
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(
-                "AdminAndManager",
-                policy =>
-                {
-                    policy.RequireRole("Admin", "Manager");
-                }
-            );
-            options.AddPolicy(
-                "Admin",
-                policy =>
-                {
-                    policy.RequireRole("Admin");
-                }
-            );
-            options.AddPolicy(
-                "Manager",
-                policy =>
-                {
-                    policy.RequireRole("Manager");
-                }
-            );
-        });
-        return services;
-    }
-
-    private static IServiceCollection ConfigureDatabase(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
-    {
-        var connectionString = Environment.GetEnvironmentVariable(
-            "ConnectionStrings__DefaultConnection"
-        );
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            connectionString = configuration.GetConnectionString("Docker");
-        }
-
-        services.AddDbContext<ApplicationDbContext>(options =>
-        {
-            options.UseSqlServer(
-                connectionString,
-                cfg =>
-                {
-                    cfg.CommandTimeout(180);
-                    cfg.EnableRetryOnFailure(10, TimeSpan.FromSeconds(30), null);
-                }
-            );
-        });
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        return services;
-    }
-
-    private static IServiceCollection ConfigureMapper(this IServiceCollection services)
-    {
-        // Get application assembly
-        var assembly = Assembly.GetAssembly(typeof(UserProfile));
-        var mapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(assembly));
-        var mapper = mapperConfig.CreateMapper();
-        services.AddSingleton(mapper);
+        services
+            .AddAuthorizationBuilder()
+            .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
+            .AddPolicy("Manager", policy => policy.RequireRole("Manager"))
+            .AddPolicy("AdminOrManager", policy => policy.RequireRole("Admin", "Manager"));
+        // services.AddAuthorization(options =>
+        // {
+        //     options.AddPolicy("AdminAndManager", policy => policy.RequireRole("Admin", "Manager"));
+        //     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+        //     options.AddPolicy("Manager", policy => policy.RequireRole("Manager"));
+        // });
         return services;
     }
 

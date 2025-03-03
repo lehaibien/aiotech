@@ -1,18 +1,26 @@
-import { PAGE_SIZE_OPTIONS } from '@/constant/common';
+import { PAGE_SIZE_OPTIONS } from "@/constant/common";
 import {
   ChevronLeftRounded,
   ChevronRightRounded,
   FirstPageRounded,
   LastPageRounded,
   RefreshRounded,
-} from '@mui/icons-material';
-import { Button, IconButton, MenuItem, Select } from '@mui/material';
+} from "@mui/icons-material";
+import {
+  IconButton,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import {
   gridPaginationModelSelector,
   gridRowCountSelector,
   useGridApiContext,
-} from '@mui/x-data-grid';
-import React from 'react';
+} from "@mui/x-data-grid";
+import React from "react";
 
 type DataGridPaginationProps = {
   isLoading: boolean;
@@ -27,107 +35,137 @@ function DataGridPagination({
   const { page, pageSize } = gridPaginationModelSelector(apiRef);
   const rowCount = gridRowCountSelector(apiRef);
   const totalPage = Math.ceil(rowCount / pageSize);
-  const onPageChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value) {
-        apiRef.current.setPage(e.target.value ? Number(e.target.value) - 1 : 0);
-      }
-    },
-    [apiRef]
-  );
+
+  // Handle page change via input
+  const handlePageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newPage = Number(event.target.value) - 1;
+    if (!isNaN(newPage) && newPage >= 0 && newPage < totalPage) {
+      apiRef.current.setPage(newPage);
+    }
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
+    apiRef.current.setPageSize(Number(event.target.value));
+  };
+
   return (
-    <div className='w-full flex items-center justify-center md:justify-between p-2 bg-secondary'>
-      <div className='flex items-center space-x-2 lg:space-x-4'>
-        <div className='flex items-center space-x-2'>
-          <Button
-            variant='outlined'
-            onClick={() => apiRef.current.setPage(0)}
-            disabled={isLoading || page === 0}
-            sx={{
-              height: { sm: 8, md: 32 },
-              padding: 0,
-              minWidth: { xs: 0, sm: 0, md: 64 },
-            }}
-          >
-            <span className='sr-only'>Đến trang đầu</span>
-            <FirstPageRounded className='h-4 w-4' />
-          </Button>
-          <Button
-            variant='outlined'
-            onClick={() => apiRef.current.setPage(page - 1)}
-            disabled={isLoading || page === 0}
-            sx={{
-              height: { sm: 8, md: 32 },
-              padding: 0,
-              minWidth: { xs: 0, sm: 0, md: 64 },
-            }}
-          >
-            <span className='sr-only'>Đến trang trước</span>
-            <ChevronLeftRounded className='h-4 w-4' />
-          </Button>
-        </div>
-        <div className='flex items-center justify-center text-sm font-medium'>
-          Trang{' '}
-          <input
-            className='w-10 mx-2 px-2 py-1 border rounded-sm text-center'
-            value={page + 1}
-            onChange={onPageChange}
-          />{' '}
-          trong tổng số {pageSize > 0 ? Math.ceil(rowCount / pageSize) : 0}
-        </div>
-        <div className='flex items-center space-x-2'>
-          <Button
-            variant='outlined'
-            onClick={() => apiRef.current.setPage(page + 1)}
-            disabled={isLoading || page >= totalPage - 1}
-            sx={{
-              height: { sm: 8, md: 32 },
-              padding: 0,
-              minWidth: { xs: 0, sm: 0, md: 64 },
-            }}
-          >
-            <span className='sr-only'>Đến trang kế</span>
-            <ChevronRightRounded className='h-4 w-4' />
-          </Button>
-          <Button
-            variant='outlined'
-            onClick={() => apiRef.current.setPage(totalPage - 1)}
-            disabled={isLoading || page >= totalPage - 1}
-            sx={{
-              height: { sm: 8, md: 32 },
-              padding: 0,
-              minWidth: { xs: 0, sm: 0, md: 64 },
-            }}
-          >
-            <span className='sr-only'>Đến trang cuối</span>
-            <LastPageRounded className='h-4 w-4' />
-          </Button>
-        </div>
-        <div className='hidden sm:flex items-center space-x-2'>
-          <Select
-            size='small'
-            value={pageSize}
-            onChange={(e) => apiRef.current.setPageSize(Number(e.target.value))}
-          >
-            {PAGE_SIZE_OPTIONS.map((pageSize) => (
-              <MenuItem key={pageSize} value={pageSize}>
-                {pageSize}
-              </MenuItem>
-            ))}
-          </Select>
-          <p className='text-sm font-medium'>dòng mỗi trang</p>
-        </div>
-      </div>
-      <div className='flex-1 text-sm text-muted-foreground text-right hidden md:block'>
-        {`${page * pageSize + 1} - ${Math.min(
-          (page + 1) * pageSize,
-          rowCount
-        )} trong ${rowCount} dòng.`}
-      </div>
-      <IconButton size='small' onClick={refreshGrid}>
-        <RefreshRounded />
-      </IconButton>
-    </div>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      spacing={2}
+      padding={1}
+      sx={{ width: "100%" }}
+    >
+      {/* Pagination Controls */}
+      <Stack direction="row" alignItems="center" spacing={1}>
+        {/* First Page Button */}
+        <IconButton
+          onClick={() => apiRef.current.setPage(0)}
+          disabled={isLoading || page === 0}
+          size="small"
+          aria-label="First page"
+        >
+          <FirstPageRounded />
+        </IconButton>
+
+        {/* Previous Page Button */}
+        <IconButton
+          onClick={() => apiRef.current.setPage(page - 1)}
+          disabled={isLoading || page === 0}
+          size="small"
+          aria-label="Previous page"
+        >
+          <ChevronLeftRounded />
+        </IconButton>
+
+        {/* Current Page Input */}
+        <TextField
+          type="number"
+          value={page + 1}
+          onChange={handlePageChange}
+          inputProps={{ min: 1, max: totalPage }}
+          variant="outlined"
+          size="small"
+          sx={{ width: 60 }}
+        />
+
+        {/* Total Pages Label */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          display={{ xs: "none", md: "inline" }}
+        >
+          trong tổng số {totalPage}
+        </Typography>
+
+        {/* Next Page Button */}
+        <IconButton
+          onClick={() => apiRef.current.setPage(page + 1)}
+          disabled={isLoading || page >= totalPage - 1}
+          size="small"
+          aria-label="Next page"
+        >
+          <ChevronRightRounded />
+        </IconButton>
+
+        {/* Last Page Button */}
+        <IconButton
+          onClick={() => apiRef.current.setPage(totalPage - 1)}
+          disabled={isLoading || page >= totalPage - 1}
+          size="small"
+          aria-label="Last page"
+        >
+          <LastPageRounded />
+        </IconButton>
+      </Stack>
+
+      {/* Page Size Selector */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        display={{ xs: "none", md: "flex" }}
+      >
+        <Select
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          variant="outlined"
+          size="small"
+          sx={{ minWidth: 80 }}
+        >
+          {PAGE_SIZE_OPTIONS.map((size) => (
+            <MenuItem key={size} value={size}>
+              {size}
+            </MenuItem>
+          ))}
+        </Select>
+        <Typography variant="body2" color="text.secondary">
+          dòng mỗi trang
+        </Typography>
+      </Stack>
+
+      {/* Row Count Summary */}
+      <Stack direction="row" spacing={2} alignItems="center">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          textAlign="right"
+          display={{ xs: "none", md: "inline" }}
+        >
+          {`${page * pageSize + 1} - ${Math.min(
+            (page + 1) * pageSize,
+            rowCount
+          )} trong ${rowCount} dòng`}
+        </Typography>
+
+        {/* Refresh Button */}
+        <IconButton onClick={refreshGrid} size="small" aria-label="Refresh">
+          <RefreshRounded />
+        </IconButton>
+      </Stack>
+    </Stack>
   );
 }
 

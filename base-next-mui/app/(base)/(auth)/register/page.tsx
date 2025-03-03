@@ -1,7 +1,7 @@
 import 'server-only'
 
-import RegisterComponent from '@/components/base/auth/register/RegisterComponent';
 import { Metadata } from 'next';
+import RegisterComponent from '@/features/auth/register/RegisterComponent';
 
 export const metadata : Metadata = {
   title: 'Register'

@@ -1,6 +1,6 @@
 'use client';
 
-import DashboardMenuProvider from '@/components/dashboard/context/DashboardMenuContext';
+import DashboardMenuProvider from '@/providers/DashboardMenuProvider';
 import AppNavbar from '@/components/layout/dashboard/AppNavbar';
 import Header from '@/components/layout/dashboard/Header';
 import MainContent from '@/components/layout/dashboard/MainContent';

@@ -14,6 +14,12 @@ const nextConfig = {
         hostname: "**",
         pathname: "/**",
       },
+      {
+        protocol: "http",
+        hostname: "host.docker.internal",  // Explicitly allow host.docker.internal <button class="citation-flag" data-index="8">
+        port: "5554",
+        pathname: "/static/**",
+      },
     ],
   },
   reactStrictMode: true,

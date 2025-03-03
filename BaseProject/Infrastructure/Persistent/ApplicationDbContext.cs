@@ -1,6 +1,4 @@
-﻿using Domain;
-using Domain.Entities;
-using Infrastructure.Configurations.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistent;
@@ -9,6 +7,7 @@ public class ApplicationDbContext : DbContext
 {
     public virtual DbSet<Brand> Brands { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Discount> Discounts { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderItem> OrderItems { get; set; }
     public virtual DbSet<Post> Posts { get; set; }
@@ -27,6 +26,6 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductEntityConfiguration).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

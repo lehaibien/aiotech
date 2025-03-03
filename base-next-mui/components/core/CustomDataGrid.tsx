@@ -12,8 +12,8 @@ import {
 } from '@mui/x-data-grid';
 import { usePathname } from 'next/navigation';
 import React, { useImperativeHandle } from 'react';
-import useColumns from '../hooks/useColumns';
-import useDataGridData from '../hooks/useGridData';
+import useColumns from '../../hooks/useColumns';
+import useDataGridData from '../../hooks/useGridData';
 import DataGridPagination from './CustomDataGridPagination';
 import ErrorOverlay from './ErrorOverlay';
 
@@ -133,24 +133,13 @@ function CustomDataGrid<T>(
         density={density}
         showCellVerticalBorder
         sx={(theme) => ({
-          borderColor: theme.palette.divider,
           '& .MuiDataGrid-cell': {
             display: 'flex',
             alignItems: 'center',
             px: 1,
           },
-          '& .MuiDataGrid-columnHeader': {
-            padding: 0,
-          },
-          '& .MuiDataGrid-columnHeaderTitleContainer': {
-            // justifyContent: 'center',
-            px: 1,
-          },
           '& .MuiDataGrid-iconSeparator': {
             color: theme.palette.divider,
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderColor: theme.palette.divider,
           },
           '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
           '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {

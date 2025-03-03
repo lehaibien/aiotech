@@ -30,9 +30,24 @@ services:
     volumes:
       - database-data:/var/opt/mssql
 
+  redis:
+    image: redis:latest
+    container_name: aiotech_redis_only
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_DATABASES: 16
+      REDIS_MAXMEMORY: 1gb
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+
 volumes:
   database-data:
   wwwroot:
+  redis_data:
 
 networks:
   backend:

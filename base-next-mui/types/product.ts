@@ -5,7 +5,7 @@ import {
 } from "@/constant/common";
 import { UUID } from "crypto";
 import { z } from "zod";
-import { GetListRequest } from "./base";
+import { BaseGetListRequest } from "./base";
 
 export type ProductDetailResponse = {
   id: UUID;
@@ -63,7 +63,7 @@ export type GetListProductRequest = {
   categories?: string;
   brands?: string;
   sort?: ProductSort;
-} & GetListRequest;
+} & BaseGetListRequest;
 
 export const ProductRequestSchema = z.object({
   id: z.string().uuid().optional(),

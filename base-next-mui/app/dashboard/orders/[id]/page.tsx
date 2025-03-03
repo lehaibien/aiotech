@@ -1,4 +1,3 @@
-import OrderDetail from "@/components/base/profile/OrderDetail";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { getByIdApi } from "@/lib/apiClient";
@@ -8,6 +7,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, Button } from "@mui/material";
 import Link from "next/link";
 import "server-only";
+import OrderDetail from "./OrderDetail";
 
 export default async function Page({ params }: { params: { id: string } }) {
   let order: OrderResponse | undefined = undefined;

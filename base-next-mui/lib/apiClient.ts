@@ -1,10 +1,10 @@
 "use server";
 
-import { ApiResponse, GetByIdRequest, GetListRequest } from "@/types/base";
+import { ApiResponse, GetByIdRequest } from "@/types/base";
 import { UUID } from "crypto";
+import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
 import { redirect } from "next/navigation";
 import { auth } from "./auth";
-import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
 
 /**
  * Sends a GET request to the specified action endpoint with the given request data and returns the response.
@@ -14,7 +14,7 @@ import { isDynamicServerError } from "next/dist/client/components/hooks-server-c
  */
 export async function getListApi(
   action: string,
-  request: GetListRequest
+  request: object
 ): Promise<ApiResponse> {
   const baseHeader = await getAuthorizationHeader();
   try {
@@ -152,13 +152,6 @@ export async function deleteApi(
       method: "DELETE",
       headers: baseHeader,
     });
-    if (response.status === 500) {
-      return {
-        success: false,
-        message: "Lỗi không xác định",
-        data: null,
-      };
-    }
     const json = await handleResponse(response);
     return json;
   } catch (error) {
@@ -178,13 +171,6 @@ export async function deleteApiQuery(
       method: "DELETE",
       headers: baseHeader,
     });
-    if (response.status === 500) {
-      return {
-        success: false,
-        message: "Lỗi không xác định",
-        data: null,
-      };
-    }
     const json = await handleResponse(response);
     return json;
   } catch (error) {
@@ -219,6 +205,13 @@ function toQueryString(params: object): string {
       if (value === null || value === undefined || value === "") {
         return "";
       }
+      if (Array.isArray(value)) {
+        return [...value]
+          .map((item) => {
+            return encodeURIComponent(key) + "=" + encodeURIComponent(item);
+          })
+          .join("&");
+      }
       return (
         encodeURIComponent(key) + "=" + encodeURIComponent(value as string)
       );
@@ -247,7 +240,7 @@ async function getAuthorizationHeader() {
  */
 async function handleResponse(response: Response): Promise<ApiResponse> {
   if (response.status === 500) {
-    throw new Error("Lỗi không xác định: " + response.text());
+    throw new Error("Lỗi server: " + response.text());
   }
   if (response.status === 401) {
     redirect("/login");
@@ -272,6 +265,6 @@ function handleError(error: unknown) {
   }
   return {
     success: false,
-    message: "Lỗi không xác định",
+    message: "Lỗi không xác định: " + (error as Error).message,
   };
 }

@@ -3,7 +3,7 @@
 import { Box, Drawer } from '@mui/material';
 import MenuContent from './MenuContent';
 import { useContext } from 'react';
-import { DashboardMenuContext } from '../../dashboard/context/DashboardMenuContext';
+import { DashboardMenuContext } from '../../../providers/DashboardMenuProvider';
 
 const drawerWidth = 240;
 

@@ -20,7 +20,9 @@ public class OrderCheckoutRequest
     public string Address { get; set; } = null!;
 
     public string? Note { get; set; }
-    public PaymentProvider Provider { get; set; } 
+    public PaymentProvider Provider { get; set; }
+
+    public string? CouponCode { get; set; }
 
     public List<OrderItemRequest> OrderItems { get; set; } = [];
 }

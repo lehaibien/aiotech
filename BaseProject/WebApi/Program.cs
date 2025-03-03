@@ -1,9 +1,12 @@
+using Application.Extensions;
 using Application.Notification;
+using Infrastructure.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using QuestPDF.Infrastructure;
 using Serilog;
+using StackExchange.Redis;
 using WebApi;
 using WebApi.Middleware;
 
@@ -20,8 +23,20 @@ builder
     });
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
-builder.Services.ConfigureServices(builder.Configuration);
+
+var configuration = builder.Configuration;
+builder.Services.AddDefaultConfig(configuration).AddApplication().AddInfrastructure(configuration);
 builder.Services.AddControllers();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = configuration.GetConnectionString("RedisConnection") ?? "localhost";
+    options.ConfigurationOptions = new ConfigurationOptions
+    {
+        AbortOnConnectFail = true,
+        EndPoints = { options.Configuration },
+    };
+});
 
 builder.Services.AddSignalR();
 
@@ -29,7 +44,7 @@ builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Desk API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AioTech API", Version = "v1" });
     c.AddSecurityDefinition(
         "Bearer",
         new OpenApiSecurityScheme

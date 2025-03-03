@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DashboardMenuContext } from '../../dashboard/context/DashboardMenuContext';
+import { DashboardMenuContext } from '../../../providers/DashboardMenuProvider';
 import { Box, Theme, useMediaQuery } from '@mui/material';
 import SideMenu from './SideMenu';
 

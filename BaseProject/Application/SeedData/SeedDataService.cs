@@ -104,7 +104,7 @@ public class SeedDataService
         {
             x.CreatedDate = DateTime.UtcNow.AddDays(-1 * _rng.Next(1, 101));
             x.CreatedBy = "seedservice";
-            x.Tags = tags.OrderBy(f => Guid.NewGuid()).Take(3).ToList();
+            x.Tags = tags.OrderBy(_ => Guid.NewGuid()).Take(3).ToList();
             x.ImageUrls =
             [
                 $"{BaseStaticUrl}/images/products/test/firstimage.png",

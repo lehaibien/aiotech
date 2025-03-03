@@ -1,5 +1,5 @@
-import { CheckoutComponent } from "@/components/base/checkout/CheckoutComponent";
 import { API_URL } from "@/constant/apiUrl";
+import { CheckoutComponent } from "@/features/checkout/CheckoutComponent";
 import { getApi } from "@/lib/apiClient";
 import { auth } from "@/lib/auth";
 import { UserProfileResponse } from "@/types";

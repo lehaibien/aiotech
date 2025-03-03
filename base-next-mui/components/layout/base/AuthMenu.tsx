@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-export default function AuthMenu() {
+export function AuthMenu() {
   const pathName = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
@@ -41,14 +41,32 @@ export default function AuthMenu() {
               gap: 1,
             }}
           >
-            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+                display: {
+                  xs: "none",
+                  md: "block",
+                },
+              }}
+            >
               {session.user.name ?? "Nguoi Dung"}
             </Typography>
             <Avatar
               sizes="small"
               alt={session.user.name ?? "user-avatar"}
               src={session.user.image ?? "/user-avatar.png"}
-              sx={{ width: 36, height: 36 }}
+              sx={{
+                width: {
+                  xs: 24,
+                  md: 28,
+                },
+                height: {
+                  xs: 24,
+                  md: 28,
+                },
+              }}
             />
           </IconButton>
           <Menu

@@ -64,9 +64,9 @@ public class AuthenticationService : IAuthenticationService
         var role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == entity.RoleId);
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, entity.Id.ToString()),
-            new(ClaimTypes.Name, entity.UserName),
-            new(ClaimTypes.Email, entity.Email),
+            new(JwtRegisteredClaimNames.NameId, entity.Id.ToString()),
+            new(JwtRegisteredClaimNames.Name, entity.UserName),
+            new(JwtRegisteredClaimNames.Email, entity.Email),
             new(ClaimTypes.Role, role?.Name ?? string.Empty),
             new(ClaimTypes.Thumbprint, entity.AvatarUrl ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

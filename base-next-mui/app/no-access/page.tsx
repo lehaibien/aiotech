@@ -11,7 +11,7 @@ export default function NoAccess() {
   return (
     <>
       <Head>
-        <title>No Access | Tech Desk</title>
+        <title>No Access | AioTech</title>
         <meta
           name='description'
           content='Trang bạn đang tìm kiếm không tồn tại.'

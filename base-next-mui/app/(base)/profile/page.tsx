@@ -1,4 +1,4 @@
-import ProfileTab from "@/components/base/profile/ProfileTab";
+import ProfileTab from "@/features/profile/ProfileTab";
 import "server-only";
 
 export default function ProfilePage({

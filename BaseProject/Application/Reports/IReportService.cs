@@ -13,8 +13,15 @@ public interface IReportService
         OrderReportRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<List<LowRatingProductReportResponse>>> GetLowRatingProductsAsync(
-        LowRatingProductReportRequest request,
-        CancellationToken cancellationToken = default
+    Task<Result<PaginatedList>> GetOutOfStockReportAsync(OutOfStockReportRequest request);
+    Task<Result<List<BrandPerformanceReportResponse>>> GetBrandPerformanceReportAsync(
+        BrandPerformanceReportRequest request
+    );
+    Task<Result<List<CategoryPerformanceReportResponse>>> GetCategoryPerformanceReportAsync(
+        CategoryPerformanceReportRequest request
+    );
+    Task<Result<List<ProductRatingResponse>>> GetProductRatingReportAsync();
+    Task<Result<List<TopCustomerReportResponse>>> GetTopCustomerReportAsync(
+        GetTopCustomerReportRequest request
     );
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { DarkMode, LightMode } from '@mui/icons-material';
 import { IconButton, useColorScheme } from '@mui/material';
 

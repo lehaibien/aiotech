@@ -1,8 +1,8 @@
 "use client";
 
 import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
-import { DashboardDeleteButton } from "@/components/dashboard/DashboardDeleteButton";
-import { DashboardSearchBar } from "@/components/dashboard/DashboardSearchBar";
+import { DashboardDeleteButton } from "@/features/dashboard/DashboardDeleteButton";
+import { DashboardSearchBar } from "@/features/dashboard/DashboardSearchBar";
 import { API_URL } from "@/constant/apiUrl";
 import { ERROR_MESSAGE } from "@/constant/message";
 import {
@@ -42,7 +42,7 @@ export function ToolBar({
     }
     const selectedData = rowSelection[0];
     if (selectedData) {
-      router.push(`/blog/${selectedData}`);
+      router.push(`/blogs/${selectedData}`);
     }
   }
   function triggerAdd() {

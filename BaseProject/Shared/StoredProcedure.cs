@@ -15,4 +15,8 @@ public class StoredProcedure
     public const string GetSaleReport = Prefix + "SaleReport_Get";
     public const string GetOrderReport = Prefix + "OrderReport_Get";
     public const string GetLowRatingProductReport = Prefix + "LowRatingProductReport_Get";
+    public const string GetOutOfStockReport = Prefix + "OutOfStockReport_Get";
+    public const string GetBrandPerformanceReport = Prefix + "BrandPerformanceReport_Get";
+    public const string GetCategoryPerformanceReport = Prefix + "CategoryPerformanceReport_Get";
+    public const string GetTopCustomerReport = Prefix + "TopCustomersReport_Get";
 }

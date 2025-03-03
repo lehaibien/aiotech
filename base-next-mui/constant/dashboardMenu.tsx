@@ -1,18 +1,17 @@
-import {
-  AccountCircleOutlined,
-  BarChartOutlined,
-  BrandingWatermarkOutlined,
-  CategoryOutlined,
-  DashboardOutlined,
-  InventoryOutlined,
-  ReviewsOutlined,
-  SensorDoorOutlined,
-  SettingsOutlined,
-  ShoppingBagOutlined,
-} from "@mui/icons-material";
+import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+import BrandingWatermarkOutlinedIcon from "@mui/icons-material/BrandingWatermarkOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
+import ReviewsOutlinedIcon from "@mui/icons-material/ReviewsOutlined";
+import SensorDoorOutlinedIcon from "@mui/icons-material/SensorDoorOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 
 export interface DashboardMenu {
   name: string;
@@ -24,26 +23,26 @@ export interface DashboardMenu {
 export const dashboardMenus: DashboardMenu[] = [
   {
     name: "Trang tổng quan",
-    icon: <DashboardOutlined />,
+    icon: <DashboardOutlinedIcon />,
     path: "/dashboard",
   },
   {
     name: "Sản phẩm",
-    icon: <ShoppingBagOutlined />,
+    icon: <ShoppingBagOutlinedIcon />,
     children: [
       {
         name: "Danh sách",
-        icon: <InventoryOutlined />,
+        icon: <InventoryOutlinedIcon />,
         path: "/dashboard/products",
       },
       {
         name: "Danh mục",
-        icon: <CategoryOutlined />,
+        icon: <CategoryOutlinedIcon />,
         path: "/dashboard/categories",
       },
       {
         name: "Thương hiệu",
-        icon: <BrandingWatermarkOutlined />,
+        icon: <BrandingWatermarkOutlinedIcon />,
         path: "/dashboard/brands",
       },
     ],
@@ -59,7 +58,7 @@ export const dashboardMenus: DashboardMenu[] = [
       },
       {
         name: "Đánh giá",
-        icon: <ReviewsOutlined />,
+        icon: <ReviewsOutlinedIcon />,
         path: "/dashboard/reviews",
       },
     ],
@@ -77,11 +76,11 @@ export const dashboardMenus: DashboardMenu[] = [
   },
   {
     name: "Báo cáo",
-    icon: <BarChartOutlined />,
+    icon: <BarChartOutlinedIcon />,
     children: [
       {
         name: "Báo cáo doanh số",
-        icon: <BarChartOutlined />,
+        icon: <BarChartOutlinedIcon />,
         path: "/dashboard/reports/sale",
       },
       {
@@ -90,25 +89,45 @@ export const dashboardMenus: DashboardMenu[] = [
         path: "/dashboard/reports/order",
       },
       {
-        name: "Báo cáo sản phẩm",
-        icon: <ShoppingBagOutlined />,
+        name: "Thống kê đánh giá sản phẩm",
+        icon: <ShoppingBagOutlinedIcon />,
         path: "/dashboard/reports/product-rating",
+      },
+      {
+        name: "Thống kê sản phẩm gần hết hàng",
+        icon: <InventoryOutlinedIcon />,
+        path: "/dashboard/reports/out-of-stock",
+      },
+      {
+        name: "Thống kê hiệu suất danh mục",
+        icon: <CategoryOutlinedIcon />,
+        path: "/dashboard/reports/category-performance",
+      },
+      {
+        name: "Thống kê hiệu suất thương hiệu",
+        icon: <BrandingWatermarkOutlinedIcon />,
+        path: "/dashboard/reports/brand-performance",
+      },
+      {
+        name: "Thống kê khách hàng mua nhiều",
+        icon: <AccountCircleOutlinedIcon />,
+        path: "/dashboard/reports/top-customer",
       },
     ],
   },
   {
     name: "Hệ thống",
-    icon: <SensorDoorOutlined />,
+    icon: <SensorDoorOutlinedIcon />,
     children: [
       // { name: 'Vai trò', icon: <SecurityOutlined />, path: '/dashboard/roles' },
       {
         name: "Tài khoản",
-        icon: <AccountCircleOutlined />,
+        icon: <AccountCircleOutlinedIcon />,
         path: "/dashboard/accounts",
       },
       {
         name: "Cài đặt hệ thống",
-        icon: <SettingsOutlined />,
+        icon: <SettingsOutlinedIcon />,
         path: "/dashboard/config",
       },
     ],

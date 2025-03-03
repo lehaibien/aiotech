@@ -151,25 +151,7 @@ public class OrderReceiptDocument : IDocument
                 column
                     .Item()
                     .AlignRight()
-                    .Column(c =>
-                    {
-                        c.Item().Text($"Tổng thanh toán: {_order.TotalPrice:N} đ").Bold();
-                    });
+                    .Column(c => c.Item().Text($"Tổng thanh toán: {_order.TotalPrice:N} đ").Bold());
             });
-    }
-
-    private string GetOrderStatusText(OrderStatus status)
-    {
-        return status switch
-        {
-            OrderStatus.Pending => "Chờ xử lý",
-            OrderStatus.Paid => "Đã thanh toán",
-            OrderStatus.Processing => "Đang xử lý",
-            OrderStatus.Delivering => "Đang giao",
-            OrderStatus.Delivered => "Đã giao",
-            OrderStatus.Completed => "Đã hoàn thành",
-            OrderStatus.Cancelled => "Đã hủy",
-            _ => "",
-        };
     }
 }

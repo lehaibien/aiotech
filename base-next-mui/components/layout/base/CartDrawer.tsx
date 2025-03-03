@@ -1,6 +1,6 @@
 "use client";
 
-import useCart from "@/components/hooks/useCart";
+import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator, parseUUID } from "@/lib/utils";
 import CloseIcon from "@mui/icons-material/Close";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
@@ -22,7 +22,7 @@ import { getByIdApi } from "@/lib/apiClient";
 import { API_URL } from "@/constant/apiUrl";
 import { CartItemResponse } from "@/types";
 
-export default function CartDrawer() {
+export function CartDrawer() {
   const router = useRouter();
   const { data: session } = useSession();
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);

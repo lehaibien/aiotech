@@ -62,11 +62,11 @@ public class PostService : IPostService
         return Result<PaginatedList>.Success(response);
     }
 
-    public async Task<Result<List<PostPreviewResponse>>> GetPostPreviewAsync(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetPostPreviewAsync(GetListRequest request)
     {
         var entities = await _unitOfWork
             .GetRepository<Post>()
-            .GetAll(x => x.IsPublished == true)
+            .GetAll(x => x.IsPublished && x.Title.Contains(request.TextSearch))
             .Skip(request.PageIndex * request.PageSize)
             .Take(request.PageSize)
             .Select(x => new PostPreviewResponse
@@ -77,7 +77,17 @@ public class PostService : IPostService
                 CreatedDate = x.CreatedDate,
             })
             .ToListAsync();
-        return Result<List<PostPreviewResponse>>.Success(entities);
+        var count = await _unitOfWork
+            .GetRepository<Post>()
+            .CountAsync(x => x.IsPublished && x.Title.Contains(request.TextSearch));
+        var response = new PaginatedList
+        {
+            PageIndex = request.PageIndex,
+            PageSize = request.PageSize,
+            TotalCount = count,
+            Items = entities,
+        };
+        return Result<PaginatedList>.Success(response);
     }
 
     public async Task<Result<PostResponse>> GetByIdAsync(Guid id)
