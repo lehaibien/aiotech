@@ -94,13 +94,53 @@ public class ProductService : IProductService
     {
         var result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll(x => x.IsDeleted == false)
+            .GetAll()
+            .Select(x => new ProductResponse
+            {
+                Id = x.Id,
+                Sku = x.Sku,
+                Name = x.Name,
+                Price = x.Price,
+                Stock = x.Stock,
+                Brand = x.Brand.Name,
+                Category = x.Category.Name,
+                ImageUrls = x.ImageUrls,
+                CreatedDate = x.CreatedDate,
+                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
+                IsFeatured = x.IsFeatured,
+            })
             .OrderByDescending(x => x.IsFeatured)
             .ThenByDescending(x => x.CreatedDate)
             .Take(top)
             .ToListAsync();
-        var response = _mapper.Map<List<ProductResponse>>(result);
-        return Result<List<ProductResponse>>.Success(response);
+        return Result<List<ProductResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductResponse>>> GetFeaturedProducts(int top = 12)
+    {
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll()
+            .Select(x => new ProductResponse
+            {
+                Id = x.Id,
+                Sku = x.Sku,
+                Name = x.Name,
+                Price = x.Price,
+                Stock = x.Stock,
+                Brand = x.Brand.Name,
+                Category = x.Category.Name,
+                ImageUrls = x.ImageUrls,
+                CreatedDate = x.CreatedDate,
+                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
+                IsFeatured = x.IsFeatured,
+            })
+            .Where(x => x.IsFeatured)
+            .OrderByDescending(x => x.CreatedDate)
+            .OrderByDescending(x => x.Rating)
+            .Take(top)
+            .ToListAsync();
+        return Result<List<ProductResponse>>.Success(result);
     }
 
     public async Task<Result<List<ProductResponse>>> GetRelatedProducts(
@@ -114,14 +154,26 @@ public class ProductService : IProductService
         }
         var result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll(x =>
-                x.IsDeleted == false && x.Id != request.Id && x.CategoryId == entity.CategoryId
-            )
+            .GetAll(x => x.Id != request.Id && x.CategoryId == entity.CategoryId)
+            .Select(x => new ProductResponse
+            {
+                Id = x.Id,
+                Sku = x.Sku,
+                Name = x.Name,
+                Price = x.Price,
+                Stock = x.Stock,
+                Brand = x.Brand.Name,
+                Category = x.Category.Name,
+                ImageUrls = x.ImageUrls,
+                CreatedDate = x.CreatedDate,
+                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
+                IsFeatured = x.IsFeatured,
+            })
+            .OrderByDescending(x => x.Rating)
             .OrderByDescending(x => x.CreatedDate)
             .Take(request.Limit)
             .ToListAsync();
-        var response = _mapper.Map<List<ProductResponse>>(result);
-        return Result<List<ProductResponse>>.Success(response);
+        return Result<List<ProductResponse>>.Success(result);
     }
 
     public async Task<Result<ProductDetailResponse>> GetById(Guid id)

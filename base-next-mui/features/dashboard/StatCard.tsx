@@ -17,7 +17,9 @@ export default function StatCard({
   icon: Icon,
 }: StatCardProps) {
   return (
-    <Card>
+    <Card sx={{
+      width: "100%",
+    }}>
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body1" fontWeight="700" color="text.secondary">

@@ -1,3 +1,5 @@
+'use client'
+
 import { List, ListItem, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
 
 const mockProducts = [

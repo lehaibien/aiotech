@@ -29,6 +29,7 @@ import {
 import { UUID } from "crypto";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
@@ -38,6 +39,7 @@ type ReviewSectionProps = {
 };
 
 export default function ReviewSection({ productId }: ReviewSectionProps) {
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const { data: session } = useSession();
 
@@ -64,7 +66,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
     []
   );
 
-  const { data, isValidating, error, mutate } = useSWR<ReviewProductResponse[]>(
+  const { data, isValidating, error } = useSWR<ReviewProductResponse[]>(
     [productId, currentPage, pageSize],
     {
       fetcher: reviewFetcher,
@@ -99,7 +101,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
             variant: "success",
           });
           setNewReview({ rating: 0, comment: "" });
-          mutate();
+          router.refresh();
         } else {
           enqueueSnackbar(res.message, { variant: "error" });
         }

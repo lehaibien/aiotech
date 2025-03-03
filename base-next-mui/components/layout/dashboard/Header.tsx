@@ -1,21 +1,12 @@
-"use client";
-
 import BrandLogo from "@/components/core/BrandLogo";
 import ColorSchemeSwitch from "@/components/core/ColorSchemeSwitch";
-import { Menu } from "@mui/icons-material";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import * as React from "react";
-import { DashboardMenuContext } from "../../../providers/DashboardMenuProvider";
 import AccountSection from "./Account";
+import { MenuButton } from "./MenuButton";
 import Searchbar from "./SearchBar";
 
-export default function Header() {
-  const [open, setOpen] = React.useContext(DashboardMenuContext);
-  function toggleMenu() {
-    const isOpen = !open;
-    setOpen(isOpen);
-  }
+export default async function Header() {
   return (
     <Stack
       direction="row"
@@ -47,9 +38,7 @@ export default function Header() {
             AioTech
           </Typography>
         </Box>
-        <IconButton onClick={toggleMenu} aria-label="Open menu">
-          <Menu />
-        </IconButton>
+        <MenuButton />
       </Box>
       <Stack direction="row" sx={{ gap: 1 }}>
         <Searchbar />

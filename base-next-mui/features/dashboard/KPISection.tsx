@@ -1,7 +1,7 @@
 import UserIcon from '@mui/icons-material/AccountCircleOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoneyOutlined';
 import OrderIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Grid2 as Grid, SvgIconTypeMap } from '@mui/material';
+import { Box, Grid2 as Grid, SvgIconTypeMap } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import StatCard from './StatCard';
 
@@ -33,7 +33,8 @@ const mockKPIs: KPI[] = [
 
 export default function KPISection() {
   return (
-    <Grid container spacing={2}>
+    <Box>
+      <Grid container spacing={2}>
       {mockKPIs.map((kpi, index) => (
         <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
           <StatCard
@@ -45,5 +46,6 @@ export default function KPISection() {
         </Grid>
       ))}
     </Grid>
+    </Box>
   );
 }

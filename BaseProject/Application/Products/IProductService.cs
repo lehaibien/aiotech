@@ -8,6 +8,7 @@ public interface IProductService
     Task<Result<PaginatedList>> GetList(GetListProductRequest request);
     Task<Result<List<ProductResponse>>> Search(SearchProductRequest request);
     Task<Result<List<ProductResponse>>> GetTopProducts(int top = 12);
+    Task<Result<List<ProductResponse>>> GetFeaturedProducts(int top = 12);
     Task<Result<List<ProductResponse>>> GetRelatedProducts(GetRelatedProductsRequest request);
     Task<Result<ProductDetailResponse>> GetById(Guid id);
     Task<Result<ProductUpdateResponse>> GetRequestById(Guid id);

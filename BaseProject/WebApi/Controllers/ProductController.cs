@@ -62,6 +62,20 @@ public class ProductController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("featured/{top:int}")]
+    public async Task<IActionResult> GetFeaturedProducts(int top) {
+        var response = new ApiResponse();
+        var result = await _service.GetFeaturedProducts(top);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
     [HttpGet("related")]
     public async Task<IActionResult> GetRelatedProducts(
         [FromQuery] GetRelatedProductsRequest request

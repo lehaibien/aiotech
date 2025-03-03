@@ -1,3 +1,5 @@
+'use client'
+
 import { useContext } from 'react';
 import { DashboardMenuContext } from '../../../providers/DashboardMenuProvider';
 import { Box, Theme, useMediaQuery } from '@mui/material';

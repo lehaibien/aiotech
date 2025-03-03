@@ -27,6 +27,7 @@ export const API_URL = {
   product: "product",
   productRequest: "product/request",
   productTop: "product/top",
+  productFeatured: "product/featured",
   productSearch: "product/search",
 
   // cart
@@ -34,6 +35,7 @@ export const API_URL = {
 
   // order
   order: "order",
+  recentOrder: "order/recent",
   orderCancel: "order/cancel",
   orderStatus: "order/status",
   createOrderUrl: "order/url",

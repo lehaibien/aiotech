@@ -146,6 +146,32 @@ public class OrderService : IOrderService
         return Result<List<OrderResponse>>.Success(entities);
     }
 
+    public async Task<Result<List<OrderResponse>>> GetRecentOrders(int count)
+    {
+        var entities = await _unitOfWork
+            .GetRepository<Order>()
+            .GetAll()
+            .OrderByDescending(x => x.CreatedDate)
+            .Take(count)
+            .Select(x => new OrderResponse
+            {
+                Id = x.Id,
+                TrackingNumber = x.TrackingNumber,
+                Name = x.Name,
+                Address = x.Address,
+                TotalPrice = x.TotalPrice,
+                Status = x.Status.ToString(),
+                DeliveryDate = x.DeliveryDate,
+                Note = x.Note,
+                CreatedDate = x.CreatedDate,
+                CancelReason = x.CancelReason,
+                PaymentProvider = x.Payment.Provider.ToString(),
+                PhoneNumber = x.PhoneNumber,
+            })
+            .ToListAsync();
+        return Result<List<OrderResponse>>.Success(entities);
+    }
+
     public async Task<Result<string>> CreateUrl(OrderCheckoutRequest request)
     {
         var productIds = request.OrderItems.Select(x => x.ProductId);

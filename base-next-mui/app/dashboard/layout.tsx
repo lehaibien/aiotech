@@ -1,5 +1,3 @@
-'use client';
-
 import DashboardMenuProvider from '@/providers/DashboardMenuProvider';
 import AppNavbar from '@/components/layout/dashboard/AppNavbar';
 import Header from '@/components/layout/dashboard/Header';
@@ -11,7 +9,7 @@ import * as React from 'react';
 
 dayjs.locale('vi');
 
-export default function Dashboard({
+export default async function Dashboard({
   children,
 }: Readonly<{
   children: React.ReactNode;

@@ -78,7 +78,6 @@ export default function Page() {
     <Stack gap={2}>
       <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h5">Quản lý danh mục sản phẩm</Typography>
-      <Stack>
         <Box
           display="flex"
           alignItems="center"
@@ -132,6 +131,5 @@ export default function Page() {
           loadData={loadData}
         />
       </Stack>
-    </Stack>
   );
 }

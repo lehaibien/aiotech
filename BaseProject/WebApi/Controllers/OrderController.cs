@@ -62,6 +62,22 @@ public class OrderController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("recent")]
+    public async Task<IActionResult> GetRecentOrders([FromQuery] int count = 10)
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetRecentOrders(count);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
     [HttpPost("url")]
     public async Task<IActionResult> CreateUrl(OrderCheckoutRequest request)
     {

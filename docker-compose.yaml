@@ -32,7 +32,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`)"
       - "traefik.http.routers.backend.entrypoints=api"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
 
   redis:
@@ -66,7 +65,7 @@ services:
     container_name: aiotech-traefik
     command:
       - "--api.insecure=true"
-      - "--providers.docker"
+      - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"

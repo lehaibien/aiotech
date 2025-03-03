@@ -7,10 +7,9 @@ import { NewArrival } from "@/features/home/NewArrival";
 import { getApi, getListApi } from "@/lib/apiClient";
 import {
   CategoryResponse,
-  BaseGetListRequest,
   PaginatedList,
   PostPreviewResponse,
-  ProductResponse,
+  ProductResponse
 } from "@/types";
 import { BannerConfiguration } from "@/types/config";
 import { Container } from "@mui/material";
@@ -32,7 +31,34 @@ export default async function Home() {
   let newProducts: ProductResponse[] = [];
   let featuredCategories: CategoryResponse[] = [];
   let posts: PostPreviewResponse[] = [];
-  const bannerResponse = await getApi(API_URL.bannerConfig);
+  const bannerPromise = getApi(API_URL.bannerConfig);
+  const newProductsPromise = getApi(API_URL.productTop + "/8");
+  const featuredProductsPromise = getApi(API_URL.productFeatured + "/8");
+  const featuredCategoriesPromise = getListApi(API_URL.category, {
+    pageIndex: 0,
+    pageSize: 16,
+    textSearch: "",
+  });
+  const postsPromise = getListApi(API_URL.postPreview, {
+    pageIndex: 0,
+    pageSize: 10,
+    textSearch: "",
+  });
+
+  const [
+    bannerResponse,
+    newProductsResponse,
+    featuredProductsResponse,
+    featuredCategoriesResponse,
+    postsResponse,
+  ] = await Promise.all([
+    bannerPromise,
+    newProductsPromise,
+    featuredProductsPromise,
+    featuredCategoriesPromise,
+    postsPromise,
+  ]);
+
   if (bannerResponse.success) {
     bannerConfig = bannerResponse.data as BannerConfiguration;
   } else {
@@ -43,39 +69,37 @@ export default async function Home() {
     };
     console.error("Failed to load banner config: ", bannerResponse.message);
   }
-  const top = 8;
-  const newProductsResponse = await getApi(API_URL.productTop + `/${top}`);
+
   if (newProductsResponse.success) {
     newProducts = newProductsResponse.data as ProductResponse[];
   } else {
     console.error("Failed to load new products: ", newProductsResponse.message);
   }
-  const categoryRequest: BaseGetListRequest = {
-    pageIndex: 0,
-    pageSize: 16,
-    textSearch: "",
-  };
-  const categoryResponse = await getListApi(API_URL.category, categoryRequest);
-  if (categoryResponse.success) {
-    const data = categoryResponse.data as PaginatedList<CategoryResponse>;
-    featuredCategories = data.items;
+
+  if (featuredProductsResponse.success) {
+    newProducts = featuredProductsResponse.data as ProductResponse[];
+  } else {
+    console.error(
+      "Failed to load featured products: ",
+      featuredProductsResponse.message
+    );
+  }
+
+  if (featuredCategoriesResponse.success) {
+    featuredCategories = (
+      featuredCategoriesResponse.data as PaginatedList<CategoryResponse>
+    ).items;
   } else {
     console.error(
       "Failed to load featured categories: ",
-      categoryResponse.message
+      featuredCategoriesResponse.message
     );
   }
-  const postRequest: BaseGetListRequest = {
-    pageIndex: 0,
-    pageSize: 10,
-    textSearch: "",
-  };
-  const postResponse = await getListApi(API_URL.postPreview, postRequest);
-  if (postResponse.success) {
-    const data = postResponse.data as PaginatedList<PostPreviewResponse>;
-    posts = data.items;
+
+  if (postsResponse.success) {
+    posts = (postsResponse.data as PaginatedList<PostPreviewResponse>).items;
   } else {
-    console.error("Failed to load featured categories: ", postResponse.message);
+    console.error("Failed to load posts: ", postsResponse.message);
   }
   return (
     <Container

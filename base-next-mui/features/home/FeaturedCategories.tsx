@@ -1,5 +1,6 @@
 'use client'
 
+import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { CategoryResponse } from "@/types";
 import {
   Card,
@@ -23,31 +24,17 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
 
   return (
     <>
-      <Typography
+      <HighlightTypography
         variant="h5"
         component="h2"
         gutterBottom
         sx={{
-          mb: 4,
+          mb: 3,
           fontWeight: 600,
-          textAlign: "center",
-          position: "relative",
-          display: "inline-block",
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            bottom: -4,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 40,
-            height: 2,
-            backgroundColor: theme.palette.primary.main,
-            borderRadius: 1,
-          },
         }}
       >
         Danh mục nổi bật
-      </Typography>
+      </HighlightTypography>
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {categories.map((category) => (
           <Grid size={{ xs: 6, sm: 4, md: 3, lg: 12 / 8 }} key={category.id}>
