@@ -8,9 +8,9 @@ import Google from "next-auth/providers/google";
 import { postApi } from "./apiClient";
 
 interface JwtPayload {
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": string;
+  "nameid": string;
+  "name": string;
+  "email": string;
   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": string;
   "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint": string;
   jti: string;
@@ -49,14 +49,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const payload = decodeJwt(jwtResult.accessToken);
         return {
           id: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            "nameid"
           ],
           name: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+            "name"
           ],
           email:
             payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              "email"
             ],
           image:
             payload[
@@ -100,14 +100,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const payload = decodeJwt(jwtResult.accessToken);
         return {
           id: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            "nameid"
           ],
           name: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+            "name"
           ],
           email:
             payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              "email"
             ],
           image:
             payload[
@@ -142,14 +142,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const payload = decodeJwt(jwtResult.accessToken);
         return {
           id: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+            "nameid"
           ],
           name: payload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+            "name"
           ],
           email:
             payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              "email"
             ],
           image:
             payload[
@@ -204,13 +204,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.refreshToken = data.refreshToken;
             const payload = decodeJwt(data.accessToken);
             token.id = payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+              "nameid"
             ] as string;
             token.name = payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+              "name"
             ] as string;
             token.email = payload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+              "email"
             ] as string;
             token.image = payload[
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/thumbprint"
