@@ -33,7 +33,9 @@ export function SecurityForm() {
           enqueueSnackbar("Cập nhật mật khẩu thành công", {
             variant: "success",
           });
-          router.refresh();
+          if(window) {
+            window.location.reload();
+          }
         } else {
           enqueueSnackbar(res.message, { variant: "error" });
         }

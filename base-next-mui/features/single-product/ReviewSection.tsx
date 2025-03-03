@@ -101,7 +101,9 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
             variant: "success",
           });
           setNewReview({ rating: 0, comment: "" });
-          router.refresh();
+          if(window) {
+            window.location.reload();
+          }
         } else {
           enqueueSnackbar(res.message, { variant: "error" });
         }
