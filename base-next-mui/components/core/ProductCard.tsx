@@ -203,11 +203,11 @@ function ProductCard({ product }: ProductCardProps) {
                 name="product-rating"
                 value={rating}
                 size="small"
-                precision={0.5}
+                precision={0.1}
                 readOnly
               />
               <Typography variant="caption" color="text.secondary">
-                ({rating})
+                ({rating.toFixed(2)})
               </Typography>
             </Box>
           </Box>
