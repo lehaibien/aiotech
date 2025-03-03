@@ -25,6 +25,7 @@ services:
       - database
     networks:
       - backend
+      - reverse-proxy
     volumes:
       - wwwroot:/app/wwwroot
     labels:
