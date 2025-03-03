@@ -29,7 +29,6 @@ import {
 import { UUID } from "crypto";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
@@ -39,7 +38,6 @@ type ReviewSectionProps = {
 };
 
 export default function ReviewSection({ productId }: ReviewSectionProps) {
-  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const { data: session } = useSession();
 

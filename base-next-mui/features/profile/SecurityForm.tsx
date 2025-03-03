@@ -5,14 +5,12 @@ import { ChangePasswordRequest, ChangePasswordSchema } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, FormLabel, Stack } from "@mui/material";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useMemo } from "react";
 import { TextFieldElement, useForm } from "react-hook-form-mui";
 
 // Change password
 export function SecurityForm() {
-  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const { data: session } = useSession();
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
