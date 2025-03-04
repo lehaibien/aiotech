@@ -4,7 +4,7 @@ services:
     build: ./base-next-mui
     container_name: aiotech_web
     networks:
-      - fe
+      - frontend
     environment:
       - NEXT_PUBLIC_API_URL=https://api.aiotech.cloud/
       - NEXT_PUBLIC_FRONTEND_URL=https://aiotech.cloud/
@@ -85,8 +85,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt:/letsencrypt
     networks:
-      - fe
-      - be
+      - backend
+      - frontend
 
 volumes:
   database-data:
@@ -97,5 +97,5 @@ volumes:
 networks:
   be:
     driver: bridge
-  fe:
+  frontend:
     driver: bridge
