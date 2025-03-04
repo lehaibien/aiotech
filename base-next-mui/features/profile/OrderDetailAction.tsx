@@ -5,7 +5,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AlertDialog from "@/components/core/AlertDialog";
 import { UUID } from "crypto";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi, putApi } from "@/lib/apiClient";
 import { useRouter } from "next/navigation";
@@ -15,20 +15,24 @@ import { OrderStatus } from "@/types";
 
 type OrderDetailActionProps = {
   id: UUID;
-  isCancel?: boolean;
-  isDelivered?: boolean;
+  status: string;
 };
 
-export function OrderDetailAction({
-  id,
-  isCancel,
-  isDelivered,
-}: OrderDetailActionProps) {
+export function OrderDetailAction({ id, status }: OrderDetailActionProps) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
+  const isCancelable = useMemo(() => {
+    return (
+      status.toLowerCase() === "pending" ||
+      status.toLowerCase() === "paid" ||
+      status.toLowerCase() === "processing"
+    );
+  }, [status]);
   const handleConfirm = useCallback(
     async (id: string) => {
-      if (isDelivered) {
+      if (
+        status.toLowerCase() === "delivered"
+      ) {
         const response = await putApi(API_URL.orderStatus, {
           id: id,
           status: OrderStatus.Completed,
@@ -45,7 +49,7 @@ export function OrderDetailAction({
         }
       }
     },
-    [enqueueSnackbar, isDelivered, router]
+    [enqueueSnackbar, router, status]
   );
   const handlePrint = useCallback(async (id: string) => {
     const response = await getApi(API_URL.order + `/${id}/print`);
@@ -96,6 +100,9 @@ export function OrderDetailAction({
         onClick={() => handleConfirm(id)}
         startIcon={<CheckIcon />}
         color="primary"
+        disabled={
+          status.toLowerCase() !== "delivered"
+        }
       >
         Đã nhận hàng
       </Button>
@@ -108,7 +115,11 @@ export function OrderDetailAction({
         content="Bạn có chắc chắn muốn hủy đơn hàng này không? Mọi thao tác sẽ không được hoàn lại"
         onConfirm={handleCancel}
       >
-        <Button color="error" startIcon={<CancelIcon />} disabled={isCancel}>
+        <Button
+          color="error"
+          startIcon={<CancelIcon />}
+          disabled={isCancelable === false}
+        >
           Hủy
         </Button>
       </AlertDialog>

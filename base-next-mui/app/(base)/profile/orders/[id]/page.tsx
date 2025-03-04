@@ -47,8 +47,7 @@ export default async function OrderDetailPage({
         </Button>
         <OrderDetailAction
           id={order?.id || EMPTY_UUID}
-          isCancel={order?.status === "Cancelled"}
-          isDelivered={order?.status === "Delivered"}
+          status={order?.status || ""}
         />
       </Box>
       <OrderDetail order={order} />
