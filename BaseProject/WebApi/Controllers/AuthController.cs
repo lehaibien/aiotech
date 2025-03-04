@@ -8,7 +8,7 @@ using IAuthenticationService = Application.Authentication.IAuthenticationService
 
 namespace WebApi.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {

@@ -6,7 +6,7 @@ using WebApi.Model;
 
 namespace WebApi.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class ReviewController : ControllerBase
 {

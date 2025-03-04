@@ -7,7 +7,7 @@ using WebApi.Model;
 namespace WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class UserController : ControllerBase
 {
     private readonly CookieOptions _cookieOptions = new()
