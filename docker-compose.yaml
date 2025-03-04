@@ -6,7 +6,7 @@ services:
     networks:
       - reverse-proxy
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:5554/
+      - NEXT_PUBLIC_API_URL=https://api.aiotech.cloud/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`aiotech.cloud`)"
@@ -30,7 +30,7 @@ services:
       - wwwroot:/app/wwwroot
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`api.aiotech.cloud`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
