@@ -77,6 +77,7 @@ export function CancelButton({ dataGridRef }: CancelButtonProps) {
             variant: "error",
           });
         });
+      setOpen(false);
     }
   };
   return (
