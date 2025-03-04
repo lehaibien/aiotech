@@ -6,7 +6,7 @@ services:
     networks:
       - reverse-proxy
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:5554/api/
+      - NEXT_PUBLIC_API_URL=http://backend:5554/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`aiotech.cloud`)"
@@ -30,8 +30,9 @@ services:
       - wwwroot:/app/wwwroot
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`)"
-      - "traefik.http.routers.backend.entrypoints=api"
+      - "traefik.http.routers.backend.rule=Host(`api.aiotech.cloud`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
 
   redis:
@@ -69,16 +70,14 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.api.address=:5554"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=lehaibien@aiotech.cloud"
+      - "--certificatesresolvers.myresolver.acme.email=lehaibien321@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
     ports:
       - "80:80"
       - "443:443"
-      - "5554:5554"
       # for traefik dashboard
       - "8080:8080"
     volumes:

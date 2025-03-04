@@ -4,7 +4,7 @@ services:
     build: ./base-next-mui/
     container_name: aiotech_web
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:5554/api/
+      - NEXT_PUBLIC_API_URL=http://backend:5554/
     ports:
       - "3000:3000"
     networks:
@@ -16,7 +16,7 @@ services:
     container_name: aiotech_api
     environment:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=http://host.docker.internal:5554/static
     depends_on:
