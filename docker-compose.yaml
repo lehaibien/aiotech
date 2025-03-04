@@ -4,9 +4,11 @@ services:
     build: ./base-next-mui
     container_name: aiotech_web
     networks:
-      - reverse-proxy
+      - fe
     environment:
       - NEXT_PUBLIC_API_URL=https://api.aiotech.cloud/
+      - NEXT_PUBLIC_FRONTEND_URL=https://aiotech.cloud/
+      - AUTH_URL=https://aiotech.cloud/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`aiotech.cloud`)"
@@ -20,12 +22,11 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5554
-      - BE_StaticUrl=http://host.docker.internal:5554/static
+      - BE_StaticUrl=https://api.aiotech.cloud/static
     depends_on:
       - database
     networks:
-      - backend
-      - reverse-proxy
+      - be
     volumes:
       - wwwroot:/app/wwwroot
     labels:
@@ -46,7 +47,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - backend
+      - be
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -57,7 +58,7 @@ services:
       SA_PASSWORD: "S3cr3tP@ssw0rd"
       ACCEPT_EULA: "Y"
     networks:
-      - backend
+      - be
     volumes:
       - database-data:/var/opt/mssql
 
@@ -84,8 +85,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - letsencrypt:/letsencrypt
     networks:
-      - backend
-      - reverse-proxy
+      - fe
+      - be
 
 volumes:
   database-data:
@@ -94,7 +95,7 @@ volumes:
   letsencrypt:
 
 networks:
-  backend:
+  be:
     driver: bridge
-  reverse-proxy:
+  fe:
     driver: bridge

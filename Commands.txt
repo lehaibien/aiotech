@@ -11,3 +11,5 @@ dotnet ef database update --project Infrastructure\Infrastructure.csproj --start
 
 
 docker compose -f .\docker-compose.development.yaml up --build
+
+dotnet ef migrations bundle --project Infrastructure//Infrastructure.csproj --startup-project WebApi//WebApi.csproj --context Infrastructure.Persistent.ApplicationDbContext --self-contained -r linux-x64 -o "../sql-scripts/bundle"
