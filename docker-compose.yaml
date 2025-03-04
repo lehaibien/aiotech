@@ -30,7 +30,7 @@ services:
       - wwwroot:/app/wwwroot
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.aiotech.cloud`)"
+      - "traefik.http.routers.backend.rule=Host(`aiotech.cloud`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
