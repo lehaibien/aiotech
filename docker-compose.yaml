@@ -4,9 +4,11 @@ services:
     build: ./base-next-mui
     container_name: aiotech_web
     networks:
-      - reverse-proxy
+      - frontend
     environment:
       - NEXT_PUBLIC_API_URL=https://api.aiotech.cloud/
+      - NEXT_PUBLIC_FRONTEND_URL=https://aiotech.cloud/
+      - AUTH_URL=https://aiotech.cloud/
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`aiotech.cloud`)"
@@ -20,7 +22,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5554
-      - BE_StaticUrl=http://host.docker.internal:5554/static
+      - BE_StaticUrl=https://api.aiotech.cloud/static
     depends_on:
       - database
     networks:
@@ -85,7 +87,7 @@ services:
       - letsencrypt:/letsencrypt
     networks:
       - backend
-      - reverse-proxy
+      - frontend
 
 volumes:
   database-data:
@@ -96,5 +98,5 @@ volumes:
 networks:
   backend:
     driver: bridge
-  reverse-proxy:
+  frontend:
     driver: bridge
