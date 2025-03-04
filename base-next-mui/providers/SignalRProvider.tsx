@@ -15,6 +15,8 @@ type SignalRProviderProps = {
   children: React.ReactNode;
 };
 
+const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+
 export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   const { data: session } = useSession();
   const { enqueueSnackbar } = useSnackbar();
@@ -32,7 +34,7 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   useEffect(() => {
     if (userRole === "admin") {
       const newConnection = new HubConnectionBuilder()
-        .withUrl("http://localhost:5554/notificationHub", {
+        .withUrl(baseUrl + "/notificationHub", {
           accessTokenFactory: async () => {
             return accessToken;
           },
