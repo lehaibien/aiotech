@@ -22,10 +22,10 @@ export default function TopCustomerFilter({
 }: TopCustomerFilterProps) {
   const router = useRouter();
   const [startDate, setStartDate] = useState<Dayjs | null>(
-    dayjs.utc(defaultStartDate)
+    defaultStartDate ? dayjs.utc(defaultStartDate) : null
   );
   const [endDate, setEndDate] = useState<Dayjs | null>(
-    dayjs.utc(defaultEndDate)
+    defaultEndDate ? dayjs.utc(defaultEndDate) : null
   );
   const [count, setCount] = useState<number>(defaultCount || 10);
   const onApplyFilter = () => {

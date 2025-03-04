@@ -13,7 +13,7 @@ dayjs.extend(utc);
 async function getTopCustomerData(request: TopCustomerReportRequest) {
   const response = await getApiQuery(API_URL.topCustomerReport, request);
   if (!response.success) {
-    throw new Error(response.message);
+    return [];
   }
   return response.data as TopCustomerReportResponse[];
 }
@@ -26,8 +26,8 @@ export default async function TopCustomerReportPage({
   const startDate = searchParams?.start_date
     ? dayjs.utc(searchParams?.start_date)
     : dayjs.utc().startOf("year");
-  const endDate = searchParams?.end_date
-    ? dayjs(searchParams?.end_date)
+    const endDate = searchParams?.end_date
+    ? dayjs.utc(searchParams?.end_date)
     : dayjs.utc().endOf("year");
   const count = searchParams?.count ? Number(searchParams?.count) : 10;
   const request: TopCustomerReportRequest = {
