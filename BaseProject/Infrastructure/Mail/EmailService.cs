@@ -69,7 +69,7 @@ public class EmailService : IEmailService
     )
     {
         var body = ParseTemplate(templateName, data);
-        if (body == "")
+        if (string.IsNullOrWhiteSpace(body))
         {
             return Result.Failure("Không tìm thấy template");
         }
@@ -111,14 +111,70 @@ public class EmailService : IEmailService
             return "";
         }
         var templateContent = File.ReadAllText(templatePath);
+
+        // Handle each loops first
+        var eachRegex = new System.Text.RegularExpressions.Regex(
+            @"{{#each\s+(\w+)}}(.*?){{/each}}",
+            System.Text.RegularExpressions.RegexOptions.Singleline
+        );
+        var matches = eachRegex.Matches(templateContent);
+
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            var arrayName = match.Groups[1].Value;
+            var template = match.Groups[2].Value;
+            var result = new System.Text.StringBuilder();
+
+            if (data.TryGetValue(arrayName, out object? value))
+            {
+                // Handle IEnumerable<Dictionary<string, string>>
+                if (value is IEnumerable<Dictionary<string, string>> dictItems)
+                {
+                    foreach (var item in dictItems)
+                    {
+                        var itemContent = template;
+                        foreach (var kvp in item)
+                        {
+                            itemContent = itemContent.Replace(
+                                "{{" + kvp.Key.ToLowerInvariant() + "}}",
+                                kvp.Value ?? ""
+                            );
+                        }
+                        result.Append(itemContent);
+                    }
+                }
+                // Handle other IEnumerable types
+                else if (value is IEnumerable<object> items)
+                {
+                    foreach (var item in items)
+                    {
+                        var itemProperties = item.GetType().GetProperties();
+                        var itemContent = template;
+                        foreach (var prop in itemProperties)
+                        {
+                            itemContent = itemContent.Replace(
+                                "{{" + prop.Name.ToLowerInvariant() + "}}",
+                                prop.GetValue(item)?.ToString() ?? ""
+                            );
+                        }
+                        result.Append(itemContent);
+                    }
+                }
+            }
+
+            templateContent = templateContent.Replace(match.Value, result.ToString());
+        }
+
+        // Handle regular variables
         foreach (var key in data.Keys)
         {
             var loweredKey = key.ToLowerInvariant();
             templateContent = templateContent.Replace(
                 "{{" + loweredKey + "}}",
-                data[key].ToString()
+                data[key]?.ToString() ?? ""
             );
         }
+
         return templateContent;
     }
 }

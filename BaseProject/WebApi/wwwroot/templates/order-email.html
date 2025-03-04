@@ -94,7 +94,7 @@
         </tr>
       </table>
     </div>
-    <!-- <div class="order-details">
+    <div class="order-details">
       <h2>Chi tiết đơn hàng</h2>
       <table>
         <thead>
@@ -105,19 +105,16 @@
           </tr>
         </thead>
         <tbody>
+          {{#each items}}
           <tr>
-            <td>Tên sản phẩm 1</td>
-            <td>2</td>
-            <td>500.000đ</td>
+            <td>{{name}}</td>
+            <td>{{quantity}}</td>
+            <td>{{price}}</td>
           </tr>
-          <tr>
-            <td>Tên sản phẩm 2</td>
-            <td>1</td>
-            <td>300.000đ</td>
-          </tr>
+          {{/each}}
         </tbody>
       </table>
-    </div> -->
+    </div>
 
     <div class="footer">
       <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>

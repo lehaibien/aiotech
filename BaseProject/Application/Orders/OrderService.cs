@@ -421,7 +421,12 @@ public class OrderService : IOrderService
                 CreatedDate = response.PayDate,
             };
 
-            var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderId);
+            var order = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAll()
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.Product)
+                .FirstOrDefaultAsync(x => x.Id == orderId);
             if (order is not null)
             {
                 order.Status = OrderStatus.Paid;
@@ -443,7 +448,7 @@ public class OrderService : IOrderService
                 _unitOfWork.GetRepository<Payment>().Add(payment);
                 _unitOfWork.GetRepository<Order>().Update(order);
                 await _unitOfWork.SaveChangesAsync();
-                _ = await _emailService.SendTemplateAsync(
+                await _emailService.SendTemplateAsync(
                     "lehaibien321@gmail.com",
                     "Đơn hàng mới",
                     "order-email",
@@ -455,6 +460,15 @@ public class OrderService : IOrderService
                         { "address", order.Address },
                         { "totalprice", order.TotalPrice.ToString("N0") + " đ" },
                         { "note", order.Note ?? "Không" },
+                        {
+                            "items",
+                            order.OrderItems.Select(x => new Dictionary<string, string>
+                            {
+                                { "name", x.Product.Name },
+                                { "quantity", x.Quantity.ToString() },
+                                { "price", x.Product.Price.ToString("N0") + " đ" },
+                            })
+                        },
                     }
                 );
                 await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -533,7 +547,6 @@ public class OrderService : IOrderService
         const string prefix = "ORD";
         string dateTimePart = DateTime.Now.ToString("yyyyMMddHHmmss");
         int randomNumber = random.Next(100, 1000);
-        string trackingNumber = $"{prefix}{dateTimePart}{randomNumber}";
-        return trackingNumber;
+        return $"{prefix}{dateTimePart}{randomNumber}";
     }
 }

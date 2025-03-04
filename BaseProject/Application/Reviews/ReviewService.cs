@@ -94,12 +94,18 @@ public class ReviewService : IReviewService
 
     public async Task<Result<ReviewResponse>> Create(CreateReviewRequest request)
     {
-        // var isExists = await _unitOfWork.GetRepository<Domain.Entities.Review>()
-        //     .FindAsync();
-        // if (isExists != null)
-        // {
-        //     return Result<ReviewResponse>.Failure("Đánh giá đã tồn tại");
-        // }
+        var isCommented = await _unitOfWork
+            .GetRepository<Review>()
+            .GetAll(x =>
+                x.ProductId == request.ProductId
+                && x.UserId == request.UserId
+                && x.IsDeleted == false
+            )
+            .FirstOrDefaultAsync();
+        if (isCommented != null)
+        {
+            return Result<ReviewResponse>.Failure("Bạn đã đánh giá sản phẩm này rồi");
+        }
         var entity = _mapper.Map<Review>(request);
         entity.CreatedDate = DateTime.Now;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";

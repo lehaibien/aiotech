@@ -2,20 +2,22 @@
   {
     "Id": "0cf5ffc4-f742-4efb-bb10-b013ed68afee",
     "UserName": "admin",
-    "FamilyName": "Nguyen",
-    "GivenName": "Van A",
-    "Email": "admin@ecommerce.vn",
+    "FamilyName": "Lê Hải",
+    "GivenName": "Biên",
+    "Email": "lehaibien321@gmail.com",
     "PhoneNumber": "0901234567",
-    "Password": "admin"
+    "Password": "admin",
+    "Address": "123 Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
   },
   {
     "Id": "c8c3dabb-284a-41d2-90f9-d9d18ef909dc",
-    "UserName": "user",
-    "FamilyName": "Tran",
-    "GivenName": "Thi B",
-    "Email": "user@ecommerce.vn",
+    "UserName": "shipper",
+    "FamilyName": "Trần Hoàng",
+    "GivenName": "Việt",
+    "Email": "hoangviet@aiotech.cloud",
     "PhoneNumber": "0912345678",
-    "Password": "user"
+    "Password": "shipper",
+    "Address": "45 Trần Phú, Phường Điện Biên, Quận Ba Đình, Hà Nội"
   },
   {
     "Id": "ee442219-d730-4ae3-ba31-8316c5ea5202",
@@ -24,7 +26,8 @@
     "GivenName": "Minh",
     "Email": "hoangminh@ecommerce.vn",
     "PhoneNumber": "0923456789",
-    "Password": "hoangminh"
+    "Password": "hoangminh",
+    "Address": "278 Nguyễn Văn Linh, Phường Nam Dương, Quận Hải Châu, TP. Đà Nẵng"
   },
   {
     "Id": "14c77df2-eca3-46e1-b65d-f4835921ddbd",
@@ -33,7 +36,8 @@
     "GivenName": "Thanh",
     "Email": "lethanh@ecommerce.vn",
     "PhoneNumber": "0934567890",
-    "Password": "lethanh"
+    "Password": "lethanh",
+    "Address": "92 Hai Bà Trưng, Phường Tân An, TP. Buôn Ma Thuột, Đắk Lắk"
   },
   {
     "Id": "38506a94-9c39-491f-b454-e19ead0b2d67",
@@ -42,7 +46,8 @@
     "GivenName": "Quang",
     "Email": "phamquang@ecommerce.vn",
     "PhoneNumber": "0945678901",
-    "Password": "phamquang"
+    "Password": "phamquang",
+    "Address": "156 Trần Hưng Đạo, Phường 2, TP. Vũng Tàu, Bà Rịa - Vũng Tàu"
   },
   {
     "Id": "9a1cd226-8d93-4c90-9f75-99cf1fd3677b",
@@ -51,7 +56,8 @@
     "GivenName": "Hoa",
     "Email": "nguyenhoa@ecommerce.vn",
     "PhoneNumber": "0956789012",
-    "Password": "nguyenhoa"
+    "Password": "nguyenhoa",
+    "Address": "234 Nguyễn Huệ, Phường Vĩnh Ninh, TP. Huế, Thừa Thiên Huế"
   },
   {
     "Id": "28fe6aaa-8718-4e96-af6f-92adf6b68a7a",
@@ -60,7 +66,8 @@
     "GivenName": "Anh",
     "Email": "trananh@ecommerce.vn",
     "PhoneNumber": "0967890123",
-    "Password": "trananh"
+    "Password": "trananh",
+    "Address": "89 Lê Duẩn, Phường Đông Kinh, TP. Lạng Sơn, Lạng Sơn"
   },
   {
     "Id": "b8b71d37-6002-4509-883f-e8beaabf22d6",
@@ -69,7 +76,8 @@
     "GivenName": "Hoa",
     "Email": "lehoa@ecommerce.vn",
     "PhoneNumber": "0978901234",
-    "Password": "lehoa"
+    "Password": "lehoa",
+    "Address": "167 Phan Chu Trinh, Phường Quang Trung, TP. Quy Nhơn, Bình Định"
   },
   {
     "Id": "8253bb67-0775-4d8b-bd4b-3688bc2efa39",
@@ -78,7 +86,8 @@
     "GivenName": "Minh",
     "Email": "phamminh@ecommerce.vn",
     "PhoneNumber": "0989012345",
-    "Password": "phamminh"
+    "Password": "phamminh",
+    "Address": "321 Nguyễn Thái Học, Phường 7, TP. Cà Mau, Cà Mau"
   },
   {
     "Id": "2c3def0c-d5d5-46a2-9e75-3e207276cced",
@@ -87,7 +96,8 @@
     "GivenName": "Quang",
     "Email": "nguyenquang@ecommerce.vn",
     "PhoneNumber": "0990123456",
-    "Password": "nguyenquang"
+    "Password": "nguyenquang",
+    "Address": "55 Lý Thường Kiệt, Phường Hoàng Văn Thụ, TP. Thái Nguyên, Thái Nguyên"
   },
   {
     "Id": "0849e5a1-ce0d-4e7f-9283-74b2c957a954",
@@ -96,7 +106,8 @@
     "GivenName": "Hoa",
     "Email": "tranhoa@ecommerce.vn",
     "PhoneNumber": "0901123456",
-    "Password": "tranhoa"
+    "Password": "tranhoa",
+    "Address": "189 Nguyễn Trãi, Phường Nguyễn Du, TP. Hà Tĩnh, Hà Tĩnh"
   },
   {
     "Id": "c6baaa11-b074-46df-a97d-893d37bc45f2",
@@ -105,7 +116,8 @@
     "GivenName": "Minh",
     "Email": "leminh@ecommerce.vn",
     "PhoneNumber": "0912234567",
-    "Password": "leminh"
+    "Password": "leminh",
+    "Address": "267 Trần Phú, Phường Cẩm Phô, TP. Hội An, Quảng Nam"
   },
   {
     "Id": "221047a8-cba8-4158-b630-fc0534b86153",
@@ -114,7 +126,8 @@
     "GivenName": "Hoa",
     "Email": "phamhoa@ecommerce.vn",
     "PhoneNumber": "0923345678",
-    "Password": "phamhoa"
+    "Password": "phamhoa",
+    "Address": "145 Ngô Quyền, Phường Tân Thành, TP. Ninh Bình, Ninh Bình"
   },
   {
     "Id": "ccd6efec-8d05-4e03-83c8-32ee42476abe",
@@ -123,7 +136,8 @@
     "GivenName": "Minh",
     "Email": "nguyenminh@ecommerce.vn",
     "PhoneNumber": "0934456789",
-    "Password": "nguyenminh"
+    "Password": "nguyenminh",
+    "Address": "78 Phan Bội Châu, Phường 2, TP. Sóc Trăng, Sóc Trăng"
   },
   {
     "Id": "1b6f6be9-58dc-4f90-aad8-c3be5e57ed61",
@@ -132,7 +146,8 @@
     "GivenName": "Quang",
     "Email": "tranquang@ecommerce.vn",
     "PhoneNumber": "0945567890",
-    "Password": "tranquang"
+    "Password": "tranquang",
+    "Address": "432 Lê Thánh Tông, Phường Đằng Giang, Quận Ngô Quyền, TP. Hải Phòng"
   },
   {
     "Id": "758de09e-a421-42d1-a7c7-69474c1503d2",
@@ -141,7 +156,8 @@
     "GivenName": "Hoa",
     "Email": "lehoa2@ecommerce.vn",
     "PhoneNumber": "0956678901",
-    "Password": "lehoa2"
+    "Password": "lehoa2",
+    "Address": "256 Hùng Vương, Phường Tiền An, TP. Bắc Ninh, Bắc Ninh"
   },
   {
     "Id": "c474a73d-a3f4-46cf-be59-da24606baf80",
@@ -150,7 +166,8 @@
     "GivenName": "Minh",
     "Email": "phamminh2@ecommerce.vn",
     "PhoneNumber": "0967789012",
-    "Password": "phamminh2"
+    "Password": "phamminh2",
+    "Address": "198 Quang Trung, Phường Quang Trung, TP. Vinh, Nghệ An"
   },
   {
     "Id": "9570be4e-c039-4652-9d6b-28879fd57c59",
@@ -159,7 +176,8 @@
     "GivenName": "Quang",
     "Email": "nguyenquang2@ecommerce.vn",
     "PhoneNumber": "0978890123",
-    "Password": "nguyenquang2"
+    "Password": "nguyenquang2",
+    "Address": "345 Trần Hưng Đạo, Phường 3, TP. Tân An, Long An"
   },
   {
     "Id": "392a4f77-c9f8-41f9-a1b2-5af9f3aec2dc",
@@ -168,7 +186,8 @@
     "GivenName": "Hoa",
     "Email": "tranhoa2@ecommerce.vn",
     "PhoneNumber": "0989901234",
-    "Password": "tranhoa2"
+    "Password": "tranhoa2",
+    "Address": "567 Nguyễn Du, Phường 1, TP. Cao Lãnh, Đồng Tháp"
   },
   {
     "Id": "7f1e721b-d6d0-4cf6-bcde-d5a6bbc7e8d3",
@@ -177,6 +196,7 @@
     "GivenName": "Minh",
     "Email": "leminh2@ecommerce.vn",
     "PhoneNumber": "0990012345",
-    "Password": "leminh2"
+    "Password": "leminh2",
+    "Address": "123 Lê Hồng Phong, Phường Đông Thành, TP. Ninh Bình, Ninh Bình"
   }
 ]

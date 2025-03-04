@@ -211,12 +211,12 @@
   {
     "Id": "8e0eb27c-041d-4bad-bf69-a7fdfd8edf56",
     "Sku": "SKU020",
-    "Name": "Laptop lập trình Lenovo ThinkPad X1 Carbon",
-    "Description": "Laptop lập trình Lenovo ThinkPad X1 Carbon với hiệu năng ổn định.",
+    "Name": "Laptop Lenovo ThinkPad X1 Carbon",
+    "Description": "Laptop Lenovo ThinkPad X1 Carbon với hiệu năng ổn định.",
     "Price": 35000000.0,
     "Stock": 20,
     "BrandId": "7c6f4d03-8ed2-4601-b29f-c7283b145bd6",
-    "CategoryId": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+    "CategoryId": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
     "IsFeatured": false
   },
   {
@@ -431,12 +431,12 @@
   {
     "Id": "45d89945-d9a2-4747-8725-1c7161958e08",
     "Sku": "SKU040",
-    "Name": "Laptop lập trình Dell Latitude 7420",
-    "Description": "Laptop lập trình Dell Latitude 7420 với hiệu năng ổn định.",
+    "Name": "Laptop Dell Latitude 7420",
+    "Description": "Laptop Dell Latitude 7420 với hiệu năng ổn định.",
     "Price": 35000000.0,
     "Stock": 20,
     "BrandId": "7c6f4d03-8ed2-4601-b29f-c7283b145bd6",
-    "CategoryId": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+    "CategoryId": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
     "IsFeatured": false
   },
   {
@@ -651,12 +651,12 @@
   {
     "Id": "daee5185-783b-4c28-ae98-941b887b0f31",
     "Sku": "SKU060",
-    "Name": "Laptop lập trình HP Elite Dragonfly",
-    "Description": "Laptop lập trình HP Elite Dragonfly với hiệu năng ổn định.",
+    "Name": "Laptop HP Elite Dragonfly",
+    "Description": "Laptop HP Elite Dragonfly với hiệu năng ổn định.",
     "Price": 40000000.0,
     "Stock": 15,
     "BrandId": "7c6f4d03-8ed2-4601-b29f-c7283b145bd6",
-    "CategoryId": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+    "CategoryId": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
     "IsFeatured": false
   },
   {
@@ -871,12 +871,12 @@
   {
     "Id": "e1afd214-88f0-41f8-a17f-753f9b78de72",
     "Sku": "SKU080",
-    "Name": "Laptop lập trình ASUS ZenBook 14",
-    "Description": "Laptop lập trình ASUS ZenBook 14 với hiệu năng ổn định.",
+    "Name": "Laptop ASUS ZenBook 14",
+    "Description": "Laptop ASUS ZenBook 14 với hiệu năng ổn định.",
     "Price": 35000000.0,
     "Stock": 15,
     "BrandId": "7c6f4d03-8ed2-4601-b29f-c7283b145bd6",
-    "CategoryId": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+    "CategoryId": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
     "IsFeatured": false
   },
   {
@@ -1091,12 +1091,12 @@
   {
     "Id": "aa8d5225-0856-4be8-9746-188a6132b16c",
     "Sku": "SKU100",
-    "Name": "Laptop lập trình Acer Swift 3",
-    "Description": "Laptop lập trình Acer Swift 3 với hiệu năng ổn định.",
+    "Name": "Laptop Acer Swift 3",
+    "Description": "Laptop Acer Swift 3 với hiệu năng ổn định.",
     "Price": 25000000.0,
     "Stock": 15,
     "BrandId": "7c6f4d03-8ed2-4601-b29f-c7283b145bd6",
-    "CategoryId": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+    "CategoryId": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
     "IsFeatured": false
   }
 ]
