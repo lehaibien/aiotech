@@ -2,13 +2,14 @@
 
 import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { PostPreviewResponse } from "@/types/post";
-import { Box, Theme, useMediaQuery } from "@mui/material";
+import { Box, Button, Theme, useMediaQuery } from "@mui/material";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import BlogPostItem from "./BlogPostItem";
+import Link from "next/link";
 
 const swiperBreakpoints = {
   320: {
@@ -37,7 +38,11 @@ export function LatestBlog({ posts }: LatestBlogProps) {
   return (
     <Box
       sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
         mb: 4,
+        gap: 2,
         "& .swiper-button-next, .swiper-button-prev": {
           color: "primary.main",
           "&::after": {
@@ -51,17 +56,27 @@ export function LatestBlog({ posts }: LatestBlogProps) {
         },
       }}
     >
-      <HighlightTypography
-        variant="h5"
-        component="h2"
-        gutterBottom
+      <Box
         sx={{
-          mb: 3,
-          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        Tin công nghệ mới nhất
-      </HighlightTypography>
+        <HighlightTypography
+          variant="h5"
+          component="h2"
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+          }}
+        >
+          Tin công nghệ mới nhất
+        </HighlightTypography>
+        <Button component={Link} href="/blogs" variant="text" color="primary">
+          Xem thêm
+        </Button>
+      </Box>
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}

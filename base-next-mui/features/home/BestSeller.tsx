@@ -1,7 +1,7 @@
 import { HighlightTypography } from "@/components/core/HighlightTypography";
 import ProductCard from "@/components/core/ProductCard";
 import { ProductResponse } from "@/types";
-import { Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid, Stack } from "@mui/material";
 
 type BestSellerProps = {
   products: ProductResponse[];
@@ -9,13 +9,12 @@ type BestSellerProps = {
 
 export function BestSeller({ products }: BestSellerProps) {
   return (
-    <>
+    <Stack spacing={2}>
       <HighlightTypography
         variant="h5"
         component="h2"
         gutterBottom
         sx={{
-          mb: 3,
           fontWeight: 600,
         }}
       >
@@ -28,6 +27,6 @@ export function BestSeller({ products }: BestSellerProps) {
           </Grid>
         ))}
       </Grid>
-    </>
+    </Stack>
   );
 }
