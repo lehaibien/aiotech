@@ -15,7 +15,7 @@ type SignalRProviderProps = {
   children: React.ReactNode;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   const { data: session } = useSession();
