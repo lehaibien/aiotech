@@ -107,7 +107,7 @@ export default async function Home() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 1,
+        gap: 2,
       }}
     >
       {/* Hero Banner */}
