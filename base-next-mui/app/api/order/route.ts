@@ -5,6 +5,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   let url = process.env.NEXT_PUBLIC_FRONTEND_URL;
+  if(!url?.endsWith('/')) {
+    url = url + '/';
+  }
   try {
     const searchParams = request.nextUrl.searchParams;
     const queryString = toQueryString(searchParams);
