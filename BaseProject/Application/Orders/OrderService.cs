@@ -12,7 +12,6 @@ using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QuestPDF.Fluent;
@@ -490,7 +489,7 @@ public class OrderService : IOrderService
                         { "name", order.Name ?? "" },
                         { "phonenumber", order.PhoneNumber ?? "" },
                         { "address", order.Address },
-                        { "tax", order.Tax },
+                        { "tax", order.Tax.ToString("N0") + " đ" },
                         { "totalprice", order.TotalPrice.ToString("N0") + " đ" },
                         { "note", order.Note ?? "Không" },
                         {
