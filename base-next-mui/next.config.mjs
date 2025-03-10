@@ -2,6 +2,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
@@ -16,13 +17,12 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        hostname: "host.docker.internal",  // Explicitly allow host.docker.internal <button class="citation-flag" data-index="8">
+        hostname: "host.docker.internal", // Explicitly allow host.docker.internal <button class="citation-flag" data-index="8">
         port: "5554",
         pathname: "/static/**",
       },
     ],
   },
-  reactStrictMode: true,
   experimental: {
     optimizePackageImports: [
       "@mui/x-data-grid",
