@@ -287,7 +287,7 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
             '& p': { mb: 2, lineHeight: 1.7 },
             '& a': { color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } },
             '& blockquote': { borderLeft: '4px solid', borderColor: 'primary.main', pl: 2, py: 1, my: 3, mx: 0, fontStyle: 'italic', bgcolor: 'action.hover', borderRadius: '0 4px 4px 0' },
-            '& ul, & ol': { pl: 3, mb: 2 },
+            '& ul, & ol': { pl: 3, mb: 2, listStyleType: 'disc' },
             '& li': { mb: 1 },
             '& pre': { p: 2, borderRadius: 1, bgcolor: 'grey.900', color: 'common.white', overflow: 'auto', fontSize: '0.875rem' },
             '& code': { fontFamily: 'monospace', bgcolor: 'action.hover', p: 0.5, borderRadius: 0.5, fontSize: '0.875em' },
