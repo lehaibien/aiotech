@@ -7,17 +7,36 @@
     "Email": "lehaibien321@gmail.com",
     "PhoneNumber": "0901234567",
     "Password": "admin",
-    "Address": "123 Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+    "Address": "433 Nguyễn Khuyến, Phường Trảng Dài, Biên Hòa, Đồng Nai"
   },
   {
     "Id": "c8c3dabb-284a-41d2-90f9-d9d18ef909dc",
-    "UserName": "shipper",
+    "UserName": "hoangviet",
     "FamilyName": "Trần Hoàng",
     "GivenName": "Việt",
     "Email": "hoangviet@aiotech.cloud",
     "PhoneNumber": "0912345678",
-    "Password": "shipper",
-    "Address": "45 Trần Phú, Phường Điện Biên, Quận Ba Đình, Hà Nội"
+    "Password": "hoangviet",
+    "Address": "123 Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"
+  },
+  {
+    "Id": "4cbfe610-cb33-4211-920c-b1de17fc77a1",
+    "UserName": "phuchung",
+    "FamilyName": "Lê Phúc",
+    "GivenName": "Hưng",
+    "Email": "phuchung@aiotech.cloud",
+    "PhoneNumber": "0923456789",
+    "Password": "phuchung",
+    "Address": "78 Nguyễn Văn Cừ, Phường 1, Quận 1, TP. Hồ Chí Minh"
+  }, {
+    "Id": "4d18c59a-0067-440a-8409-575ffacda66d",
+    "UserName": "minhtri",
+    "FamilyName": "Nguyễn Minh",
+    "GivenName": "Trí",
+    "Email": "minhtri@aiotech.cloud",
+    "PhoneNumber": "0934567890",
+    "Password": "minhtri",
+    "Address": "67 Lê Văn Việt, Phường 1, Quận 1, TP. Hồ Chí Minh"
   },
   {
     "Id": "ee442219-d730-4ae3-ba31-8316c5ea5202",
