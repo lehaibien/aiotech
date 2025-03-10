@@ -10,7 +10,7 @@
 -- Oldest = 4
 -- =============================================
 CREATE
-OR ALTER PROCEDURE [dbo].[usp_Product_GetList] @iMinPrice FLOAT,
+OR ALTER PROCEDURE [dbo].[usp_Product_GetFilteredList] @iMinPrice FLOAT,
 @iMaxPrice FLOAT,
 @iCategories NVARCHAR(4000),
 @iBrands NVARCHAR(4000),
@@ -23,6 +23,7 @@ SELECT Prd.Id,
     Prd.Sku,
     Prd.Name,
     Prd.Price,
+    Prd.DiscountPrice,
     Prd.Stock,
     Prd.ImageUrls,
     Prd.CreatedDate,

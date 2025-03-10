@@ -3,7 +3,8 @@
 -- Create date:		25-12-2024
 -- Description:		Lấy danh sách thương hiệu phân trang và tìm kiếm
 -- =============================================
-CREATE PROCEDURE [dbo].[usp_TopCustomersReport_Get]
+CREATE
+OR ALTER PROCEDURE [dbo].[usp_TopCustomersReport_Get]
     @iStartDate DATE,
     @iEndDate DATE,
     @iCount INT

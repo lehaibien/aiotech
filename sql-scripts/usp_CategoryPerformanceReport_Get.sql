@@ -19,7 +19,7 @@ OR ALTER PROCEDURE [dbo].[usp_CategoryPerformanceReport_Get] @iStartDate DATE,
             OR (
                 o.CreatedDate >= @iStartDate
                 AND o.CreatedDate <= @iEndDate
-                AND o.Status = 'Delivered'
+                AND o.Status = 'Completed'
             )
         )
     GROUP BY b.Id,
