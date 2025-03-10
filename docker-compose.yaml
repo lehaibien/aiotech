@@ -27,7 +27,7 @@ services:
     depends_on:
       - database
     networks:
-      - be
+      - backend
     volumes:
       - wwwroot:/app/wwwroot
     labels:
@@ -48,7 +48,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - be
+      - backend
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -59,7 +59,7 @@ services:
       SA_PASSWORD: "S3cr3tP@ssw0rd"
       ACCEPT_EULA: "Y"
     networks:
-      - be
+      - backend
     volumes:
       - database-data:/var/opt/mssql
 
@@ -96,7 +96,7 @@ volumes:
   letsencrypt:
 
 networks:
-  be:
+  backend:
     driver: bridge
   frontend:
     driver: bridge
