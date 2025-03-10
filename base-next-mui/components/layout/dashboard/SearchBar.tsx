@@ -1,69 +1,179 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useState, useMemo } from 'react';
+import Link from 'next/link';
+import Fuse from 'fuse.js';
+import { DashboardMenu, dashboardMenus } from '@/constant/dashboardMenu';
 import { Close, Search } from '@mui/icons-material';
 import {
   Box,
   Drawer,
   IconButton,
   Input,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
   useMediaQuery,
   useTheme,
+  alpha,
 } from '@mui/material';
 
 export default function SearchBar() {
-  // drawer top
   const [showDrawer, setShowDrawer] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleDrawerClose = () => {
-    setShowDrawer(false);
-  };
+  const fuse = useMemo(() => {
+    const flattenMenu = (menu: DashboardMenu, parent?: string): Array<DashboardMenu & { parent?: string }> => {
+      if (menu.path) return [{ ...menu, parent }];
+      if (menu.children) {
+        return menu.children.flatMap(child => 
+          flattenMenu(child, menu.name)
+        );
+      }
+      return [];
+    };
+
+    const flatMenus = dashboardMenus.flatMap(menu => 
+      flattenMenu(menu)
+    ).filter((item): item is DashboardMenu & { path: string } => !!item.path);
+
+    return new Fuse(flatMenus, {
+      keys: ['name', 'parent'],
+      includeMatches: true,
+      threshold: 0.3,
+      shouldSort: true,
+      includeScore: true,
+      useExtendedSearch: true,
+    });
+  }, []);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    
+    return fuse.search(searchQuery)
+      .map(result => ({
+        ...result.item,
+        parent: (result.item as { parent?: string }).parent,
+        matches: result.matches
+      }));
+  }, [searchQuery, fuse]);
+
   return (
     <>
       <IconButton
-        aria-label='show 4 new mails'
-        aria-controls='search-menu'
-        aria-haspopup='true'
         onClick={() => setShowDrawer(true)}
-        size='large'
-      >
-        <Search width={22} height={22} />
-      </IconButton>
-      <Drawer
-        anchor='top'
-        open={showDrawer}
-        onClose={() => setShowDrawer(false)}
+        size="large"
         sx={{
-          '& .MuiDrawer-paper': {
-            padding: '15px 30px',
-            width: isMobile ? '100%' : '50%',
-            margin: 'auto',
-          },
+          color: 'text.secondary',
+          '&:hover': { color: 'primary.main' }
         }}
       >
-        <Box display='flex' alignItems='center'>
+        <Search fontSize="small" />
+      </IconButton>
+
+      <Drawer
+        anchor="top"
+        open={showDrawer}
+        onClose={() => setShowDrawer(false)}
+        PaperProps={{
+          sx: {
+            backdropFilter: 'blur(12px)',
+            bgcolor: alpha(theme.palette.background.default, 0.9),
+            borderRadius: 2,
+            mx: 'auto',
+            mt: 2,
+            p: 2,
+            width: isMobile ? '95%' : '60%',
+            boxShadow: theme.shadows[6],
+            overflow: 'hidden',
+          }
+        }}
+      >
+        <Box position="relative">
           <Input
-            placeholder='Tìm kiếm chức năng...'
-            aria-label='description'
             fullWidth
-          />
-          <Box
-            display='flex'
+            autoFocus
+            placeholder="Tìm kiếm chức năng..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             sx={{
-              ml: 'auto',
+              '&:before, &:after': { display: 'none' },
+              '& .MuiInput-input': {
+                py: 1.5,
+                fontSize: '1.1rem',
+              }
             }}
+          />
+
+          <IconButton
+            onClick={() => setShowDrawer(false)}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
           >
-            <IconButton>
-              <Search width={20} height={20} />
-            </IconButton>
-            <IconButton onClick={handleDrawerClose}>
-              <Close width={20} height={20} />
-            </IconButton>
-          </Box>
+            <Close fontSize="small" />
+          </IconButton>
         </Box>
+
+        {searchQuery && (
+          <List sx={{ mt: 2, maxHeight: 400, overflow: 'auto' }}>
+            {searchResults.map((item, index) => (
+              <ListItem
+                key={index}
+                component={Link}
+                href={item.path ?? '#'}
+                onClick={() => setShowDrawer(false)}
+                sx={{
+                  borderRadius: 1,
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    transform: 'translateX(4px)',
+                  }
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 32, color: 'text.secondary' }}>
+                  {item.icon}
+                </ListItemIcon>
+
+                <ListItemText
+                  primary={
+                    <Box>
+                      {item.parent && (
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block', lineHeight: 1.2 }}
+                        >
+                          {item.parent}
+                        </Typography>
+                      )}
+                      <Typography component="span">
+                        {item.name}
+                      </Typography>
+                    </Box>
+                  }
+                  primaryTypographyProps={{
+                    sx: { fontWeight: 500, color: 'text.primary' }
+                  }}
+                />
+              </ListItem>
+            ))}
+
+            {searchQuery && searchResults.length === 0 && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'center', py: 2 }}
+              >
+                Không tìm thấy kết quả phù hợp
+              </Typography>
+            )}
+          </List>
+        )}
       </Drawer>
     </>
   );

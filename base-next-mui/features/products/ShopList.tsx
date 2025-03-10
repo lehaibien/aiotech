@@ -4,9 +4,9 @@ import { ProductResponse } from "@/types";
 import { Box, Grid2 as Grid, Pagination } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback } from "react";
-import ProductCard from "../../components/core/ProductCard";
 import NoItem from "@/components/core/NoItem";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import ProductCard from "@/components/core/ProductCard";
 
 type ShopListProps = {
   items: ProductResponse[];
@@ -50,7 +50,7 @@ export default function ShopList({
     <>
       <Grid container spacing={2}>
         {items.map((product) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3, lg: 12 / 5 }} key={product.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} key={product.id}>
             <ProductCard product={product} />
           </Grid>
         ))}
@@ -59,6 +59,8 @@ export default function ShopList({
         <Pagination
           count={totalPage}
           page={currentPage}
+          variant="text"
+          shape="rounded"
           onChange={handlePageChange}
           color="primary"
           sx={{

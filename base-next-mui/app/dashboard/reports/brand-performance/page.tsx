@@ -56,7 +56,7 @@ export default async function BrandPerformancePage({
     .slice(0, 10);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h4" gutterBottom>
         Báo cáo hiệu suất thương hiệu

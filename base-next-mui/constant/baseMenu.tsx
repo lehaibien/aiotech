@@ -1,6 +1,7 @@
-import {
-  StoreOutlined
-} from "@mui/icons-material";
+import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
+import BookOutlinedIcon from "@mui/icons-material/BookOutlined";
+import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 export interface BaseNavigation {
   name: string;
@@ -21,7 +22,22 @@ export const BaseNavigation: BaseNavigation[] = [
   // },
   {
     name: "Cửa hàng",
-    icon: <StoreOutlined />,
+    icon: <StoreOutlinedIcon />,
     path: "/products",
+  },
+  {
+    name: "Tin tức",
+    icon: <BookOutlinedIcon />,
+    path: "/blogs",
+  },
+  {
+    name: "Liên hệ",
+    icon: <ContactsOutlinedIcon />,
+    path: "/contact",
+  },
+  {
+    name: "Giới thiệu",
+    icon: <InfoOutlinedIcon />,
+    path: "/about",
   },
 ];

@@ -9,9 +9,9 @@ import { styled } from '@mui/material/styles';
 import { tabsClasses } from '@mui/material/Tabs';
 import MuiToolbar from '@mui/material/Toolbar';
 import * as React from 'react';
-import MenuButton from '../../core/MenuButton';
 import Searchbar from './SearchBar';
 import SideMenuMobile from './SideMenuMobile';
+import MenuButton from '@/components/core/MenuButton';
 
 const Toolbar = styled(MuiToolbar)({
   width: '100%',

@@ -200,10 +200,6 @@ export function SearchBar({ categories }: SearchBarProps) {
         aria-label="search"
         sx={{
           display: { xs: "block", md: "none" },
-          backgroundColor: theme.palette.grey[100],
-          "&:hover": {
-            backgroundColor: theme.palette.grey[200],
-          },
         }}
       >
         <SearchIcon />
@@ -217,11 +213,6 @@ export function SearchBar({ categories }: SearchBarProps) {
           border: `1px solid ${
             isFocus ? theme.palette.primary.main : theme.palette.divider
           }`,
-          p: "2px 4px",
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          },
         }}
       >
         {searchInput}
@@ -255,13 +246,6 @@ export function SearchBar({ categories }: SearchBarProps) {
           <Typography variant="h6">Tìm kiếm sản phẩm</Typography>
           <IconButton
             onClick={() => setOpen(false)}
-            sx={{
-              color: theme.palette.grey[500],
-              transition: "color 0.2s",
-              "&:hover": {
-                color: theme.palette.grey[800],
-              },
-            }}
           >
             <CloseIcon />
           </IconButton>
@@ -280,14 +264,9 @@ export function SearchBar({ categories }: SearchBarProps) {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                bgcolor: theme.palette.grey[100],
                 borderRadius: 1,
                 p: "2px 4px",
                 transition: "all 0.2s ease-in-out",
-                "&:focus-within": {
-                  bgcolor: "#fff",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                },
               }}
             >
               <Box sx={{ position: "relative", width: "100%" }}>

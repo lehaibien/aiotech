@@ -32,7 +32,7 @@ export default async function Home() {
   let featuredCategories: CategoryResponse[] = [];
   let posts: PostPreviewResponse[] = [];
   const bannerPromise = getApi(API_URL.bannerConfig);
-  const newProductsPromise = getApi(API_URL.productTop + "/8");
+  const topProductsPromise = getApi(API_URL.productTop + "/8");
   const featuredProductsPromise = getApi(API_URL.productFeatured + "/8");
   const featuredCategoriesPromise = getListApi(API_URL.category, {
     pageIndex: 0,
@@ -53,7 +53,7 @@ export default async function Home() {
     postsResponse,
   ] = await Promise.all([
     bannerPromise,
-    newProductsPromise,
+    topProductsPromise,
     featuredProductsPromise,
     featuredCategoriesPromise,
     postsPromise,

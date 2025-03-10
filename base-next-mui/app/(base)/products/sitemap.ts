@@ -1,10 +1,10 @@
 import { getListApi } from "@/lib/apiClient";
-import { GetListProductRequest, PaginatedList, ProductResponse } from "@/types"
+import { GetListFilteredProductRequest, PaginatedList, ProductResponse } from "@/types"
 import { MetadataRoute } from "next"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Google's limit is 50,000 URLs per sitemap
-    const request: GetListProductRequest = {
+    const request: GetListFilteredProductRequest = {
         pageIndex: 0,
         pageSize: 1000,
         textSearch: '',

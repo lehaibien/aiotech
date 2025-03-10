@@ -38,11 +38,7 @@ export function LatestBlog({ posts }: LatestBlogProps) {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
         mb: 4,
-        gap: 2,
         "& .swiper-button-next, .swiper-button-prev": {
           color: "primary.main",
           "&::after": {
@@ -58,6 +54,7 @@ export function LatestBlog({ posts }: LatestBlogProps) {
     >
       <Box
         sx={{
+          width: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",

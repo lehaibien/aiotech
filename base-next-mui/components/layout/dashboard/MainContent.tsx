@@ -1,9 +1,9 @@
 'use client'
 
 import { useContext } from 'react';
-import { DashboardMenuContext } from '../../../providers/DashboardMenuProvider';
 import { Box, Theme, useMediaQuery } from '@mui/material';
 import SideMenu from './SideMenu';
+import { DashboardMenuContext } from '@/providers/DashboardMenuProvider';
 
 export default function MainContent({
   children,

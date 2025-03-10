@@ -26,13 +26,14 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
           xAxis={[
             {
               label: "Ngày kể từ lần mua cuối",
+              tickMinStep: 1,
             },
           ]}
           yAxis={[
             {
               label: "Tổng chi",
               labelStyle: {
-                transform: "translate(20px, -150px)",
+                transform: "translate(20px, -160px)",
                 textAnchor: "end",
               },
             },

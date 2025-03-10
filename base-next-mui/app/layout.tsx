@@ -39,17 +39,20 @@ const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-beVietnamPro",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
     <html lang="vi" suppressHydrationWarning>
       <head></head>
       <body className={`${beVietnamPro.className} antialiased`}>
         <SessionProvider>
-          <RootClientProvider>{children}</RootClientProvider>
+          <RootClientProvider signalRUrl={baseUrl ?? ""}>
+            {children}
+          </RootClientProvider>
         </SessionProvider>
       </body>
     </html>

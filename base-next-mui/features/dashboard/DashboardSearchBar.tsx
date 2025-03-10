@@ -1,24 +1,19 @@
-import { useCallback, useMemo } from "react";
-import { SearchToolBar } from "../../components/core/SearchToolBar";
-import { CustomDataGridRef } from "../../components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
+import { SearchToolBar } from "@/components/core/SearchToolBar";
 import { debounce } from "@mui/material";
+import { useCallback, useMemo } from "react";
 
 type DashboardSearchBarProps = {
-  textSearchRef: React.MutableRefObject<string>;
-  dataGridRef: React.RefObject<CustomDataGridRef>;
+  dataGridRef: React.RefObject<DataTableRef>;
 };
 
-export function DashboardSearchBar({
-  textSearchRef: textSearch,
-  dataGridRef,
-}: DashboardSearchBarProps) {
+export function DashboardSearchBar({ dataGridRef }: DashboardSearchBarProps) {
   const handleSearchQueryChange = useCallback(
     (searchTerm: string) => {
       const trimmedSearch = searchTerm.trim();
-      textSearch.current = trimmedSearch;
-      dataGridRef.current?.reload();
+      dataGridRef.current?.search(trimmedSearch);
     },
-    [dataGridRef, textSearch]
+    [dataGridRef]
   );
 
   const debouncedSearch = useMemo(

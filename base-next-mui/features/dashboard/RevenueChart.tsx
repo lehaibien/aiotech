@@ -12,7 +12,7 @@ const mockRevenueData = [
   { date: '2023-11-01', revenue: 92000 },
 ];
 
-export default function RevenueChart() {
+export function RevenueChart() {
   const theme = useTheme();
   const xLabels = mockRevenueData.map(item => {
     const date = new Date(item.date);
@@ -21,7 +21,7 @@ export default function RevenueChart() {
   const yValues = mockRevenueData.map(item => item.revenue);
 
   return (
-    <Box sx={{ width: '100%', height: 400 }}>
+    <Box sx={{ width: '100%', height: '100%' }}>
       <LineChart
         xAxis={[{ 
           data: xLabels,

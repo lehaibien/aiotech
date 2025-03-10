@@ -1,19 +1,21 @@
 "use client";
 
-import theme from "@/lib/theme";
 import { CssBaseline } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import MuiThemeProvider from "@mui/material/styles/ThemeProvider";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Provider as JotaiProvider } from "jotai";
 import { closeSnackbar, SnackbarProvider } from "notistack";
 import { SignalRProvider } from "./SignalRProvider";
+import theme from "@/lib/newTheme";
 
 export default function RootClientProvider({
+  signalRUrl,
   children,
 }: Readonly<{
+  signalRUrl: string;
   children: React.ReactNode;
 }>) {
   return (
@@ -32,7 +34,7 @@ export default function RootClientProvider({
               <button onClick={() => closeSnackbar(snackbarId)}>x</button>
             )}
           >
-            <SignalRProvider>
+            <SignalRProvider url={signalRUrl}>
               <JotaiProvider>{children}</JotaiProvider>
             </SignalRProvider>
           </SnackbarProvider>

@@ -48,6 +48,7 @@ export default async function OrderDetailPage({
         <OrderDetailAction
           id={order?.id || EMPTY_UUID}
           status={order?.status || ""}
+          trackingNumber={order?.trackingNumber || ""}
         />
       </Box>
       <OrderDetail order={order} />

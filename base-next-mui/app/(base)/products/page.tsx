@@ -4,12 +4,20 @@ import { API_URL } from "@/constant/apiUrl";
 import { getApi, getListApi } from "@/lib/apiClient";
 import {
   ComboBoxItem,
-  GetListProductRequest,
+  GetListFilteredProductRequest,
   PaginatedList,
   ProductResponse,
   ProductSort,
 } from "@/types";
-import { Box, Breadcrumbs, CircularProgress, Container, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  CircularProgress,
+  Container,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import FilterDrawer from "@/features/products/FilterDrawer";
@@ -21,11 +29,13 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Cửa hàng | AioTech",
-  description: "Mua sắm thiết bị điện tử chính hãng với giá tốt nhất tại AioTech",
+  description:
+    "Mua sắm thiết bị điện tử chính hãng với giá tốt nhất tại AioTech",
   keywords: ["thiết bị điện tử", "mua sắm", "công nghệ", "AioTech", "cửa hàng"],
   openGraph: {
     title: "AioTech - Cửa hàng thiết bị điện tử chính hãng",
-    description: "Mua sắm thiết bị điện tử tại AioTech với đa dạng sản phẩm và dịch vụ hậu mãi tốt nhất",
+    description:
+      "Mua sắm thiết bị điện tử tại AioTech với đa dạng sản phẩm và dịch vụ hậu mãi tốt nhất",
     url: "https://aiotech.cloud/products",
     siteName: "AioTech",
     images: [
@@ -45,7 +55,7 @@ export default async function ShopPage({
 }: {
   searchParams?: { [key: string]: string | undefined };
 }) {
-  const pageSize = 20;
+  const pageSize = 12;
   const page = searchParams?.page ? Number(searchParams?.page) : 1;
   const category = searchParams?.category;
   const brand = searchParams?.brand;
@@ -63,8 +73,8 @@ export default async function ShopPage({
   };
   let categories: ComboBoxItem[] = [];
   let brands: ComboBoxItem[] = [];
-  const categoryResponse = await getApi(API_URL.categoryComboBox);
-  const brandResponse = await getApi(API_URL.brandComboBox);
+  const categoryPromise = getApi(API_URL.categoryComboBox);
+  const brandPromise = getApi(API_URL.brandComboBox);
   let currentSort = ProductSort.Default;
   switch (sort) {
     case "price_asc":
@@ -83,7 +93,7 @@ export default async function ShopPage({
       currentSort = ProductSort.Default;
       break;
   }
-  const request: GetListProductRequest = {
+  const request: GetListFilteredProductRequest = {
     pageIndex: page - 1,
     pageSize: pageSize,
     textSearch: "",
@@ -93,17 +103,20 @@ export default async function ShopPage({
     maxPrice: Number(maxPrice),
     sort: currentSort,
   };
-  const response = await getListApi(API_URL.product, request);
-  if (response.success) {
-    const data = response.data as PaginatedList<ProductResponse>;
+  const productPromise = getListApi(API_URL.productFiltered, request);
+  const [categoryResponse, brandResponse, productResponse] = await Promise.all([
+    categoryPromise,
+    brandPromise,
+    productPromise,
+  ]);
+  if (productResponse.success) {
+    const data = productResponse.data as PaginatedList<ProductResponse>;
     dataList = {
       items: data.items,
       pageIndex: page - 1,
       pageSize: pageSize,
       totalCount: data.totalCount,
     };
-  } else {
-    console.error("FAILED TO FETCH PRODUCTS: ", response.message);
   }
   if (categoryResponse.success) {
     categories = categoryResponse.data as ComboBoxItem[];
@@ -116,11 +129,22 @@ export default async function ShopPage({
       {/* Breadcrumbs Navigation */}
       <Box mb={3}>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
             <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
             Trang chủ
           </Link>
-          <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            color="text.primary"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             <ShoppingBagIcon sx={{ mr: 0.5 }} fontSize="small" />
             Sản phẩm
           </Typography>
@@ -128,10 +152,15 @@ export default async function ShopPage({
       </Box>
 
       <Paper elevation={1} sx={{ p: { xs: 2, md: 3 }, borderRadius: 2, mb: 4 }}>
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+        <Typography
+          variant="h5"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: 600, mb: 3 }}
+        >
           Danh sách sản phẩm
         </Typography>
-        
+
         <Stack spacing={3}>
           <Box
             sx={{
@@ -150,14 +179,26 @@ export default async function ShopPage({
             />
             <ShopSort defaultSort={sort ?? "default"} />
           </Box>
-          
+
           <Box sx={{ position: "relative", minHeight: "200px" }}>
-            <Suspense key={"Products page"} fallback={
-              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
-                <CircularProgress size={60} thickness={4} />
-                <Typography variant="body1" sx={{ ml: 2 }}>Đang tải sản phẩm...</Typography>
-              </Box>
-            }>
+            <Suspense
+              key={"Products page"}
+              fallback={
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "300px",
+                  }}
+                >
+                  <CircularProgress size={60} thickness={4} />
+                  <Typography variant="body1" sx={{ ml: 2 }}>
+                    Đang tải sản phẩm...
+                  </Typography>
+                </Box>
+              }
+            >
               <ShopList
                 items={dataList.items}
                 currentPage={page}

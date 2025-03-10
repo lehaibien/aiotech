@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { Stack, Typography } from '@mui/material';
-import ReviewPage from './ReviewPage';
 import NavBreadcrumbs from '@/components/core/NavBreadcrumbs';
+import { ReviewContent } from '@/features/dashboard/reviews/ReviewContent';
 
 const breadcrums = [
   {
@@ -20,7 +20,7 @@ export default async function Page() {
     <Stack gap={2}>
       <NavBreadcrumbs items={breadcrums} />
       <Typography variant='h5'>Quản lý đánh giá</Typography>
-      <ReviewPage />
+      <ReviewContent />
     </Stack>
   );
 }

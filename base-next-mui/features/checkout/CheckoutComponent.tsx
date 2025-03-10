@@ -100,6 +100,7 @@ export function CheckoutComponent({
           phoneNumber: data.phoneNumber,
           address: data.address,
           note: data.note,
+          tax: cartTotal * TAX_VALUE,
           totalPrice: cartTotal * (1 + TAX_VALUE),
           orderItems: cartItems.map((item) => ({
             productId: parseUUID(item.productId),
@@ -163,7 +164,7 @@ export function CheckoutComponent({
                 },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <LocalShippingOutlinedIcon
                   sx={{
                     color: theme.palette.primary.main,
@@ -448,10 +449,13 @@ export function CheckoutComponent({
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography color="text.secondary">
-                    Thuế ({TAX_VALUE * 100}%):
+                    Thuế GTGT ({TAX_VALUE * 100}%):
                   </Typography>
                   <Typography fontWeight="500">
-                    {formatNumberWithSeperator(cartTotal * TAX_VALUE)} đ
+                    {formatNumberWithSeperator(
+                      Number((cartTotal * TAX_VALUE).toFixed(2))
+                    )}{" "}
+                    đ
                   </Typography>
                 </Box>
                 <Box
@@ -463,7 +467,10 @@ export function CheckoutComponent({
                 >
                   <Typography variant="h6">Tổng cộng:</Typography>
                   <Typography variant="h6" color="primary.main">
-                    {formatNumberWithSeperator(cartTotal * (1 + TAX_VALUE))} đ
+                    {formatNumberWithSeperator(
+                      Number((cartTotal * (1 + TAX_VALUE)).toFixed(2))
+                    )}{" "}
+                    đ
                   </Typography>
                 </Box>
               </Stack>

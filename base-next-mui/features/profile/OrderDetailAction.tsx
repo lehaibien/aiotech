@@ -1,24 +1,24 @@
 "use client";
 
-import { Box, Button } from "@mui/material";
-import PrintIcon from "@mui/icons-material/Print";
-import CancelIcon from "@mui/icons-material/Cancel";
 import AlertDialog from "@/components/core/AlertDialog";
-import { UUID } from "crypto";
-import { useCallback, useMemo } from "react";
 import { API_URL } from "@/constant/apiUrl";
-import { getApi, putApi } from "@/lib/apiClient";
+import { getApi, postApi, putApi } from "@/lib/apiClient";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckIcon from "@mui/icons-material/Check";
+import PrintIcon from "@mui/icons-material/Print";
+import { Box, Button } from "@mui/material";
+import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
-import CheckIcon from "@mui/icons-material/Check";
-import { OrderStatus } from "@/types";
+import { useCallback, useMemo } from "react";
 
 type OrderDetailActionProps = {
   id: UUID;
   status: string;
+  trackingNumber: string;
 };
 
-export function OrderDetailAction({ id, status }: OrderDetailActionProps) {
+export function OrderDetailAction({ id, status, trackingNumber }: OrderDetailActionProps) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const isCancelable = useMemo(() => {
@@ -30,13 +30,8 @@ export function OrderDetailAction({ id, status }: OrderDetailActionProps) {
   }, [status]);
   const handleConfirm = useCallback(
     async (id: string) => {
-      if (
-        status.toLowerCase() === "delivered"
-      ) {
-        const response = await putApi(API_URL.orderStatus, {
-          id: id,
-          status: OrderStatus.Completed,
-        });
+      if (status.toLowerCase() === "delivered") {
+        const response = await postApi(API_URL.orderConfirm + `/${id}`, {});
         if (response.success) {
           enqueueSnackbar("Xác nhận đơn hàng thành công", {
             variant: "success",
@@ -63,7 +58,7 @@ export function OrderDetailAction({ id, status }: OrderDetailActionProps) {
       const url = window.URL.createObjectURL(new Blob([buffer]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "receipt.pdf"); //or any other extension
+      link.setAttribute("download", `${trackingNumber}.pdf`); 
       document.body.appendChild(link);
       link.click();
       // clean up
@@ -100,9 +95,7 @@ export function OrderDetailAction({ id, status }: OrderDetailActionProps) {
         onClick={() => handleConfirm(id)}
         startIcon={<CheckIcon />}
         color="primary"
-        disabled={
-          status.toLowerCase() !== "delivered"
-        }
+        disabled={status.toLowerCase() !== "delivered"}
       >
         Đã nhận hàng
       </Button>

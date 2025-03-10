@@ -16,7 +16,7 @@ import SaleReportFilter from "./SaleReportFilter";
 import SalesChart from "./SalesChart";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import utc from "dayjs/plugin/utc";
-import { TrendingUp, ShoppingCart, AttachMoney, Cancel, CheckCircle } from "@mui/icons-material";
+import { TrendingUp, ShoppingCart, AttachMoney, Cancel, CheckCircle, Pending } from "@mui/icons-material";
 
 dayjs.extend(utc);
 
@@ -161,6 +161,24 @@ export default async function SaleReportPage({
                   </Typography>
                   <Typography variant="h5">
                     {formatNumberWithSeperator(totalCompletedOrders)}
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Pending color="warning" sx={{ fontSize: 40 }} />
+                <Box>
+                  <Typography color="text.secondary" gutterBottom>
+                    Đơn hàng đang thực hiện
+                  </Typography>
+                  <Typography variant="h5">
+                    {formatNumberWithSeperator(totalOrders - (totalCompletedOrders + totalCancelledOrders))}
                   </Typography>
                 </Box>
               </Stack>

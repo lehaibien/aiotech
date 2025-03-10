@@ -1,5 +1,6 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
+import ProductUpsertForm from "@/features/dashboard/products/upsert/ProductUpsertForm";
 import { getApi, getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import {
@@ -9,7 +10,6 @@ import {
   ProductUpdateResponse,
 } from "@/types";
 import "server-only";
-import ProductUpsertForm from "./ProductUpsertForm";
 
 export default async function ProductUpsertPage({
   searchParams,
@@ -30,6 +30,7 @@ export default async function ProductUpsertPage({
         sku: data.sku,
         name: data.name,
         price: data.price,
+        discountPrice: data.discountPrice,
         stock: data.stock,
         brandId: data.brandId,
         categoryId: data.categoryId,

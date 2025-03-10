@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
-import BrandPage from './BrandPage';
 import NavBreadcrumbs from '@/components/core/NavBreadcrumbs';
+import { BrandContent } from '@/features/dashboard/brands/BrandContent';
 
 const breadcrums = [
   {
@@ -18,7 +18,7 @@ export default async function Page() {
     <Stack gap={2}>
       <NavBreadcrumbs items={breadcrums} />
       <Typography variant='h5'>Quản lý thương hiệu</Typography>
-      <BrandPage />
+      <BrandContent />
     </Stack>
   );
 }

@@ -1,11 +1,11 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
+import { AccountUpsertForm } from "@/features/dashboard/accounts/AccountUpsertForm";
 import { getApi, getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, UserRequest, UserResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
 import "server-only";
-import AccountUpsertForm from "./AccountUpsertForm";
 
 export default async function AccountUpsertPage({
   searchParams,

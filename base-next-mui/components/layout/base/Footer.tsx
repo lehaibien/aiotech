@@ -1,125 +1,193 @@
 import { Facebook, Instagram, X, YouTube } from "@mui/icons-material";
-import { Box, Grid2 as Grid, Link, Typography } from "@mui/material";
+import {
+  Box,
+  Grid2 as Grid,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
-import 'server-only';
+import "server-only";
+import { LocationOn, Phone, Email } from "@mui/icons-material";
+import { HighlightTypography } from "@/components/core/HighlightTypography";
+import BrandLogo from "@/components/core/BrandLogo";
 
 export default function Footer() {
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: "background.paper",
-        color: "text.secondary",
-        mt: "auto",
-        py: 2,
-        px: 2,
+        p: 2,
+        pb: 0,
+        borderTop: "1px solid",
+        borderColor: "divider",
       }}
     >
-      <Grid container spacing={2} maxWidth="lg" mx="auto">
+      <Grid container spacing={4}>
         {/* Về chúng tôi */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            AioTech
-          </Typography>
-          <Typography variant="body2">
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <BrandLogo />
+            <Typography variant="h5" color="text.primary">
+              AioTech
+            </Typography>
+          </Stack>
+          <Typography variant="body1" gutterBottom>
             Hệ thống bán lẻ điện tử công nghệ hàng đầu Việt Nam
           </Typography>
 
-          <Box mt={1}>
-            {/* Thêm các icon phương thức thanh toán tại đây */}
-            <Typography variant="body2">Hỗ trợ thanh toán:</Typography>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body1" gutterBottom sx={{ fontWeight: 600 }}>
+            Hỗ trợ thanh toán
+          </Typography>
+          <Stack spacing={2} direction="row">
+            {["VnPay", "Momo"].map((text) => (
+              <Box key={text} display="flex" alignItems="center" gap={1}>
                 <Image
-                  src="/vnpay-icon.svg"
-                  alt="VNPay"
+                  src={`/${text.toLowerCase()}-icon.svg`}
+                  alt={text}
                   width={24}
                   height={24}
                 />
-                <span>VNPay</span>
+                <Typography variant="body2">{text}</Typography>
               </Box>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Image src="/momo-icon.svg" alt="Momo" width={24} height={24} />
-                <span>Momo</span>
-              </Box>
-            </Box>
-            {/* Ví dụ: Visa, Mastercard, PayPal icons */}
-          </Box>
+            ))}
+          </Stack>
         </Grid>
 
         {/* Hỗ trợ khách hàng */}
         <Grid size={{ xs: 6, md: 3 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Hỗ trợ
-          </Typography>
-          <Link href="#" color="inherit" display="block">
-            Trung tâm hỗ trợ
-          </Link>
-          <Link href="#" color="inherit" display="block">
-            Hướng dẫn mua hàng
-          </Link>
-          <Link href="#" color="inherit" display="block">
-            Tra cứu đơn hàng
-          </Link>
-          <Link href="#" color="inherit" display="block">
-            Chính sách bảo hành
-          </Link>
+          <Stack spacing={1}>
+            <HighlightTypography variant="h6">Hỗ trợ</HighlightTypography>
+            {[
+              "Trung tâm hỗ trợ",
+              "Hướng dẫn mua hàng",
+              "Tra cứu đơn hàng",
+              "Chính sách bảo hành",
+            ].map((text) => (
+              <Link
+                key={text}
+                href="#"
+                sx={{
+                  display: "block",
+                  py: 0.5,
+                  color: "inherit",
+                  transition: "color 0.2s",
+                  "&:hover": { color: "primary.main" },
+                }}
+              >
+                {text}
+              </Link>
+            ))}
+          </Stack>
         </Grid>
 
         {/* Chính sách */}
         <Grid size={{ xs: 6, md: 3 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Chính sách
-          </Typography>
-          <Link href="#" color="inherit" display="block" underline="hover">
-            Bảo mật thông tin
-          </Link>
-          <Link href="#" color="inherit" display="block" underline="hover">
-            Vận chuyển
-          </Link>
-          <Link href="#" color="inherit" display="block" underline="hover">
-            Đổi trả
-          </Link>
-          <Link href="#" color="inherit" display="block" underline="hover">
-            Thanh toán
-          </Link>
+          <Stack spacing={1}>
+            <HighlightTypography variant="h6">Chính sách</HighlightTypography>
+            {["Bảo mật thông tin", "Vận chuyển", "Đổi trả", "Thanh toán"].map(
+              (text) => (
+                <Link
+                  key={text}
+                  href="#"
+                  sx={{
+                    display: "block",
+                    py: 0.5,
+                    color: "inherit",
+                    transition: "color 0.2s",
+                    "&:hover": { color: "primary.main" },
+                  }}
+                >
+                  {text}
+                </Link>
+              )
+            )}
+          </Stack>
         </Grid>
 
         {/* Liên hệ */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
-            Kết nối với chúng tôi
-          </Typography>
+          <Stack spacing={2}>
+            <HighlightTypography variant="h6">Liên hệ</HighlightTypography>
+            <Stack spacing={2}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <LocationOn fontSize="small" color="primary" />
+                <Typography variant="body2">
+                  Số 123, Đường Công nghệ, Q.1, TP.HCM
+                </Typography>
+              </Box>
 
-          <Box display="flex" gap={2} mb={2}>
-            <Link href="https://www.facebook.com/">
-              <Facebook color="info" fontSize="large" />
-            </Link>
-            <Link href="https://x.com">
-              <X color="action" fontSize="large" />
-            </Link>
-            <Link href="https://www.instagram.com/">
-              <Instagram color="primary" fontSize="large" />
-            </Link>
-            <Link href="https://www.youtube.com/">
-              <YouTube color="error" fontSize="large" />
-            </Link>
-          </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Phone fontSize="small" color="primary" />
+                <Typography variant="body2">1900 123 456</Typography>
+              </Box>
 
-          <Typography variant="body2" gutterBottom>
-            {/* Địa chỉ: Số 123, Đường Công nghệ, Q.1, TP.HCM */}
-            Địa chỉ: xxxxx
-          </Typography>
-          <Typography variant="body2" gutterBottom>
-            Hotline: xxxxxxxx
-          </Typography>
-          <Typography variant="body2">Email: support@aiotech.vn</Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Email fontSize="small" color="primary" />
+                <Link
+                  href="mailto:support@aiotech.cloud"
+                  color="inherit"
+                  sx={{
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                >
+                  support@aiotech.cloud
+                </Link>
+              </Box>
+            </Stack>
+
+            <Stack spacing={2} direction="row">
+              {[
+                {
+                  icon: <Facebook sx={{ fontSize: 28 }} />,
+                  color: "#1877F2",
+                  href: "https://www.facebook.com",
+                },
+                {
+                  icon: <X sx={{ fontSize: 28 }} />,
+                  color: "#000",
+                  href: "https://x.com",
+                },
+                {
+                  icon: <Instagram sx={{ fontSize: 28 }} />,
+                  color: "#E4405F",
+                  href: "https://instagram.com",
+                },
+                {
+                  icon: <YouTube sx={{ fontSize: 28 }} />,
+                  color: "#CD201F",
+                  href: "https://youtube.com",
+                },
+              ].map((social, index) => (
+                <IconButton
+                  LinkComponent={Link}
+                  href={social.href}
+                  key={index}
+                  sx={{
+                    p: 1,
+                    bgcolor: "background.paper",
+                    "&:hover": {
+                      bgcolor: social.color,
+                      "& svg": { color: "white" },
+                    },
+                  }}
+                >
+                  {social.icon}
+                </IconButton>
+              ))}
+            </Stack>
+          </Stack>
         </Grid>
 
         {/* Bản quyền */}
-        <Grid size={12}>
-          <Typography variant="body2" textAlign="center">
-            © {new Date().getFullYear()} AioTech.
+        <Grid
+          size={12}
+          sx={{ py: 1, borderTop: "1px solid", borderColor: "divider" }}
+        >
+          <Typography variant="body2" textAlign="center" sx={{ opacity: 0.7 }}>
+            © {new Date().getFullYear()} AioTech. Bảo lưu mọi quyền.
           </Typography>
         </Grid>
       </Grid>

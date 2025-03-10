@@ -1,47 +1,64 @@
-import { getListApi } from '@/lib/apiClient';
-import { GetListRequest, PaginatedList } from '@/types';
-import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
-import React from 'react';
-import useSWR from 'swr';
+import { getListApi } from "@/lib/apiClient";
+import { GetListRequest, PaginatedList } from "@/types";
+import { GridPaginationModel, GridSortItem } from "@mui/x-data-grid";
+import React from "react";
+import useSWR from "swr";
 
 type useDataTableFetchProps = {
   apiUrl: string;
   paginationModel: GridPaginationModel;
-  sortModel: GridSortModel;
+  sortModel: GridSortItem;
+  textSearch: string;
 };
 
-export function useDataTableFetch<T>({apiUrl, paginationModel, sortModel}: useDataTableFetchProps) {
+export function useDataTableFetch<T>({
+  apiUrl,
+  paginationModel,
+  sortModel,
+  textSearch,
+}: useDataTableFetchProps) {
   const fetcher = React.useCallback(
-    async ([apiUrl, page, pageSize, sortBy, sortOrder]: [string, number, number, string, 'asc' | 'desc']): Promise<PaginatedList<T>> => {
+    async ([apiUrl, page, pageSize, sortColumn, sortOrder, textSearch]: [
+      string,
+      number,
+      number,
+      string | undefined,
+      "asc" | "desc" | undefined,
+      string
+    ]): Promise<PaginatedList<T>> => {
       const request: GetListRequest = {
-        pageIndex: page - 1,
+        pageIndex: page,
         pageSize: pageSize,
-        sortBy: sortBy,
+        sortColumn: sortColumn,
         sortOrder: sortOrder,
-        textSearch: '',
-      }
+        textSearch: textSearch,
+      };
       const response = await getListApi(apiUrl, request);
-      if(response.success) {
+      if (response.success) {
         return response.data as PaginatedList<T>;
       }
       throw new Error(response.message);
     },
-    [],
+    []
   );
 
-  const swrKey = React.useMemo(() => [
-    apiUrl,
-    paginationModel.page,
-    paginationModel.pageSize,
-    sortModel[0]?.field,
-    sortModel[0]?.sort,
-  ], [apiUrl, paginationModel, sortModel]);
+  const swrKey = React.useMemo(
+    () => [
+      apiUrl,
+      paginationModel.page,
+      paginationModel.pageSize,
+      sortModel?.field,
+      sortModel?.sort,
+      textSearch,
+    ],
+    [apiUrl, paginationModel, sortModel, textSearch]
+  );
 
   return useSWR<PaginatedList<T>>(swrKey, {
     fetcher: fetcher,
     revalidateOnMount: true,
     revalidateOnFocus: false,
-    errorRetryCount: 1,
-    errorRetryInterval: 5000,
+    errorRetryCount: 2,
+    errorRetryInterval: 3000,
   });
 }

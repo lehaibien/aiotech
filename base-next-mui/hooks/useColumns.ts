@@ -26,6 +26,7 @@ function useColumns({ columns, withRowNumber = false }: UseColumnsProps) {
             const rowNumber = pageSize * page + (rowIndex + 1);
             return rowNumber;
           },
+          sortable: false,
         },
         ...columns,
       ];

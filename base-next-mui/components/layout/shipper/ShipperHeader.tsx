@@ -6,9 +6,9 @@ import { Menu } from "@mui/icons-material";
 import { Box, IconButton, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import * as React from "react";
-import { DashboardMenuContext } from "../../../providers/DashboardMenuProvider";
 import AccountSection from "../dashboard/Account";
 import Searchbar from "../dashboard/SearchBar";
+import { DashboardMenuContext } from "@/providers/DashboardMenuProvider";
 
 export default function ShipperHeader() {
   const [open, setOpen] = React.useContext(DashboardMenuContext);

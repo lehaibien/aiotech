@@ -10,3 +10,4 @@ export * from "./review";
 export * from "./report";
 export * from "./post";
 export * from "./notification";
+export * from "./dashboard";

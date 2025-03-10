@@ -1,30 +1,29 @@
-'use client'
+"use client";
 
-import { List, ListItem, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
+import { ProductResponse } from "@/types";
+import { List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import Image from "next/image";
 
-const mockProducts = [
-  { id: '1', name: 'Gaming Mouse', salesCount: 1245, imageUrl: '/placeholder.svg?height=40&width=40' },
-  { id: '2', name: 'Mechanical Keyboard', salesCount: 1100, imageUrl: '/placeholder.svg?height=40&width=40' },
-  { id: '3', name: 'Gaming Headset', salesCount: 950, imageUrl: '/placeholder.svg?height=40&width=40' },
-  { id: '4', name: '4K Monitor', salesCount: 820, imageUrl: '/placeholder.svg?height=40&width=40' },
-  { id: '5', name: 'Gaming Chair', salesCount: 780, imageUrl: '/placeholder.svg?height=40&width=40' },
-];
+type TopSellingProps = {
+  data: ProductResponse[];
+};
 
-export default function TopSelling() {
+export function TopSelling({ data }: TopSellingProps) {
   return (
     <List>
-      {mockProducts.map((product) => (
+      {data.map((product) => (
         <ListItem key={product.id}>
           <ListItemAvatar>
-            <Avatar alt={product.name} src={product.imageUrl} />
+            <Image
+              src={product.imageUrls[0]}
+              alt={product.name}
+              width={50}
+              height={50}
+            />
           </ListItemAvatar>
-          <ListItemText
-            primary={product.name}
-            secondary={`Sales: ${product.salesCount}`}
-          />
+          <ListItemText primary={product.name} secondary={`Sales: 555`} />
         </ListItem>
       ))}
     </List>
   );
 }
-

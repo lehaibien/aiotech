@@ -1,14 +1,17 @@
+import AlertDialog from "@/components/core/AlertDialog";
+import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { deleteListApi } from "@/lib/apiClient";
 import { ApiResponse } from "@/types";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
-import AlertDialog from "../../components/core/AlertDialog";
-import { CustomDataGridRef } from "../../components/core/CustomDataGrid";
 
 type DashboardDeleteButtonProps = {
-  dataGridRef: React.RefObject<CustomDataGridRef>;
+  dataGridRef:
+    | React.RefObject<CustomDataGridRef>
+    | React.RefObject<DataTableRef>;
   name: string;
   apiUrl: string;
 };

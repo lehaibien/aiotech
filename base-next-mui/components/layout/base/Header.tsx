@@ -7,9 +7,9 @@ import Link from "next/link";
 import { AuthMenu } from "./AuthMenu";
 import { CartDrawer } from "./CartDrawer";
 import { CategoryMenu } from "./CategoriesMenu";
-import { SearchBar } from "./SearchBar";
-import { SiteInfo } from "./SiteInfo";
 import { MobileDrawer } from "./MobileDrawer";
+import Navigation from "./Navigation";
+import { SearchBar } from "./SearchBar";
 
 export default async function Header() {
   let categories: ComboBoxItem[] = [];
@@ -29,8 +29,6 @@ export default async function Header() {
         borderBottomColor: "divider",
       }}
     >
-      {/* Client components are handled by HeaderClient */}
-
       {/* Main Toolbar */}
       <Toolbar sx={{ justifyContent: "space-between" }}>
         {/* Left section - Logo on desktop */}
@@ -108,7 +106,7 @@ export default async function Header() {
         }}
       >
         <CategoryMenu data={categories || []} />
-        <SiteInfo />
+        <Navigation />
       </Toolbar>
     </AppBar>
   );

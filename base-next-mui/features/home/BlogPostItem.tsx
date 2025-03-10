@@ -130,7 +130,6 @@ function BlogPostItem({ id, title, imageUrl, createdDate }: BlogPostItemProps) {
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
-              mb: 2,
               color: theme.palette.text.primary,
               transition: 'color 0.2s ease',
               '&:hover': {

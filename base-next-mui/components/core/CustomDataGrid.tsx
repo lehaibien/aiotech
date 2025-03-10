@@ -12,10 +12,10 @@ import {
 } from '@mui/x-data-grid';
 import { usePathname } from 'next/navigation';
 import React, { useImperativeHandle } from 'react';
-import useColumns from '../../hooks/useColumns';
-import useDataGridData from '../../hooks/useGridData';
 import DataGridPagination from './CustomDataGridPagination';
 import ErrorOverlay from './ErrorOverlay';
+import useColumns from '@/hooks/useColumns';
+import useDataGridData from '@/hooks/useGridData';
 
 export type CustomDataGridProps<T> = {
   columns: GridColDef[];

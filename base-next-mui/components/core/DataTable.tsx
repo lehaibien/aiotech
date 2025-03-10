@@ -1,36 +1,42 @@
-'use client';
+"use client";
 
-import NoRowOverlay from '@/components/core/NoRowOverlay';
-import { useDataTableFetch } from '@/hooks/useDataTableFetch';
-import { PaginatedList } from '@/types';
-import { Box } from '@mui/material';
+import NoRowOverlay from "@/components/core/NoRowOverlay";
+import useColumns from "@/hooks/useColumns";
+import { useDataTableFetch } from "@/hooks/useDataTableFetch";
+import { Box } from "@mui/material";
 import {
-    DataGrid,
-    GridColDef,
-    GridDensity,
-    GridPaginationModel,
-    GridRowSelectionModel,
-    GridSortModel,
-} from '@mui/x-data-grid';
-import React, { ForwardedRef, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import useColumns from '../../hooks/useColumns';
-import ErrorOverlay from './ErrorOverlay';
-import CustomDataGridPagination from './CustomDataGridPagination';
+  DataGrid,
+  GridColDef,
+  GridDensity,
+  GridPaginationModel,
+  GridRowSelectionModel,
+  GridSortModel,
+} from "@mui/x-data-grid";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import CustomDataGridPagination from "./CustomDataGridPagination";
+import ErrorOverlay from "./ErrorOverlay";
 
-export type DataTableProps<T> = {
+export type DataTableProps = {
   columns: GridColDef[];
   apiUrl: string;
   checkboxSelection?: boolean;
   withRowNumber?: boolean;
   height?: number;
   density?: GridDensity;
-  loadData: (page: number, pageSize: number, sort: GridSortModel) => Promise<PaginatedList<T>>;
 };
 
 export type DataTableRef = {
   rowSelectionModel: GridRowSelectionModel;
   reload: () => void;
   clearSelection: () => void;
+  search: (search: string) => void;
 };
 
 function DataTable<T>(
@@ -40,24 +46,27 @@ function DataTable<T>(
     checkboxSelection,
     withRowNumber,
     height = 600,
-    density = 'standard',
-  }: DataTableProps<T>,
+    density = "standard",
+  }: DataTableProps,
   ref: ForwardedRef<DataTableRef>
 ) {
   useImperativeHandle(ref, () => ({
     rowSelectionModel: rowSelectionModel,
     reload: () => mutate(),
+    search: (search: string) => {
+      textSearch.current = search;
+      mutate();
+    },
     clearSelection: () => setRowSelectionModel([]),
   }));
 
-  const [paginationModel, setPaginationModel] =
-    useState<GridPaginationModel>({
-      page: 0,
-      pageSize: 10,
-    });
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 10,
+  });
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  
-  const [globalFilter, setGlobalFilter] = useState('');
+  const textSearch = useRef("");
+
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
 
@@ -70,22 +79,16 @@ function DataTable<T>(
   const { data, error, isValidating, mutate } = useDataTableFetch<T>({
     apiUrl: apiUrl,
     paginationModel,
-    sortModel: []
+    sortModel: sortModel[0],
+    textSearch: textSearch.current,
   });
-  const rowRef = React.useRef(data?.items ?? []);
-  const row = React.useMemo(() => {
-    if (Array.isArray(data?.items) && data?.items.length > 0) {
-      rowRef.current = data.items;
-    }
-    return rowRef.current;
-  }, [data?.items]);
-  const rowCountRef = React.useRef(data?.totalCount ?? 0);
-  const rowCount = React.useMemo(() => {
-    if (data?.totalCount !== undefined) {
-      rowCountRef.current = data.totalCount;
-    }
-    return rowCountRef.current;
-  }, [data?.totalCount]);
+  // const rowRef = React.useRef(data?.items ?? []);
+  const row = React.useMemo(() => data?.items ?? [], [data?.items]);
+  // const rowCountRef = React.useRef(data?.totalCount ?? 0);
+  const rowCount = React.useMemo(
+    () => data?.totalCount ?? 0,
+    [data?.totalCount]
+  );
   // Handle pagination model change
   const onPaginationModelChange = useCallback(
     (newPaginationModel: GridPaginationModel) => {
@@ -94,50 +97,24 @@ function DataTable<T>(
     []
   );
 
-  const onSortModelChange = useCallback(
-    (newSortModel: GridSortModel) => {
-      setSortModel(newSortModel);
-    },
-    []
-  );
-
-  const handleGlobalFilterChange = useCallback(
-    (newGlobalFilter: string) => {
-      setGlobalFilter(newGlobalFilter);
-    },
-    []
-  );
-
+  const onSortModelChange = useCallback((newSortModel: GridSortModel) => {
+    setSortModel(newSortModel);
+  }, []);
   return (
-    <Box height={height} width={'100%'}>
-      <Box>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={globalFilter}
-        onChange={(e) => handleGlobalFilterChange(e.target.value)}
-        style={{
-          marginBottom: '10px',
-          padding: '8px',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      />
-      </Box>
+    <Box height={height} width={"100%"}>
       <DataGrid
         rows={row}
         rowCount={rowCount}
         columns={gridColumn}
         checkboxSelection={checkboxSelection}
-        paginationMode='server'
+        paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
-        sortingMode='server'
+        sortingMode="server"
         sortModel={sortModel}
         onSortModelChange={onSortModelChange}
         rowSelectionModel={rowSelectionModel}
         onRowSelectionModelChange={setRowSelectionModel}
-        disableColumnSorting
         disableColumnMenu
         loading={isValidating}
         slots={{
@@ -150,47 +127,38 @@ function DataTable<T>(
           ),
           noRowsOverlay: error
             ? () => (
-                <ErrorOverlay message={'Lỗi tải dữ liệu: ' + error.message} />
+                <ErrorOverlay message={"Lỗi tải dữ liệu: " + error.message} />
               )
             : NoRowOverlay,
           noResultsOverlay: NoRowOverlay,
         }}
         slotProps={{
           loadingOverlay: {
-            variant: 'circular-progress',
+            variant: "circular-progress",
           },
         }}
-        getRowHeight={() => 'auto'}
+        getRowHeight={() => "auto"}
         density={density}
         showCellVerticalBorder
-        sx={(theme) => ({
-          borderColor: theme.palette.divider,
-          '& .MuiDataGrid-cell': {
-            display: 'flex',
-            alignItems: 'center',
+        showColumnVerticalBorder
+        sx={{
+          borderColor: "red",
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            display: "flex",
+            alignItems: "center",
             px: 1,
           },
-          '& .MuiDataGrid-columnHeader': {
-            padding: 0,
+          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
+          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+            py: "15px",
           },
-          '& .MuiDataGrid-columnHeaderTitleContainer': {
-            // justifyContent: 'center',
-            px: 1,
+          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+            py: "22px",
           },
-          '& .MuiDataGrid-iconSeparator': {
-            color: theme.palette.divider,
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderColor: theme.palette.divider,
-          },
-          '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-            py: '15px',
-          },
-          '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
-            py: '22px',
-          },
-        })}
+        }}
       />
     </Box>
   );

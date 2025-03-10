@@ -1,4 +1,5 @@
 import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
 import { API_URL } from "@/constant/apiUrl";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { putApi } from "@/lib/apiClient";
@@ -19,7 +20,9 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 
 type CancelButtonProps = {
-  dataGridRef: React.RefObject<CustomDataGridRef>;
+  dataGridRef:
+    | React.RefObject<CustomDataGridRef>
+    | React.RefObject<DataTableRef>;
 };
 
 export function CancelButton({ dataGridRef }: CancelButtonProps) {

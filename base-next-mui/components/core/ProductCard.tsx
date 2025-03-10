@@ -1,5 +1,6 @@
 "use client";
 
+import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { ProductResponse } from "@/types";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -11,17 +12,16 @@ import {
   CardMedia,
   Chip,
   Rating,
+  Stack,
   Typography,
-  alpha,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
 import { memo, useState } from "react";
-import useCart from "../../hooks/useCart";
 
-interface ProductCardProps {
+type ProductCardProps = {
   product: ProductResponse;
 }
 
@@ -33,6 +33,7 @@ function ProductCard({ product }: ProductCardProps) {
     imageUrls: thumbnails,
     brand,
     price,
+    discountPrice,
     rating,
     stock,
   } = product;
@@ -40,6 +41,7 @@ function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImage, setCurrentImage] = useState(thumbnails[0]);
+  const primary = theme.palette.primary;
 
   const handleAddToCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -81,7 +83,6 @@ function ProductCard({ product }: ProductCardProps) {
     if (stock <= 10) return "Sắp hết hàng";
     return "Còn hàng";
   };
-
   return (
     <Card
       component={Link}
@@ -92,17 +93,17 @@ function ProductCard({ product }: ProductCardProps) {
         height: "100%",
         position: "relative",
         overflow: "hidden",
-        borderRadius: 2,
-        boxShadow: isHovered ? theme.shadows[8] : theme.shadows[1],
         transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-8px)",
+          boxShadow: `0 4px 16px rgba(${parseInt(primary.main.slice(1, 3), 16)}, ${parseInt(primary.main.slice(3, 5), 16)}, ${parseInt(primary.main.slice(5, 7), 16)}, 0.2)`,
         },
         cursor: "pointer",
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Stock status chip */}
       {stock <= 10 && (
         <Chip
           label={getStockText()}
@@ -110,17 +111,19 @@ function ProductCard({ product }: ProductCardProps) {
           size="small"
           sx={{
             position: "absolute",
-            top: 10,
-            left: 10,
+            top: 8,
+            left: 8,
             zIndex: 1,
+            fontWeight: 600,
           }}
         />
       )}
+      {/* Product image */}
       <CardMedia
         sx={{
           position: "relative",
           height: 220,
-          backgroundColor: alpha(theme.palette.primary.light, 0.05),
+          bgcolor: "background.paper",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -129,13 +132,13 @@ function ProductCard({ product }: ProductCardProps) {
       >
         <Image
           src={currentImage}
-          height={180}
-          width={180}
+          height={200}
+          width={200}
           alt={name}
           style={{
             objectFit: "contain",
-            transition: "transform 0.5s ease",
-            transform: isHovered ? "scale(1.1)" : "scale(1)",
+            transition: "transform 0.3s ease",
+            transform: isHovered ? "scale(1.05)" : "scale(1)",
           }}
           placeholder="blur"
           blurDataURL={currentImage}
@@ -144,23 +147,21 @@ function ProductCard({ product }: ProductCardProps) {
       <CardContent
         sx={{
           flexGrow: 1,
-          p: 2,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          gap: 1.5,
+          gap: 1,
+          p: 2,
         }}
       >
+        {/* Brand and product name */}
         <Box>
           <Typography
-            variant="caption"
+            variant="overline"
+            color="primary"
+            fontWeight="bold"
+            display="block"
             noWrap
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 500,
-              textTransform: "uppercase",
-              letterSpacing: 0.5,
-            }}
           >
             {brand}
           </Typography>
@@ -172,84 +173,88 @@ function ProductCard({ product }: ProductCardProps) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               display: "-webkit-box",
-              WebkitLineClamp: "2",
+              WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
-              minHeight: "48px",
-              mt: 0.5,
+              lineHeight: 1.25,
             }}
           >
             {name}
           </Typography>
         </Box>
-        <Box>
+        {/* Pricing and actions */}
+        <Stack gap={1}>
           <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={1}
           >
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              color="error"
-              sx={{
-                fontSize: "1.1rem",
-              }}
-            >
-              {formatNumberWithSeperator(price)} đ
-            </Typography>
-            <Box display="flex" alignItems="center" gap={0.5}>
+            {/* Price display */}
+            <Stack >
+              {discountPrice ? (
+                <>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      textDecoration: "line-through",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatNumberWithSeperator(price)} đ
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="error"
+                  >
+                    {formatNumberWithSeperator(discountPrice)} đ
+                  </Typography>
+                </>
+              ) : (
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="error"
+                  noWrap
+                >
+                  {formatNumberWithSeperator(price)} đ
+                </Typography>
+              )}
+            </Stack>
+            {/* Rating */}
+            <Stack direction="row" alignItems="center" spacing={0.5}>
               <Rating
-                name="product-rating"
                 value={rating}
-                size="small"
                 precision={0.1}
+                size="small"
                 readOnly
+                sx={{ '& .MuiRating-icon': { fontSize: '1rem' } }}
               />
               <Typography variant="caption" color="text.secondary">
-                ({rating.toFixed(2)})
+                ({rating.toFixed(1)})
               </Typography>
-            </Box>
+            </Stack>
           </Box>
-          <Box
+          {/* Add to cart button */}
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            size="small"
+            disabled={stock <= 0}
+            startIcon={<AddShoppingCartIcon fontSize="small" />}
+            onClick={handleAddToCartClick}
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 1,
+              fontWeight: 700,
+              py: 1,
+              '& .MuiButton-startIcon': { mr: 0.5 }
             }}
           >
-            <Button
-              color="primary"
-              variant="contained"
-              size="small"
-              disabled={stock <= 0}
-              sx={{
-                borderRadius: "20px",
-                textTransform: "none",
-                flex: 2,
-                boxShadow: 2,
-                fontWeight: 600,
-                "&:hover": {
-                  boxShadow: 4,
-                },
-              }}
-              startIcon={<AddShoppingCartIcon />}
-              onClick={handleAddToCartClick}
-            >
-              Thêm vào giỏ
-            </Button>
-          </Box>
-        </Box>
+            Thêm vào giỏ
+          </Button>
+        </Stack>
       </CardContent>
     </Card>
   );
 }
 
-export default memo(ProductCard, (prev, next) => {
-  return (
-    prev.product.id === next.product.id &&
-    prev.product.stock === next.product.stock &&
-    prev.product.price === next.product.price
-  );
-});
+export default memo(ProductCard, (prev, next) => 
+  JSON.stringify(prev.product) === JSON.stringify(next.product)
+);

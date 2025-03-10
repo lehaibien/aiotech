@@ -12,12 +12,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const SignalRContext = createContext<HubConnection | null>(null);
 
 type SignalRProviderProps = {
+  url: string;
   children: React.ReactNode;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
-export const SignalRProvider = ({ children }: SignalRProviderProps) => {
+export const SignalRProvider = ({ url, children }: SignalRProviderProps) => {
   const { data: session } = useSession();
   const { enqueueSnackbar } = useSnackbar();
   const [connection, setConnection] = useState<HubConnection | null>(null);
@@ -34,7 +33,7 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   useEffect(() => {
     if (userRole === "admin") {
       const newConnection = new HubConnectionBuilder()
-        .withUrl(baseUrl + "/notificationHub", {
+        .withUrl(url + "notificationHub", {
           accessTokenFactory: async () => {
             return accessToken;
           },

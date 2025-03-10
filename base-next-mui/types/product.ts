@@ -13,6 +13,7 @@ export type ProductDetailResponse = {
   name: string;
   description: string;
   price: number;
+  discountPrice?: number;
   stock: number;
   brand: string;
   category: string;
@@ -27,6 +28,7 @@ export type ProductResponse = {
   sku: string;
   name: string;
   price: number;
+  discountPrice?: number;
   category: string;
   brand: string;
   imageUrls: string[];
@@ -41,6 +43,7 @@ export type ProductUpdateResponse = {
   name: string;
   description: string;
   price: number;
+  discountPrice?: number;
   stock: number;
   brandId: UUID;
   categoryId: UUID;
@@ -57,7 +60,7 @@ export enum ProductSort {
   Oldest,
 }
 
-export type GetListProductRequest = {
+export type GetListFilteredProductRequest = {
   minPrice?: number;
   maxPrice?: number;
   categories?: string;
@@ -81,6 +84,10 @@ export const ProductRequestSchema = z.object({
   price: z
     .number({ message: "Giá sản phẩm không hợp lệ" })
     .min(0, { message: "Giá sản phẩm phải không được nhỏ hơn 0" }),
+  discountPrice: z
+   .number({ message: "Giá giảm giá không hợp lệ" })
+   .min(0, { message: "Giá giảm giá phải không được nhỏ hơn 0" })
+   .optional(),
   stock: z
     .number({ message: "Số lượng sản phẩm không hợp lệ" })
     .min(1, { message: "Số lượng sản phẩm phải lớn hơn 0" }),
@@ -118,6 +125,7 @@ export const ProductRequestDefault: ProductRequest = {
   name: "",
   description: "",
   price: 0,
+  discountPrice: 0,
   stock: 0,
   brandId: EMPTY_UUID,
   categoryId: EMPTY_UUID,

@@ -19,7 +19,7 @@ import Link from "next/link";
 import { useCallback, useMemo, useRef } from "react";
 
 const createColumns = (
-  onPrint: (id: string) => void
+  onPrint: (id: string, trackingNumber: string) => void
 ): GridColDef<OrderResponse>[] => [
   {
     field: "trackingNumber",
@@ -45,7 +45,8 @@ const createColumns = (
     flex: 1,
     headerAlign: "right",
     align: "right",
-    valueFormatter: (params) => formatNumberWithSeperator(params as number),
+    valueFormatter: (params) =>
+      formatNumberWithSeperator(Number((params as number).toFixed(2))),
   },
   {
     field: "status",
@@ -77,7 +78,9 @@ const createColumns = (
         >
           <ViewIcon />
         </IconButton>
-        <IconButton onClick={() => onPrint(params.row.id)}>
+        <IconButton
+          onClick={() => onPrint(params.row.id, params.row.trackingNumber)}
+        >
           <PrintIcon />
         </IconButton>
       </>
@@ -89,26 +92,29 @@ function OrderHistory() {
   const searchTerm = useRef("");
   const dataGridRef = useRef<CustomDataGridRef>(null);
   const { data: session } = useSession();
-  const handlePrint = useCallback(async (id: string) => {
-    const response = await getApi(API_URL.order + `/${id}/print`);
-    if (response.success) {
-      const data = response.data as string;
-      const binary = atob(data);
-      const buffer = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        buffer[i] = binary.charCodeAt(i);
+  const handlePrint = useCallback(
+    async (id: string, trackingNumber: string) => {
+      const response = await getApi(API_URL.order + `/${id}/print`);
+      if (response.success) {
+        const data = response.data as string;
+        const binary = atob(data);
+        const buffer = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          buffer[i] = binary.charCodeAt(i);
+        }
+        const url = window.URL.createObjectURL(new Blob([buffer]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${trackingNumber}.pdf`); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+        // clean up
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
       }
-      const url = window.URL.createObjectURL(new Blob([buffer]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "receipt.pdf"); //or any other extension
-      document.body.appendChild(link);
-      link.click();
-      // clean up
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }
-  }, []);
+    },
+    []
+  );
 
   const columns = useMemo(() => createColumns(handlePrint), [handlePrint]);
 

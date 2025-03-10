@@ -1,6 +1,6 @@
 "use client";
 
-import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { DashboardSearchBar } from "@/features/dashboard/DashboardSearchBar";
 import { VisibilityRounded } from "@mui/icons-material";
@@ -11,15 +11,10 @@ import React from "react";
 import { CancelButton } from "./CancelButton";
 
 type OrderToolbarProps = {
-  dataGridRef: React.RefObject<CustomDataGridRef>;
-  searchTermRef: React.MutableRefObject<string>;
+  dataGridRef: React.RefObject<DataTableRef>;
   children?: React.ReactNode;
 };
-export function OrderToolbar({
-  dataGridRef,
-  searchTermRef,
-  children,
-}: OrderToolbarProps) {
+export function OrderToolbar({ dataGridRef, children }: OrderToolbarProps) {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   function triggerView() {
@@ -63,10 +58,7 @@ export function OrderToolbar({
       </Button>
       <CancelButton dataGridRef={dataGridRef} />
       {children}
-      <DashboardSearchBar
-        dataGridRef={dataGridRef}
-        textSearchRef={searchTermRef}
-      />
+      <DashboardSearchBar dataGridRef={dataGridRef} />
     </Box>
   );
 }

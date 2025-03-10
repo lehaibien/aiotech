@@ -1,19 +1,15 @@
 "use client";
 
-import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
 import { DashboardSearchBar } from "@/features/dashboard/DashboardSearchBar";
 import { Box } from "@mui/material";
 import React from "react";
 
 type ShipperOrderToolbarProps = {
-  dataGridRef: React.RefObject<CustomDataGridRef>;
-  searchTermRef: React.MutableRefObject<string>;
+  dataGridRef: React.RefObject<DataTableRef>;
 };
 
-export function ShipperOrderToolbar({
-  dataGridRef,
-  searchTermRef,
-}: ShipperOrderToolbarProps) {
+export function ShipperOrderToolbar({ dataGridRef }: ShipperOrderToolbarProps) {
   return (
     <Box
       display="flex"
@@ -22,10 +18,7 @@ export function ShipperOrderToolbar({
       paddingBottom={1}
       flexWrap="wrap"
     >
-      <DashboardSearchBar
-        dataGridRef={dataGridRef}
-        textSearchRef={searchTermRef}
-      />
+      <DashboardSearchBar dataGridRef={dataGridRef} />
     </Box>
   );
 }

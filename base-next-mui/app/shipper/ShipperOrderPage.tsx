@@ -1,21 +1,26 @@
 "use client";
 
-import CustomDataGrid, {
-    CustomDataGridRef,
-} from "@/components/core/CustomDataGrid";
+import DataTable, { DataTableRef } from "@/components/core/DataTable";
 import { API_URL } from "@/constant/apiUrl";
-import { getListApi, putApi } from "@/lib/apiClient";
-import { OrderGetListRequest, OrderResponse, OrderStatus, PaginatedList } from "@/types";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { putApi } from "@/lib/apiClient";
+import {
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import dynamic from "next/dynamic";
 import { useSnackbar } from "notistack";
 import { useCallback, useRef, useState } from "react";
 import { createShipperColumns } from "./columns";
 import { ShipperOrderToolbar } from "./ShipperOrderToolbar";
 
+const Dialog = dynamic(() => import("@mui/material/Dialog"), { ssr: false });
+
 export function ShipperOrderPage() {
   const { enqueueSnackbar } = useSnackbar();
-  const searchTerm = useRef("");
-  const dataGridRef = useRef<CustomDataGridRef>(null);
+  const dataGridRef = useRef<DataTableRef>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
 
@@ -59,37 +64,16 @@ export function ShipperOrderPage() {
 
   const columns = createShipperColumns(handleOpenDialog);
 
-  const loadData = useCallback(
-    async (
-      page: number,
-      pageSize: number
-    ): Promise<PaginatedList<OrderResponse>> => {
-      const getListRequest: OrderGetListRequest = {
-        pageIndex: page,
-        pageSize,
-        textSearch: searchTerm.current,
-        statuses: [OrderStatus.Delivering, OrderStatus.Delivered],
-      };
-      const response = await getListApi(API_URL.order, getListRequest);
-      if (response.success) {
-        const paginatedList = response.data as PaginatedList<OrderResponse>;
-        return paginatedList;
-      }
-      throw new Error(response.message);
-    },
-    []
-  );
-
   return (
     <>
-      <ShipperOrderToolbar dataGridRef={dataGridRef} searchTermRef={searchTerm} />
-      <CustomDataGrid
+      <ShipperOrderToolbar dataGridRef={dataGridRef} />
+      <DataTable
         ref={dataGridRef}
         columns={columns}
+        apiUrl={API_URL.order}
+        checkboxSelection={false}
         withRowNumber
-        loadData={loadData}
       />
-
       {/* Confirmation Dialog */}
       <Dialog
         open={openDialog}

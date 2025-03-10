@@ -4,7 +4,7 @@ import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { PostResponse } from "@/types";
 import "server-only";
-import { PostUpsertForm } from "./PostUpsertForm";
+import { PostUpsertForm } from "../../../../features/dashboard/posts/PostUpsertForm";
 
 export default async function UpsertPage({
   searchParams,

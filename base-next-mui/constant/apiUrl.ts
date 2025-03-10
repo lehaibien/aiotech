@@ -25,6 +25,7 @@ export const API_URL = {
 
   // product
   product: "product",
+  productFiltered: "product/filtered",
   productRequest: "product/request",
   productTop: "product/top",
   productFeatured: "product/featured",
@@ -37,6 +38,7 @@ export const API_URL = {
   order: "order",
   recentOrder: "order/recent",
   orderCancel: "order/cancel",
+  orderConfirm: "order/confirm",
   orderStatus: "order/status",
   createOrderUrl: "order/url",
 
@@ -60,4 +62,7 @@ export const API_URL = {
   // configuration
   bannerConfig: "configuration/banner",
   emailConfig: "configuration/email",
+
+  // dashboard
+  dashboard: "dashboard",
 };

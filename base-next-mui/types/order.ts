@@ -41,6 +41,7 @@ export type OrderResponse = {
   name: string;
   phoneNumber: string;
   address: string;
+  tax: number;
   totalPrice: number;
   status: string;
   deliveryDate?: Date;
@@ -78,6 +79,7 @@ export enum PaymentMethods {
 
 export const checkoutRequestSchema = z.object({
   customerId: z.string().uuid(),
+  tax: z.number(),
   totalPrice: z
     .number()
     .min(1, { message: "Thành tiền phải lớn hơn hoặc bằng 0" }),

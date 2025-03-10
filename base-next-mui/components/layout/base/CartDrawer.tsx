@@ -50,9 +50,9 @@ export function CartDrawer() {
   }, [setCartItems, userId]);
   return (
     <>
-      <IconButton color="inherit" onClick={onOpen}>
+      <IconButton color="inherit" onClick={onOpen} sx={{ p: 1 }}>
         <Badge badgeContent={cartItems.length} color="error">
-          <ShoppingBagOutlinedIcon />
+          <ShoppingBagOutlinedIcon fontSize="small" />
         </Badge>
       </IconButton>
 
@@ -62,69 +62,51 @@ export function CartDrawer() {
         onClose={onClose}
         PaperProps={{
           sx: {
-            width: { xs: "100%", sm: 360, lg: 400 },
+            width: { xs: '100%', sm: 420, lg: 520 },
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
-        <Box
-          sx={{
-            p: 2,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6">{cartItems.length} sản phẩm</Typography>
-              <IconButton onClick={onClose}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-            <CartItemListing
-              cartItems={cartItems}
-              onQuantityChange={addToCart}
-              onRemoveFromCart={removeFromCart}
-            />
-          </Box>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h6" component="h2">Giỏ hàng</Typography>
+          <IconButton onClick={onClose} edge="end" size="small">
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
 
-          <Box>
-            <Button
-              onClick={() => handleNavigation("/checkout")}
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              Thanh toán ngay{" "}
-              {cartItems.length > 0 &&
-                "(" +
-                  formatNumberWithSeperator(
-                    cartItems.reduce(
-                      (acc, cur) =>
-                        acc + (cur.productPrice ?? 0) * cur.quantity,
-                      0
-                    )
-                  ) +
-                  " đ)"}
-            </Button>
-            <Button
-              onClick={() => handleNavigation("/cart")}
-              variant="outlined"
-              color="primary"
-              fullWidth
-              sx={{ mt: 1 }}
-            >
-              Xem giỏ hàng
-            </Button>
-          </Box>
+        <CartItemListing
+          cartItems={cartItems}
+          onQuantityChange={addToCart}
+          onRemoveFromCart={removeFromCart}
+          sx={{ flex: 1, overflow: 'auto' }}
+        />
+
+        <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5, borderTop: 1, borderColor: 'divider' }}>
+          <Button
+            onClick={() => handleNavigation('/checkout')}
+            variant="contained"
+            color="primary"
+            size="medium"
+            fullWidth
+            sx={{ fontWeight: 600 }}
+          >
+            Thanh toán ngay
+            ({formatNumberWithSeperator(
+              cartItems.reduce((acc, cur) => acc + (cur.productPrice ?? 0) * cur.quantity, 0)
+            )} ₫)
+          </Button>
+          
+          <Button
+            onClick={() => handleNavigation('/cart')}
+            variant="outlined"
+            color="primary"
+            size="medium"
+            fullWidth
+            sx={{ fontWeight: 500 }}
+          >
+            Xem chi tiết
+          </Button>
         </Box>
       </Drawer>
     </>

@@ -1,9 +1,9 @@
 import "server-only";
 
 import { API_URL } from "@/constant/apiUrl";
-import ImageGallery from "@/features/single-product/ImageGallery";
-import ProductInfo from "@/features/single-product/ProductInfo";
-import ReviewSection from "@/features/single-product/ReviewSection";
+import ImageGallery from "@/features/products/single/ImageGallery";
+import ProductInfo from "@/features/products/single/ProductInfo";
+import ReviewSection from "@/features/products/single/ReviewSection";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ProductDetailResponse } from "@/types/product";

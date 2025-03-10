@@ -1,7 +1,6 @@
 "use server";
 
 import { ApiResponse, GetByIdRequest } from "@/types/base";
-import { UUID } from "crypto";
 import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
 import { redirect } from "next/navigation";
 import { auth } from "./auth";
@@ -142,11 +141,10 @@ export async function putApi(
 
 export async function deleteApi(
   action: string,
-  id: UUID
 ): Promise<ApiResponse> {
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const url = getBaseUrl() + action + "?id=" + id;
+    const url = getBaseUrl() + action;
     const baseHeader = await getAuthorizationHeader();
     const response = await fetch(url, {
       method: "DELETE",
@@ -265,6 +263,6 @@ function handleError(error: unknown) {
   }
   return {
     success: false,
-    message: "Lỗi không xác định: " + (error as Error).message,
+    message: (error as Error).message,
   };
 }

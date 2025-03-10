@@ -1,10 +1,10 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
+import { BrandUpsertForm } from "@/features/dashboard/brands/BrandUpsertForm";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { BrandResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
-import BrandUpsertForm from "./BrandUpsertForm";
 
 async function Page({
   searchParams,

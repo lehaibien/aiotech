@@ -9,7 +9,7 @@ export type BaseGetListRequest = {
 export type GetListRequest = {
   pageIndex: number;
   pageSize: number;
-  sortBy?: string;
+  sortColumn?: string;
   sortOrder?: 'asc' | 'desc';
   textSearch: string;
 }

@@ -10,7 +10,7 @@ const mockStockAlerts = [
   { id: '5', productName: 'Gaming Chair', currentStock: 4, minStockLevel: 6 },
 ];
 
-export default function StockAlert() {
+export function StockAlert() {
   return (
     <List>
       {mockStockAlerts.map((alert) => (
