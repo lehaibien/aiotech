@@ -13,6 +13,7 @@ public class SeedDataService
     private readonly Random _rng = new();
     private readonly Guid _adminRoleId = Guid.Parse("85844E35-F6A0-4F8E-90C4-071366BF5FF6");
     private readonly Guid _userRoleId = Guid.Parse("A8B42A83-B1BC-4937-99D9-0AAA70B896E5");
+    private readonly Guid _shipperRoleId = Guid.Parse("b2f02c43-4d58-45d2-84a4-caf92a976672");
     private readonly string BaseStaticUrl =
         Environment.GetEnvironmentVariable("BE_StaticUrl") ?? "http://localhost:5554/static";
 
@@ -50,6 +51,7 @@ public class SeedDataService
         var brandData = JsonConvert.DeserializeObject<List<Brand>>(brands);
         brandData?.ForEach(x =>
         {
+            // x.ImageUrl = $"{BaseStaticUrl}/images/brands/" + x.ImageUrl;
             x.ImageUrl = $"{BaseStaticUrl}/images/brands/asus/asus-logo.jpg";
             x.CreatedDate = DateTime.UtcNow.AddDays(-1 * _rng.Next(1, 101));
             x.CreatedBy = "seedservice";
@@ -129,7 +131,10 @@ public class SeedDataService
             x.CreatedBy = "seedservice";
             x.Password = EncryptionHelper.HashPassword(x.UserName, out var salt);
             x.Salt = Convert.ToBase64String(salt);
-            x.RoleId = x.UserName == "admin" ? _adminRoleId : _userRoleId;
+            x.RoleId =
+                x.UserName == "admin" ? _adminRoleId
+                : x.UserName == "hoangviet" ? _shipperRoleId
+                : _userRoleId;
         });
         if (userData is null || userData.Count == 0)
         {

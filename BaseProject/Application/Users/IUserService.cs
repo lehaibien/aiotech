@@ -5,7 +5,10 @@ namespace Application.Users;
 
 public interface IUserService
 {
-    Task<Result<PaginatedList>> GetList(GetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<UserResponse>> GetById(Guid id);
     Task<Result<UserResponse>> GetByUsername(string username);
     Task<Result<UserResponse>> GetByEmail(string email);

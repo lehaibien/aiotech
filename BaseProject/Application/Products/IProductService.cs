@@ -5,7 +5,11 @@ namespace Application.Products;
 
 public interface IProductService
 {
-    Task<Result<PaginatedList>> GetList(GetListProductRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<PaginatedList>> GetListFilteredAsync(GetListFilteredProductRequest request);
     Task<Result<List<ProductResponse>>> Search(SearchProductRequest request);
     Task<Result<List<ProductResponse>>> GetTopProducts(int top = 12);
     Task<Result<List<ProductResponse>>> GetFeaturedProducts(int top = 12);

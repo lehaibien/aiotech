@@ -30,7 +30,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = configuration.GetConnectionString("RedisConnection") ?? "localhost";
+    options.Configuration =
+        Environment.GetEnvironmentVariable("RedisConnectionString")
+        ?? configuration.GetConnectionString("RedisConnection");
     options.ConfigurationOptions = new ConfigurationOptions
     {
         AbortOnConnectFail = true,

@@ -5,7 +5,10 @@ namespace Application.Categories;
 
 public interface ICategoryService
 {
-    Task<Result<PaginatedList>> GetList(GetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<CategoryResponse>> GetById(Guid id);
     Task<Result<CategoryResponse>> Create(CreateCategoryRequest request);
     Task<Result<CategoryResponse>> Update(UpdateCategoryRequest request);

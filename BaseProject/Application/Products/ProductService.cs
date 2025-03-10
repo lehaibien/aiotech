@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Application.Images;
 using Application.Mail;
 using Application.Products.Dtos;
@@ -38,7 +39,60 @@ public class ProductService : IProductService
         _emailService = emailService;
     }
 
-    public async Task<Result<PaginatedList>> GetList(GetListProductRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var productQuery = _unitOfWork.GetRepository<Product>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
+        {
+            productQuery = productQuery.Where(x =>
+                x.Sku.ToLower().Contains(request.TextSearch.ToLower())
+                || x.Name.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
+        {
+            productQuery = productQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            productQuery = productQuery.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await productQuery.CountAsync(cancellationToken);
+        var result = await productQuery
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new ProductResponse
+            {
+                Id = x.Id,
+                Sku = x.Sku,
+                Name = x.Name,
+                Price = x.Price,
+                DiscountPrice = x.DiscountPrice,
+                Stock = x.Stock,
+                Brand = x.Brand.Name,
+                Category = x.Category.Name,
+                ImageUrls = x.ImageUrls,
+                CreatedDate = x.CreatedDate,
+                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
+                IsFeatured = x.IsFeatured,
+            })
+            .ToListAsync(cancellationToken);
+        var response = new PaginatedList
+        {
+            PageIndex = request.PageIndex,
+            PageSize = request.PageSize,
+            TotalCount = totalRow,
+            Items = result,
+        };
+        return Result<PaginatedList>.Success(response);
+    }
+
+    public async Task<Result<PaginatedList>> GetListFilteredAsync(
+        GetListFilteredProductRequest request
+    )
     {
         SqlParameter totalRow = new()
         {
@@ -63,7 +117,7 @@ public class ProductService : IProductService
         };
         var result = await _unitOfWork
             .GetRepository<ProductResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListProduct, parameters);
+            .ExecuteStoredProcedureAsync(StoredProcedure.GetFilteredProduct, parameters);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
@@ -80,7 +134,7 @@ public class ProductService : IProductService
             .GetRepository<Product>()
             .GetAll()
             .Where(x =>
-                x.IsDeleted == false
+                !x.IsDeleted
                 && (request.Category == null || x.Category.Name == request.Category)
                 && x.Name.Contains(request.TextSearch)
             )
@@ -94,13 +148,14 @@ public class ProductService : IProductService
     {
         var result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll()
+            .GetAll(x => x.Stock >= 8)
             .Select(x => new ProductResponse
             {
                 Id = x.Id,
                 Sku = x.Sku,
                 Name = x.Name,
                 Price = x.Price,
+                DiscountPrice = x.DiscountPrice,
                 Stock = x.Stock,
                 Brand = x.Brand.Name,
                 Category = x.Category.Name,
@@ -109,7 +164,18 @@ public class ProductService : IProductService
                 Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
                 IsFeatured = x.IsFeatured,
             })
-            .OrderByDescending(x => x.IsFeatured)
+            .OrderByDescending(p =>
+                _unitOfWork
+                    .GetRepository<OrderItem>()
+                    .GetAll()
+                    .Count(oi =>
+                        oi.ProductId == p.Id
+                        && !oi.Order.IsDeleted
+                        && oi.Order.Status != OrderStatus.Cancelled
+                    )
+            )
+            .ThenByDescending(x => x.IsFeatured)
+            .ThenByDescending(x => x.Rating)
             .ThenByDescending(x => x.CreatedDate)
             .Take(top)
             .ToListAsync();
@@ -127,6 +193,7 @@ public class ProductService : IProductService
                 Sku = x.Sku,
                 Name = x.Name,
                 Price = x.Price,
+                DiscountPrice = x.DiscountPrice,
                 Stock = x.Stock,
                 Brand = x.Brand.Name,
                 Category = x.Category.Name,
@@ -136,8 +203,8 @@ public class ProductService : IProductService
                 IsFeatured = x.IsFeatured,
             })
             .Where(x => x.IsFeatured)
-            .OrderByDescending(x => x.CreatedDate)
             .OrderByDescending(x => x.Rating)
+            .ThenByDescending(x => x.CreatedDate)
             .Take(top)
             .ToListAsync();
         return Result<List<ProductResponse>>.Success(result);
@@ -161,6 +228,7 @@ public class ProductService : IProductService
                 Sku = x.Sku,
                 Name = x.Name,
                 Price = x.Price,
+                DiscountPrice = x.DiscountPrice,
                 Stock = x.Stock,
                 Brand = x.Brand.Name,
                 Category = x.Category.Name,
@@ -195,7 +263,7 @@ public class ProductService : IProductService
                 Stock = x.Stock,
                 Description = x.Description,
                 IsFeatured = x.IsFeatured,
-                Tags = new List<string>(),
+                Tags = x.Tags,
             })
             .FirstOrDefaultAsync();
         if (entity is null)
@@ -318,5 +386,19 @@ public class ProductService : IProductService
         }
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
+    }
+
+    private static Expression<Func<Product, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "sku" => x => x.Sku,
+            "name" => x => x.Name,
+            "price" => x => x.Price,
+            "discountPrice" => x => x.DiscountPrice,
+            "stock" => x => x.Stock,
+            "createdDate" => x => x.CreatedDate,
+            _ => x => x.Id,
+        };
     }
 }

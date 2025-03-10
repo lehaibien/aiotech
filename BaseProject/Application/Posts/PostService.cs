@@ -1,4 +1,5 @@
 using System.Data;
+using System.Linq.Expressions;
 using Application.Images;
 using Application.Posts.Dtos;
 using AutoDependencyRegistration.Attributes;
@@ -34,29 +35,49 @@ public class PostService : IPostService
         _imageService = imageService;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        SqlParameter totalRow = new()
+        var postQuery = _unitOfWork.GetRepository<Post>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
+            postQuery = postQuery.Where(x =>
+                x.Title.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
         {
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<PostResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListPost, parameters);
+            postQuery = postQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            postQuery = postQuery.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await postQuery.CountAsync(cancellationToken);
+        var result = await postQuery
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new PostResponse
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Content = x.Content,
+                Tags = x.Tags,
+                IsPublished = x.IsPublished,
+                ImageUrl = x.ImageUrl,
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -219,5 +240,17 @@ public class PostService : IPostService
 
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
+    }
+
+    private static Expression<Func<Post, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "name" => x => x.Title,
+            "isPublished" => x => x.IsPublished,
+            "createdDate" => x => x.CreatedDate,
+            "updatedDate" => x => x.UpdatedDate,
+            _ => x => x.Id,
+        };
     }
 }

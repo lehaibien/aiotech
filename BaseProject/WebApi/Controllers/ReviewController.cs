@@ -107,7 +107,6 @@ public class ReviewController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
         return Ok(response);
     }
 

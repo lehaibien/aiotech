@@ -7,7 +7,10 @@ namespace Application.Orders;
 
 public interface IOrderService
 {
-    Task<Result<PaginatedList>> GetList(OrderGetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        OrderGetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<OrderResponse>> GetById(Guid id);
     Task<Result<List<OrderResponse>>> GetByUsername(string username);
     Task<Result<List<OrderResponse>>> GetRecentOrders(int count);
@@ -21,5 +24,6 @@ public interface IOrderService
     Task<Result<string>> ChangeStatusList(List<Guid> ids, OrderStatus status);
     Task<Result<byte[]>> PrintReceipt(Guid id);
     Task<Result> HandleCallbackPayment(IQueryCollection queryCollection);
+    Task<Result> Confirm(Guid id);
     Task<Result> Cancel(OrderCancelRequest request);
 }

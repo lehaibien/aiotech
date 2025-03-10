@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.GetList(request);
+        var result = await _service.GetListAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

@@ -12,10 +12,7 @@ public class ProductProfile : Profile
         CreateMap<Product, ProductDetailResponse>();
         CreateMap<ProductRequest, Product>().ReverseMap();
         CreateMap<CreateProductRequest, Product>().ReverseMap();
-        // .ForMember(x => x.Tags, opt => opt.Ignore());
-        CreateMap<UpdateProductRequest, Product>()
-            .ReverseMap();
-        // .ForMember(x => x.Tags, opt => opt.Ignore());
+        CreateMap<UpdateProductRequest, Product>().ReverseMap();
         CreateMap<Product, ProductUpdateResponse>();
     }
 }

@@ -6,6 +6,7 @@ public class ProductResponse
     public string Sku { get; set; } = null!;
     public string Name { get; set; } = null!;
     public decimal Price { get; set; }
+    public decimal? DiscountPrice { get; set; }
     public string Brand { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public double Rating { get; set; }

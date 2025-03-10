@@ -7,6 +7,7 @@ public class OrderRequest
 {
     public Guid Id { get; set; }
     public Guid CustomerId { get; set; }
+    public double Tax { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Thành tiền phải lớn hơn hoặc bằng 0")]
     public double TotalPrice { get; set; }

@@ -1,6 +1,7 @@
 using Application.Products;
 using Application.Products.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using WebApi.Model;
 
 namespace WebApi.Controllers;
@@ -17,10 +18,28 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] GetListProductRequest request)
+    public async Task<IActionResult> GetListAsync([FromQuery] GetListRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.GetList(request);
+        var result = await _service.GetListAsync(request);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("filtered")]
+    public async Task<IActionResult> GetListFilteredAsync(
+        [FromQuery] GetListFilteredProductRequest request
+    )
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetListFilteredAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -63,7 +82,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("featured/{top:int}")]
-    public async Task<IActionResult> GetFeaturedProducts(int top) {
+    public async Task<IActionResult> GetFeaturedProducts(int top)
+    {
         var response = new ApiResponse();
         var result = await _service.GetFeaturedProducts(top);
         if (result.IsFailure)

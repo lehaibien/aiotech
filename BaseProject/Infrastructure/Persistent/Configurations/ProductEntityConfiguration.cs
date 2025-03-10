@@ -19,7 +19,7 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.Sku).IsRequired().IsUnicode().HasMaxLength(50);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
-        builder.Property(x => x.Description).HasMaxLength(1000);
+        builder.Property(x => x.Description);
         builder.Property(x => x.Price).IsRequired().HasPrecision(10, 2);
         builder.Property(x => x.DiscountPrice).HasPrecision(10, 2);
         builder.ToTable(b => b.HasCheckConstraint("CK_Product_Price", "Price > 0"));

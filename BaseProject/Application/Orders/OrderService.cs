@@ -1,6 +1,6 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using System.Security.Claims;
-using Application.Discounts;
 using Application.Helpers;
 using Application.Mail;
 using Application.Notification;
@@ -51,35 +51,65 @@ public class OrderService : IOrderService
         // _discountService = discountService;
     }
 
-    public async Task<Result<PaginatedList>> GetList(OrderGetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        OrderGetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        var statuses = request.Statuses.Select(x => x.ToString());
-        SqlParameter totalRow = new()
+        var orderQuery = _unitOfWork.GetRepository<Order>().GetAll();
+        if (request.Statuses.Count > 0)
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new[]
+            orderQuery = orderQuery.Where(x => request.Statuses.Contains(x.Status));
+        }
+        if (request.CustomerId.HasValue && request.CustomerId != Guid.Empty)
         {
-            new(
-                "@iCustomerId",
-                request.CustomerId.HasValue ? request.CustomerId.Value : DBNull.Value
-            ),
-            new("@iStatuses", string.Join(",", statuses)),
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<OrderResponse>()
-            .ExecuteStoredProcedureAsync("usp_Order_GetList", parameters);
+            orderQuery = orderQuery.Where(x => x.CustomerId == request.CustomerId);
+        }
+        if (!string.IsNullOrEmpty(request.TextSearch))
+        {
+            orderQuery = orderQuery.Where(x =>
+                x.Name.ToLower().Contains(request.TextSearch.ToLower())
+                || x.PhoneNumber.ToLower().Contains(request.TextSearch.ToLower())
+                || x.TrackingNumber.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
+        {
+            orderQuery = orderQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            orderQuery = orderQuery.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await orderQuery.CountAsync(cancellationToken);
+        var result = await orderQuery
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new OrderResponse
+            {
+                Id = x.Id,
+                TrackingNumber = x.TrackingNumber,
+                Name = x.Name,
+                PhoneNumber = x.PhoneNumber,
+                Address = x.Address,
+                Tax = x.Tax,
+                TotalPrice = x.TotalPrice,
+                Status = x.Status.ToString(),
+                Note = x.Note,
+                DeliveryDate = x.DeliveryDate,
+                CancelReason = x.CancelReason,
+                PaymentProvider = x.Payment.Provider.ToString(),
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -98,6 +128,7 @@ public class OrderService : IOrderService
                 PhoneNumber = x.PhoneNumber,
                 PaymentProvider = x.Payment.Provider.ToString(),
                 Address = x.Address,
+                Tax = x.Tax,
                 TotalPrice = x.TotalPrice,
                 Status = x.Status.ToString(),
                 DeliveryDate = x.DeliveryDate,
@@ -159,6 +190,7 @@ public class OrderService : IOrderService
                 TrackingNumber = x.TrackingNumber,
                 Name = x.Name,
                 Address = x.Address,
+                Tax = x.Tax,
                 TotalPrice = x.TotalPrice,
                 Status = x.Status.ToString(),
                 DeliveryDate = x.DeliveryDate,
@@ -458,6 +490,7 @@ public class OrderService : IOrderService
                         { "name", order.Name ?? "" },
                         { "phonenumber", order.PhoneNumber ?? "" },
                         { "address", order.Address },
+                        { "tax", order.Tax },
                         { "totalprice", order.TotalPrice.ToString("N0") + " đ" },
                         { "note", order.Note ?? "Không" },
                         {
@@ -548,5 +581,16 @@ public class OrderService : IOrderService
         string dateTimePart = DateTime.Now.ToString("yyyyMMddHHmmss");
         int randomNumber = random.Next(100, 1000);
         return $"{prefix}{dateTimePart}{randomNumber}";
+    }
+
+    private static Expression<Func<Order, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "name" => x => x.Name,
+            "trackingnumber" => x => x.TrackingNumber,
+            "phonenumber" => x => x.PhoneNumber,
+            _ => x => x.Id,
+        };
     }
 }

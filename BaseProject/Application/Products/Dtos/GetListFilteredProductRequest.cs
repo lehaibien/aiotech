@@ -1,8 +1,8 @@
-﻿using Shared;
+using Shared;
 
 namespace Application.Products.Dtos;
 
-public class GetListProductRequest : GetListRequest
+public class GetListFilteredProductRequest : GetListRequest
 {
     public double MinPrice { get; set; } = 0;
     public double MaxPrice { get; set; } = double.MaxValue;

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Application.Brands.Dtos;
 using Application.Images;
 using AutoDependencyRegistration.Attributes;
@@ -6,7 +7,6 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -19,7 +19,7 @@ public class BrandService : IBrandService
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
-    private const string FolderUpload = "brand";
+    private const string FolderUpload = "brands";
 
     public BrandService(
         IUnitOfWork unitOfWork,
@@ -34,29 +34,46 @@ public class BrandService : IBrandService
         _imageService = imageService;
     }
 
-    public async Task<Result<PaginatedList>> GetList(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        SqlParameter totalRow = new()
+        var brandQuery = _unitOfWork.GetRepository<Brand>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
+            brandQuery = brandQuery.Where(x =>
+                x.Name.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
         {
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<BrandResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListBrand, parameters);
+            brandQuery = brandQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            brandQuery = brandQuery.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await brandQuery.CountAsync(cancellationToken);
+        var result = await brandQuery
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new BrandResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ImageUrl = x.ImageUrl,
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -95,6 +112,7 @@ public class BrandService : IBrandService
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
+        entity.ImageUrl = uploadResult.Data;
         _unitOfWork.GetRepository<Brand>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<BrandResponse>(entity);
@@ -135,6 +153,7 @@ public class BrandService : IBrandService
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
+        entity.ImageUrl = uploadResult.Data;
         _unitOfWork.GetRepository<Brand>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<BrandResponse>(entity);
@@ -182,5 +201,16 @@ public class BrandService : IBrandService
             .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
             .ToListAsync();
         return Result<List<ComboBoxItem>>.Success(result);
+    }
+
+    private static Expression<Func<Brand, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "name" => x => x.Name,
+            "createdDate" => x => x.CreatedDate,
+            "updatedDate" => x => x.UpdatedDate,
+            _ => x => x.Id,
+        };
     }
 }

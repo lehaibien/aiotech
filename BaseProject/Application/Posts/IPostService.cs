@@ -5,7 +5,10 @@ namespace Application.Posts;
 
 public interface IPostService
 {
-    Task<Result<PaginatedList>> GetListAsync(GetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<PaginatedList>> GetPostPreviewAsync(GetListRequest request);
     Task<Result<PostResponse>> GetByIdAsync(Guid id);
     Task<Result<PostResponse>> CreateAsync(CreatePostRequest request);

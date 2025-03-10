@@ -106,6 +106,18 @@ public class ReviewService : IReviewService
         {
             return Result<ReviewResponse>.Failure("Bạn đã đánh giá sản phẩm này rồi");
         }
+        var hasBought = await _unitOfWork
+            .GetRepository<Order>()
+            .GetAll(x =>
+                x.CustomerId == request.UserId
+                && !x.IsDeleted
+                && x.OrderItems.Any(y => y.ProductId == request.ProductId)
+            )
+            .AnyAsync();
+        if (!hasBought)
+        {
+            return Result<ReviewResponse>.Failure("Bạn chưa mua sản phẩm này");
+        }
         var entity = _mapper.Map<Review>(request);
         entity.CreatedDate = DateTime.Now;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
@@ -117,11 +129,6 @@ public class ReviewService : IReviewService
 
     public async Task<Result<ReviewResponse>> Update(UpdateReviewRequest request)
     {
-        var isExists = await _unitOfWork.GetRepository<Review>().AnyAsync(x => x.Id != request.Id);
-        if (isExists)
-        {
-            return Result<ReviewResponse>.Failure("Đánh giá đã tồn tại");
-        }
         var entity = await _unitOfWork.GetRepository<Review>().FindAsync(x => x.Id == request.Id);
         if (entity is null)
         {
@@ -136,19 +143,19 @@ public class ReviewService : IReviewService
         return Result<ReviewResponse>.Success(response);
     }
 
-    public async Task<Result<string>> Delete(Guid id)
+    public async Task<Result> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
         if (entity is null)
         {
-            return Result<string>.Failure("Đánh giá không tồn tại");
+            return Result.Failure("Đánh giá không tồn tại");
         }
         entity.DeletedDate = DateTime.Now;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        return Result<string>.Success("Xóa thành công");
+        return Result.Success();
     }
 
     public async Task<Result<string>> DeleteList(List<Guid> ids)
@@ -166,6 +173,6 @@ public class ReviewService : IReviewService
             _unitOfWork.GetRepository<Review>().Update(entity);
         }
         await _unitOfWork.SaveChangesAsync();
-        return Result<string>.Success("Xóa thành công");
+        return Result<string>.Success(ids.Count.ToString());
     }
 }

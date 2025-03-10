@@ -218,8 +218,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("TotalPrice")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("float(10)");
+                        .HasColumnType("float");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()

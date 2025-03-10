@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Application.Categories.Dtos;
 using Application.Images;
 using AutoDependencyRegistration.Attributes;
@@ -34,29 +35,46 @@ public class CategoryService : ICategoryService
         _imageService = imageService;
     }
 
-    public async Task<Result<PaginatedList>> GetList(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        SqlParameter totalRow = new()
+        var categoryQuery = _unitOfWork.GetRepository<Category>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
+            categoryQuery = categoryQuery.Where(x =>
+                x.Name.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
         {
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<CategoryResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListCategory, parameters);
+            categoryQuery = categoryQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            categoryQuery = categoryQuery.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await categoryQuery.CountAsync(cancellationToken);
+        var result = await categoryQuery
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new CategoryResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ImageUrl = x.ImageUrl,
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -192,5 +210,16 @@ public class CategoryService : ICategoryService
             .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
             .ToListAsync();
         return Result<List<ComboBoxItem>>.Success(result);
+    }
+
+    private static Expression<Func<Category, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "name" => x => x.Name,
+            "createdDate" => x => x.CreatedDate,
+            "updatedDate" => x => x.UpdatedDate,
+            _ => x => x.Id,
+        };
     }
 }

@@ -164,6 +164,39 @@ namespace Infrastructure.Migrations
                     b.ToTable("Configuration", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Discount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CouponCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("DiscountPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("MaximumDiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.Property<double>("MinimumOrderAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.Property<int?>("Uses")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ValidUntil")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Discount", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.EmailChange", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -254,8 +287,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("float");
 
                     b.Property<double>("TotalPrice")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("float(10)");
+                        .HasColumnType("float");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
@@ -442,8 +474,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("DiscountPrice")
                         .HasPrecision(10, 2)
@@ -618,7 +649,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("85844e35-f6a0-4f8e-90c4-071366bf5ff6"),
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 2, 23, 15, 29, 53, 70, DateTimeKind.Local).AddTicks(8009),
+                            CreatedDate = new DateTime(2025, 3, 9, 15, 22, 28, 896, DateTimeKind.Local).AddTicks(5761),
                             IsDeleted = false,
                             Name = "Admin"
                         },
@@ -626,9 +657,17 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("a8b42a83-b1bc-4937-99d9-0aaa70b896e5"),
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 2, 23, 15, 29, 53, 70, DateTimeKind.Local).AddTicks(8025),
+                            CreatedDate = new DateTime(2025, 3, 9, 15, 22, 28, 896, DateTimeKind.Local).AddTicks(5773),
                             IsDeleted = false,
                             Name = "User"
+                        },
+                        new
+                        {
+                            Id = new Guid("b2f02c43-4d58-45d2-84a4-caf92a976672"),
+                            CreatedBy = "system",
+                            CreatedDate = new DateTime(2025, 3, 9, 15, 22, 28, 896, DateTimeKind.Local).AddTicks(5775),
+                            IsDeleted = false,
+                            Name = "Shipper"
                         });
                 });
 
@@ -729,7 +768,15 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.EmailChange", b =>

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250213014822_AddThumbnailToPost")]
-    partial class AddThumbnailToPost
+    [Migration("20250306123518_AddDiscountToProduct")]
+    partial class AddDiscountToProduct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -143,6 +143,95 @@ namespace Infrastructure.Migrations
                     b.ToTable("Category", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Configuration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("Configuration", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Discount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CouponCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("DiscountPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("MaximumDiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.Property<double>("MinimumOrderAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.Property<int?>("Uses")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ValidUntil")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Discount", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.EmailChange", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("OldEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId")
+                        .HasName("PK_EmailChangeUserId");
+
+                    b.ToTable("EmailChange", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -152,6 +241,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CancelReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
@@ -192,6 +285,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Tax")
+                        .HasColumnType("float");
 
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
@@ -264,7 +360,7 @@ namespace Infrastructure.Migrations
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -328,6 +424,10 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -476,10 +576,10 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Rating")
+                    b.Property<int>("Rating")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("float")
-                        .HasDefaultValue(1.0);
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(255)
@@ -553,7 +653,7 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("85844e35-f6a0-4f8e-90c4-071366bf5ff6"),
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 2, 13, 8, 48, 21, 644, DateTimeKind.Local).AddTicks(4981),
+                            CreatedDate = new DateTime(2025, 3, 6, 19, 35, 17, 672, DateTimeKind.Local).AddTicks(9612),
                             IsDeleted = false,
                             Name = "Admin"
                         },
@@ -561,60 +661,18 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("a8b42a83-b1bc-4937-99d9-0aaa70b896e5"),
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 2, 13, 8, 48, 21, 644, DateTimeKind.Local).AddTicks(4997),
+                            CreatedDate = new DateTime(2025, 3, 6, 19, 35, 17, 672, DateTimeKind.Local).AddTicks(9629),
                             IsDeleted = false,
                             Name = "User"
+                        },
+                        new
+                        {
+                            Id = new Guid("b2f02c43-4d58-45d2-84a4-caf92a976672"),
+                            CreatedBy = "system",
+                            CreatedDate = new DateTime(2025, 3, 6, 19, 35, 17, 672, DateTimeKind.Local).AddTicks(9632),
+                            IsDeleted = false,
+                            Name = "Shipper"
                         });
-                });
-
-            modelBuilder.Entity("Domain.Entities.Template", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id")
-                        .HasName("PK_TemplateId");
-
-                    b.ToTable("Template", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -622,6 +680,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("nvarchar(max)");
@@ -711,7 +772,27 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EmailChange", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmailChange_UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>

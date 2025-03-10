@@ -1,11 +1,11 @@
 ﻿namespace Shared;
 
-public class StoredProcedure
+public static class StoredProcedure
 {
     private const string Prefix = "usp_";
     public const string GetListBrand = Prefix + "Brand_GetList";
     public const string GetListCategory = Prefix + "Category_GetList";
-    public const string GetListProduct = Prefix + "Product_GetList";
+    public const string GetFilteredProduct = Prefix + "Product_GetFilteredList";
     public const string GetListProductPreview = Prefix + "ProductPreview_GetList";
     public const string GetListUser = Prefix + "User_GetList";
     public const string GetListTag = Prefix + "Tag_GetList";

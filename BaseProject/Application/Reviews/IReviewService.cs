@@ -12,6 +12,6 @@ public interface IReviewService
     Task<Result<ReviewResponse>> GetById(Guid id);
     Task<Result<ReviewResponse>> Create(CreateReviewRequest request);
     Task<Result<ReviewResponse>> Update(UpdateReviewRequest request);
-    Task<Result<string>> Delete(Guid id);
+    Task<Result> Delete(Guid id);
     Task<Result<string>> DeleteList(List<Guid> ids);
 }

@@ -8,6 +8,7 @@ public class Order : BaseEntity
     public string? Name { get; set; }
     public string? PhoneNumber { get; set; }
     public string Address { get; set; } = null!;
+    public double Tax { get; set; }
     public double TotalPrice { get; set; }
     public OrderStatus Status { get; set; }
     public DateTime? DeliveryDate { get; set; }

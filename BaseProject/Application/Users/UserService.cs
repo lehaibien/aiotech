@@ -1,14 +1,13 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Application.Helpers;
 using Application.Images;
-using Application.Jwt;
 using Application.Users.Dtos;
 using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -36,29 +35,54 @@ public class UserService : IUserService
         _imageService = imageService;
     }
 
-    public async Task<Result<PaginatedList>> GetList(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        SqlParameter totalRow = new()
+        var query = _unitOfWork.GetRepository<User>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
+            query = query.Where(x =>
+                x.UserName.ToLower().Contains(request.TextSearch.ToLower())
+                || x.Email.ToLower().Contains(request.TextSearch.ToLower())
+                || x.PhoneNumber.ToLower().Contains(request.TextSearch.ToLower())
+                || x.GivenName.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+        if (request.SortOrder?.ToLower() == "desc")
         {
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<UserResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListUser, parameters);
+            query = query.OrderByDescending(GetSortExpression(request.SortColumn));
+        }
+        else
+        {
+            query = query.OrderBy(GetSortExpression(request.SortColumn));
+        }
+        var totalRow = await query.CountAsync(cancellationToken);
+        var result = await query
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new UserResponse
+            {
+                Id = x.Id,
+                UserName = x.UserName,
+                Email = x.Email,
+                PhoneNumber = x.PhoneNumber,
+                FamilyName = x.FamilyName,
+                GivenName = x.GivenName,
+                Role = x.Role.Name,
+                AvatarUrl = x.AvatarUrl,
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -286,5 +310,17 @@ public class UserService : IUserService
         _unitOfWork.GetRepository<User>().UpdateRange(entities);
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
+    }
+
+    private static Expression<Func<User, object>> GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "userName" => x => x.UserName,
+            "fullName" => x => x.GivenName,
+            "email" => x => x.Email,
+            "phoneNumber" => x => x.PhoneNumber,
+            _ => x => x.Id,
+        };
     }
 }

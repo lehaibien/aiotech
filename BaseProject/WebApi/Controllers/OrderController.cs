@@ -20,7 +20,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetList([FromQuery] OrderGetListRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.GetList(request);
+        var result = await _service.GetListAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -189,6 +189,21 @@ public class OrderController : ControllerBase
     {
         var response = new ApiResponse();
         var result = await _service.HandleCallbackPayment(Request.Query);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        return Ok(response);
+    }
+
+    [HttpPost("confirm/{id:guid}")]
+    public async Task<IActionResult> Confirm(Guid id)
+    {
+        var response = new ApiResponse();
+        var result = await _service.Confirm(id);
         if (result.IsFailure)
         {
             response.Success = false;

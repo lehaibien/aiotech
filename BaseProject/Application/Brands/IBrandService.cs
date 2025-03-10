@@ -5,7 +5,10 @@ namespace Application.Brands;
 
 public interface IBrandService
 {
-    Task<Result<PaginatedList>> GetList(GetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<BrandResponse>> GetById(Guid id);
     Task<Result<BrandResponse>> Create(CreateBrandRequest request);
     Task<Result<BrandResponse>> Update(UpdateBrandRequest request);
