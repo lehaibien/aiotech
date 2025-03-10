@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Avatar,
@@ -8,9 +8,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React from "react";
 
 interface AccountSectionProps {
@@ -21,7 +20,6 @@ export default function AccountSection({
   showText = true,
 }: AccountSectionProps) {
   const { data: session } = useSession();
-  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -39,8 +37,10 @@ export default function AccountSection({
     setOpen(false);
     setAnchorEl(null);
   };
-  const handleNavigation = (path: string) => {
-    router.push(path);
+  const handleLogout = () => {
+    signOut({
+      redirectTo: "/login",
+    });
   };
   return (
     <Stack
@@ -86,9 +86,7 @@ export default function AccountSection({
         <MenuItem>
           <Link href="/">Trang chủ</Link>
         </MenuItem>
-        <MenuItem onClick={() => handleNavigation("/logout")}>
-          Đăng xuất
-        </MenuItem>
+        <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
       </Menu>
     </Stack>
   );

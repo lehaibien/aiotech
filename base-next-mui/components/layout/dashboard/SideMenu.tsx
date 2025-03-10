@@ -20,6 +20,7 @@ export default function SideMenu() {
           width: drawerWidth,
           boxSizing: 'border-box',
           top: 'unset',
+          pb: '4rem',
         },
         display: { xs: 'none', md: 'block' },
       }}

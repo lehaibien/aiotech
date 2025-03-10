@@ -104,5 +104,7 @@ export default function MenuContent() {
       ))}
     </List>
   );
-  return <Box>{renderNavItems(dashboardMenus)}</Box>;
+  return <Box sx={{
+    overflowY: "auto",
+  }}>{renderNavItems(dashboardMenus)}</Box>;
 }
