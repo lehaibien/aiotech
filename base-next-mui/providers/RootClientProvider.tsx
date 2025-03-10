@@ -12,10 +12,8 @@ import { SignalRProvider } from "./SignalRProvider";
 import theme from "@/lib/newTheme";
 
 export default function RootClientProvider({
-  signalRUrl,
   children,
 }: Readonly<{
-  signalRUrl: string;
   children: React.ReactNode;
 }>) {
   return (
@@ -34,7 +32,7 @@ export default function RootClientProvider({
               <button onClick={() => closeSnackbar(snackbarId)}>x</button>
             )}
           >
-            <SignalRProvider url={signalRUrl}>
+            <SignalRProvider>
               <JotaiProvider>{children}</JotaiProvider>
             </SignalRProvider>
           </SnackbarProvider>

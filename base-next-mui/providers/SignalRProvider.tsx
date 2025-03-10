@@ -12,15 +12,13 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const SignalRContext = createContext<HubConnection | null>(null);
 
 type SignalRProviderProps = {
-  url: string;
   children: React.ReactNode;
 };
 
-export const SignalRProvider = ({ url, children }: SignalRProviderProps) => {
+export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   const { data: session } = useSession();
   const { enqueueSnackbar } = useSnackbar();
   const [connection, setConnection] = useState<HubConnection | null>(null);
-
   // Memoize the user's role
   const userRole = useMemo(() => {
     return session?.user?.role?.toLowerCase();
@@ -33,7 +31,7 @@ export const SignalRProvider = ({ url, children }: SignalRProviderProps) => {
   useEffect(() => {
     if (userRole === "admin") {
       const newConnection = new HubConnectionBuilder()
-        .withUrl(url + "notificationHub", {
+        .withUrl("https://api.aiotech.cloud/" + "notificationHub", {
           accessTokenFactory: async () => {
             return accessToken;
           },

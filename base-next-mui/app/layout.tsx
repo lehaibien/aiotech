@@ -44,13 +44,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
     <html lang="vi" suppressHydrationWarning>
       <head></head>
       <body className={`${beVietnamPro.className} antialiased`}>
         <SessionProvider>
-          <RootClientProvider signalRUrl={baseUrl ?? ""}>
+          <RootClientProvider>
             {children}
           </RootClientProvider>
         </SessionProvider>
