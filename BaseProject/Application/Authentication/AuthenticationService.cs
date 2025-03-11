@@ -50,7 +50,9 @@ public class AuthenticationService : IAuthenticationService
     {
         var entity = await _unitOfWork
             .GetRepository<User>()
-            .FindAsync(u => u.UserName == request.UserName);
+            .GetAll()
+            .Include(r => r.Role)
+            .FirstOrDefaultAsync(u => u.UserName == request.UserName);
         if (entity is null)
             return Result<TokenResult>.Failure("Tài khoản hoặc mật khẩu không chính xác");
         if (
@@ -60,18 +62,11 @@ public class AuthenticationService : IAuthenticationService
                 request.Password
             )
         )
-            return Result<TokenResult>.Failure("Tài khoản hoặc mật khẩu không chính xác");
-        var role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == entity.RoleId);
-        var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.NameId, entity.Id.ToString()),
-            new(JwtRegisteredClaimNames.Name, entity.UserName),
-            new(JwtRegisteredClaimNames.Email, entity.Email),
-            new(ClaimTypes.Role, role?.Name ?? string.Empty),
-            new(ClaimTypes.Thumbprint, entity.AvatarUrl ?? string.Empty),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-        var accessToken = _jwtService.GenerateToken(claims);
+            return Result<TokenResult>.Failure("Tài khoản hoặc mật khẩu không chính xác");
+        }
+
+        var accessToken = _jwtService.GenerateToken(entity);
         var refreshToken = _jwtService.GenerateRefreshToken();
         var response = new TokenResult(accessToken, refreshToken);
         return Result<TokenResult>.Success(response);
@@ -127,17 +122,8 @@ public class AuthenticationService : IAuthenticationService
             await _unitOfWork.SaveChangesAsync();
         }
 
-        var userRole = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == user.RoleId);
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName),
-            new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, userRole?.Name ?? string.Empty),
-            new(ClaimTypes.Thumbprint, user.AvatarUrl ?? string.Empty),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-        var accessToken = _jwtService.GenerateToken(claims);
+        user.Role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == user.RoleId);
+        var accessToken = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
         var response = new TokenResult(accessToken, refreshToken);
         return Result<TokenResult>.Success(response);
@@ -203,7 +189,11 @@ public class AuthenticationService : IAuthenticationService
         var userId = Guid.Parse(
             jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value
         );
-        var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Id == userId);
+        var user = await _unitOfWork
+            .GetRepository<User>()
+            .GetAll()
+            .Include(x => x.Role)
+            .FirstOrDefaultAsync(x => x.Id == userId);
         if (user is null)
         {
             return Result<TokenResult>.Failure("Người dùng không tồn tại");
@@ -212,17 +202,7 @@ public class AuthenticationService : IAuthenticationService
         // {
         //     return Result<TokenResult>.Failure("Token hết hạn");
         // }
-        var userRole = await _unitOfWork.GetRepository<Role>().FindAsync(x => x.Id == user.RoleId);
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName),
-            new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, userRole?.Name ?? string.Empty),
-            new(ClaimTypes.Thumbprint, user.AvatarUrl ?? string.Empty),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
-        var accessToken = _jwtService.GenerateToken(claims);
+        var accessToken = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
         return Result<TokenResult>.Success(new TokenResult(accessToken, refreshToken));
     }

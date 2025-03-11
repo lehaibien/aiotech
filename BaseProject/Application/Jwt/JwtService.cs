@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Application.Jwt.Options;
 using AutoDependencyRegistration.Attributes;
+using Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -33,8 +34,17 @@ public class JwtService : IJwtService
         };
     }
 
-    public string GenerateToken(List<Claim> claims)
+    public string GenerateToken(User user)
     {
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Name, user.UserName),
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(ClaimTypes.Role, user.Role.Name ?? string.Empty),
+            new(ClaimTypes.Thumbprint, user.AvatarUrl ?? string.Empty),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
         var token = new JwtSecurityToken(
             _options.Issuer,
             _options.Audience,
