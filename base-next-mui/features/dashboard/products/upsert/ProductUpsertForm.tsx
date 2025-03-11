@@ -48,6 +48,7 @@ function ProductUpsertForm({
   });
   const [chips, setChips] = useState<string[]>(product.tags ?? []);
   const [images, setImages] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChipChange = (newChips: string[]) => {
     setChips(newChips);
@@ -58,7 +59,7 @@ function ProductUpsertForm({
   };
   // Modify the onSubmit handler to handle null values:
   const onSubmit = async (data: ProductRequest) => {
-    console.log(data.discountPrice);
+    setIsLoading(true);
     const request: ProductRequest = {
       ...data,
       discountPrice: data.discountPrice || undefined, // Convert empty/null to undefined
@@ -88,6 +89,7 @@ function ProductUpsertForm({
         enqueueSnackbar(response.message, { variant: "error" });
       }
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     const imagePromises = defaultImages.map(async (url) => {
@@ -343,6 +345,7 @@ function ProductUpsertForm({
           type="button"
           variant="contained"
           color="inherit"
+          disabled={isLoading}
         >
           Hủy
         </Button>
@@ -350,11 +353,13 @@ function ProductUpsertForm({
           type="submit"
           variant="contained"
           color="primary"
-          sx={{
-            textTransform: "initial",
-          }}
+          disabled={isLoading}
         >
-          {product.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+          {isLoading
+            ? "Đang xử lý..."
+            : product.id === EMPTY_UUID
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </Box>
     </form>

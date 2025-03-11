@@ -27,6 +27,7 @@ function CategoryUpsertForm({ category }: CategoryUpsertFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -36,6 +37,7 @@ function CategoryUpsertForm({ category }: CategoryUpsertFormProps) {
     resolver: zodResolver(CategoryRequestSchema),
   });
   const onSubmit = async (data: CategoryRequest) => {
+    setIsLoading(true);
     const request: CategoryRequest = {
       ...data,
       image: image,
@@ -72,6 +74,7 @@ function CategoryUpsertForm({ category }: CategoryUpsertFormProps) {
         variant: "error",
       });
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     const getImage = async (url: string) => {
@@ -133,12 +136,21 @@ function CategoryUpsertForm({ category }: CategoryUpsertFormProps) {
           LinkComponent={Link}
           href="/dashboard/categories"
           variant="contained"
-          color="inherit"
+          disabled={isLoading}
         >
           Hủy
         </Button>
-        <Button type="submit" variant="contained" color="primary">
-          {category.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} danh mục
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
+          {isLoading
+            ? "Đang xử lý..."
+            : category.id === EMPTY_UUID
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </FormControl>
     </Box>

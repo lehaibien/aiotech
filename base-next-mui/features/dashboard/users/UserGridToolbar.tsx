@@ -8,16 +8,16 @@ import { useSnackbar } from "notistack";
 import { DashboardDeleteButton } from "../DashboardDeleteButton";
 import { DashboardSearchBar } from "../DashboardSearchBar";
 
-type AccountGridToolbarProps = {
+type UserGridToolbarProps = {
   dataGridRef: React.RefObject<DataTableRef>;
 };
 
-export function AccountGridToolbar({ dataGridRef }: AccountGridToolbarProps) {
+export function UserGridToolbar({ dataGridRef }: UserGridToolbarProps) {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   function triggerAdd() {
     dataGridRef.current?.clearSelection();
-    router.push("/dashboard/accounts/upsert");
+    router.push("/dashboard/users/upsert");
   }
   function triggerEdit() {
     const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
@@ -34,7 +34,7 @@ export function AccountGridToolbar({ dataGridRef }: AccountGridToolbarProps) {
     const selectedData = rowSelection[0];
     if (selectedData) {
       dataGridRef.current?.clearSelection();
-      router.push(`/dashboard/accounts/upsert?id=${selectedData}`);
+      router.push(`/dashboard/users/upsert?id=${selectedData}`);
     }
   }
   return (

@@ -1,5 +1,5 @@
 import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
-import { AccountContent } from "@/features/dashboard/accounts/AccountContent";
+import { UserContent } from "@/features/dashboard/users/UserContent";
 import { Stack, Typography } from "@mui/material";
 import "server-only";
 
@@ -19,7 +19,7 @@ export default function Page() {
     <Stack gap={2}>
       <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h5">Quản lý tài khoản</Typography>
-      <AccountContent />
+      <UserContent />
     </Stack>
   );
 }

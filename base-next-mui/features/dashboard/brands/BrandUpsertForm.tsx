@@ -23,6 +23,7 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,6 +33,7 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
     resolver: zodResolver(BrandRequestSchema),
   });
   const onSubmit = async (data: BrandRequest) => {
+    setIsLoading(true);
     const request: BrandRequest = {
       ...data,
       image: image,
@@ -68,6 +70,7 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
         variant: "error",
       });
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     const getImage = async (url: string) => {
@@ -130,11 +133,21 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
           color="inherit"
           LinkComponent={Link}
           href="/dashboard/brands"
+          disabled={isLoading}
         >
           Hủy
         </Button>
-        <Button type="submit" variant="contained" color="primary">
-          {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
+          {isLoading
+            ? "Đang xử lý..."
+            : data.id === EMPTY_UUID
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </FormControl>
     </Box>

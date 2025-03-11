@@ -3,18 +3,18 @@
 import DataTable, { DataTableRef } from "@/components/core/DataTable";
 import { API_URL } from "@/constant/apiUrl";
 import { useRef } from "react";
-import { accountGridColumns } from "./accountGridColumns";
-import { AccountGridToolbar } from "./AccountGridToolbar";
+import { userGridColumns } from "./userGridColumns";
+import { UserGridToolbar } from "./UserGridToolbar";
 
-export function AccountContent() {
+export function UserContent() {
   const dataGridRef = useRef<DataTableRef>(null);
   return (
     <>
-      <AccountGridToolbar dataGridRef={dataGridRef} />
+      <UserGridToolbar dataGridRef={dataGridRef} />
       <DataTable
         apiUrl={API_URL.user}
         ref={dataGridRef}
-        columns={accountGridColumns}
+        columns={userGridColumns}
         checkboxSelection
         withRowNumber
       />

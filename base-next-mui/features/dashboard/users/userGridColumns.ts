@@ -1,7 +1,7 @@
 import { UserResponse } from '@/types';
 import { GridColDef } from '@mui/x-data-grid';
 
-export const accountGridColumns: GridColDef<UserResponse>[] = [
+export const userGridColumns: GridColDef<UserResponse>[] = [
   { field: 'userName', headerName: 'Tên tài khoản', flex: 1 },
   { field: 'fullName', headerName: 'Họ và tên', flex: 1 },
   { field: 'email', headerName: 'Email', flex: 1 },

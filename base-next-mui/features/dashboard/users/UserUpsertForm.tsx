@@ -4,6 +4,7 @@ import ComboBox from "@/components/core/ComboBox";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
+import { convertObjectToFormData } from "@/lib/utils";
 import {
   ComboBoxItem,
   UserRequest,
@@ -11,6 +12,7 @@ import {
   UserResponse,
 } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
   Avatar,
   Box,
@@ -25,21 +27,17 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { convertObjectToFormData } from "@/lib/utils";
 
 type UserUpsertFormProps = {
   data: UserResponse;
   roleCombobox: ComboBoxItem[];
 };
 
-export function AccountUpsertForm({
-  data,
-  roleCombobox,
-}: UserUpsertFormProps) {
+export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [avatarPreview, setAvatarPreview] = useState(data.avatarUrl);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -51,6 +49,7 @@ export function AccountUpsertForm({
     resolver: zodResolver(UserRequestSchema),
   });
   const onSubmit = async (request: UserRequest) => {
+    setIsLoading(true);
     const formData = convertObjectToFormData(request);
     try {
       if (data.id === EMPTY_UUID) {
@@ -59,7 +58,7 @@ export function AccountUpsertForm({
           enqueueSnackbar("Thêm mới tài khoản thành công", {
             variant: "success",
           });
-          router.push("/dashboard/accounts");
+          router.push("/dashboard/users");
         } else {
           enqueueSnackbar("Lỗi xảy ra: " + response.message, {
             variant: "error",
@@ -71,7 +70,7 @@ export function AccountUpsertForm({
           enqueueSnackbar("Cập nhật tài khoản thành công", {
             variant: "success",
           });
-          router.push("/dashboard/accounts");
+          router.push("/dashboard/users");
         } else {
           enqueueSnackbar("Lỗi xảy ra: " + response.message, {
             variant: "error",
@@ -83,6 +82,7 @@ export function AccountUpsertForm({
         variant: "error",
       });
     }
+    setIsLoading(false);
   };
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -246,14 +246,18 @@ export function AccountUpsertForm({
         <Button
           type="button"
           LinkComponent={Link}
-          href="/dashboard/accounts"
+          href="/dashboard/users"
           variant="contained"
-          color="inherit"
+          disabled={isLoading}
         >
           Hủy
         </Button>
         <Button type="submit" variant="contained" color="primary">
-          {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài khoản
+          {isLoading
+            ? "Đang xử lý..."
+            : data.id === EMPTY_UUID
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </FormControl>
     </Box>

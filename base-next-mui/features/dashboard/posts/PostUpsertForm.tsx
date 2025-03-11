@@ -39,6 +39,7 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
   });
   const [chips, setChips] = useState<string[]>(post.tags);
   const [image, setImage] = useState<File>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChipChange = (newChips: string[]) => {
     if (chips.includes(newChips[newChips.length - 1])) {
@@ -51,13 +52,13 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
     setImage(newImage);
   };
   const onSubmit = async (data: PostRequest) => {
+    setIsLoading(true);
     const request: PostRequest = {
       ...data,
       content: rteRef.current?.content ?? "",
       image: image,
       tags: chips,
     };
-    console.log(data);
     const formData = convertObjectToFormData(request);
     if (post.id === EMPTY_UUID) {
       const response = await postApi(API_URL.post, formData);
@@ -80,6 +81,7 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
         enqueueSnackbar(response.message, { variant: "error" });
       }
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -151,7 +153,7 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
           href="/dashboard/posts"
           type="button"
           variant="contained"
-          color="inherit"
+          disabled={isLoading}
         >
           Hủy
         </Button>
@@ -159,11 +161,9 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
           type="submit"
           variant="contained"
           color="primary"
-          sx={{
-            textTransform: "initial",
-          }}
+          disabled={isLoading}
         >
-          {post.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+          {isLoading ? "Đang xử lý..." : post.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
         </Button>
       </Box>
     </form>

@@ -1,13 +1,13 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
-import { AccountUpsertForm } from "@/features/dashboard/accounts/AccountUpsertForm";
+import { UserUpsertForm } from "@/features/dashboard/users/UserUpsertForm";
 import { getApi, getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, UserRequest, UserResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
 import "server-only";
 
-export default async function AccountUpsertPage({
+export default async function Page({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | undefined };
@@ -67,13 +67,12 @@ export default async function AccountUpsertPage({
     >
       <Typography
         component="h1"
-        variant="h4"
-        sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+        variant="h5"
       >
-        {uuid === null || uuid === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài
+        {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài
         khoản
       </Typography>
-      <AccountUpsertForm data={data} roleCombobox={roleCombobox} />
+      <UserUpsertForm data={data} roleCombobox={roleCombobox} />
     </Card>
   );
 }

@@ -123,7 +123,7 @@ export const dashboardMenus: DashboardMenu[] = [
       {
         name: "Tài khoản",
         icon: <AccountCircleOutlinedIcon />,
-        path: "/dashboard/accounts",
+        path: "/dashboard/users",
       },
       {
         name: "Cài đặt hệ thống",
