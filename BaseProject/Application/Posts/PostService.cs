@@ -151,6 +151,7 @@ public class PostService : IPostService
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
+            ImageType.BlogFeatured,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)
@@ -184,7 +185,7 @@ public class PostService : IPostService
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.Now;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var deleteResult = await _imageService.Delete(entity.ImageUrl);
+        var deleteResult = _imageService.DeleteByUrl(entity.ImageUrl);
         if (deleteResult.IsFailure)
         {
             return Result<PostResponse>.Failure(deleteResult.Message);
@@ -192,6 +193,7 @@ public class PostService : IPostService
 
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
+            ImageType.BlogFeatured,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)

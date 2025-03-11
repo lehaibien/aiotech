@@ -160,6 +160,7 @@ public class UserService : IUserService
         user.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
+            ImageType.Logo,
             Path.Combine(FolderUpload, user.Id.ToString())
         );
         if (uploadResult.IsFailure)
@@ -205,7 +206,7 @@ public class UserService : IUserService
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         if (entity.AvatarUrl is not null)
         {
-            var deleteResult = await _imageService.Delete(entity.AvatarUrl);
+            var deleteResult = _imageService.DeleteByUrl(entity.AvatarUrl);
             if (deleteResult.IsFailure)
             {
                 return Result<UserResponse>.Failure(deleteResult.Message);
@@ -216,6 +217,7 @@ public class UserService : IUserService
         {
             var uploadResult = await _imageService.UploadAsync(
                 request.Image,
+                ImageType.Logo,
                 Path.Combine(FolderUpload, entity.Id.ToString())
             );
             if (uploadResult.IsFailure)
@@ -249,7 +251,7 @@ public class UserService : IUserService
         user.Address = string.IsNullOrWhiteSpace(request.Address) ? user.Address : request.Address;
         if (user.AvatarUrl is not null)
         {
-            var deleteResult = await _imageService.Delete(user.AvatarUrl);
+            var deleteResult = _imageService.DeleteByUrl(user.AvatarUrl);
             if (deleteResult.IsFailure)
             {
                 return Result<UserResponse>.Failure(deleteResult.Message);
@@ -260,6 +262,7 @@ public class UserService : IUserService
         {
             var uploadResult = await _imageService.UploadAsync(
                 request.Image,
+                ImageType.Logo,
                 Path.Combine(FolderUpload, user.Id.ToString())
             );
             if (uploadResult.IsFailure)

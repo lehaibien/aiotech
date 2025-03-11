@@ -106,6 +106,7 @@ public class BrandService : IBrandService
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
+            ImageType.Category,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)
@@ -138,7 +139,7 @@ public class BrandService : IBrandService
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         if (entity.ImageUrl is not null)
         {
-            var deleteResult = await _imageService.Delete(entity.ImageUrl);
+            var deleteResult = _imageService.DeleteByUrl(entity.ImageUrl);
             if (deleteResult.IsFailure)
             {
                 return Result<BrandResponse>.Failure(deleteResult.Message);
@@ -147,6 +148,7 @@ public class BrandService : IBrandService
 
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
+            ImageType.Category,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)

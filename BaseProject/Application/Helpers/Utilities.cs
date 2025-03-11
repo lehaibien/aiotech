@@ -57,4 +57,13 @@ public static class Utilities
             _ => "",
         };
     }
+
+    public static bool IsAllowedExtension(string extension, string[] allowedExtensions)
+    {
+        extension = extension.ToLowerInvariant();
+        return Array.Exists(
+            allowedExtensions,
+            ext => ext.Equals(extension, StringComparison.InvariantCultureIgnoreCase)
+        );
+    }
 }

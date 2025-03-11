@@ -5,8 +5,34 @@ namespace Application.Files;
 
 public interface IFileService
 {
-    public Task<Result<string>> GetFileUrlAsync(string fileName, string folderName);
-    public Task<Result<FileMetadata>> GetFileMetadataAsync(string fileName, string folderName);
-    public Task<Result> UploadAsync(IFormFile file, string folderName);
-    public Task<Result> DeleteAsync(string fileName, string folderName);
+    Result<string> GetFileUrl(string fileName, string folderName);
+    Result<List<string>> GetFileUrls(List<string> fileNames, string folderName);
+    Result<string> GetFileBase64(string fileName, string folderName);
+    Task<Result<FileUploadResult>> UploadAsync(
+        IFormFile file,
+        string folderName,
+        string? fileName = null,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Result<List<FileUploadResult>>> UploadBulkAsync(
+        List<IFormFile> files,
+        string folderName,
+        string? fileName = null,
+        CancellationToken cancellationToken = default
+    );
+    Result Delete(string fileName, string folderName);
+    Result DeleteBulk(List<string> fileNames, string folderName);
+
+    Result DeleteByUrl(string fileUrl);
+
+    Result DeleteBulkByUrl(List<string> fileUrls);
+    void EnsureDirectoryExists(string folder);
+}
+
+public class FileUploadResult
+{
+    public string FileName { get; set; } = string.Empty;
+    public string FilePath { get; set; } = string.Empty;
+    public string FileUrl { get; set; } = string.Empty;
 }

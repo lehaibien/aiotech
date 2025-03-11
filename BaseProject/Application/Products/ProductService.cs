@@ -300,8 +300,9 @@ public class ProductService : IProductService
         var entity = _mapper.Map<Product>(request);
         entity.CreatedDate = DateTime.Now;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var uploadResult = await _imageService.UploadListAsync(
+        var uploadResult = await _imageService.UploadBulkAsync(
             request.Images,
+            ImageType.ProductDetail,
             Path.Combine(FolderUpload, entity.Sku)
         );
         if (uploadResult.IsFailure)
@@ -332,15 +333,16 @@ public class ProductService : IProductService
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.Now;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var deleteResult = await _imageService.DeleteList(entity.ImageUrls);
+        var deleteResult = _imageService.DeleteBulkByUrl(entity.ImageUrls);
         if (deleteResult.IsFailure)
         {
             return Result<ProductResponse>.Failure(deleteResult.Message);
         }
         if (request.Images.Count > 0)
         {
-            var uploadResult = await _imageService.UploadListAsync(
+            var uploadResult = await _imageService.UploadBulkAsync(
                 request.Images,
+                ImageType.ProductDetail,
                 Path.Combine(FolderUpload, entity.Sku)
             );
             if (uploadResult.IsFailure)

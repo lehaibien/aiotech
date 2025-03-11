@@ -103,14 +103,10 @@ public class AuthenticationService : IAuthenticationService
                 ContentType = contentType,
             };
             var newImageUrl = string.Empty;
-            var uploadImageResult = await _imageService.UploadListAsync([file], "user");
+            var uploadImageResult = await _imageService.UploadAsync(file, ImageType.Logo, "user");
             if (uploadImageResult.IsSuccess)
             {
-                newImageUrl = Path.Combine(
-                    "https://localhost:5555/static/images",
-                    "user",
-                    fullName
-                );
+                newImageUrl = uploadImageResult.Data;
             }
             user = new User
             {
