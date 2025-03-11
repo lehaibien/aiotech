@@ -82,13 +82,20 @@ function DataTable<T>(
     sortModel: sortModel[0],
     textSearch: textSearch.current,
   });
-  // const rowRef = React.useRef(data?.items ?? []);
-  const row = React.useMemo(() => data?.items ?? [], [data?.items]);
-  // const rowCountRef = React.useRef(data?.totalCount ?? 0);
-  const rowCount = React.useMemo(
-    () => data?.totalCount ?? 0,
-    [data?.totalCount]
-  );
+  const rowRef = React.useRef(data?.items ?? []);
+  const row = React.useMemo(() => {
+    if (Array.isArray(data?.items)) {
+      rowRef.current = data.items;
+    }
+    return rowRef.current;
+  }, [data?.items]);
+  const rowCountRef = React.useRef(data?.totalCount ?? 0);
+  const rowCount = React.useMemo(() => {
+    if (data?.totalCount !== undefined) {
+      rowCountRef.current = data.totalCount;
+    }
+    return rowCountRef.current;
+  }, [data?.totalCount]);
   // Handle pagination model change
   const onPaginationModelChange = useCallback(
     (newPaginationModel: GridPaginationModel) => {
