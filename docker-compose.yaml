@@ -30,6 +30,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=https://api.aiotech.cloud/static
+      - DOTNET_GCHeapCount=2  # Match vCPU count
+      - DOTNET_ServerGarbageCollection=1
     depends_on:
       database:
         condition: service_started
@@ -47,6 +49,11 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 256M
 
   seq:
     image: datalust/seq:latest
@@ -65,13 +72,20 @@ services:
   redis:
     image: redis:latest
     container_name: aiotech_redis
-    environment:
-      REDIS_DATABASES: 16
-      REDIS_MAXMEMORY: 1gb
+    command: 
+      - redis-server 
+      - --maxmemory 256mb  # Reduced from 1GB
+      - --maxmemory-policy allkeys-lru
+      - --save ""  # Disable persistence
     volumes:
       - redis_data:/data
     networks:
       - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -82,6 +96,8 @@ services:
       - TZ=Asia/Ho_Chi_Minh
       - MSSQL_PID=Express
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_MEMORY_LIMIT_MB=1024
+      - MSSQL_TEMPDB_MEMORY_OPTIMIZED=ON
       - ACCEPT_EULA="Y"
     networks:
       - backend
@@ -92,6 +108,14 @@ services:
       interval: 5s
       timeout: 30s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1500M
+        reservations:
+          cpus: '0.5' 
+          memory: 1000M
 
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
@@ -140,6 +164,8 @@ services:
     image: traefik:v3.1
     container_name: aiotech_traefik
     command:
+      - "--entrypoints.web.http2.maxConcurrentStreams=50"  # Reduced from 100
+      - "--experimental.http3=false"  # Disable HTTP3
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -161,6 +187,11 @@ services:
     networks:
       - backend
       - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.4'
+          memory: 256M
 
 volumes:
   database-data:
