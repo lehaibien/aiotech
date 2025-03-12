@@ -65,6 +65,10 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
             .HasPrincipalKey(p => p.Id)
             .HasConstraintName("FK_Review_ProductId")
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.Sku).IsUnique();
+        builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => new { x.CategoryId, x.BrandId });
         builder.ToTable("Product");
     }
 }

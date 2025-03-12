@@ -22,6 +22,7 @@ public class EmailChangeEntityConfiguration : IEntityTypeConfiguration<EmailChan
             .HasForeignKey(x => x.UserId)
             .HasConstraintName("FK_EmailChange_UserId")
             .OnDelete(DeleteBehavior.Cascade);
+        builder.HasIndex(x => x.Token).IncludeProperties(x => x.ExpiryDate);
         builder.ToTable("EmailChange");
     }
 }

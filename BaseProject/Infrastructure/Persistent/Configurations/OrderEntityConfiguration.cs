@@ -34,6 +34,9 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
             .HasPrincipalKey(x => x.Id)
             .HasConstraintName("FK_Order_OrderItemId")
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.CustomerId);
+        builder.HasIndex(x => x.TrackingNumber).IsUnique();
         builder.ToTable("Order");
     }
 }

@@ -19,6 +19,7 @@ public class BrandEntityConfiguration : IEntityTypeConfiguration<Brand>
             .HasForeignKey(x => x.BrandId)
             .HasPrincipalKey(x => x.Id)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(x => x.Name).IsUnique();
         builder.ToTable("Brand");
     }
 }

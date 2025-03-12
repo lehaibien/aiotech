@@ -30,6 +30,8 @@ public class ReviewEntityConfiguration : IEntityTypeConfiguration<Review>
             .HasPrincipalKey(x => x.Id)
             .HasConstraintName("FK_Review_UserId")
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasIndex(x => new { x.ProductId, x.UserId });
         builder.ToTable("Review");
     }
 }
