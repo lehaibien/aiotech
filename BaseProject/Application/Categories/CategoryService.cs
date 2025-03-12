@@ -104,7 +104,7 @@ public class CategoryService : ICategoryService
 
         var entity = _mapper.Map<Category>(request);
         entity.Id = Guid.NewGuid();
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
@@ -140,7 +140,7 @@ public class CategoryService : ICategoryService
         }
 
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         if (entity.ImageUrl is not null)
         {
@@ -176,7 +176,7 @@ public class CategoryService : ICategoryService
             return Result<string>.Failure("Thể loại không tồn tại");
         }
 
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Category>().Update(entity);
@@ -194,7 +194,7 @@ public class CategoryService : ICategoryService
                 return Result<string>.Failure("Thể loại không tồn tại");
             }
 
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Category>().Update(entity);

@@ -231,7 +231,7 @@ public class OrderService : IOrderService
             item.OrderId = entity.Id;
         }
 
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         // if (!string.IsNullOrWhiteSpace(request.CouponCode))
         // {
@@ -288,7 +288,7 @@ public class OrderService : IOrderService
             item.OrderId = entity.Id;
         }
 
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Add(entity);
         _unitOfWork.GetRepository<OrderItem>().AddRange(items);
@@ -307,7 +307,7 @@ public class OrderService : IOrderService
         if (entity is null)
             return Result<OrderResponse>.Failure("Đơn hàng không tồn tại");
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -320,7 +320,7 @@ public class OrderService : IOrderService
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
         if (entity is null)
             return Result<string>.Failure("Đơn hàng không tồn tại");
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Order>().Update(entity);
@@ -335,7 +335,7 @@ public class OrderService : IOrderService
             var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
             if (entity is null)
                 return Result<string>.Failure("Đơn hàng không tồn tại");
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Order>().Update(entity);
@@ -369,7 +369,7 @@ public class OrderService : IOrderService
         }
         if (request.Status == OrderStatus.Delivered)
         {
-            entity.DeliveryDate = DateTime.Now;
+            entity.DeliveryDate = DateTime.UtcNow;
         }
         if (
             entity.Status == OrderStatus.Delivered
@@ -380,7 +380,7 @@ public class OrderService : IOrderService
             entity.DeliveryDate = null;
         }
         entity.Status = request.Status;
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -400,7 +400,7 @@ public class OrderService : IOrderService
             if (entity is null)
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             entity.Status = status;
-            entity.UpdatedDate = DateTime.Now;
+            entity.UpdatedDate = DateTime.UtcNow;
             entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             _unitOfWork.GetRepository<Order>().Update(entity);
         }
@@ -541,7 +541,7 @@ public class OrderService : IOrderService
         }
         order.Status = OrderStatus.Cancelled;
         order.CancelReason = request.Reason;
-        order.UpdatedDate = DateTime.Now;
+        order.UpdatedDate = DateTime.UtcNow;
         order.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
@@ -563,7 +563,7 @@ public class OrderService : IOrderService
             return Result.Failure("Không thể xác nhận đơn hàng");
         }
         order.Status = OrderStatus.Completed;
-        order.UpdatedDate = DateTime.Now;
+        order.UpdatedDate = DateTime.UtcNow;
         order.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
@@ -577,7 +577,7 @@ public class OrderService : IOrderService
     {
         var random = new Random();
         const string prefix = "ORD";
-        string dateTimePart = DateTime.Now.ToString("yyyyMMddHHmmss");
+        string dateTimePart = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         int randomNumber = random.Next(100, 1000);
         return $"{prefix}{dateTimePart}{randomNumber}";
     }

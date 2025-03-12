@@ -6,6 +6,7 @@ import Credentials from "next-auth/providers/credentials";
 import Facebook from "next-auth/providers/facebook";
 import Google from "next-auth/providers/google";
 import { postApi } from "./apiClient";
+import dayjs from "@/lib/extended-dayjs";
 
 interface JwtPayload {
   "nameid": string;
@@ -273,6 +274,6 @@ const decodeJwt = (token: string): JwtPayload => {
 
 const isTokenExpired = (token: string, offsetSeconds: number = 0): boolean => {
   const decoded = jwtDecode<JwtPayload>(token);
-  const currentTime = Date.now() / 1000; // Convert to seconds
+  const currentTime = dayjs().unix();
   return decoded.exp < currentTime - offsetSeconds;
 };

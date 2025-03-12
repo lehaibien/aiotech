@@ -1,4 +1,6 @@
-import { Facebook, Instagram, X, YouTube } from "@mui/icons-material";
+import BrandLogo from "@/components/core/BrandLogo";
+import { HighlightTypography } from "@/components/core/HighlightTypography";
+import { Email, Facebook, Instagram, LocationOn, Phone, X, YouTube } from "@mui/icons-material";
 import {
   Box,
   Grid2 as Grid,
@@ -8,10 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
+import dayjs from '@/lib/extended-dayjs';
 import "server-only";
-import { LocationOn, Phone, Email } from "@mui/icons-material";
-import { HighlightTypography } from "@/components/core/HighlightTypography";
-import BrandLogo from "@/components/core/BrandLogo";
 
 export default function Footer() {
   return (
@@ -187,7 +187,7 @@ export default function Footer() {
           sx={{ py: 1, borderTop: "1px solid", borderColor: "divider" }}
         >
           <Typography variant="body2" textAlign="center" sx={{ opacity: 0.7 }}>
-            © {new Date().getFullYear()} AioTech. Bảo lưu mọi quyền.
+            © {dayjs().year()} AioTech. Bảo lưu mọi quyền.
           </Typography>
         </Grid>
       </Grid>

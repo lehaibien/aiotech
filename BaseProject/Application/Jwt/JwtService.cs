@@ -49,7 +49,7 @@ public class JwtService : IJwtService
             _options.Issuer,
             _options.Audience,
             claims,
-            expires: DateTime.Now.AddMinutes(_options.ExpirationInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_options.ExpirationInMinutes),
             signingCredentials: new SigningCredentials(
                 _symmetricSecurityKey,
                 SecurityAlgorithms.HmacSha384

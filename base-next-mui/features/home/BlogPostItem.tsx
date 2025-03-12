@@ -17,6 +17,7 @@ import { UUID } from "crypto";
 import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
+import dayjs from "@/lib/extended-dayjs";
 
 interface BlogPostItemProps {
   id: UUID;
@@ -27,12 +28,11 @@ interface BlogPostItemProps {
 
 function BlogPostItem({ id, title, imageUrl, createdDate }: BlogPostItemProps) {
   const theme = useTheme();
-  const date = new Date(createdDate);
+  const postDate = dayjs(createdDate);
   
-  // Format date parts
-  const formattedDate = date.toLocaleDateString('vi-VN');
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const formattedDate = postDate.format('DD/MM/YYYY');
+  const hours = postDate.format('HH');
+  const minutes = postDate.format('mm');
   
   return (
     <Card

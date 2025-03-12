@@ -102,7 +102,7 @@ public class BrandService : IBrandService
         }
         var entity = _mapper.Map<Brand>(request);
         entity.Id = Guid.NewGuid();
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
@@ -135,7 +135,7 @@ public class BrandService : IBrandService
             return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
         }
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         if (entity.ImageUrl is not null)
         {
@@ -169,7 +169,7 @@ public class BrandService : IBrandService
         {
             return Result<string>.Failure("Thương hiệu không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Brand>().Update(entity);
@@ -186,7 +186,7 @@ public class BrandService : IBrandService
             {
                 return Result<string>.Failure("Thương hiệu không tồn tại");
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Brand>().Update(entity);

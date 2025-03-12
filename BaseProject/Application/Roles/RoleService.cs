@@ -73,7 +73,7 @@ public class RoleService : IRoleService
             return Result<RoleResponse>.Failure("Vai trò đã tồn tại");
         }
         var entity = _mapper.Map<Role>(request);
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Role>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -95,7 +95,7 @@ public class RoleService : IRoleService
             return Result<RoleResponse>.Failure("Vai trò không tồn tại");
         }
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Role>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -110,7 +110,7 @@ public class RoleService : IRoleService
         {
             return Result<string>.Failure("Vai trò không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Role>().Update(entity);
@@ -127,7 +127,7 @@ public class RoleService : IRoleService
             {
                 return Result<string>.Failure("Vai trò không tồn tại");
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Role>().Update(entity);

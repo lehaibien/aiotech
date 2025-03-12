@@ -4,7 +4,7 @@ import { TopCustomerReportRequest, TopCustomerReportResponse } from "@/types";
 import { Box, Typography } from "@mui/material";
 import TopCustomerChart from "./TopCustomerChart";
 import TopCustomerGrid from "./TopCustomerGrid";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 import utc from "dayjs/plugin/utc";
 import TopCustomerFilter from "./TopCustomerFilter";
 

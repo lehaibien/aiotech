@@ -147,7 +147,7 @@ public class PostService : IPostService
 
         var entity = _mapper.Map<Post>(request);
         entity.Id = Guid.NewGuid();
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
@@ -183,7 +183,7 @@ public class PostService : IPostService
         }
 
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var deleteResult = _imageService.DeleteByUrl(entity.ImageUrl);
         if (deleteResult.IsFailure)
@@ -216,7 +216,7 @@ public class PostService : IPostService
             return Result<string>.Failure("Bài viết không tồn tại");
         }
 
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Post>().Update(entity);
@@ -234,7 +234,7 @@ public class PostService : IPostService
                 return Result<string>.Failure("Bài viết không tồn tại");
             }
 
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Post>().Update(entity);

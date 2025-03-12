@@ -5,6 +5,7 @@ import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { BrandResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
+import dayjs from "@/lib/extended-dayjs";
 
 async function Page({
   searchParams,
@@ -16,7 +17,7 @@ async function Page({
     id: EMPTY_UUID,
     name: "",
     imageUrl: "",
-    createdDate: new Date(),
+    createdDate: dayjs().toDate(),
     createdBy: "",
   };
   if (uuid !== EMPTY_UUID) {

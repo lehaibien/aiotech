@@ -18,7 +18,7 @@ export default async function UpsertPage({
     imageUrl: "",
     isPublished: false,
     tags: [],
-    createdDate: new Date(),
+    createdDate: dayjs().utc().toDate(),
   };
   const parsedId = parseUUID(searchParams?.id ?? "");
   if (parsedId !== EMPTY_UUID) {

@@ -10,15 +10,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 import "server-only";
 import SaleReportFilter from "./SaleReportFilter";
 import SalesChart from "./SalesChart";
 import { formatNumberWithSeperator } from "@/lib/utils";
-import utc from "dayjs/plugin/utc";
 import { TrendingUp, ShoppingCart, AttachMoney, Cancel, CheckCircle, Pending } from "@mui/icons-material";
-
-dayjs.extend(utc);
 
 const breadcrums = [
   {
@@ -90,8 +87,8 @@ export default async function SaleReportPage({
         }}
       >
         <SaleReportFilter
-          defaultStartDate={startDate.toDate()}
-          defaultEndDate={endDate.toDate()}
+          defaultStartDate={startDate}
+          defaultEndDate={endDate}
         />
       </Box>
 

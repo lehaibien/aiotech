@@ -37,7 +37,7 @@ public class DiscountService : IDiscountService
         {
             return Result.Failure("Mã giảm giá không tồn tại");
         }
-        if (discount.ValidUntil >= DateTime.Now && discount.Uses > 0)
+        if (discount.ValidUntil >= DateTime.UtcNow && discount.Uses > 0)
         {
             return Result.Failure("Mã giảm giá đã hết hạn hoặc không còn hiệu lực");
         }

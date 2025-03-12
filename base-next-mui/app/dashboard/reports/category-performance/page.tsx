@@ -6,7 +6,7 @@ import {
     CategoryPerformanceReportResponse,
 } from "@/types";
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 import utc from "dayjs/plugin/utc";
 import { CategoryPerformanceChart } from "./CategoryPerformanceChart";
 import { CategoryPerformanceGrid } from "./CategoryPerformanceGrid";

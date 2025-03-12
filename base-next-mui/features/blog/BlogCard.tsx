@@ -86,7 +86,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           >
             <CalendarTodayIcon sx={{ fontSize: "1rem", mr: 0.5 }} />
             <Typography variant="body2" color="text.secondary">
-              {formatDate(new Date(post.createdDate))}
+              {formatDate(post.createdDate)}
             </Typography>
           </Box>
         </CardContent>

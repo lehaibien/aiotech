@@ -11,7 +11,6 @@ using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +87,7 @@ public class AuthenticationService : IAuthenticationService
             var password = EncryptionHelper.HashPassword(randomPassword, out var salt);
             using var httpClient = new HttpClient();
             var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
-            var fileName = email + DateTime.Now.ToString("yyyyMMddHHmmss");
+            var fileName = email + DateTime.UtcNow.ToString("yyyyMMddHHmmss");
             var fullName = fileName + ".png";
             var contentType = "image/png";
             var stream = new MemoryStream(imageBytes);
@@ -113,7 +112,7 @@ public class AuthenticationService : IAuthenticationService
                 Password = password,
                 Salt = Convert.ToBase64String(salt),
                 AvatarUrl = newImageUrl,
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
                 IsDeleted = false,
                 RoleId = role.Id,
@@ -154,7 +153,7 @@ public class AuthenticationService : IAuthenticationService
             {
                 Id = Guid.NewGuid(),
                 Name = "User",
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
                 IsDeleted = false,
             };
@@ -168,7 +167,7 @@ public class AuthenticationService : IAuthenticationService
 
         user.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
         user.Salt = Convert.ToBase64String(salt);
-        user.CreatedDate = DateTime.Now;
+        user.CreatedDate = DateTime.UtcNow;
         user.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<User>().Add(user);
         await _unitOfWork.SaveChangesAsync();
@@ -236,7 +235,7 @@ public class AuthenticationService : IAuthenticationService
         }
         entity.Password = EncryptionHelper.HashPassword(request.NewPassword, out var salt);
         entity.Salt = Convert.ToBase64String(salt);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<User>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -252,7 +251,7 @@ public class AuthenticationService : IAuthenticationService
             return Result<string>.Failure("Tài khoản không tồn tại");
         }
         var token = GenerateSecureToken();
-        var currentTime = DateTime.Now;
+        var currentTime = DateTime.UtcNow;
         var changeEmail = new EmailChange
         {
             UserId = entity.Id,
@@ -280,7 +279,7 @@ public class AuthenticationService : IAuthenticationService
         {
             return Result.Failure("Đường dẫn không hợp lệ");
         }
-        if (entity.ExpiryDate < DateTime.Now)
+        if (entity.ExpiryDate < DateTime.UtcNow)
         {
             return Result.Failure("Đường dẫn đã hết hạn");
         }

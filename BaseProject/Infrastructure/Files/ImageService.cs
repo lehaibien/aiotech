@@ -78,7 +78,7 @@ public class ImageService : IImageService
 
         // Generate a unique base filename
         var baseFileName =
-            $"{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid().ToString().Substring(0, 8)}";
+            $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid().ToString().Substring(0, 8)}";
 
         try
         {

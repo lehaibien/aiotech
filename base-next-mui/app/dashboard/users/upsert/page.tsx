@@ -24,7 +24,7 @@ export default async function Page({
     roleId: EMPTY_UUID,
     fullName: "",
     role: "",
-    createdDate: new Date(),
+    createdDate: dayjs().utc().toDate(),
     createdBy: "",
   };
   let roleCombobox: ComboBoxItem[] = [];

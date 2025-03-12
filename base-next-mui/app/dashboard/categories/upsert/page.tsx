@@ -17,7 +17,7 @@ export default async function CategoryUpsertPage({
     id: EMPTY_UUID,
     name: "",
     imageUrl: "",
-    createdDate: new Date(),
+    createdDate: dayjs().utc().toDate(),
     createdBy: "",
   };
   if (uuid !== EMPTY_UUID) {

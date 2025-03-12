@@ -72,7 +72,7 @@ public class ProductCollectionService : IProductCollectionService
             return Result<ProductCollectionResponse>.Failure("Bộ sản phẩm đã tồn tại");
         }
         var entity = _mapper.Map<ProductCollection>(request);
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<ProductCollection>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -94,7 +94,7 @@ public class ProductCollectionService : IProductCollectionService
             return Result<ProductCollectionResponse>.Failure("Bộ sản phẩm không tồn tại");
         }
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<ProductCollection>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -109,7 +109,7 @@ public class ProductCollectionService : IProductCollectionService
         {
             return Result<string>.Failure("Bộ sản phẩm không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<ProductCollection>().Update(entity);
@@ -126,7 +126,7 @@ public class ProductCollectionService : IProductCollectionService
             {
                 return Result<string>.Failure("Bộ sản phẩm không tồn tại");
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<ProductCollection>().Update(entity);

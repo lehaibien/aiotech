@@ -1,6 +1,7 @@
-import { EMPTY_UUID } from "@/constant/common";
+import { DEFAULT_TIMEZONE, EMPTY_UUID } from "@/constant/common";
+import dayjs from "@/lib/extended-dayjs";
 import { UUID } from "crypto";
-import dayjs from "dayjs";
+import { Dayjs } from "dayjs";
 
 /**
  * Generates a version 4 UUID (Universally Unique Identifier)
@@ -41,26 +42,15 @@ export function formatNumberWithSeperator(
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
 }
 
-/**
- * Formats a date string into a locale-specific string.
- *
- * @param {string | null} dateString - The date string to format. If `null`, returns an empty string.
- * @returns {string} The formatted date as a string in the user's locale, or an empty string if the input is invalid.
- */
 export function formatDateFromString(dateString: string | null): string {
-  if (dateString === null) {
+  if (!dateString) {
     return "";
   }
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    return "";
-  }
-  return date.toLocaleString();
+  return dayjs(dateString).tz(DEFAULT_TIMEZONE).format("DD/MM/YYYY HH:mm");
 }
 
-export function formatDate(date: Date): string {
-  const newDate = dayjs(date);
-  return newDate.locale("vi").format("DD/MM/YYYY HH:mm");
+export function formatDate(date: Date | Dayjs): string {
+  return dayjs(date).tz(DEFAULT_TIMEZONE).format("DD/MM/YYYY HH:mm");
 }
 
 export function capitalize(str: string) {

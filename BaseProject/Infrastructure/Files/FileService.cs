@@ -74,7 +74,7 @@ public class FileService : IFileService
         EnsureDirectoryExists(folderPath);
 
         // Generate filename if not provided
-        fileName ??= $"{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid().ToString().Substring(0, 8)}";
+        fileName ??= $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid().ToString().Substring(0, 8)}";
         var fullFileName = $"{fileName}{extension}";
         var filePath = Path.Combine(folderPath, fullFileName);
 

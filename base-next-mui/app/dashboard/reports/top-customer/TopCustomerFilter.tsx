@@ -1,17 +1,14 @@
 "use client";
 
+import { ReportMonthFilter } from "@/features/dashboard/reports/ReportMonthFilter";
 import { Box, Button, MenuItem, Select } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
-import utc from "dayjs/plugin/utc";
+import { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-dayjs.extend(utc);
-
 type TopCustomerFilterProps = {
-  defaultStartDate?: Date | null;
-  defaultEndDate?: Date | null;
+  defaultStartDate: Dayjs | null;
+  defaultEndDate: Dayjs | null;
   defaultCount?: number;
 };
 
@@ -21,12 +18,8 @@ export default function TopCustomerFilter({
   defaultCount,
 }: TopCustomerFilterProps) {
   const router = useRouter();
-  const [startDate, setStartDate] = useState<Dayjs | null>(
-    defaultStartDate ? dayjs.utc(defaultStartDate) : null
-  );
-  const [endDate, setEndDate] = useState<Dayjs | null>(
-    defaultEndDate ? dayjs.utc(defaultEndDate) : null
-  );
+  const [startDate, setStartDate] = useState<Dayjs | null>(defaultStartDate);
+  const [endDate, setEndDate] = useState<Dayjs | null>(defaultEndDate);
   const [count, setCount] = useState<number>(defaultCount || 10);
   const onApplyFilter = () => {
     const start = startDate?.toJSON();
@@ -36,7 +29,14 @@ export default function TopCustomerFilter({
     );
   };
 
-  const handleEndDateChange = () => {
+  const handleStartDateClose = () => {
+    if (startDate?.isAfter(endDate)) {
+      setStartDate(endDate);
+      return;
+    }
+  };
+
+  const handleEndDateClose = () => {
     if (endDate?.isBefore(startDate)) {
       setEndDate(startDate);
       return;
@@ -52,24 +52,17 @@ export default function TopCustomerFilter({
   };
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      <DatePicker
+      <ReportMonthFilter
         label="Từ tháng"
         value={startDate}
         onChange={setStartDate}
-        views={["year", "month"]}
-        format="MM/YYYY"
-        //Remove this line: renderInput={(params) => (<TextField {...params} />)}
-        slotProps={{ textField: { variant: "outlined" } }} // optional styling. Choose variant as per your need.
-      />
-      <DatePicker
+        onClose={handleStartDateClose}
+        />
+      <ReportMonthFilter
         label="Đến tháng"
         value={endDate}
         onChange={setEndDate}
-        onClose={handleEndDateChange}
-        views={["year", "month"]}
-        format="MM/YYYY"
-        //Remove this line: renderInput={(params) => (<TextField {...params} />)}
-        slotProps={{ textField: { variant: "outlined" } }} // optional styling. Choose variant as per your need.
+        onClose={handleEndDateClose}
       />
       <Select
         label="Số lượng"

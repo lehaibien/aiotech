@@ -3,6 +3,7 @@
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { SaleReportResponse } from "@/types";
 import { BarChart } from "@mui/x-charts";
+import dayjs from '@/lib/extended-dayjs';
 // Then create a React component to display the chart
 
 interface SalesChartProps {
@@ -10,14 +11,12 @@ interface SalesChartProps {
 }
 
 export default function SalesChart({ data }: SalesChartProps) {
-  // Convert date strings to JavaScript Date objects
   const chartData = data
     .map((item) => ({
       ...item,
-      date: new Date(item.date),
+      date: dayjs(item.date).toDate(),
     }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
-  // Ensure we have a valid minimum price value, defaulting to 0 if all values are 0
+    .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
   const minPrice = Math.min(...chartData.map((item) => item.revenue));
   const hasNonZeroValues = chartData.some(item => item.revenue > 0);
   return (
@@ -27,12 +26,10 @@ export default function SalesChart({ data }: SalesChartProps) {
           id: "x-axis-date",
           dataKey: "date",
           scaleType: "band",
-          data: chartData.map((item) => item.date),
+          data: chartData.map((item) => dayjs(item.date).toDate()),
           valueFormatter: (value: Date) =>
-            value.toLocaleDateString("vi-VN", {
-              year: "numeric",
-              month: "numeric",
-            }),
+            dayjs(value).format("MM/YYYY"),
+          label: "Tháng",
           position: "bottom",
         },
       ]}

@@ -31,7 +31,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 
 type OrderDetailProps = {
   order?: OrderResponse;

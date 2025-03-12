@@ -119,7 +119,7 @@ public class ReviewService : IReviewService
             return Result<ReviewResponse>.Failure("Bạn chưa mua sản phẩm này");
         }
         var entity = _mapper.Map<Review>(request);
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Review>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -135,7 +135,7 @@ public class ReviewService : IReviewService
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -150,7 +150,7 @@ public class ReviewService : IReviewService
         {
             return Result.Failure("Đánh giá không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Review>().Update(entity);
@@ -167,7 +167,7 @@ public class ReviewService : IReviewService
             {
                 return Result<string>.Failure("Đánh giá không tồn tại");
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Review>().Update(entity);

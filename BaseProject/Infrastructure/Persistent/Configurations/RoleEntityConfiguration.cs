@@ -22,21 +22,21 @@ public class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
             {
                 Id = Guid.Parse("85844E35-F6A0-4F8E-90C4-071366BF5FF6"),
                 Name = "Admin",
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
             },
             new Role
             {
                 Id = Guid.Parse("A8B42A83-B1BC-4937-99D9-0AAA70B896E5"),
                 Name = "User",
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
             },
             new Role
             {
                 Id = Guid.Parse("B2F02C43-4D58-45D2-84A4-CAF92A976672"),
                 Name = "Shipper",
-                CreatedDate = DateTime.Now,
+                CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
             }
         );

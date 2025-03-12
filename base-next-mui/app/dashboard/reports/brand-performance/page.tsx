@@ -6,7 +6,7 @@ import {
     BrandPerformanceReportResponse,
 } from "@/types";
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 import utc from "dayjs/plugin/utc";
 import { BrandPerformanceChart } from "./BrandPerformanceChart";
 import { BrandPerformanceGrid } from "./BrandPerformanceGrid";
@@ -31,11 +31,11 @@ export default async function BrandPerformancePage({
 }) {
   let data: BrandPerformanceReportResponse[] = [];
   const startDate = searchParams?.start_date
-    ? dayjs.utc(searchParams?.start_date)
-    : dayjs.utc().startOf("year");
+    ? dayjs(searchParams?.start_date)
+    : dayjs().startOf("year");
   const endDate = searchParams?.end_date
     ? dayjs(searchParams?.end_date)
-    : dayjs.utc().endOf("year");
+    : dayjs().endOf("year");
   const request: BrandPerformanceReportRequest = {
     startDate: startDate.toJSON(),
     endDate: endDate.toJSON(),

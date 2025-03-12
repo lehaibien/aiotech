@@ -19,7 +19,7 @@ public class DashboardService : IDashboardService
 
     public async Task<Result<DashboardCard>> GetDashboardCardAsync()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var currentMonthStart = new DateTime(now.Year, now.Month, 1);
         var previousMonthStart = currentMonthStart.AddMonths(-1);
         var previousMonthEnd = previousMonthStart.AddMonths(1).AddDays(-1);

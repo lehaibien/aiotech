@@ -4,7 +4,7 @@ import { getApiQuery } from "@/lib/apiClient";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { OrderReportRequest, OrderReportResponse } from "@/types";
 import { Box, Typography } from "@mui/material";
-import dayjs from "dayjs";
+import dayjs from "@/lib/extended-dayjs";
 import utc from "dayjs/plugin/utc";
 import "server-only";
 import OrderReportFilter from "./OrderReportFilter";

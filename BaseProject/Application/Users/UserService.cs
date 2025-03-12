@@ -156,7 +156,7 @@ public class UserService : IUserService
         user.RoleId = request.RoleId == Guid.Empty ? role.Id : request.RoleId;
         user.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
         user.Salt = Convert.ToBase64String(salt);
-        user.CreatedDate = DateTime.Now;
+        user.CreatedDate = DateTime.UtcNow;
         user.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
@@ -202,7 +202,7 @@ public class UserService : IUserService
             entity.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
             entity.Salt = Convert.ToBase64String(salt);
         }
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         if (entity.AvatarUrl is not null)
         {
@@ -285,7 +285,7 @@ public class UserService : IUserService
         {
             return Result<string>.Failure("Tài khoản không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<User>().Update(entity);
@@ -307,7 +307,7 @@ public class UserService : IUserService
         entities.ForEach(x =>
         {
             x.IsDeleted = true;
-            x.DeletedDate = DateTime.Now;
+            x.DeletedDate = DateTime.UtcNow;
             x.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         });
         _unitOfWork.GetRepository<User>().UpdateRange(entities);

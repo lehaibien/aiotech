@@ -16,7 +16,7 @@ public class UserController : ControllerBase
         HttpOnly = true,
         SameSite = SameSiteMode.Strict,
         Secure = true,
-        Expires = DateTime.Now.AddDays(1),
+        Expires = DateTime.UtcNow.AddDays(1),
     };
     private readonly IUserService _service;
 

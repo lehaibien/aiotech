@@ -2,6 +2,7 @@
 
 import { API_URL } from "@/constant/apiUrl";
 import { deleteApi, getListApi, postApi, putApi } from "@/lib/apiClient";
+import { formatDate } from "@/lib/utils";
 import {
   ApiResponse,
   GetListReviewByProductIdRequest,
@@ -409,9 +410,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                             />
                             <Typography variant="body2" color="text.secondary">
                               •{" "}
-                              {new Date(
-                                review.createdDate
-                              ).toLocaleDateString()}
+                              {formatDate(review.createdDate)}
                             </Typography>
                           </Box>
                           <Typography variant="body1" sx={{ mt: 1 }}>

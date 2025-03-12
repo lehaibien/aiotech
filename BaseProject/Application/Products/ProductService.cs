@@ -298,7 +298,7 @@ public class ProductService : IProductService
             return Result<ProductResponse>.Failure("Sản phẩm đã tồn tại");
         }
         var entity = _mapper.Map<Product>(request);
-        entity.CreatedDate = DateTime.Now;
+        entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadBulkAsync(
             request.Images,
@@ -331,7 +331,7 @@ public class ProductService : IProductService
             return Result<ProductResponse>.Failure("Sản phẩm không tồn tại");
         }
         _mapper.Map(request, entity);
-        entity.UpdatedDate = DateTime.Now;
+        entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var deleteResult = _imageService.DeleteBulkByUrl(entity.ImageUrls);
         if (deleteResult.IsFailure)
@@ -364,7 +364,7 @@ public class ProductService : IProductService
         {
             return Result<string>.Failure("Sản phẩm không tồn tại");
         }
-        entity.DeletedDate = DateTime.Now;
+        entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Product>().Update(entity);
@@ -381,7 +381,7 @@ public class ProductService : IProductService
             {
                 return Result<string>.Failure("Sản phẩm không tồn tại");
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Product>().Update(entity);
