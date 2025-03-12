@@ -128,6 +128,8 @@ services:
     volumes:
       - umami-db-data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
