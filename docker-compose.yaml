@@ -33,8 +33,10 @@ services:
     depends_on:
       database:
         condition: service_healthy
-      redis: {}
-      seq: {}
+      redis:
+        condition: service_started
+      seq:
+        condition: service_started
     networks:
       - backend
     volumes:
