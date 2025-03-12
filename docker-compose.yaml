@@ -24,16 +24,17 @@ services:
     build: ./BaseProject/
     container_name: aiotech_api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=true;MultipleActiveResultSets=true
       - RedisConnectionString=redis:6379
       - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=https://api.aiotech.cloud/static
     depends_on:
-      - database
-      - redis
-      - seq
+      database:
+        condition: service_healthy
+      redis:
+      seq:
     networks:
       - backend
     volumes:
@@ -77,13 +78,18 @@ services:
       - "1433:1433"
     environment:
       - TZ=Asia/Ho_Chi_Minh
-      - MSSQL_PID=Developer
+      - MSSQL_PID=Express
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
       - ACCEPT_EULA="Y"
     networks:
       - backend
     volumes:
       - database-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "${DB_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
 
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
