@@ -1,5 +1,6 @@
 using Application.Brands;
 using Application.Brands.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using WebApi.Model;
@@ -11,10 +12,12 @@ namespace WebApi.Controllers;
 public class BrandController : ControllerBase
 {
     private readonly IBrandService _service;
+    private readonly ILogger<BrandController> _logger;
 
-    public BrandController(IBrandService service)
+    public BrandController(IBrandService service, ILogger<BrandController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -50,7 +53,7 @@ public class BrandController : ControllerBase
     }
 
     [HttpPost]
-    // [Authorize(Policy = "AdminAndManager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromForm] CreateBrandRequest request)
     {
         var response = new ApiResponse();
@@ -63,11 +66,12 @@ public class BrandController : ControllerBase
         }
 
         response.Data = result.Data;
+        _logger.LogInformation("A brand with name {Name} has been created", request.Name);
         return Ok(response);
     }
 
     [HttpPut]
-    // [Authorize(Policy = "AdminAndManager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update([FromForm] UpdateBrandRequest request)
     {
         var response = new ApiResponse();
@@ -80,11 +84,16 @@ public class BrandController : ControllerBase
         }
 
         response.Data = result.Data;
+        _logger.LogInformation(
+            "A brand with id {Id} name {Name} has been updated",
+            request.Id,
+            request.Name
+        );
         return Ok(response);
     }
 
     [HttpDelete("{id:guid}")]
-    // [Authorize(Policy = "AdminAndManager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = new ApiResponse();
@@ -97,11 +106,12 @@ public class BrandController : ControllerBase
         }
 
         response.Data = result.Data;
+        _logger.LogInformation("A brand with Id {Id} has been deleted.", id);
         return Ok(response);
     }
 
     [HttpDelete]
-    // [Authorize(Policy = "AdminAndManager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
         var response = new ApiResponse();
@@ -114,6 +124,7 @@ public class BrandController : ControllerBase
         }
 
         response.Data = result.Data;
+        _logger.LogInformation("A list of brand has been deleted. Ids: {Id}", ids);
         return Ok(response);
     }
 

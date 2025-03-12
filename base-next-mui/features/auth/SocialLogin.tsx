@@ -25,6 +25,7 @@ function SocialLogin({ redirectTo, isRegister }: SocialLoginProps) {
         variant="contained"
         startIcon={<GoogleIcon />}
         onClick={() => loginSocial("google")}
+        data-umami-event={`${isRegister ? "Đăng ký" : "Đăng nhập"} với Google`}
       >
         {isRegister ? "Đăng ký" : "Đăng nhập"} với Google
       </SocialMediaButton>
@@ -32,6 +33,7 @@ function SocialLogin({ redirectTo, isRegister }: SocialLoginProps) {
         variant="contained"
         startIcon={<FacebookIcon />}
         onClick={() => loginSocial("facebook")}
+        data-umami-event={`${isRegister ? "Đăng ký" : "Đăng nhập"} với Facebook`}
       >
         {isRegister ? "Đăng ký" : "Đăng nhập"} với Facebook
       </SocialMediaButton>

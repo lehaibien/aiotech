@@ -25,14 +25,16 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlServer(
-                connectionString,
-                cfg =>
-                {
-                    cfg.CommandTimeout(180);
-                    cfg.EnableRetryOnFailure(10, TimeSpan.FromSeconds(30), null);
-                }
-            );
+            options
+                .UseSqlServer(
+                    connectionString,
+                    cfg =>
+                    {
+                        cfg.CommandTimeout(180);
+                        cfg.EnableRetryOnFailure(10, TimeSpan.FromSeconds(30), null);
+                    }
+                )
+                .LogTo(Console.WriteLine);
         });
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmailService, EmailService>();

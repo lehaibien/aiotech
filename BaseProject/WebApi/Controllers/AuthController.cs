@@ -1,7 +1,4 @@
 using Application.Authentication.Dtos;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Model;
 using IAuthenticationService = Application.Authentication.IAuthenticationService;
@@ -13,17 +10,12 @@ namespace WebApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _service;
-    private readonly CookieOptions _cookieOptions = new()
-    {
-        HttpOnly = true,
-        SameSite = SameSiteMode.Strict,
-        Secure = true,
-        Expires = DateTime.Now.AddDays(1),
-    };
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthenticationService service)
+    public AuthController(IAuthenticationService service, ILogger<AuthController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -40,6 +32,11 @@ public class AuthController : ControllerBase
 
         // HttpContext.Response.Cookies.Append("token", result.Data.AccessToken, _cookieOptions);
         response.Data = result.Data;
+        _logger.LogInformation(
+            "The user with username {UserName} is logged in at {Timestamp}.",
+            request.UserName,
+            DateTime.UtcNow
+        );
         return Ok(response);
     }
 
@@ -54,7 +51,12 @@ public class AuthController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        // HttpContext.Response.Cookies.Append("token", result.Data.AccessToken ?? "", _cookieOptions);
+
+        _logger.LogInformation(
+            "A user with email {Email} is logged in through OAuth at {Timestamp}",
+            request.Email,
+            DateTime.UtcNow
+        );
         response.Data = result.Data;
         return Ok(response);
     }
@@ -143,6 +145,11 @@ public class AuthController : ControllerBase
         }
 
         response.Data = result.Data;
+        _logger.LogInformation(
+            "A user {UserName} has been created at {Timestamp}",
+            request.UserName,
+            DateTime.UtcNow
+        );
         return Ok(response);
     }
 
@@ -186,6 +193,7 @@ public class AuthController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
+        _logger.LogInformation("User with id {Id} has changed their password", request.Id);
         return Ok(response);
     }
 

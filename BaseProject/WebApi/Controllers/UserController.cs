@@ -1,5 +1,6 @@
 ﻿using Application.Users;
 using Application.Users.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using WebApi.Model;
@@ -70,6 +71,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromForm] CreateUserRequest request)
     {
         var response = new ApiResponse();
@@ -85,6 +87,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update([FromForm] UpdateUserRequest request)
     {
         var response = new ApiResponse();
@@ -115,6 +118,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = new ApiResponse();
@@ -130,6 +134,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
         var response = new ApiResponse();

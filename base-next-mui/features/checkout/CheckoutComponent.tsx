@@ -481,6 +481,7 @@ export function CheckoutComponent({
                 color="primary"
                 fullWidth
                 size="large"
+                data-umami-event="Thanh toán"
                 disabled={isSubmitting || !isValid}
               >
                 {isSubmitting ? (

@@ -92,7 +92,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         control={<Checkbox value="remember" color="primary" />}
         label="Ghi nhớ tôi"
       />
-      <Button type="submit" fullWidth variant="contained" color="primary">
+      <Button type="submit" fullWidth variant="contained" color="primary" data-umami-event="Đăng nhập">
         Đăng nhập
       </Button>
     </Box>

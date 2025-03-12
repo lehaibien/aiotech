@@ -241,13 +241,14 @@ function ProductCard({ product }: ProductCardProps) {
             disabled={stock <= 0}
             startIcon={<AddShoppingCartIcon fontSize="small" />}
             onClick={handleAddToCartClick}
+            data-umami-event="Thêm vào giỏ hàng"
             sx={{
               fontWeight: 700,
               py: 1,
               '& .MuiButton-startIcon': { mr: 0.5 }
             }}
           >
-            Thêm vào giỏ
+            Thêm vào giỏ hàng
           </Button>
         </Stack>
       </CardContent>

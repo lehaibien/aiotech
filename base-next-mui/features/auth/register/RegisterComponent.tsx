@@ -157,7 +157,7 @@ export default function RegisterComponent() {
             color="primary"
           />
         </FormControl>
-        <Button type="submit" fullWidth variant="contained" color="primary">
+        <Button type="submit" fullWidth variant="contained" color="primary" data-umami-event="Đăng ký">
           Đăng ký
         </Button>
         <Typography sx={{ textAlign: "center" }}>

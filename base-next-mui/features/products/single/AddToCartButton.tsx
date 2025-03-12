@@ -24,6 +24,7 @@ export function AddToCartButton({
           variant="contained"
           color="primary"
           startIcon={<AddShoppingCartIcon />}
+          data-umami-event="Thêm vào giỏ hàng"
           size="medium"
           onClick={() =>
             addToCart({

@@ -46,12 +46,16 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <head></head>
+      <head>
+        <script
+          defer
+          src="http://localhost:8000/script.js"
+          data-website-id="68fd00af-c00c-4758-9acd-12d56487b8a2"
+        />
+      </head>
       <body className={`${beVietnamPro.className} antialiased`}>
         <SessionProvider>
-          <RootClientProvider>
-            {children}
-          </RootClientProvider>
+          <RootClientProvider>{children}</RootClientProvider>
         </SessionProvider>
       </body>
     </html>

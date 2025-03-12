@@ -7,8 +7,9 @@ services:
       - NEXT_PUBLIC_API_URL=http://backend:5554/
       - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000/
       - AUTH_URL=http://localhost:3000/
+      - NEXT_PUBLIC_ANALYTICS_URL=http://localhost:8000
     ports:
-      - "3000:3000"
+      - "3000:2400"
     networks:
       - reverse-proxy
     depends_on:
@@ -19,11 +20,14 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - RedisConnectionString=redis:6379
+      - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=http://host.docker.internal:5554/static
     depends_on:
       - database
+      - redis
+      - seq
     ports:
       - "5554:5554"
     networks:
@@ -32,6 +36,15 @@ services:
     volumes:
       - wwwroot:/app/wwwroot
 
+  seq:
+    image: datalust/seq:latest
+    container_name: aiotech_seq
+    ports:
+      - "5341:80"  # Seq UI on http://localhost:5341
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - backend
   redis:
     image: redis:latest
     container_name: aiotech_redis
@@ -57,11 +70,46 @@ services:
       - backend
     volumes:
       - database-data:/var/opt/mssql
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: aiotech_umami
+    ports:
+      - "8000:3000"
+    environment:
+      DATABASE_URL: postgresql://umami:umami@db:5432/umami
+      DATABASE_TYPE: postgresql
+      APP_SECRET: 55HKzswuhkItXkovyTnWP9MGruBO9vVb
+    depends_on:
+      db:
+        condition: service_healthy
+    init: true
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:3001/api/heartbeat"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  db:
+    image: postgres:15-alpine
+    container_name: aiotech_umami_db
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: umami
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   database-data:
   wwwroot:
   redis_data:
+  umami-db-data:
 
 networks:
   backend:

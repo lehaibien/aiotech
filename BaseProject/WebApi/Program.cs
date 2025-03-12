@@ -82,10 +82,12 @@ builder.Services.AddSwaggerGen(c =>
         }
     );
 });
+
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.WithCorrelationId()
     .Enrich.FromLogContext()
-    // .WriteTo.PostgreSQL()
+    .MinimumLevel.Debug()
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);

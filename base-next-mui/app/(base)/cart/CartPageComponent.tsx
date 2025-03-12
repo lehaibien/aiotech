@@ -139,6 +139,7 @@ export default function CartPageComponent() {
               size="large"
               fullWidth
               disabled={cartItems.length === 0}
+              data-umami-event="Tiến hành thanh toán"
             >
               Thanh toán
             </Button>
