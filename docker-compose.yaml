@@ -134,7 +134,7 @@ services:
 
   reverse-proxy:
     image: traefik:v3.1
-    container_name: aiotech-traefik
+    container_name: aiotech_traefik
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
