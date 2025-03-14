@@ -6,6 +6,7 @@ import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, UserRequest, UserResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
 import "server-only";
+import dayjs from "@/lib/extended-dayjs";
 
 export default async function Page({
   searchParams,
@@ -24,7 +25,7 @@ export default async function Page({
     roleId: EMPTY_UUID,
     fullName: "",
     role: "",
-    createdDate: dayjs().utc().toDate(),
+    createdDate: dayjs().toDate(),
     createdBy: "",
   };
   let roleCombobox: ComboBoxItem[] = [];

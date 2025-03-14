@@ -22,7 +22,7 @@ export function ReportMonthFilter({
   }, [value]);
   const handleOnChange = (newValue: Dayjs | null) => {
     if (newValue === null) {
-      return;
+      onChange(null);
     }
     onChange(dayjs(newValue));
   };
@@ -33,8 +33,7 @@ export function ReportMonthFilter({
       onChange={handleOnChange}
       views={["year", "month"]}
       format="MM/YYYY"
-      //Remove this line: renderInput={(params) => (<TextField {...params} />)}
-      slotProps={{ textField: { variant: "outlined" } }} // optional styling. Choose variant as per your need.
+      slotProps={{ textField: { variant: "outlined" } }}
     />
   );
 }

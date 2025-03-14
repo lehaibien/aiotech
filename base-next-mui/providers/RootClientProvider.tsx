@@ -1,5 +1,6 @@
 "use client";
 
+import theme from "@/lib/newTheme";
 import { CssBaseline } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
@@ -9,7 +10,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Provider as JotaiProvider } from "jotai";
 import { closeSnackbar, SnackbarProvider } from "notistack";
 import { SignalRProvider } from "./SignalRProvider";
-import theme from "@/lib/newTheme";
+import 'dayjs/locale/vi';
 
 export default function RootClientProvider({
   children,
@@ -18,26 +19,26 @@ export default function RootClientProvider({
 }>) {
   return (
     <AppRouterCacheProvider>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <MuiThemeProvider theme={theme}>
-          <InitColorSchemeScript attribute="class" />
-          <CssBaseline enableColorScheme />
-          <SnackbarProvider
-            maxSnack={2}
-            autoHideDuration={2000}
-            disableWindowBlurListener
-            preventDuplicate
-            anchorOrigin={{ horizontal: "right", vertical: "top" }}
-            action={(snackbarId) => (
-              <button onClick={() => closeSnackbar(snackbarId)}>x</button>
-            )}
-          >
+      <MuiThemeProvider theme={theme}>
+        <InitColorSchemeScript attribute="class" />
+        <CssBaseline enableColorScheme />
+        <SnackbarProvider
+          maxSnack={2}
+          autoHideDuration={2000}
+          disableWindowBlurListener
+          preventDuplicate
+          anchorOrigin={{ horizontal: "right", vertical: "top" }}
+          action={(snackbarId) => (
+            <button onClick={() => closeSnackbar(snackbarId)}>x</button>
+          )}
+        >
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
             <SignalRProvider>
               <JotaiProvider>{children}</JotaiProvider>
             </SignalRProvider>
-          </SnackbarProvider>
-        </MuiThemeProvider>
-      </LocalizationProvider>
+          </LocalizationProvider>
+        </SnackbarProvider>
+      </MuiThemeProvider>
     </AppRouterCacheProvider>
   );
 }

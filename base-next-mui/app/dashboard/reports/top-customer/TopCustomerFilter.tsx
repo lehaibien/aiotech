@@ -1,6 +1,7 @@
 "use client";
 
 import { ReportMonthFilter } from "@/features/dashboard/reports/ReportMonthFilter";
+import dayjs from "@/lib/extended-dayjs";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
@@ -22,31 +23,33 @@ export default function TopCustomerFilter({
   const [endDate, setEndDate] = useState<Dayjs | null>(defaultEndDate);
   const [count, setCount] = useState<number>(defaultCount || 10);
   const onApplyFilter = () => {
-    const start = startDate?.toJSON();
-    const end = endDate?.toJSON();
+    const start = dayjs(startDate).toJSON();
+    const end = dayjs(endDate).toJSON();
     router.push(
       `/dashboard/reports/top-customer?start_date=${start}&end_date=${end}&count=${count}`
     );
   };
 
   const handleStartDateClose = () => {
-    if (startDate?.isAfter(endDate)) {
+    if (dayjs(startDate).isAfter(endDate)) {
       setStartDate(endDate);
       return;
     }
   };
 
   const handleEndDateClose = () => {
-    if (endDate?.isBefore(startDate)) {
+    const startDayjs = dayjs(startDate);
+    const endDayjs = dayjs(endDate);
+    if (endDayjs.isBefore(startDate)) {
       setEndDate(startDate);
       return;
     }
     if (
       startDate !== null &&
       endDate !== null &&
-      endDate.diff(startDate, "months") > 12
+      endDayjs.diff(startDayjs, "months") > 12
     ) {
-      setEndDate(startDate.add(12, "month"));
+      setEndDate(startDayjs.add(12, "month"));
       return;
     }
   };
@@ -57,7 +60,7 @@ export default function TopCustomerFilter({
         value={startDate}
         onChange={setStartDate}
         onClose={handleStartDateClose}
-        />
+      />
       <ReportMonthFilter
         label="Đến tháng"
         value={endDate}

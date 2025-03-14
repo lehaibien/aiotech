@@ -44,8 +44,8 @@ export default async function TopCustomerReportPage({
       </Typography>
 
       <TopCustomerFilter
-        defaultStartDate={startDate.toDate()}
-        defaultEndDate={endDate.toDate()}
+        defaultStartDate={startDate}
+        defaultEndDate={endDate}
         defaultCount={count}
       />
       <TopCustomerChart data={data} />

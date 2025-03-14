@@ -1,20 +1,23 @@
-// theme/index.ts
-'use client';
+"use client";
 
-import { createTheme } from '@mui/material/styles';
+import { viVN as coreviVN } from "@mui/material/locale";
+import { viVN as dateGridviVN } from "@mui/x-data-grid/locales";
+import { viVN as datePickerviVN } from "@mui/x-date-pickers/locales";
+
+import { createTheme } from "@mui/material/styles";
 import {
-    background,
-    error,
-    grey,
-    info,
-    primary,
-    secondary,
-    success,
-    tertiary,
-    warning
-} from './colors';
-import components from './components';
-import typography from './typography';
+  background,
+  error,
+  grey,
+  info,
+  primary,
+  secondary,
+  success,
+  tertiary,
+  warning,
+} from "./colors";
+import components from "./components";
+import typography from "./typography";
 
 const theme = createTheme({
   colorSchemes: {
@@ -66,6 +69,9 @@ const theme = createTheme({
     },
   },
   typography,
+  coreviVN,
+  datePickerviVN,
+  dateGridviVN,
   components,
   breakpoints: {
     values: {
@@ -77,7 +83,7 @@ const theme = createTheme({
     },
   },
   cssVariables: {
-    colorSchemeSelector: 'class',
+    colorSchemeSelector: "class",
   },
 });
 

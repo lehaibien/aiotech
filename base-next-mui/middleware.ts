@@ -7,13 +7,18 @@ export default auth(async (req) => {
   if (path === "/login" && req.auth) {
     return NextResponse.redirect(new URL("/", req.url));
   }
-  // if (path.startsWith('/dashboard') && !req.auth) {
-  //   return NextResponse.redirect(new URL('/login', req.url));
-  // }
-  // if (path.startsWith('/dashboard') && req.auth?.user.role !== 'Admin') {
-  //   console.log(req.auth?.user)
-  //   return NextResponse.redirect(new URL('/no-access', req.url));
-  // }
+  if (path.startsWith("/dashboard") && !req.auth) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  if (path.startsWith("/shipper") && !req.auth) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  if (path.startsWith("/dashboard") && req.auth?.user.role !== "Admin") {
+    return NextResponse.redirect(new URL("/no-access", req.url));
+  }
+  if (path.startsWith("/shipper") && req.auth?.user.role !== "Shipper" && req.auth?.user.role!== "Admin") {
+    return NextResponse.redirect(new URL("/no-access", req.url));
+  }
   if (path.startsWith("/profile") && !req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));
   }

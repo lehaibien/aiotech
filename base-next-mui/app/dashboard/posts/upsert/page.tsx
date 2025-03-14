@@ -4,7 +4,8 @@ import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { PostResponse } from "@/types";
 import "server-only";
-import { PostUpsertForm } from "../../../../features/dashboard/posts/PostUpsertForm";
+import dayjs from "@/lib/extended-dayjs";
+import { PostUpsertForm } from "@/features/dashboard/posts/PostUpsertForm";
 
 export default async function UpsertPage({
   searchParams,
@@ -18,7 +19,7 @@ export default async function UpsertPage({
     imageUrl: "",
     isPublished: false,
     tags: [],
-    createdDate: dayjs().utc().toDate(),
+    createdDate: dayjs().toDate(),
   };
   const parsedId = parseUUID(searchParams?.id ?? "");
   if (parsedId !== EMPTY_UUID) {

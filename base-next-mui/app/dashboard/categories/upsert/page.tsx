@@ -5,6 +5,7 @@ import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { CategoryResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
+import dayjs from "@/lib/extended-dayjs";
 import "server-only";
 
 export default async function CategoryUpsertPage({
@@ -17,7 +18,7 @@ export default async function CategoryUpsertPage({
     id: EMPTY_UUID,
     name: "",
     imageUrl: "",
-    createdDate: dayjs().utc().toDate(),
+    createdDate: dayjs().toDate(),
     createdBy: "",
   };
   if (uuid !== EMPTY_UUID) {

@@ -33,13 +33,12 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
         <Image
           src={imageUrl || "/hero-banner.jpg"}
           alt="Banner Image"
-          width={1280}
-          height={720}
+          width={1600}
+          height={400}
           quality={100}
-          priority // Optional: if this image is above the fold
+          priority
           style={{
             width: "100%",
-            height: "100%",
             objectFit: "cover",
           }}
         />
