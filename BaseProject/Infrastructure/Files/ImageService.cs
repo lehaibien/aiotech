@@ -19,7 +19,7 @@ namespace Infrastructure.Files;
 public class ImageService : IImageService
 {
     private const string ImageFolder = "images";
-    private readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+    private readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IFileService _fileService;
 
@@ -77,8 +77,7 @@ public class ImageService : IImageService
         var baseFolder = Path.Combine(ImageFolder, folderName);
 
         // Generate a unique base filename
-        var baseFileName =
-            $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid().ToString().Substring(0, 8)}";
+        var baseFileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid().ToString()[..8]}";
 
         try
         {
@@ -86,7 +85,8 @@ public class ImageService : IImageService
             var originalResult = await _fileService.UploadAsync(
                 file,
                 baseFolder,
-                $"{baseFileName}_original"
+                $"{baseFileName}_original",
+                cancellationToken
             );
 
             if (!originalResult.IsSuccess)
@@ -112,10 +112,9 @@ public class ImageService : IImageService
             await SaveOptimizedImageAsync(optimizedImage, optimizedFilePath, optimizedExtension);
 
             // Return URL to the optimized image
-            var baseUrl = originalFileResult.FileUrl.Substring(
-                0,
-                originalFileResult.FileUrl.LastIndexOf('/') + 1
-            );
+            var baseUrl = originalFileResult.FileUrl[
+                ..(originalFileResult.FileUrl.LastIndexOf('/') + 1)
+            ];
 
             return Result<string>.Success(Path.Combine(baseUrl, optimizedFileName));
         }
@@ -227,7 +226,7 @@ public class ImageService : IImageService
             case ImageType.Category:
                 image.Mutate(x =>
                     x.Resize(
-                        new ResizeOptions { Size = new Size(600, 400), Mode = ResizeMode.Crop }
+                        new ResizeOptions { Size = new Size(600, 400), Mode = ResizeMode.Stretch }
                     )
                 );
                 break;
@@ -235,7 +234,7 @@ public class ImageService : IImageService
             case ImageType.CategoryHeader:
                 image.Mutate(x =>
                     x.Resize(
-                        new ResizeOptions { Size = new Size(1200, 300), Mode = ResizeMode.Crop }
+                        new ResizeOptions { Size = new Size(1200, 300), Mode = ResizeMode.Stretch }
                     )
                 );
                 break;

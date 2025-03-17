@@ -46,13 +46,23 @@ public class BrandService : IBrandService
                 x.Name.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+        var sortCol = GetSortExpression(request.SortColumn);
+        if (sortCol is null)
         {
-            brandQuery = brandQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+            brandQuery = brandQuery
+                .OrderByDescending(x => x.UpdatedDate)
+                .ThenByDescending(x => x.CreatedDate);
         }
         else
         {
-            brandQuery = brandQuery.OrderBy(GetSortExpression(request.SortColumn));
+            if (request.SortOrder?.ToLower() == "desc")
+            {
+                brandQuery = brandQuery.OrderByDescending(sortCol);
+            }
+            else
+            {
+                brandQuery = brandQuery.OrderBy(sortCol);
+            }
         }
         var totalRow = await brandQuery.CountAsync(cancellationToken);
         var result = await brandQuery
@@ -205,14 +215,14 @@ public class BrandService : IBrandService
         return Result<List<ComboBoxItem>>.Success(result);
     }
 
-    private static Expression<Func<Brand, object>> GetSortExpression(string? orderBy)
+    private static Expression<Func<Brand, object>>? GetSortExpression(string? orderBy)
     {
         return orderBy?.ToLower() switch
         {
             "name" => x => x.Name,
             "createdDate" => x => x.CreatedDate,
             "updatedDate" => x => x.UpdatedDate,
-            _ => x => x.Id,
+            _ => null,
         };
     }
 }

@@ -5,7 +5,10 @@ namespace Application.Reviews;
 
 public interface IReviewService
 {
-    Task<Result<PaginatedList>> GetList(GetListRequest request);
+    Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
     Task<Result<List<ReviewProductResponse>>> GetByProductId(
         GetListReviewByProductIdRequest request
     );

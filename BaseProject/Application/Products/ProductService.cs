@@ -52,13 +52,23 @@ public class ProductService : IProductService
                 || x.Name.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+        var sortCol = GetSortExpression(request.SortColumn);
+        if (sortCol is null)
         {
-            productQuery = productQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+            productQuery = productQuery
+                .OrderByDescending(x => x.UpdatedDate)
+                .ThenByDescending(x => x.CreatedDate);
         }
         else
         {
-            productQuery = productQuery.OrderBy(GetSortExpression(request.SortColumn));
+            if (request.SortOrder?.ToLower() == "desc")
+            {
+                productQuery = productQuery.OrderByDescending(sortCol);
+            }
+            else
+            {
+                productQuery = productQuery.OrderBy(sortCol);
+            }
         }
         var totalRow = await productQuery.CountAsync(cancellationToken);
         var result = await productQuery
@@ -390,7 +400,7 @@ public class ProductService : IProductService
         return Result<string>.Success("Xóa thành công");
     }
 
-    private static Expression<Func<Product, object>> GetSortExpression(string? orderBy)
+    private static Expression<Func<Product, object>>? GetSortExpression(string? orderBy)
     {
         return orderBy?.ToLower() switch
         {
@@ -400,7 +410,7 @@ public class ProductService : IProductService
             "discountPrice" => x => x.DiscountPrice,
             "stock" => x => x.Stock,
             "createdDate" => x => x.CreatedDate,
-            _ => x => x.Id,
+            _ => null,
         };
     }
 }

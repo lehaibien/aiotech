@@ -47,13 +47,23 @@ public class CategoryService : ICategoryService
                 x.Name.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+        var sortCol = GetSortExpression(request.SortColumn);
+        if (sortCol is null)
         {
-            categoryQuery = categoryQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+            categoryQuery = categoryQuery
+                .OrderByDescending(x => x.UpdatedDate)
+                .ThenByDescending(x => x.CreatedDate);
         }
         else
         {
-            categoryQuery = categoryQuery.OrderBy(GetSortExpression(request.SortColumn));
+            if (request.SortOrder?.ToLower() == "desc")
+            {
+                categoryQuery = categoryQuery.OrderByDescending(sortCol);
+            }
+            else
+            {
+                categoryQuery = categoryQuery.OrderBy(sortCol);
+            }
         }
         var totalRow = await categoryQuery.CountAsync(cancellationToken);
         var result = await categoryQuery
@@ -214,14 +224,14 @@ public class CategoryService : ICategoryService
         return Result<List<ComboBoxItem>>.Success(result);
     }
 
-    private static Expression<Func<Category, object>> GetSortExpression(string? orderBy)
+    private static Expression<Func<Category, object>>? GetSortExpression(string? orderBy)
     {
         return orderBy?.ToLower() switch
         {
             "name" => x => x.Name,
             "createdDate" => x => x.CreatedDate,
             "updatedDate" => x => x.UpdatedDate,
-            _ => x => x.Id,
+            _ => null,
         };
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System.Data;
+using System.Linq.Expressions;
 using Application.Reviews.Dtos;
 using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -29,29 +29,53 @@ public class ReviewService : IReviewService
         _contextAccessor = contextAccessor;
     }
 
-    public async Task<Result<PaginatedList>> GetList(GetListRequest request)
+    public async Task<Result<PaginatedList>> GetListAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
-        SqlParameter totalRow = new()
+        var query = _unitOfWork.GetRepository<Review>().GetAll();
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
+            query = query.Where(x => x.User.UserName.Contains(request.TextSearch));
+        }
+        var sortCol = GetSortExpression(request.SortColumn);
+        if (sortCol is null)
         {
-            new("@iTextSearch", request.TextSearch),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<ReviewResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetListReview, parameters);
+            query = query
+                .OrderByDescending(x => x.UpdatedDate)
+                .ThenByDescending(x => x.CreatedDate);
+        }
+        else
+        {
+            if (request.SortOrder?.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(sortCol);
+            }
+            else
+            {
+                query = query.OrderBy(sortCol);
+            }
+        }
+        var totalRow = await query.CountAsync(cancellationToken);
+        var result = await query
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .Select(x => new ReviewResponse
+            {
+                UserName = x.User.UserName,
+                ProductName = x.Product.Name,
+                Rating = x.Rating,
+                Comment = x.Comment,
+                CreatedDate = x.CreatedDate,
+                UpdatedDate = x.UpdatedDate,
+            })
+            .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
@@ -74,6 +98,7 @@ public class ReviewService : IReviewService
                 Comment = x.Comment,
                 CreatedDate = x.CreatedDate,
             })
+            .OrderByDescending(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name)
             .Skip(request.PageSize * request.PageIndex)
             .Take(request.PageSize)
             .ToListAsync();
@@ -174,5 +199,15 @@ public class ReviewService : IReviewService
         }
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success(ids.Count.ToString());
+    }
+
+    private static Expression<Func<Review, object>>? GetSortExpression(string? orderBy)
+    {
+        return orderBy?.ToLower() switch
+        {
+            "rating" => x => x.Rating,
+            "createdDate" => x => x.CreatedDate,
+            _ => x => x.CreatedDate,
+        };
     }
 }

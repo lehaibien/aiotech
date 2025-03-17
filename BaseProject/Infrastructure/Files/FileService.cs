@@ -176,6 +176,17 @@ public class FileService : IFileService
         return Result.Success();
     }
 
+    public Result DeleteFolder(string folderName)
+    {
+        var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, folderName);
+        if (!Directory.Exists(folderPath))
+        {
+            return Result.Failure("Folder not found");
+        }
+        Directory.Delete(folderPath, recursive: true);
+        return Result.Success();
+    }
+
     public void EnsureDirectoryExists(string folder)
     {
         if (!Directory.Exists(folder))
@@ -205,7 +216,7 @@ public class FileService : IFileService
     private string GetPhysicalPath(string fileUrl)
     {
         var uri = new Uri(fileUrl);
-        var relativePath = uri.AbsolutePath.TrimStart('/');
+        var relativePath = uri.AbsolutePath.TrimStart('/').Replace("static/", "");
 
         return Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
     }
