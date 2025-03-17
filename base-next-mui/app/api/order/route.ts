@@ -14,15 +14,16 @@ export async function GET(request: NextRequest) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}order/callback?${queryString}`
     );
-    const json = (await response.json()) as ApiResponse;
-    if (json.success) {
+    const content = (await response.json()) as ApiResponse;
+    if (content.success) {
       url = url + 'checkout/confirmation';
     } else {
-      url = url + 'checkout/error';
+      console.error('ERROR OCCUR WHEN ORDER:'+ content.message);
+      url = url + 'checkout?error=true';
     }
   } catch (err) {
     console.error('ERROR OCCUR WHEN ORDER: ' + (err as Error).message);
-    url = url + 'checkout/error';
+    url = url + 'checkout?error=true';
   }
   return NextResponse.redirect(url);
 }

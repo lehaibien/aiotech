@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Card,
@@ -55,17 +55,18 @@ export function CategoryCard({ name, imageUrl }: CategoryCardProps) {
             position: "relative",
             height: "100%",
             overflow: "hidden",
-            backgroundColor: alpha(theme.palette.primary.light, 0.05),
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           }}
         >
           <Image
             src={imageUrl}
-            width={300}
-            height={300}
+            width={600}
+            height={400}
             alt={name}
             className="category-image"
             style={{
-              objectFit: "cover",
+              objectFit: "fill",
+              aspectRatio: 3 / 2,
               transition: "transform 0.3s ease-in-out",
             }}
             priority

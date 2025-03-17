@@ -57,7 +57,7 @@ const createColumns = (
     valueFormatter: (params) => mapOrderStatus(params as string),
   },
   {
-    field: "shippedDate",
+    field: "deliveryDate",
     headerName: "Ngày giao hàng",
     width: 200,
     headerAlign: "center",

@@ -6,7 +6,12 @@ import { UserProfileResponse } from "@/types";
 import { redirect } from "next/navigation";
 import "server-only";
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | undefined };
+}) {
+  const isError = Boolean(searchParams?.error);
   const session = await auth();
   if (!session) {
     redirect("/login");
@@ -33,6 +38,7 @@ export default async function CheckoutPage() {
       name={fullName}
       phoneNumber={profile.phoneNumber}
       address={profile.address}
+      isError={isError}
     />
   );
 }

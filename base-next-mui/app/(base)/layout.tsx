@@ -23,7 +23,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Container maxWidth='xl'>
+    <Container maxWidth='xl' sx={{
+      px: {
+        xs: 0,
+        md: 4,
+      }
+    }}>
       <Header />
       <Box component='main' sx={{ py: 2 }}>
         {children}

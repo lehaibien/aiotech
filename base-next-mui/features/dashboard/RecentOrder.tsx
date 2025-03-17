@@ -26,8 +26,6 @@ const columns: GridColDef<OrderResponse>[] = [
     field: "phoneNumber",
     headerName: "Số điện thoại",
     width: 180,
-    headerAlign: "center",
-    align: "center",
   },
   {
     field: "createdDate",
@@ -37,7 +35,9 @@ const columns: GridColDef<OrderResponse>[] = [
     align: "center",
     valueFormatter: (params) => formatDate(params),
   },
-  { field: "totalPrice", headerName: "Thành tiền", width: 160, type: "number" },
+  { field: "totalPrice", headerName: "Thành tiền", width: 160, type: "number",
+    align: "right",
+   },
 ];
 
 type RecentOrdersProps = {
@@ -48,7 +48,7 @@ export function RecentOrders({ data }: RecentOrdersProps) {
   return (
     <TableContainer
       component={Paper}
-      elevation={3}
+      elevation={0}
       sx={{
         position: "relative",
         minHeight: 400,
@@ -70,6 +70,7 @@ export function RecentOrders({ data }: RecentOrdersProps) {
                   fontWeight: 600,
                   color: "text.secondary",
                 }}
+                align={column.align}
               >
                 {column.headerName}
               </TableCell>
@@ -86,11 +87,11 @@ export function RecentOrders({ data }: RecentOrdersProps) {
             >
               <TableCell>{row.trackingNumber}</TableCell>
               <TableCell>{row.name}</TableCell>
-              <TableCell align="center">{row.phoneNumber}</TableCell>
+              <TableCell>{row.phoneNumber}</TableCell>
               <TableCell align="center">
                 {formatDate(row.createdDate)}
               </TableCell>
-              <TableCell>{formatNumberWithSeperator(row.totalPrice)} đ</TableCell>
+              <TableCell align="right">{formatNumberWithSeperator(row.totalPrice)} đ</TableCell>
             </TableRow>
           ))}
 
