@@ -14,4 +14,5 @@ public class UserResponse : BaseResponse
     public string? PhoneNumber { get; set; } = string.Empty;
     public string? AvatarUrl { get; set; } = string.Empty;
     public string? Role { get; set; } = string.Empty;
+    public bool IsLocked { get; set; }
 }

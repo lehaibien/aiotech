@@ -18,6 +18,7 @@ export type UserResponse = {
   avatarUrl?: string;
   roleId?: UUID;
   role?: string;
+  isLocked: boolean;
 } & BaseResponse;
 
 export type UserProfileResponse = {

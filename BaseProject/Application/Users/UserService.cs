@@ -72,6 +72,7 @@ public class UserService : IUserService
                 GivenName = x.GivenName,
                 Role = x.Role.Name,
                 AvatarUrl = x.AvatarUrl,
+                IsLocked = x.IsLocked,
                 CreatedDate = x.CreatedDate,
                 CreatedBy = x.CreatedBy,
                 UpdatedDate = x.UpdatedDate,
@@ -313,6 +314,19 @@ public class UserService : IUserService
         _unitOfWork.GetRepository<User>().UpdateRange(entities);
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
+    }
+
+    public async Task<Result> LockUser(Guid id)
+    {
+        var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);
+        if (user is null)
+        {
+            return Result.Failure("Tài khoản không tồn tại");
+        }
+        user.IsLocked = true;
+        _unitOfWork.GetRepository<User>().Update(user);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success();
     }
 
     private static Expression<Func<User, object>> GetSortExpression(string? orderBy)

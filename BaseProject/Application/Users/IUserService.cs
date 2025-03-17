@@ -18,4 +18,5 @@ public interface IUserService
     Task<Result<UserResponse>> UpdateProfile(UserProfileRequest request);
     Task<Result<string>> Delete(Guid id);
     Task<Result<string>> DeleteList(List<Guid> ids);
+    Task<Result> LockUser(Guid id);
 }

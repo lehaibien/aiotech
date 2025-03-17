@@ -11,13 +11,6 @@ namespace WebApi.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly CookieOptions _cookieOptions = new()
-    {
-        HttpOnly = true,
-        SameSite = SameSiteMode.Strict,
-        Secure = true,
-        Expires = DateTime.UtcNow.AddDays(1),
-    };
     private readonly IUserService _service;
 
     public UserController(IUserService service)
@@ -147,6 +140,22 @@ public class UserController : ControllerBase
         }
 
         response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpPost("lock/{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> LockUser(Guid id)
+    {
+        var response = new ApiResponse();
+        var result = await _service.LockUser(id);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
         return Ok(response);
     }
 }

@@ -53,7 +53,13 @@ public class AuthenticationService : IAuthenticationService
             .Include(r => r.Role)
             .FirstOrDefaultAsync(u => u.UserName == request.UserName);
         if (entity is null)
+        {
             return Result<TokenResult>.Failure("Tài khoản hoặc mật khẩu không chính xác");
+        }
+        if (entity.IsLocked)
+        {
+            return Result<TokenResult>.Failure("Tài khoản đã bị khóa");
+        }
         if (
             !EncryptionHelper.VerifyHashedPassword(
                 entity.Password,

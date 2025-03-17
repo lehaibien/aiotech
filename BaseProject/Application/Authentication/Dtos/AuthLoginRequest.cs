@@ -5,7 +5,8 @@ namespace Application.Authentication.Dtos;
 public class AuthLoginRequest
 {
     [Required(AllowEmptyStrings = false, ErrorMessage = "Tên người dùng không được để trống")]
-    public string? UserName { get; set; }
+    public string UserName { get; set; } = null!;
+
     [Required(AllowEmptyStrings = false, ErrorMessage = "Mật khẩu không được để trống")]
-    public string? Password { get; set; }
+    public string Password { get; set; } = null!;
 }
