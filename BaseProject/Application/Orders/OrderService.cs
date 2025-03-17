@@ -30,6 +30,7 @@ public class OrderService : IOrderService
     private readonly VnPayOption _option;
     private readonly IEmailService _emailService;
     private readonly IHubContext<NotificationHub, INotificationClient> _notificationHubContext;
+    private readonly MomoLibrary _momoLibrary;
 
     public OrderService(
         IUnitOfWork unitOfWork,
@@ -37,7 +38,8 @@ public class OrderService : IOrderService
         IHttpContextAccessor contextAccessor,
         IOptions<VnPayOption> option,
         IEmailService emailService,
-        IHubContext<NotificationHub, INotificationClient> notificationHubContext
+        IHubContext<NotificationHub, INotificationClient> notificationHubContext,
+        MomoLibrary momoLibrary
     // IDiscountService discountService
     )
     {
@@ -47,6 +49,7 @@ public class OrderService : IOrderService
         _option = option.Value;
         _emailService = emailService;
         _notificationHubContext = notificationHubContext;
+        _momoLibrary = momoLibrary;
         // _discountService = discountService;
     }
 
@@ -263,20 +266,14 @@ public class OrderService : IOrderService
                 _option,
                 _contextAccessor.HttpContext
             ),
+            PaymentProvider.Momo => await _momoLibrary.CreatePaymentUrlAsync(entity),
             _ => "",
         };
-        // var url = VnPayLibrary.CreatePaymentUrl(order, _option.Value, _contextAccessor.HttpContext);
         return Result<string>.Success(url);
     }
 
     public async Task<Result<OrderResponse>> Create(OrderRequest request)
     {
-        // var isExists = await _unitOfWork.GetRepository<Domain.Entities.Order>()
-        //     .FindAsync();
-        // if (isExists != null)
-        // {
-        //     return Result<OrderResponse>.Failure("Đơn hàng đã tồn tại");
-        // }
         var entity = _mapper.Map<Order>(request);
         entity.Id = request.Id == Guid.Empty ? Guid.NewGuid() : request.Id;
         entity.TrackingNumber = GenerateTrackingNumber();
@@ -426,12 +423,22 @@ public class OrderService : IOrderService
 
     public async Task<Result> HandleCallbackPayment(IQueryCollection queryCollection)
     {
+        queryCollection.TryGetValue("partnerCode", out var partnerCode);
+        queryCollection.TryGetValue("vnp_BankCode", out var bankCode);
+        var paymentResponse = new PaymentResponse();
         try
         {
-            var pay = new VnPayLibrary();
-            var response = pay.GetFullResponseData(queryCollection, _option.HashSecret);
-            var orderId = Guid.Parse(response.OrderId);
-            if (!response.Success)
+            if (!string.IsNullOrWhiteSpace(bankCode) && bankCode == "VNPAY")
+            {
+                var pay = new VnPayLibrary();
+                paymentResponse = pay.GetFullResponseData(queryCollection, _option.HashSecret);
+            }
+            else if (!string.IsNullOrEmpty(partnerCode) && partnerCode == "MOMO")
+            {
+                paymentResponse = await _momoLibrary.PaymentExecuteAsync(queryCollection);
+            }
+            var orderId = Guid.Parse(paymentResponse.OrderId);
+            if (!paymentResponse.Success)
             {
                 var deleteOrder = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderId);
                 if (deleteOrder is not null)
@@ -445,11 +452,11 @@ public class OrderService : IOrderService
             {
                 Id = Guid.NewGuid(),
                 OrderId = orderId,
-                TransactionId = response.TransactionId,
+                TransactionId = paymentResponse.TransactionId,
                 Provider = PaymentProvider.VnPay,
-                Amount = Convert.ToDouble(response.Amount),
-                Description = response.OrderDescription,
-                CreatedDate = response.PayDate,
+                Amount = Convert.ToDouble(paymentResponse.Amount),
+                Description = paymentResponse.OrderDescription,
+                CreatedDate = paymentResponse.PayDate,
             };
 
             var order = await _unitOfWork

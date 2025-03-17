@@ -25,10 +25,6 @@ public static class DependencyInjection
         services.ConfigureCors(configuration);
         services.AutoRegisterDependencies();
         //CONFIGURATION
-        services
-            .Configure<JwtOption>(configuration.GetSection("Jwt"))
-            .Configure<VnPayOption>(configuration.GetSection("VnPay"))
-            .Configure<MailSettingsOption>(configuration.GetSection("MailSettings"));
         return services;
     }
 

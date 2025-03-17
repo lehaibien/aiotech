@@ -25,7 +25,10 @@ builder
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var configuration = builder.Configuration;
-builder.Services.AddDefaultConfig(configuration).AddApplication().AddInfrastructure(configuration);
+builder
+    .Services.AddDefaultConfig(configuration)
+    .AddApplication(configuration)
+    .AddInfrastructure(configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddStackExchangeRedisCache(options =>

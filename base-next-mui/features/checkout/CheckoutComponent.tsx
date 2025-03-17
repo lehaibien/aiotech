@@ -111,9 +111,13 @@ export function CheckoutComponent({
         };
 
         if (orderData.provider === PaymentMethods.MOMO) {
-          // Handle Momo integration
-          setError("Phương thức thanh toán Momo đang được phát triển");
-          setIsSubmitting(false);
+          const response = await postApi(API_URL.createOrderUrl, orderData);
+          if (!response.success) {
+            setError(response.message || "Có lỗi xảy ra khi xử lý đơn hàng");
+            console.error(response.message);
+          } else {
+            router.push(response.data as string);
+          }
           return;
         }
         if (orderData.provider === PaymentMethods.VNPAY) {

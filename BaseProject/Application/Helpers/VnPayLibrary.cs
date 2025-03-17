@@ -6,7 +6,6 @@ using System.Text;
 using Application.Options;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace Application.Helpers;
 
@@ -45,7 +44,7 @@ public class VnPayLibrary
         return pay.CreateRequestUrl(option.BaseUrl, option.HashSecret);
     }
 
-    public VnPayResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
+    public PaymentResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
     {
         var vnPay = new VnPayLibrary();
 
@@ -72,9 +71,9 @@ public class VnPayLibrary
         var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
 
         if (!checkSignature)
-            return new VnPayResponse() { Success = false };
+            return new PaymentResponse() { Success = false };
 
-        return new VnPayResponse()
+        return new PaymentResponse()
         {
             Success = vnpResponseCode.Equals("00"),
             PaymentMethod = "VnPay",
@@ -85,7 +84,7 @@ public class VnPayLibrary
             Amount = orderAmouth,
             PayDate = payDate,
             Token = vnpSecureHash,
-            VnPayResponseCode = vnpResponseCode,
+            ResponseCode = vnpResponseCode,
         };
     }
 
@@ -241,18 +240,4 @@ public class VnPayCompare : IComparer<string>
         var vnpCompare = CompareInfo.GetCompareInfo("en-US");
         return vnpCompare.Compare(x, y, CompareOptions.Ordinal);
     }
-}
-
-public class VnPayResponse
-{
-    public string OrderDescription { get; set; } = null!;
-    public string TransactionId { get; set; } = null!;
-    public string OrderId { get; set; } = null!;
-    public string PaymentMethod { get; set; } = null!;
-    public string PaymentId { get; set; } = null!;
-    public decimal Amount { get; set; } = 0m;
-    public DateTime PayDate { get; set; }
-    public bool Success { get; set; }
-    public string Token { get; set; } = null!;
-    public string VnPayResponseCode { get; set; } = null!;
 }
