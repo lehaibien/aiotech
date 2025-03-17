@@ -3,6 +3,7 @@ using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Shared;
 
 namespace Application.Dashboard;
@@ -130,5 +131,89 @@ public class DashboardService : IDashboardService
             NewUserDiff = newUser?.NewUserDiff ?? 0,
         };
         return Result<DashboardCard>.Success(result);
+    }
+
+    public async Task<Result<List<DashboardTopProduct>>> GetDashboardTopProductAsync()
+    {
+        var order = _unitOfWork.GetRepository<OrderItem>().GetAll();
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x =>
+                order.Any(oi =>
+                    oi.ProductId == x.Id
+                    && !oi.Order.IsDeleted
+                    && oi.Order.Status == OrderStatus.Completed
+                )
+            )
+            .Select(x => new DashboardTopProduct
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ImageUrls = x.ImageUrls,
+                Sales = order.Count(oi => oi.ProductId == x.Id),
+            })
+            .OrderByDescending(p => order.Count(oi => oi.ProductId == p.Id))
+            .Take(8)
+            .ToListAsync();
+        return Result<List<DashboardTopProduct>>.Success(result);
+    }
+
+    public async Task<Result<List<DashboardSale>>> GetDashboardSaleAsync()
+    {
+        var now = DateTime.UtcNow;
+        var firstMonthStart = new DateTime(now.Year, 1, 1);
+        var lastMonthEnd = new DateTime(now.Year, 12, 31);
+        var orders = await _unitOfWork
+            .GetRepository<Order>()
+            .GetAll()
+            .Where(o => o.CreatedDate >= firstMonthStart && o.CreatedDate <= lastMonthEnd)
+            .ToListAsync();
+
+        var allMonths = Enumerable.Range(0, 12).Select(i => firstMonthStart.AddMonths(i)).ToList();
+
+        // Group orders by month
+        var groupedOrders = orders
+            .GroupBy(o => new DateTime(o.CreatedDate.Year, o.CreatedDate.Month, 1)) // Group by the first day of the month
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // Build the report for each month
+        var report = allMonths.ConvertAll(month =>
+        {
+            // Get orders for the current month, or an empty list if no orders exist
+            var monthlyOrders = groupedOrders.TryGetValue(month, out List<Order>? value)
+                ? value
+                : [];
+
+            // Calculate metrics
+            var completedOrders = monthlyOrders
+                .Where(o => o.Status == OrderStatus.Completed)
+                .ToList();
+            var totalRevenue = completedOrders.Sum(o => o.TotalPrice);
+            var averageOrderValue =
+                completedOrders.Count != 0 ? completedOrders.Average(o => o.TotalPrice) : 0;
+
+            return new DashboardSale { Date = month, Revenue = totalRevenue };
+        });
+
+        return Result<List<DashboardSale>>.Success(report);
+    }
+
+    public async Task<Result<List<DashboardStockAlert>>> GetDashboardStockAlertAsync(
+        int stockThreshold = 10
+    )
+    {
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll()
+            .Where(p => p.Stock <= stockThreshold)
+            .Select(p => new DashboardStockAlert
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                ProductImage = p.ImageUrls.FirstOrDefault()!,
+                Stock = p.Stock,
+            })
+            .ToListAsync();
+        return Result<List<DashboardStockAlert>>.Success(result);
     }
 }

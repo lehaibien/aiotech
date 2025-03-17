@@ -1,27 +1,50 @@
 "use client";
 
-import { ProductResponse } from "@/types";
-import { List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import { DashboardTopProduct } from "@/types";
+import {
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 
 type TopSellingProps = {
-  data: ProductResponse[];
+  data: DashboardTopProduct[];
 };
 
 export function TopSelling({ data }: TopSellingProps) {
+  if (data.length == 0) {
+    return (
+      <Typography
+        variant="body1"
+        sx={{
+          textAlign: "center",
+          color: "text.secondary",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        Không có dữ liệu
+      </Typography>
+    );
+  }
   return (
     <List>
-      {data.map((product) => (
-        <ListItem key={product.id}>
+      {data.map((prd) => (
+        <ListItem key={prd.id}>
           <ListItemAvatar>
             <Image
-              src={product.imageUrls[0]}
-              alt={product.name}
+              src={prd.imageUrls[0]}
+              alt={prd.name}
               width={50}
               height={50}
             />
           </ListItemAvatar>
-          <ListItemText primary={product.name} secondary={`Sales: 555`} />
+          <ListItemText primary={prd.name} secondary={`Số lượng: ${prd.sales}`} />
         </ListItem>
       ))}
     </List>

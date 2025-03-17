@@ -2,11 +2,17 @@ import { API_URL } from "@/constant/apiUrl";
 import KPISection from "@/features/dashboard/KPISection";
 import { RecentOrders } from "@/features/dashboard/RecentOrder";
 import { RevenueChart } from "@/features/dashboard/RevenueChart";
-import { StockAlert } from "@/features/dashboard/StockAlert";
+import { StockAlertSection } from "@/features/dashboard/StockAlert";
 import { TopSelling } from "@/features/dashboard/TopSelling";
 import { getApi, getApiQuery } from "@/lib/apiClient";
 import { formatNumberWithSeperator } from "@/lib/utils";
-import { DashboardCard, OrderResponse, ProductResponse } from "@/types";
+import {
+  DashboardCard,
+  DashboardSale,
+  DashboardTopProduct,
+  OrderResponse,
+  StockAlert
+} from "@/types";
 import UserIcon from "@mui/icons-material/AccountCircleOutlined";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoneyOutlined";
 import OrderIcon from "@mui/icons-material/ShoppingCartOutlined";
@@ -18,26 +24,41 @@ import {
 } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 
-interface KPI {
+type KPI = {
   title: string;
   value: string;
   percentageChange: number;
   icon: OverridableComponent<SvgIconTypeMap<object, "svg">> & {
     muiName: string;
   };
-}
+};
 
 export default async function Page() {
   let kpi: KPI[] = [];
-  let topProducts: ProductResponse[] = [];
+  let saleData: DashboardSale[] = [];
+  let topProducts: DashboardTopProduct[] = [];
   let recentOrders: OrderResponse[] = [];
-  const kpiPromise = await getApi(API_URL.dashboard);
-  const topProductsPromise = getApi(API_URL.productTop + "/7");
+  let stockAlerts: StockAlert[] = [];
+  const kpiPromise = await getApi(API_URL.dashboardCard);
+  const dashboardSalePromise = getApi(API_URL.dashboardSale);
+  const topProductsPromise = getApi(API_URL.dashboardTopProduct);
   const recentOrdersPromise = getApiQuery(API_URL.recentOrder, {
     count: 10,
   });
-  const [kpiResponse, topProductsResponse, recentOrdersResponse] =
-    await Promise.all([kpiPromise, topProductsPromise, recentOrdersPromise]);
+  const stockAlertPromise = getApi(API_URL.dashboardStockAlert);
+  const [
+    kpiResponse,
+    dashboardSaleResponse,
+    topProductsResponse,
+    recentOrdersResponse,
+    stockAlertResponse,
+  ] = await Promise.all([
+    kpiPromise,
+    dashboardSalePromise,
+    topProductsPromise,
+    recentOrdersPromise,
+    stockAlertPromise,
+  ]);
   if (kpiResponse.success) {
     const data = kpiResponse.data as DashboardCard;
     kpi = [
@@ -67,11 +88,17 @@ export default async function Page() {
       },
     ];
   }
+  if (dashboardSaleResponse.success) {
+    saleData = dashboardSaleResponse.data as DashboardSale[];
+  }
   if (topProductsResponse.success) {
-    topProducts = topProductsResponse.data as ProductResponse[];
+    topProducts = topProductsResponse.data as DashboardTopProduct[];
   }
   if (recentOrdersResponse.success) {
     recentOrders = recentOrdersResponse.data as OrderResponse[];
+  }
+  if (stockAlertResponse.success) {
+    stockAlerts = stockAlertResponse.data as StockAlert[];
   }
   return (
     <>
@@ -93,7 +120,7 @@ export default async function Page() {
             <Typography variant="h6" gutterBottom>
               Biểu đồ doanh thu
             </Typography>
-            <RevenueChart />
+            <RevenueChart data={saleData} />
           </Paper>
         </Grid>
         <Grid
@@ -103,7 +130,10 @@ export default async function Page() {
             overflowY: "auto",
           }}
         >
-          <Paper elevation={2} sx={{ p: 2 }}>
+          <Paper
+            elevation={2}
+            sx={{ p: 2, minHeight: "100%", position: "relative" }}
+          >
             <Typography variant="h6" gutterBottom>
               Danh sách sản phẩm bán chạy
             </Typography>
@@ -119,11 +149,17 @@ export default async function Page() {
           <Paper
             elevation={2}
             sx={{
-              p: 2,
               height: "100%",
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                px: 2,
+                pt: 2,
+              }}
+            >
               Đơn hàng gần đây
             </Typography>
             <RecentOrders data={recentOrders} />
@@ -136,17 +172,11 @@ export default async function Page() {
             overflowY: "auto",
           }}
         >
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              height: "100%",
-            }}
-          >
+          <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Cảnh báo hàng tồn kho
             </Typography>
-            <StockAlert />
+            <StockAlertSection data={stockAlerts} />
           </Paper>
         </Grid>
       </Grid>

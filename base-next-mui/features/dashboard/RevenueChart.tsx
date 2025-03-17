@@ -1,43 +1,51 @@
-'use client';
+"use client";
 
-import { LineChart } from '@mui/x-charts/LineChart';
-import { Box, useTheme } from '@mui/material';
+import { formatDate } from "@/lib/utils";
+import { DashboardSale } from "@/types";
+import { Box, useTheme } from "@mui/material";
+import { LineChart } from "@mui/x-charts/LineChart";
 
-const mockRevenueData = [
-  { date: '2023-06-01', revenue: 65000 },
-  { date: '2023-07-01', revenue: 72000 },
-  { date: '2023-08-01', revenue: 68000 },
-  { date: '2023-09-01', revenue: 80000 },
-  { date: '2023-10-01', revenue: 85000 },
-  { date: '2023-11-01', revenue: 92000 },
-];
+type RevenueChartProps = {
+  data: DashboardSale[];
+};
 
-export function RevenueChart() {
+export function RevenueChart({ data }: RevenueChartProps) {
   const theme = useTheme();
-  const xLabels = mockRevenueData.map(item => {
-    const date = new Date(item.date);
-    return date.toLocaleString('default', { month: 'short', year: '2-digit' });
-  });
-  const yValues = mockRevenueData.map(item => item.revenue);
+  const xLabels = data.map((item) => formatDate(item.date, "MM/YYYY"));
+  const yValues = data.map((item) => item.revenue);
+  const minPrice = Math.min(...data.map((item) => item.revenue));
+  const hasNonZeroValues = data.some((item) => item.revenue > 0);
 
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
+    <Box sx={{ width: "100%", height: "100%" }}>
       <LineChart
-        xAxis={[{ 
-          data: xLabels,
-          scaleType: 'point',
-          tickLabelStyle: {
-            angle: 0,
-            textAnchor: 'middle',
-            fontSize: 12,
+        xAxis={[
+          {
+            data: xLabels,
+            scaleType: "point",
+            tickLabelStyle: {
+              angle: 0,
+              textAnchor: "middle",
+              fontSize: 12,
+            },
           },
-        }]}
-        yAxis={[{
-          tickNumber: 5,
-          tickLabelStyle: {
-            fontSize: 12,
+        ]}
+        yAxis={[
+          {
+            id: "y-axis-revenue",
+            label: "Doanh thu (đ)",
+            position: "left",
+            min: 0,
+            tickMinStep: hasNonZeroValues ? Math.max(1, minPrice / 10) : 1,
+            tickLabelStyle: {
+              fontSize: 12,
+            },
+            labelStyle: {
+              transform: "translate(100px, -160px)",
+              textAnchor: "end",
+            },
           },
-        }]}
+        ]}
         series={[
           {
             data: yValues,
@@ -47,12 +55,12 @@ export function RevenueChart() {
           },
         ]}
         height={400}
-        margin={{ top: 20, right: 35, bottom: 30, left: 65 }}
+        margin={{ left: 80 }}
         sx={{
-          '.MuiLineElement-root': {
+          ".MuiLineElement-root": {
             strokeWidth: 2,
           },
-          '.MuiAreaElement-root': {
+          ".MuiAreaElement-root": {
             fillOpacity: 0.2,
           },
         }}
@@ -60,4 +68,3 @@ export function RevenueChart() {
     </Box>
   );
 }
-

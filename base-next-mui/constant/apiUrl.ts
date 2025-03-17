@@ -10,6 +10,7 @@ export const API_URL = {
   user: "user",
   userByName: "user/name",
   userProfile: "user/profile",
+  userLock: "user/lock",
 
   // role
   role: "role",
@@ -64,5 +65,8 @@ export const API_URL = {
   emailConfig: "configuration/email",
 
   // dashboard
-  dashboard: "dashboard",
+  dashboardCard: "dashboard/card",
+  dashboardTopProduct: "dashboard/top-product",
+  dashboardSale: "dashboard/sale",
+  dashboardStockAlert: "dashboard/stock-alert",
 };
