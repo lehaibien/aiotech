@@ -45,18 +45,22 @@ type CheckoutComponentProps = {
   name: string;
   phoneNumber: string;
   address: string;
+  isError: boolean;
 };
 
 export function CheckoutComponent({
   name,
   phoneNumber,
   address,
+  isError = false,
 }: CheckoutComponentProps) {
   const theme = useTheme();
   const router = useRouter();
   const [cartItems] = useAtom(cartItemsAtom);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    isError ? "Lỗi xảy ra khi thanh toán, vui lòng thử lại sau!" : null
+  );
 
   const cartTotal = useMemo(
     () =>

@@ -62,7 +62,7 @@ export const createShipperColumns = (
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      params.row.status === "Delivered" ? null : (
+      params.row.status !== "Delivering" ? null : (
         <Button
           variant="contained"
           color="success"

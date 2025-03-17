@@ -3,17 +3,17 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
+import { convertObjectToFormData } from "@/lib/utils";
 import { BrandRequest, BrandRequestSchema, BrandResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, FormControl, FormLabel, Typography } from "@mui/material";
+import { Box, Button, FormControl, FormLabel } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ImageUpload from "./ImageUpload";
-import { useEffect, useState } from "react";
-import { convertObjectToFormData } from "@/lib/utils";
 
 type BrandUpsertFormProps = {
   brand: BrandResponse;
@@ -109,12 +109,15 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
       <FormControl
         margin="normal"
         sx={{
-          width: "30%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 1,
         }}
       >
-        <Typography variant="h6" className="mb-4">
+        <FormLabel htmlFor="name" required>
           Ảnh thương hiệu
-        </Typography>
+        </FormLabel>
         <ImageUpload image={image} onUpload={setImage} />
       </FormControl>
       <FormControl

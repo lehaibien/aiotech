@@ -428,12 +428,12 @@ public class OrderService : IOrderService
         var paymentResponse = new PaymentResponse();
         try
         {
-            if (!string.IsNullOrWhiteSpace(bankCode) && bankCode == "VNPAY")
+            if (!string.IsNullOrWhiteSpace(bankCode))
             {
                 var pay = new VnPayLibrary();
                 paymentResponse = pay.GetFullResponseData(queryCollection, _option.HashSecret);
             }
-            else if (!string.IsNullOrEmpty(partnerCode) && partnerCode == "MOMO")
+            else if (!string.IsNullOrEmpty(partnerCode))
             {
                 paymentResponse = await _momoLibrary.PaymentExecuteAsync(queryCollection);
             }

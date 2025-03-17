@@ -14,7 +14,10 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
       sx={{
         position: "relative",
         width: "100%",
-        height: 480, // Fixed height for the banner
+        height: {
+          xs: 200,
+          md: 400,
+        },
         borderRadius: 2,
         overflow: "hidden",
       }}
@@ -37,8 +40,24 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
           height={400}
           quality={100}
           priority
+          className="hidden md:block"
           style={{
             width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+        <Image
+          src={imageUrl || "/hero-banner.jpg"}
+          alt="Banner Image"
+          width={600}
+          height={200}
+          quality={100}
+          priority
+          className="d-block md:hidden"
+          style={{
+            width: "100%",
+            height: 200,
             objectFit: "cover",
           }}
         />
@@ -76,7 +95,14 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
         <Typography
           variant="h5"
           gutterBottom
-          sx={{ lineHeight: 1.5, fontSize: "clamp(1.2rem, 10rem, 1.2rem)" }}
+          sx={{
+            lineHeight: 1.5,
+            fontSize: "clamp(1.2rem, 10rem, 1.2rem)",
+            display: {
+              xs: "none",
+              md: "block",
+            },
+          }}
         >
           {description}
         </Typography>

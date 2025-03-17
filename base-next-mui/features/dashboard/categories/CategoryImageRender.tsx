@@ -13,7 +13,7 @@ export function CategoryImageRender(
       style={{
         width: 'auto',
         height: 'auto',
-        aspectRatio: 1 / 1,
+        aspectRatio: 3/2,
       }}
     />
   );

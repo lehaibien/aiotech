@@ -29,13 +29,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, image }) => {
           src={URL.createObjectURL(image) || "/placeholder.svg"}
           alt={`Uploaded`}
           loading="lazy"
-          width={200}
-          height={200}
+          width={600}
+          height={400}
           style={{
-            objectFit: "cover",
+            objectFit: "fill",
             width: "100%",
-            height: "100%",
             backgroundColor: "white",
+            aspectRatio: 3 / 2,
           }}
         />
       )}
