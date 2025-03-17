@@ -93,32 +93,44 @@ public class ReportService : IReportService
     }
 
     public async Task<Result<PaginatedList>> GetOutOfStockReportAsync(
-        OutOfStockReportRequest request
+        InventoryStatusReportRequest request
     )
     {
-        SqlParameter totalRow = new()
-        {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
-        {
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            new("@iBrandId", request.BrandId is null ? DBNull.Value : request.BrandId),
-            new("@iCategoryId", request.CategoryId is null ? DBNull.Value : request.CategoryId),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<OutOfStockReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetOutOfStockReport, parameters);
+        const int lowStockThreshold = 10;
+        var query = _unitOfWork
+            .GetRepository<Product>()
+            .GetAll()
+            .Where(x =>
+                (request.BrandId == null || x.BrandId == request.BrandId)
+                && (request.CategoryId == null || x.CategoryId == request.CategoryId)
+            );
+        var count = await query.CountAsync();
+        var result = await query
+            .Select(p => new InventoryStatusReportResponse
+            {
+                Id = p.Id,
+                Sku = p.Sku,
+                Name = p.Name,
+                CurrentStock = p.Stock,
+                StockStatus =
+                    p.Stock <= 0 ? "Out of Stock"
+                    : p.Stock <= lowStockThreshold ? "Low Stock"
+                    : "In Stock",
+                ReorderRecommended = p.Stock <= lowStockThreshold,
+                Brand = p.Brand.Name,
+                Category = p.Category.Name,
+                ImageUrls = p.ImageUrls,
+            })
+            .OrderBy(p => p.CurrentStock)
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync();
 
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = count,
             Items = result,
         };
 
@@ -198,5 +210,45 @@ public class ReportService : IReportService
             .GetRepository<TopCustomerReportResponse>()
             .ExecuteStoredProcedureAsync(StoredProcedure.GetTopCustomerReport, parameters);
         return Result<List<TopCustomerReportResponse>>.Success(result.ToList());
+    }
+
+    public async Task<Result<PaginatedList>> GetTopSellingProductsAsync(
+        TopSellingProductRequest request
+    )
+    {
+        var query = _unitOfWork
+            .GetRepository<OrderItem>()
+            .GetAll()
+            .Where(oi =>
+                oi.Order!.CreatedDate >= request.StartDate
+                && oi.Order.CreatedDate <= request.EndDate
+                && oi.Order.Status == OrderStatus.Completed
+            )
+            .GroupBy(oi => oi.ProductId);
+        var count = await query.CountAsync();
+        var result = await query
+            .Select(g => new TopSellingProductResponse
+            {
+                ProductId = g.Key,
+                Sku = g.First().Product.Sku,
+                ProductName = g.First().Product.Name,
+                TotalQuantitySold = g.Sum(oi => oi.Quantity),
+                TotalRevenue = g.Sum(oi => oi.Price * oi.Quantity),
+                AverageRating = g.First().Product.Reviews.Any()
+                    ? g.First().Product.Reviews.Average(r => r.Rating)
+                    : 0,
+            })
+            .OrderByDescending(p => p.TotalQuantitySold)
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync();
+        var list = new PaginatedList
+        {
+            PageIndex = request.PageIndex,
+            PageSize = request.PageSize,
+            TotalCount = count,
+            Items = result,
+        };
+        return Result<PaginatedList>.Success(list);
     }
 }

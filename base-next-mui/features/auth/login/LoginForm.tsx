@@ -13,10 +13,12 @@ import {
 } from "@mui/material";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const {
     register,
@@ -25,14 +27,19 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
   } = useForm<UserLoginRequest>({ resolver: zodResolver(UserLoginSchema) });
   const onSubmit = async (data: UserLoginRequest) => {
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         username: data.username,
         password: data.password,
-        redirectTo: redirectTo,
+        redirect: false,
       });
+      if (result?.error) {
+        enqueueSnackbar(result.code, { variant: "error" });
+        return;
+      }
       enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
-    } catch {
-      enqueueSnackbar("Đăng nhập thất bại", { variant: "error" });
+      router.push(redirectTo);
+    } catch (err) {
+      enqueueSnackbar((err as Error).message, { variant: "error" });
     }
     return;
   };
@@ -92,7 +99,13 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         control={<Checkbox value="remember" color="primary" />}
         label="Ghi nhớ tôi"
       />
-      <Button type="submit" fullWidth variant="contained" color="primary" data-umami-event="Đăng nhập">
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        color="primary"
+        data-umami-event="Đăng nhập"
+      >
         Đăng nhập
       </Button>
     </Box>

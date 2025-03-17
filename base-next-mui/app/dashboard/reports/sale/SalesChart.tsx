@@ -12,10 +12,6 @@ interface SalesChartProps {
 
 export default function SalesChart({ data }: SalesChartProps) {
   const chartData = data
-    .map((item) => ({
-      ...item,
-      date: dayjs(item.date).toDate(),
-    }))
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
   const minPrice = Math.min(...chartData.map((item) => item.revenue));
   const hasNonZeroValues = chartData.some(item => item.revenue > 0);
@@ -26,7 +22,7 @@ export default function SalesChart({ data }: SalesChartProps) {
           id: "x-axis-date",
           dataKey: "date",
           scaleType: "band",
-          data: chartData.map((item) => dayjs(item.date).toDate()),
+          data: chartData.map((item) => item.date),
           valueFormatter: (value: Date) =>
             dayjs(value).format("MM/YYYY"),
           label: "Tháng",

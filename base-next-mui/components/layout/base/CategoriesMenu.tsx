@@ -91,7 +91,7 @@ export function CategoryMenu({ position, data }: CategoryMenuProps) {
           maxHeight: "32rem",
           "& .MuiPaper-root": {
             borderRadius: 2,
-            overflow: "hidden",
+            overflow: "auto",
           },
         }}
       >

@@ -66,7 +66,7 @@ public class ReportController : ControllerBase
 
     [HttpGet("out-of-stock")]
     public async Task<IActionResult> GetOutOfStockReportAsync(
-        [FromQuery] OutOfStockReportRequest request
+        [FromQuery] InventoryStatusReportRequest request
     )
     {
         var response = new ApiResponse();
@@ -125,6 +125,24 @@ public class ReportController : ControllerBase
     {
         var response = new ApiResponse();
         var result = await _service.GetTopCustomerReportAsync(request);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
+    [HttpGet("top-product")]
+    public async Task<IActionResult> GetTopProductReportAsync(
+        [FromQuery] TopSellingProductRequest request
+    )
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetTopSellingProductsAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

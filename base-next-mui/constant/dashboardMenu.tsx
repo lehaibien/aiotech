@@ -94,9 +94,9 @@ export const dashboardMenus: DashboardMenu[] = [
         path: "/dashboard/reports/product-rating",
       },
       {
-        name: "Thống kê sản phẩm gần hết hàng",
+        name: "Thống kê trạng thái kho",
         icon: <InventoryOutlinedIcon />,
-        path: "/dashboard/reports/out-of-stock",
+        path: "/dashboard/reports/inventory-status",
       },
       {
         name: "Thống kê hiệu suất danh mục",

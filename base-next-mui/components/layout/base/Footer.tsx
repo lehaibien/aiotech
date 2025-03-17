@@ -1,6 +1,15 @@
 import BrandLogo from "@/components/core/BrandLogo";
 import { HighlightTypography } from "@/components/core/HighlightTypography";
-import { Email, Facebook, Instagram, LocationOn, Phone, X, YouTube } from "@mui/icons-material";
+import dayjs from "@/lib/extended-dayjs";
+import {
+  Email,
+  Facebook,
+  Instagram,
+  LocationOn,
+  Phone,
+  X,
+  YouTube,
+} from "@mui/icons-material";
 import {
   Box,
   Grid2 as Grid,
@@ -10,7 +19,6 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import dayjs from '@/lib/extended-dayjs';
 import "server-only";
 
 export default function Footer() {
@@ -27,12 +35,7 @@ export default function Footer() {
       <Grid container spacing={4}>
         {/* Về chúng tôi */}
         <Grid size={{ xs: 12, md: 3 }}>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <BrandLogo />
-            <Typography variant="h5" color="text.primary">
-              AioTech
-            </Typography>
-          </Stack>
+          <BrandLogo />
           <Typography variant="body1" gutterBottom>
             Hệ thống bán lẻ điện tử công nghệ hàng đầu Việt Nam
           </Typography>

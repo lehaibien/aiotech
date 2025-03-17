@@ -149,7 +149,6 @@ function DataTable<T>(
         showCellVerticalBorder
         showColumnVerticalBorder
         sx={{
-          borderColor: "red",
           "& .MuiDataGrid-cell:focus": {
             outline: "none",
           },

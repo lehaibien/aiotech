@@ -39,18 +39,30 @@ export function formatNumberWithSeperator(
   number: number,
   seperator: string = "."
 ): string {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
+  return number.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
 }
 
-export function formatDateFromString(dateString: string | null): string {
+export function formatDateFromString(
+  dateString: string | null,
+  format?: string | undefined
+): string {
   if (!dateString) {
     return "";
   }
-  return dayjs(dateString).tz(DEFAULT_TIMEZONE).format("DD/MM/YYYY HH:mm");
+  return dayjs(dateString)
+    .utc(true)
+    .tz(DEFAULT_TIMEZONE)
+    .format(format ?? "DD/MM/YYYY HH:mm");
 }
 
-export function formatDate(date: Date | Dayjs): string {
-  return dayjs(date).tz(DEFAULT_TIMEZONE).format("DD/MM/YYYY HH:mm");
+export function formatDate(
+  date: Date | Dayjs,
+  format?: string | undefined
+): string {
+  return dayjs(date)
+    .utc(true)
+    .tz(DEFAULT_TIMEZONE)
+    .format(format ?? "DD/MM/YYYY HH:mm");
 }
 
 export function capitalize(str: string) {

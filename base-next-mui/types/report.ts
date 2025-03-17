@@ -11,7 +11,7 @@ export type OrderReportRequest = {
   customerUsername?: string;
 } & BaseReportRequest;
 
-export type OutOfStockReportRequest = {
+export type InventoryStatusReportRequest = {
   pageIndex: number;
   pageSize: number;
   brandId?: UUID;
@@ -21,14 +21,16 @@ export type OutOfStockReportRequest = {
 export type CategoryPerformanceReportRequest = BaseReportRequest;
 export type BrandPerformanceReportRequest = BaseReportRequest;
 
-export type OutOfStockReportResponse = {
+export type InventoryStatusReportResponse = {
   id: UUID;
   sku: string;
   name: string;
-  stock: number;
+  currentStock: number;
   category: string;
   brand: string;
   imageUrls: string[];
+  stockStatus: string;
+  reorderRecommended: boolean;
 };
 
 export type TopCustomerReportRequest = {
@@ -38,7 +40,7 @@ export type TopCustomerReportRequest = {
 // Response
 
 export type SaleReportResponse = {
-  date: string; // ISO string from DateTime
+  date: Date;
   revenue: number;
   totalOrder: number;
   completedOrder: number;

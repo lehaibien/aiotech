@@ -7,6 +7,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 
+dayjs.utc();
 dayjs.tz.setDefault('UTC');
 
 export default dayjs;

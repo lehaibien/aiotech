@@ -93,6 +93,12 @@ export function AuthMenu() {
                 <Link href="/dashboard">Dashboard</Link>
               </MenuItem>
             )}
+            {(session.user.role.toLowerCase() === "shipper" ||
+              session.user.role.toLowerCase() === "admin") && (
+              <MenuItem>
+                <Link href="/shipper">Shipper</Link>
+              </MenuItem>
+            )}
             <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
           </Menu>
         </>

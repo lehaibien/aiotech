@@ -1,14 +1,14 @@
 import { API_URL } from "@/constant/apiUrl";
+import dayjs from "@/lib/extended-dayjs";
 import { ApiResponse, UserLoginRequest } from "@/types";
 import { jwtDecode } from "jwt-decode";
-import NextAuth, { User } from "next-auth";
+import NextAuth, { CredentialsSignin, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Facebook from "next-auth/providers/facebook";
 import Google from "next-auth/providers/google";
 import { postApi } from "./apiClient";
-import dayjs from "@/lib/extended-dayjs";
 
-interface JwtPayload {
+type JwtPayload = {
   "nameid": string;
   "name": string;
   "email": string;
@@ -18,6 +18,14 @@ interface JwtPayload {
   exp: number;
   iss: string;
   aud: string;
+}
+
+class InvalidLoginError extends CredentialsSignin {
+  code = 'Đăng nhập không thành công'
+  constructor(code: string) {
+    super();
+    this.code = code;
+  }
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -134,7 +142,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
         const response = await postApi(API_URL.login, data);
         if (!response.success) {
-          return null;
+          throw new InvalidLoginError(response.message || 'Đăng nhập không thành công');
         }
         const jwtResult = response.data as {
           accessToken: string;
@@ -223,7 +231,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
           return { ...token, error: "RefreshAccessTokenError" };
         } catch (error) {
-          console.error("Failed to refresh token:", error);
           return { ...token, error: "RefreshAccessTokenError" };
         }
       }

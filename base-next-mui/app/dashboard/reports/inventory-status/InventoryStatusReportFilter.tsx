@@ -13,19 +13,19 @@ import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type OutOfStockReportFilterProps = {
+type InventoryStatusReportFilterProps = {
   brandList: ComboBoxItem[];
   categoryList: ComboBoxItem[];
   defaultBrandId?: UUID;
   defaultCategoryId?: UUID;
 };
 
-export default function OutOfStockReportFilter({
+export default function InventoryStatusReportFilter({
   brandList,
   categoryList,
   defaultBrandId,
   defaultCategoryId,
-}: OutOfStockReportFilterProps) {
+}: InventoryStatusReportFilterProps) {
   const theme = useTheme();
   const router = useRouter();
 
@@ -59,7 +59,7 @@ export default function OutOfStockReportFilter({
       params.delete("category_id");
     }
 
-    router.push(`/dashboard/reports/out-of-stock?${params.toString()}`);
+    router.push(`/dashboard/reports/inventory-status?${params.toString()}`);
   };
 
   return (

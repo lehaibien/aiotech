@@ -27,6 +27,7 @@ public interface IFileService
     Result DeleteByUrl(string fileUrl);
 
     Result DeleteBulkByUrl(List<string> fileUrls);
+    Result DeleteFolder(string folderName);
     void EnsureDirectoryExists(string folder);
 }
 

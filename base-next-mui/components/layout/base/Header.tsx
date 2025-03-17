@@ -1,8 +1,8 @@
+import BrandLogo from "@/components/core/BrandLogo";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
 import { ComboBoxItem } from "@/types";
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
-import Image from "next/image";
+import { AppBar, Box, Toolbar } from "@mui/material";
 import Link from "next/link";
 import { AuthMenu } from "./AuthMenu";
 import { CartDrawer } from "./CartDrawer";
@@ -30,34 +30,18 @@ export default async function Header() {
       }}
     >
       {/* Main Toolbar */}
-      <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Toolbar
+        sx={{
+          justifyContent: "space-between",
+          paddingX: {
+            xs: 0,
+            md: 4,
+          },
+        }}
+      >
         {/* Left section - Logo on desktop */}
-        <Link
-          href="/"
-          className="flex items-center justify-center gap-2 order-2 md:order-1 w-1/3 md:w-auto"
-        >
-          <Image
-            src="/favicon.svg"
-            alt="Logo"
-            width={32}
-            height={32}
-            style={{
-              aspectRatio: 1 / 1,
-              minWidth: 32,
-            }}
-          />
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "semibold",
-              display: {
-                xs: "none",
-                md: "block",
-              },
-            }}
-          >
-            AioTech
-          </Typography>
+        <Link href="/" className="flex-1 order-2 md:order-1 w-1/3 md:w-auto">
+          <BrandLogo />
         </Link>
 
         {/* Center section - Logo on mobile */}
@@ -78,15 +62,17 @@ export default async function Header() {
         {/* User controls */}
         <Box
           sx={{
+            flex: 1,
             display: "flex",
+            justifyContent: "flex-end",
             order: 3,
-            width: {
-              xs: "33%",
-              md: "auto",
-            },
           }}
         >
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          <Box
+            sx={{
+              display: { xs: "flex", md: "none" },
+            }}
+          >
             <SearchBar categories={categories} />
           </Box>
           <AuthMenu />

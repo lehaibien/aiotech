@@ -1,6 +1,6 @@
 import BrandLogo from "@/components/core/BrandLogo";
 import ColorSchemeSwitch from "@/components/core/ColorSchemeSwitch";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import AccountSection from "./Account";
 import { MenuButton } from "./MenuButton";
@@ -32,12 +32,7 @@ export default async function Header() {
         alignItems="center"
         justifyContent="space-between"
       >
-        <Box display="flex" gap={1}>
-          <BrandLogo />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            AioTech
-          </Typography>
-        </Box>
+        <BrandLogo />
         <MenuButton />
       </Box>
       <Stack direction="row" sx={{ gap: 1 }}>

@@ -1,6 +1,6 @@
 namespace Application.Reports.Dtos;
 
-public class OutOfStockReportRequest
+public class InventoryStatusReportRequest
 {
     public int PageIndex { get; set; }
     public int PageSize { get; set; } = 10;

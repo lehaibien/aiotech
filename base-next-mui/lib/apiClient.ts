@@ -237,11 +237,14 @@ async function getAuthorizationHeader() {
  * @returns A Promise that resolves to an ApiResponse object.
  */
 async function handleResponse(response: Response): Promise<ApiResponse> {
-  if (response.status === 500) {
-    throw new Error("Lỗi server: " + response.text());
-  }
   if (response.status === 401) {
     redirect("/login");
+  }
+  if (response.status === 500) {
+    return {
+      success: false,
+      message: "Lỗi server",
+    }
   }
   const json = await response.json();
   if (

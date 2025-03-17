@@ -54,10 +54,18 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
     setDrawerOpen(false);
   };
   return (
-    <>
+    <Box
+      sx={{
+        flex: 1,
+        display: {
+          xs: "flex",
+          md: "none",
+        },
+      }}
+    >
       <IconButton
         sx={{
-          display: { xs: "flex", md: "none" },
+          display: "flex",
           order: 1,
           width: "auto",
           p: 1,
@@ -96,11 +104,14 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
 
                 {/* Insert categories after first navigation item */}
                 {index === 0 && (
-                  <ListItem disablePadding sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexDirection: "column",
-                  }}>
+                  <ListItem
+                    disablePadding
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexDirection: "column",
+                    }}
+                  >
                     <ListItemButton onClick={() => setExpanded(!expanded)}>
                       <ListItemIcon>
                         <CategoryOutlinedIcon fontSize="small" />
@@ -141,6 +152,6 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
           </List>
         </Box>
       </Drawer>
-    </>
+    </Box>
   );
 }
