@@ -1,14 +1,23 @@
+import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
 import { API_URL } from "@/constant/apiUrl";
 import { getApiQuery } from "@/lib/apiClient";
-import { TopCustomerReportRequest, TopCustomerReportResponse } from "@/types";
-import { Box, Typography } from "@mui/material";
-import TopCustomerChart from "./TopCustomerChart";
-import TopCustomerGrid from "./TopCustomerGrid";
 import dayjs from "@/lib/extended-dayjs";
-import utc from "dayjs/plugin/utc";
+import { TopCustomerReportRequest, TopCustomerReportResponse } from "@/types";
+import { Stack, Typography } from "@mui/material";
+import TopCustomerChart from "./TopCustomerChart";
 import TopCustomerFilter from "./TopCustomerFilter";
+import TopCustomerGrid from "./TopCustomerGrid";
 
-dayjs.extend(utc);
+const breadcrums = [
+  {
+    label: "",
+    href: "dashboard",
+  },
+  {
+    label: "Báo cáo khách hàng mua hàng nhiều nhất",
+    href: "/dashboard/reports/top-customer",
+  },
+];
 
 async function getTopCustomerData(request: TopCustomerReportRequest) {
   const response = await getApiQuery(API_URL.topCustomerReport, request);
@@ -26,7 +35,7 @@ export default async function TopCustomerReportPage({
   const startDate = searchParams?.start_date
     ? dayjs.utc(searchParams?.start_date)
     : dayjs.utc().startOf("year");
-    const endDate = searchParams?.end_date
+  const endDate = searchParams?.end_date
     ? dayjs.utc(searchParams?.end_date)
     : dayjs.utc().endOf("year");
   const count = searchParams?.count ? Number(searchParams?.count) : 10;
@@ -38,9 +47,11 @@ export default async function TopCustomerReportPage({
   const data = await getTopCustomerData(request);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Stack spacing={3}>
+      <NavBreadcrumbs items={breadcrums} />
+      <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h4" component="h1">
-        Khách hàng mua hàng nhiều nhất
+        Báo cáo khách hàng mua hàng nhiều nhất
       </Typography>
 
       <TopCustomerFilter
@@ -50,6 +61,6 @@ export default async function TopCustomerReportPage({
       />
       <TopCustomerChart data={data} />
       <TopCustomerGrid data={data} />
-    </Box>
+    </Stack>
   );
 }

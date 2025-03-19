@@ -7,7 +7,6 @@ import ReviewsOutlinedIcon from "@mui/icons-material/ReviewsOutlined";
 import SensorDoorOutlinedIcon from "@mui/icons-material/SensorDoorOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -109,7 +108,7 @@ export const dashboardMenus: DashboardMenu[] = [
         path: "/dashboard/reports/brand-performance",
       },
       {
-        name: "Thống kê khách hàng mua nhiều",
+        name: "Báo cáo khách hàng mua nhiều",
         icon: <AccountCircleOutlinedIcon />,
         path: "/dashboard/reports/top-customer",
       },
