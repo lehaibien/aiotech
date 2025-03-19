@@ -165,7 +165,6 @@ services:
     container_name: aiotech_traefik
     command:
       - "--entrypoints.web.http2.maxConcurrentStreams=50"  # Reduced from 100
-      - "--experimental.http3=false"  # Disable HTTP3
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
