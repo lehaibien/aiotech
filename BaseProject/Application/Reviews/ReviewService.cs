@@ -63,6 +63,7 @@ public class ReviewService : IReviewService
             .Take(request.PageSize)
             .Select(x => new ReviewResponse
             {
+                Id = x.Id,
                 UserName = x.User.UserName,
                 ProductName = x.Product.Name,
                 Rating = x.Rating,

@@ -1,14 +1,7 @@
 "use client";
 
 import { ComboBoxItem } from "@/types";
-import {
-  Autocomplete,
-  Button,
-  Paper,
-  Stack,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { Autocomplete, Button, Paper, Stack, TextField } from "@mui/material";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,7 +19,6 @@ export default function InventoryStatusReportFilter({
   defaultBrandId,
   defaultCategoryId,
 }: InventoryStatusReportFilterProps) {
-  const theme = useTheme();
   const router = useRouter();
 
   const defaultBrand = defaultBrandId
@@ -64,16 +56,11 @@ export default function InventoryStatusReportFilter({
 
   return (
     <Paper
-      elevation={2}
+      elevation={0}
       sx={{
         p: 3,
         borderRadius: 2,
         mb: 4,
-        backgroundColor: theme.palette.background.paper,
-        transition: "all 0.3s ease-in-out",
-        "&:hover": {
-          boxShadow: 6,
-        },
       }}
     >
       <Stack direction="row" spacing={2} alignItems="center">

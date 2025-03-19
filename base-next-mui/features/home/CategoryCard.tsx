@@ -24,7 +24,7 @@ export function CategoryCard({ name, imageUrl }: CategoryCardProps) {
       sx={{
         position: "relative",
         overflow: "hidden",
-        height: 200,
+        height: 150,
         borderRadius: 2,
         transition: "all 0.2s ease-in-out",
         boxShadow: "none",

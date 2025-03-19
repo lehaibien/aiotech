@@ -89,6 +89,7 @@ function DataGridPagination({
           variant="outlined"
           size="small"
           sx={{ width: 60 }}
+          aria-label="Trang hiện tại"
         />
 
         {/* Total Pages Label */}
@@ -134,6 +135,7 @@ function DataGridPagination({
           variant="outlined"
           size="small"
           sx={{ minWidth: 80 }}
+          aria-label="Số dòng mỗi trang"
         >
           {PAGE_SIZE_OPTIONS.map((size) => (
             <MenuItem key={size} value={size}>
@@ -161,7 +163,7 @@ function DataGridPagination({
         </Typography>
 
         {/* Refresh Button */}
-        <IconButton onClick={refreshGrid} size="small" aria-label="Refresh">
+        <IconButton onClick={refreshGrid} size="small" aria-label="Tải lại">
           <RefreshRounded />
         </IconButton>
       </Stack>

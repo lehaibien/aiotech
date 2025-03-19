@@ -69,10 +69,12 @@ const theme = createTheme({
     },
   },
   typography,
-  coreviVN,
-  datePickerviVN,
-  dateGridviVN,
-  components,
+  components: {
+    ...components,
+    ...coreviVN,
+    ...datePickerviVN,
+    ...dateGridviVN,
+  },
   breakpoints: {
     values: {
       xs: 0,

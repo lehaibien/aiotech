@@ -1,11 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import Fuse from 'fuse.js';
-import { DashboardMenu, dashboardMenus } from '@/constant/dashboardMenu';
-import { Close, Search } from '@mui/icons-material';
+import { DashboardMenu, dashboardMenus } from "@/constant/dashboardMenu";
+import { Close, Search } from "@mui/icons-material";
 import {
+  alpha,
   Box,
   Drawer,
   IconButton,
@@ -15,34 +13,35 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  useMediaQuery,
-  useTheme,
-  alpha,
-} from '@mui/material';
+  useTheme
+} from "@mui/material";
+import Fuse from "fuse.js";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 export default function SearchBar() {
   const [showDrawer, setShowDrawer] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const fuse = useMemo(() => {
-    const flattenMenu = (menu: DashboardMenu, parent?: string): Array<DashboardMenu & { parent?: string }> => {
+    const flattenMenu = (
+      menu: DashboardMenu,
+      parent?: string
+    ): Array<DashboardMenu & { parent?: string }> => {
       if (menu.path) return [{ ...menu, parent }];
       if (menu.children) {
-        return menu.children.flatMap(child => 
-          flattenMenu(child, menu.name)
-        );
+        return menu.children.flatMap((child) => flattenMenu(child, menu.name));
       }
       return [];
     };
 
-    const flatMenus = dashboardMenus.flatMap(menu => 
-      flattenMenu(menu)
-    ).filter((item): item is DashboardMenu & { path: string } => !!item.path);
+    const flatMenus = dashboardMenus
+      .flatMap((menu) => flattenMenu(menu))
+      .filter((item): item is DashboardMenu & { path: string } => !!item.path);
 
     return new Fuse(flatMenus, {
-      keys: ['name', 'parent'],
+      keys: ["name", "parent"],
       includeMatches: true,
       threshold: 0.3,
       shouldSort: true,
@@ -53,13 +52,12 @@ export default function SearchBar() {
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
-    
-    return fuse.search(searchQuery)
-      .map(result => ({
-        ...result.item,
-        parent: (result.item as { parent?: string }).parent,
-        matches: result.matches
-      }));
+
+    return fuse.search(searchQuery).map((result) => ({
+      ...result.item,
+      parent: (result.item as { parent?: string }).parent,
+      matches: result.matches,
+    }));
   }, [searchQuery, fuse]);
 
   return (
@@ -68,9 +66,10 @@ export default function SearchBar() {
         onClick={() => setShowDrawer(true)}
         size="large"
         sx={{
-          color: 'text.secondary',
-          '&:hover': { color: 'primary.main' }
+          color: "text.secondary",
+          "&:hover": { color: "primary.main" },
         }}
+        aria-label="Tìm kiếm chức năng"
       >
         <Search fontSize="small" />
       </IconButton>
@@ -81,16 +80,19 @@ export default function SearchBar() {
         onClose={() => setShowDrawer(false)}
         PaperProps={{
           sx: {
-            backdropFilter: 'blur(12px)',
+            backdropFilter: "blur(12px)",
             bgcolor: alpha(theme.palette.background.default, 0.9),
             borderRadius: 2,
-            mx: 'auto',
+            mx: "auto",
             mt: 2,
             p: 2,
-            width: isMobile ? '95%' : '60%',
+            width: {
+              xs: "95%",
+              sm: "60%",
+            },
             boxShadow: theme.shadows[6],
-            overflow: 'hidden',
-          }
+            overflow: "hidden",
+          },
         }}
       >
         <Box position="relative">
@@ -101,40 +103,40 @@ export default function SearchBar() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{
-              '&:before, &:after': { display: 'none' },
-              '& .MuiInput-input': {
+              "&:before, &:after": { display: "none" },
+              "& .MuiInput-input": {
                 py: 1.5,
-                fontSize: '1.1rem',
-              }
+                fontSize: "1.1rem",
+              },
             }}
           />
 
           <IconButton
             onClick={() => setShowDrawer(false)}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
+            sx={{ position: "absolute", right: 8, top: 8 }}
           >
             <Close fontSize="small" />
           </IconButton>
         </Box>
 
         {searchQuery && (
-          <List sx={{ mt: 2, maxHeight: 400, overflow: 'auto' }}>
+          <List sx={{ mt: 2, maxHeight: 400, overflow: "auto" }}>
             {searchResults.map((item, index) => (
               <ListItem
                 key={index}
                 component={Link}
-                href={item.path ?? '#'}
+                href={item.path ?? "#"}
                 onClick={() => setShowDrawer(false)}
                 sx={{
                   borderRadius: 1,
-                  transition: 'all 0.2s',
-                  '&:hover': {
+                  transition: "all 0.2s",
+                  "&:hover": {
                     bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    transform: 'translateX(4px)',
-                  }
+                    transform: "translateX(4px)",
+                  },
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 32, color: 'text.secondary' }}>
+                <ListItemIcon sx={{ minWidth: 32, color: "text.secondary" }}>
                   {item.icon}
                 </ListItemIcon>
 
@@ -146,18 +148,16 @@ export default function SearchBar() {
                           component="span"
                           variant="caption"
                           color="text.secondary"
-                          sx={{ display: 'block', lineHeight: 1.2 }}
+                          sx={{ display: "block", lineHeight: 1.2 }}
                         >
                           {item.parent}
                         </Typography>
                       )}
-                      <Typography component="span">
-                        {item.name}
-                      </Typography>
+                      <Typography component="span">{item.name}</Typography>
                     </Box>
                   }
                   primaryTypographyProps={{
-                    sx: { fontWeight: 500, color: 'text.primary' }
+                    sx: { fontWeight: 500, color: "text.primary" },
                   }}
                 />
               </ListItem>
@@ -167,7 +167,7 @@ export default function SearchBar() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ textAlign: 'center', py: 2 }}
+                sx={{ textAlign: "center", py: 2 }}
               >
                 Không tìm thấy kết quả phù hợp
               </Typography>

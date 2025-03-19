@@ -1,12 +1,13 @@
 "use client";
 
-import DataTable, { DataTableRef } from "@/components/core/DataTable";
+import CustomDataGrid from "@/components/core/CustomDataGrid";
+import { DataTableRef } from "@/components/core/DataTable";
 import { API_URL } from "@/constant/apiUrl";
-import { formatNumberWithSeperator } from "@/lib/utils";
-import { InventoryStatusReportResponse } from "@/types";
+import { getListApi } from "@/lib/apiClient";
+import { InventoryStatusReportResponse, PaginatedList } from "@/types";
 import { GridColDef } from "@mui/x-data-grid";
 import { UUID } from "crypto";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const columns: GridColDef<InventoryStatusReportResponse>[] = [
   {
@@ -27,7 +28,6 @@ const columns: GridColDef<InventoryStatusReportResponse>[] = [
     headerName: "Tồn kho",
     width: 100,
     sortable: false,
-    valueFormatter: (value) => formatNumberWithSeperator(value),
   },
   {
     field: "stockStatus",
@@ -78,14 +78,33 @@ export default function InventoryStatusReportGrid({
 }: InventoryStatusReportGridProps) {
   const dataGridRef = useRef<DataTableRef>(null);
 
+  const fetcher = useCallback(
+    async (
+      page: number,
+      pageSize: number
+    ): Promise<PaginatedList<InventoryStatusReportResponse>> => {
+      const request = {
+        pageIndex: page,
+        pageSize: pageSize,
+        brandId: brandId,
+        categoryId: categoryId,
+      };
+      const response = await getListApi(API_URL.outOfStockReport, request);
+      if (response.success) {
+        return response.data as PaginatedList<InventoryStatusReportResponse>;
+      }
+      throw new Error(response.message);
+    },
+    [brandId, categoryId]
+  );
   useEffect(() => {
     if (dataGridRef.current) {
       dataGridRef.current.reload();
     }
   }, [brandId, categoryId]);
   return (
-    <DataTable
-      apiUrl={API_URL.outOfStockReport}
+    <CustomDataGrid
+      loadData={fetcher}
       checkboxSelection={false}
       ref={dataGridRef}
       columns={columns}

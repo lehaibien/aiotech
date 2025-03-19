@@ -27,6 +27,7 @@ export default async function Page({
     role: "",
     createdDate: dayjs().toDate(),
     createdBy: "",
+    isLocked: false,
   };
   let roleCombobox: ComboBoxItem[] = [];
 

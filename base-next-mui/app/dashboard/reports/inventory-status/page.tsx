@@ -5,8 +5,8 @@ import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem } from "@/types";
 import { Stack, Typography } from "@mui/material";
 import "server-only";
-import InventoryStatusReportGrid from "./InventoryStatusReportGrid";
 import InventoryStatusReportFilter from "./InventoryStatusReportFilter";
+import InventoryStatusReportGrid from "./InventoryStatusReportGrid";
 
 export default async function OutOfStockReportPage({
   searchParams,
@@ -31,9 +31,14 @@ export default async function OutOfStockReportPage({
     ? parseUUID(searchParams.category_id)
     : undefined;
 
-  const brandComboboxResponse = await getApi(API_URL.brandComboBox);
+  const brandComboboxPromise = getApi(API_URL.brandComboBox);
+  const categoryComboboxPromise = getApi(API_URL.categoryComboBox);
+  const [brandComboboxResponse, categoryComboboxResponse] = await Promise.all([
+    brandComboboxPromise,
+    categoryComboboxPromise,
+  ]);
+
   const brandList = (brandComboboxResponse.data as ComboBoxItem[]) ?? [];
-  const categoryComboboxResponse = await getApi(API_URL.categoryComboBox);
   const categoryList = (categoryComboboxResponse.data as ComboBoxItem[]) ?? [];
 
   return (
