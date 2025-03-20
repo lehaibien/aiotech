@@ -194,14 +194,14 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
             <Image
               src={post.imageUrl}
               alt={post.title}
-              width={1400}
-              height={800}
+              width={1200}
+              height={630}
               priority
-              sizes="(max-width: 600px) 100vw, (max-width: 960px) 90vw, 1200px"
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
+                aspectRatio: 1200 / 630,
+                objectFit: "fill",
               }}
             />
           </Box>
