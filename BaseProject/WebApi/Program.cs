@@ -90,7 +90,6 @@ var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.WithCorrelationId()
     .Enrich.FromLogContext()
-    .MinimumLevel.Debug()
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);

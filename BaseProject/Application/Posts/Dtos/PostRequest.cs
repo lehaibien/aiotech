@@ -10,6 +10,8 @@ public class PostRequest
 
     [Required(AllowEmptyStrings = false, ErrorMessage = "Nội dung không được để trống")]
     public string Content { get; set; } = null!;
+
+    [Required(AllowEmptyStrings = false, ErrorMessage = "Ảnh không được để trống")]
     public IFormFile Image { get; set; } = null!;
     public bool IsPublished { get; set; } = true;
     public List<string> Tags { get; set; } = [];

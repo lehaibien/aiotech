@@ -159,17 +159,20 @@ public class UserService : IUserService
         user.Salt = Convert.ToBase64String(salt);
         user.CreatedDate = DateTime.UtcNow;
         user.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var uploadResult = await _imageService.UploadAsync(
-            request.Image,
-            ImageType.Logo,
-            Path.Combine(FolderUpload, user.Id.ToString())
-        );
-        if (uploadResult.IsFailure)
+        if (request.Image is not null)
         {
-            return Result<UserResponse>.Failure(uploadResult.Message);
+            var uploadResult = await _imageService.UploadAsync(
+                request.Image,
+                ImageType.Logo,
+                Path.Combine(FolderUpload, user.Id.ToString())
+            );
+            if (uploadResult.IsFailure)
+            {
+                return Result<UserResponse>.Failure(uploadResult.Message);
+            }
+            user.AvatarUrl = uploadResult.Data;
         }
 
-        user.AvatarUrl = uploadResult.Data;
         _unitOfWork.GetRepository<User>().Add(user);
         await _unitOfWork.SaveChangesAsync();
         var userResponse = _mapper.Map<UserResponse>(user);
@@ -205,17 +208,16 @@ public class UserService : IUserService
         }
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        if (entity.AvatarUrl is not null)
-        {
-            var deleteResult = _imageService.DeleteByUrl(entity.AvatarUrl);
-            if (deleteResult.IsFailure)
-            {
-                return Result<UserResponse>.Failure(deleteResult.Message);
-            }
-        }
-
         if (request.Image is not null)
         {
+            if (entity.AvatarUrl is not null)
+            {
+                var deleteResult = _imageService.DeleteByUrl(entity.AvatarUrl);
+                if (deleteResult.IsFailure)
+                {
+                    return Result<UserResponse>.Failure(deleteResult.Message);
+                }
+            }
             var uploadResult = await _imageService.UploadAsync(
                 request.Image,
                 ImageType.Logo,
@@ -227,7 +229,6 @@ public class UserService : IUserService
             }
             entity.AvatarUrl = uploadResult.Data;
         }
-
         _unitOfWork.GetRepository<User>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var userResponse = _mapper.Map<UserResponse>(entity);
@@ -261,6 +262,14 @@ public class UserService : IUserService
 
         if (request.Image is not null)
         {
+            if (user.AvatarUrl is not null)
+            {
+                var deleteResult = _imageService.DeleteByUrl(user.AvatarUrl);
+                if (deleteResult.IsFailure)
+                {
+                    return Result<UserResponse>.Failure(deleteResult.Message);
+                }
+            }
             var uploadResult = await _imageService.UploadAsync(
                 request.Image,
                 ImageType.Logo,

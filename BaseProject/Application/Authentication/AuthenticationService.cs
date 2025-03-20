@@ -192,7 +192,7 @@ public class AuthenticationService : IAuthenticationService
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(request.AccessToken);
         var userId = Guid.Parse(
-            jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value
+            jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value
         );
         var user = await _unitOfWork
             .GetRepository<User>()
