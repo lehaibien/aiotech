@@ -8,14 +8,14 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 
 export default function MenuContent() {
   const pathname = usePathname();
   const realPath = pathname ?? "/dashboard";
   const theme = useTheme();
-  const router = useRouter();
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   const handleClick = (item: string) => {
@@ -25,13 +25,6 @@ export default function MenuContent() {
     }));
   };
 
-  const handleNavigation = (name: string, path?: string) => {
-    setOpen((prevOpen: Record<string, boolean>) => ({
-      ...prevOpen,
-      [name]: false,
-    }));
-    router.push(path ?? "/dashboard");
-  };
   const getParentBackgroundColor = (item: DashboardMenu) => {
     if (item.children === undefined && realPath === item.path) {
       return theme.palette.action.selected;
@@ -54,18 +47,22 @@ export default function MenuContent() {
               backgroundColor: getParentBackgroundColor(item),
             }}
           >
-            <ListItemButton
-              onClick={() =>
-                item.children
-                  ? handleClick(item.name)
-                  : handleNavigation(item.name, item.path)
-              }
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.name} />
-              {item.children &&
-                (open[item.name] ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
+            {item.children ? (
+              <ListItemButton onClick={() => handleClick(item.name)}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.name} />
+                {open[item.name] ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+            ) : (
+              <ListItemButton
+                component={Link}
+                href={item.path ?? "/dashboard"}
+                selected={realPath === item.path}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItemButton>
+            )}
           </ListItem>
           {item.children && (
             <Collapse
@@ -90,7 +87,8 @@ export default function MenuContent() {
                     }}
                   >
                     <ListItemButton
-                      onClick={() => handleNavigation(child.name, child.path)}
+                      component={Link}
+                      href={child.path ?? "/dashboard"}
                     >
                       <ListItemIcon>{child.icon}</ListItemIcon>
                       <ListItemText primary={child.name} />
@@ -104,7 +102,13 @@ export default function MenuContent() {
       ))}
     </List>
   );
-  return <Box sx={{
-    overflowY: "auto",
-  }}>{renderNavItems(dashboardMenus)}</Box>;
+  return (
+    <Box
+      sx={{
+        overflowY: "auto",
+      }}
+    >
+      {renderNavItems(dashboardMenus)}
+    </Box>
+  );
 }
