@@ -69,7 +69,7 @@ export default async function Page() {
         icon: AttachMoneyIcon,
       },
       {
-        title: "Đơn hàng",
+        title: "Đơn hàng mới",
         value: data.order.toString(),
         percentageChange: data.orderDiff,
         icon: OrderIcon,
@@ -81,7 +81,7 @@ export default async function Page() {
         icon: AttachMoneyIcon,
       },
       {
-        title: "Khách hàng",
+        title: "Khách hàng mới",
         value: data.newUser.toString(),
         percentageChange: data.newUserDiff,
         icon: UserIcon,

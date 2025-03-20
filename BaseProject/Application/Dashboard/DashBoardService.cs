@@ -45,8 +45,9 @@ public class DashboardService : IDashboardService
                 RevenueDiff =
                     r.PreviousRevenue == 0
                         ? (r.CurrentRevenue == 0 ? 0 : 100) // Adjust as needed
-                        : ((r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue) * 100,
+                        : (r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue * 100,
             })
+            .OrderByDescending(r => r.Revenue)
             .FirstOrDefaultAsync();
         var order = await _unitOfWork
             .GetRepository<Order>()
@@ -70,6 +71,7 @@ public class DashboardService : IDashboardService
                         ? (x.CurrentCount == 0 ? 0 : 100) // Adjust as needed
                         : (x.CurrentCount - x.PreviousCount) / x.PreviousCount * 100,
             })
+            .OrderByDescending(r => r.Order)
             .FirstOrDefaultAsync();
         var averageOrderValue = await _unitOfWork
             .GetRepository<Order>()
@@ -95,6 +97,7 @@ public class DashboardService : IDashboardService
                         ? (x.CurrentAverage == 0 ? 0 : 100)
                         : (x.CurrentAverage - x.PreviousAverage) / x.PreviousAverage * 100,
             })
+            .OrderByDescending(r => r.AverageOrderValue)
             .FirstOrDefaultAsync();
         var newUser = await _unitOfWork
             .GetRepository<User>()
@@ -118,6 +121,7 @@ public class DashboardService : IDashboardService
                         ? (x.CurrentNewUser == 0 ? 0 : 100)
                         : (x.CurrentNewUser - x.PreviousNewUser) / x.PreviousNewUser * 100,
             })
+            .OrderByDescending(r => r.NewUser)
             .FirstOrDefaultAsync();
         var result = new DashboardCard
         {
