@@ -13,7 +13,7 @@ export function ImageRenderer(
       style={{
         width: "auto",
         height: "auto",
-        aspectRatio: 16 / 9,
+        aspectRatio: 1200 / 630,
       }}
     />
   );

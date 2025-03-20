@@ -24,6 +24,7 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -46,7 +47,10 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
           enqueueSnackbar("Thêm mới thương hiệu thành công", {
             variant: "success",
           });
-          router.push("/dashboard/brands");
+          // Use setTimeout to delay navigation
+          setTimeout(() => {
+            router.push("/dashboard/brands");
+          }, 100);
         } else {
           enqueueSnackbar("Lỗi xảy ra: " + response.message, {
             variant: "error",
@@ -58,7 +62,10 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
           enqueueSnackbar("Cập nhật thương hiệu thành công", {
             variant: "success",
           });
-          router.push("/dashboard/brands");
+          // Use setTimeout to delay navigation
+          setTimeout(() => {
+            router.push("/dashboard/brands");
+          }, 100);
         } else {
           enqueueSnackbar("Lỗi xảy ra: " + response.message, {
             variant: "error",
