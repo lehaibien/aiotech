@@ -8,7 +8,7 @@ export const productGridColumns: GridColDef<ProductResponse>[] = [
     field: "imageUrls",
     headerName: "Ảnh",
     renderCell: ProductImageRenderer,
-    width: 150,
+    width: 200,
     align: "center",
     headerAlign: "center",
     sortable: false,

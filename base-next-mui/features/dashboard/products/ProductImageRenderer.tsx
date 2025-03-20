@@ -17,8 +17,9 @@ export default function ProductImageRenderer(
       width={300}
       height={0}
       style={{
-        width: "auto",
-        height: "auto",
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
         aspectRatio: 1 / 1,
       }}
     />
