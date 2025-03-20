@@ -47,13 +47,23 @@ public class PostService : IPostService
                 x.Title.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+        var sortCol = GetSortExpression(request.SortColumn);
+        if (sortCol is null)
         {
-            postQuery = postQuery.OrderByDescending(GetSortExpression(request.SortColumn));
+            postQuery = postQuery
+                .OrderByDescending(x => x.UpdatedDate)
+                .ThenByDescending(x => x.CreatedDate);
         }
         else
         {
-            postQuery = postQuery.OrderBy(GetSortExpression(request.SortColumn));
+            if (request.SortOrder?.ToLower() == "desc")
+            {
+                postQuery = postQuery.OrderByDescending(sortCol);
+            }
+            else
+            {
+                postQuery = postQuery.OrderBy(sortCol);
+            }
         }
         var totalRow = await postQuery.CountAsync(cancellationToken);
         var result = await postQuery
@@ -88,6 +98,7 @@ public class PostService : IPostService
         var entities = await _unitOfWork
             .GetRepository<Post>()
             .GetAll(x => x.IsPublished && x.Title.Contains(request.TextSearch))
+            .OrderByDescending(x => x.CreatedDate)
             .Skip(request.PageIndex * request.PageSize)
             .Take(request.PageSize)
             .Select(x => new PostPreviewResponse
@@ -97,7 +108,6 @@ public class PostService : IPostService
                 ImageUrl = x.ImageUrl,
                 CreatedDate = x.CreatedDate,
             })
-            .OrderByDescending(x => x.CreatedDate)
             .ToListAsync();
         var count = await _unitOfWork
             .GetRepository<Post>()
@@ -263,7 +273,7 @@ public class PostService : IPostService
         return Result<string>.Success("Xóa thành công");
     }
 
-    private static Expression<Func<Post, object>> GetSortExpression(string? orderBy)
+    private static Expression<Func<Post, object>>? GetSortExpression(string? orderBy)
     {
         return orderBy?.ToLower() switch
         {
@@ -271,7 +281,7 @@ public class PostService : IPostService
             "isPublished" => x => x.IsPublished,
             "createdDate" => x => x.CreatedDate,
             "updatedDate" => x => x.UpdatedDate,
-            _ => x => x.Id,
+            _ => null,
         };
     }
 }
