@@ -16,7 +16,7 @@ export function ReviewContent() {
         columns={reviewGridColumns}
         withRowNumber
         checkboxSelection
-        apiUrl={API_URL.category}
+        apiUrl={API_URL.review}
       />
     </>
   );
