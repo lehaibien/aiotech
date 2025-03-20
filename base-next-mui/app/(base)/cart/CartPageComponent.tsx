@@ -1,5 +1,6 @@
 "use client";
 
+import { TAX_VALUE } from "@/constant/common";
 import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import AddIcon from "@mui/icons-material/Add";
@@ -9,7 +10,7 @@ import {
   Box,
   Button,
   Container,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   Stack,
   Typography,
@@ -32,7 +33,7 @@ export default function CartPageComponent() {
 
       <Grid container spacing={4}>
         {/* Cart Items */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           {cartItems.map((item) => (
             <Grid
               container
@@ -41,7 +42,7 @@ export default function CartPageComponent() {
               sx={{ py: 3, borderBottom: 1, borderColor: "divider" }}
             >
               {/* Product Image */}
-              <Grid item xs={4} md={2}>
+              <Grid size={{ xs: 4, md: 2 }}>
                 <Box sx={{ position: "relative", aspectRatio: "1/1" }}>
                   <Image
                     src={item.productImage || "/placeholder-product.jpg"}
@@ -53,7 +54,7 @@ export default function CartPageComponent() {
               </Grid>
 
               {/* Product Info */}
-              <Grid item xs={8} md={6}>
+              <Grid size={{ xs: 8, md: 6 }}>
                 <Typography variant="body1" gutterBottom>
                   {item.productName}
                 </Typography>
@@ -63,7 +64,7 @@ export default function CartPageComponent() {
               </Grid>
 
               {/* Quantity Controls */}
-              <Grid item xs={6} md={2}>
+              <Grid size={{ xs: 6, md: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <IconButton
                     size="small"
@@ -89,7 +90,7 @@ export default function CartPageComponent() {
               </Grid>
 
               {/* Total Price */}
-              <Grid item xs={6} md={2}>
+              <Grid size={{ xs: 6, md: 2 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -115,11 +116,22 @@ export default function CartPageComponent() {
         </Grid>
 
         {/* Order Summary */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Box sx={{ p: 3, bgcolor: "background.paper", borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>
               Thông tin
             </Typography>
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              sx={{ mb: 3 }}
+            >
+              <Typography variant="h6">Thuế GTGT</Typography>
+              <Typography variant="h6" color="primary">
+                {formatNumberWithSeperator(subtotal * TAX_VALUE)} đ
+              </Typography>
+            </Stack>
 
             <Stack
               direction="row"
@@ -149,7 +161,7 @@ export default function CartPageComponent() {
 
       {cartItems.length === 0 && (
         <Typography variant="body1" textAlign="center" sx={{ py: 8 }}>
-          Your cart is empty
+          Giỏ hàng trống
         </Typography>
       )}
     </Container>

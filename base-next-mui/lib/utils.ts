@@ -39,7 +39,20 @@ export function formatNumberWithSeperator(
   number: number,
   seperator: string = "."
 ): string {
-  return number.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
+  // Split number into integer and decimal parts
+  const [integerPart, decimalPart] = number.toFixed(3).split('.');
+  
+  // Format integer part with thousand separators
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
+  
+  // If there's a decimal part, use appropriate decimal separator
+  if (decimalPart !== undefined) {
+    return seperator === ',' 
+      ? `${formattedInteger}.${decimalPart}`
+      : `${formattedInteger},${decimalPart}`;
+  }
+  
+  return formattedInteger;
 }
 
 export function formatDateFromString(

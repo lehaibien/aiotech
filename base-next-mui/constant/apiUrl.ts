@@ -59,6 +59,7 @@ export const API_URL = {
   // post
   post: "post",
   postPreview: "post/preview",
+  postRelated: (id: string) => `post/${id}/related`,
 
   // configuration
   bannerConfig: "configuration/banner",

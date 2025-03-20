@@ -26,13 +26,10 @@ import Link from "next/link";
 import NoItem from "@/components/core/NoItem";
 import { API_URL } from "@/constant/apiUrl";
 import { DEFAULT_TIMEZONE } from "@/constant/common";
-import { getByIdApi, getListApi } from "@/lib/apiClient";
+import { getApi, getByIdApi } from "@/lib/apiClient";
 import { HTMLPartToTextPart, parseUUID } from "@/lib/utils";
 import type {
-  BaseGetListRequest,
-  PaginatedList,
-  PostPreviewResponse,
-  PostResponse,
+  PostResponse
 } from "@/types";
 
 export async function generateMetadata({
@@ -78,20 +75,11 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
   }
 
   // Fetch related posts
-  let relatedPosts: PostPreviewResponse[] = [];
+  let relatedPosts: PostResponse[] = [];
   if (post) {
-    const postRequest: BaseGetListRequest = {
-      pageIndex: 0,
-      pageSize: 3,
-      textSearch: "",
-    };
-    const postResponse = await getListApi(API_URL.postPreview, postRequest);
+    const postResponse = await getApi(API_URL.postRelated(id));
     if (postResponse.success) {
-      relatedPosts = (
-        postResponse.data as PaginatedList<PostPreviewResponse>
-      ).items
-        .filter((p) => p.id !== post.id)
-        .slice(0, 3);
+      relatedPosts = postResponse.data as PostResponse[];
     }
   }
 

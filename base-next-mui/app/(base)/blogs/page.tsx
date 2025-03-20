@@ -59,7 +59,6 @@ export default async function BlogsPage({
 
   const { items, totalCount } = await fetchBlogPosts(page, pageSize, search);
   const totalPages = Math.ceil(totalCount / pageSize);
-  console.log(totalCount);
 
   return (
     <>
