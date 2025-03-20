@@ -10,6 +10,7 @@ public interface IPostService
         CancellationToken cancellationToken = default
     );
     Task<Result<PaginatedList>> GetPostPreviewAsync(GetListRequest request);
+    Task<Result<List<PostResponse>>> GetRelatedPostAsync(Guid id);
     Task<Result<PostResponse>> GetByIdAsync(Guid id);
     Task<Result<PostResponse>> CreateAsync(CreatePostRequest request);
     Task<Result<PostResponse>> UpdateAsync(UpdatePostRequest request);

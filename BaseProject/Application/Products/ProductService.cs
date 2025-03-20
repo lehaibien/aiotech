@@ -10,6 +10,8 @@ using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using Shared;
 
 namespace Application.Products;
@@ -22,21 +24,21 @@ public class ProductService : IProductService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
     private const string FolderUpload = "products";
-    private readonly IEmailService _emailService;
+    private readonly IDistributedCache _cache;
 
     public ProductService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IHttpContextAccessor contextAccessor,
         IImageService imageService,
-        IEmailService emailService
+        IDistributedCache cache
     )
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _contextAccessor = contextAccessor;
         _imageService = imageService;
-        _emailService = emailService;
+        _cache = cache;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -156,6 +158,12 @@ public class ProductService : IProductService
 
     public async Task<Result<List<ProductResponse>>> GetTopProducts(int top = 12)
     {
+        var productInCache = await _cache.GetStringAsync(CacheKeys.TopProducts);
+        if (productInCache is not null)
+        {
+            var res = JsonConvert.DeserializeObject<List<ProductResponse>>(productInCache);
+            return Result<List<ProductResponse>>.Success(res);
+        }
         var result = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => x.Stock >= 8)
@@ -189,11 +197,19 @@ public class ProductService : IProductService
             .ThenByDescending(x => x.CreatedDate)
             .Take(top)
             .ToListAsync();
+        var json = JsonConvert.SerializeObject(result);
+        await _cache.SetStringAsync(CacheKeys.TopProducts, json);
         return Result<List<ProductResponse>>.Success(result);
     }
 
     public async Task<Result<List<ProductResponse>>> GetFeaturedProducts(int top = 12)
     {
+        var productInCache = await _cache.GetStringAsync(CacheKeys.FeaturedProducts);
+        if (productInCache is not null)
+        {
+            var res = JsonConvert.DeserializeObject<List<ProductResponse>>(productInCache);
+            return Result<List<ProductResponse>>.Success(res);
+        }
         var result = await _unitOfWork
             .GetRepository<Product>()
             .GetAll()
@@ -217,6 +233,9 @@ public class ProductService : IProductService
             .ThenByDescending(x => x.CreatedDate)
             .Take(top)
             .ToListAsync();
+
+        var json = JsonConvert.SerializeObject(result);
+        await _cache.SetStringAsync(CacheKeys.FeaturedProducts, json);
         return Result<List<ProductResponse>>.Success(result);
     }
 
@@ -322,6 +341,8 @@ public class ProductService : IProductService
         entity.ImageUrls = uploadResult.Data;
         _unitOfWork.GetRepository<Product>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
+        await _cache.RemoveAsync(CacheKeys.TopProducts);
+        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         var response = _mapper.Map<ProductResponse>(entity);
         return Result<ProductResponse>.Success(response);
     }
@@ -363,6 +384,8 @@ public class ProductService : IProductService
         }
         _unitOfWork.GetRepository<Product>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
+        await _cache.RemoveAsync(CacheKeys.TopProducts);
+        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         var response = _mapper.Map<ProductResponse>(entity);
         return Result<ProductResponse>.Success(response);
     }
@@ -379,6 +402,8 @@ public class ProductService : IProductService
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Product>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
+        await _cache.RemoveAsync(CacheKeys.TopProducts);
+        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         return Result<string>.Success("Xóa thành công");
     }
 
@@ -397,6 +422,8 @@ public class ProductService : IProductService
             _unitOfWork.GetRepository<Product>().Update(entity);
         }
         await _unitOfWork.SaveChangesAsync();
+        await _cache.RemoveAsync(CacheKeys.TopProducts);
+        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         return Result<string>.Success("Xóa thành công");
     }
 

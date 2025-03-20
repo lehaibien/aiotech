@@ -33,6 +33,22 @@ public class CategoryController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("featured")]
+    public async Task<IActionResult> GetFeaturedAsync()
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetFeaturedAsync();
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

@@ -97,6 +97,7 @@ public class PostService : IPostService
                 ImageUrl = x.ImageUrl,
                 CreatedDate = x.CreatedDate,
             })
+            .OrderByDescending(x => x.CreatedDate)
             .ToListAsync();
         var count = await _unitOfWork
             .GetRepository<Post>()
@@ -109,6 +110,24 @@ public class PostService : IPostService
             Items = entities,
         };
         return Result<PaginatedList>.Success(response);
+    }
+
+    public async Task<Result<List<PostResponse>>> GetRelatedPostAsync(Guid id)
+    {
+        var entities = await _unitOfWork
+            .GetRepository<Post>()
+            .GetAll(x => x.IsPublished && x.Id != id)
+            .OrderByDescending(x => x.CreatedDate)
+            .Take(5)
+            .Select(x => new PostResponse
+            {
+                Id = x.Id,
+                Title = x.Title,
+                ImageUrl = x.ImageUrl,
+                CreatedDate = x.CreatedDate,
+            })
+            .ToListAsync();
+        return Result<List<PostResponse>>.Success(entities);
     }
 
     public async Task<Result<PostResponse>> GetByIdAsync(Guid id)

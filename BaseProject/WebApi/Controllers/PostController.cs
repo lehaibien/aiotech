@@ -48,6 +48,22 @@ public class PostController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("{id:guid}/related")]
+    public async Task<IActionResult> GetRelatedPostAsync(Guid id)
+    {
+        var response = new ApiResponse();
+        var result = await _service.GetRelatedPostAsync(id);
+        if (result.IsFailure)
+        {
+            response.Success = false;
+            response.Message = result.Message;
+            return BadRequest(response);
+        }
+
+        response.Data = result.Data;
+        return Ok(response);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetByIdAsync(Guid id)
     {

@@ -9,6 +9,8 @@ using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using Shared;
 
 namespace Application.Categories;
@@ -21,18 +23,21 @@ public class CategoryService : ICategoryService
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
+    private readonly IDistributedCache _cache;
 
     public CategoryService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IHttpContextAccessor contextAccessor,
-        IImageService imageService
+        IImageService imageService,
+        IDistributedCache cache
     )
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _contextAccessor = contextAccessor;
         _imageService = imageService;
+        _cache = cache;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -88,6 +93,34 @@ public class CategoryService : ICategoryService
             Items = result,
         };
         return Result<PaginatedList>.Success(response);
+    }
+
+    public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync()
+    {
+        var categoryInCache = await _cache.GetStringAsync(CacheKeys.FeaturedCategories);
+        if (categoryInCache is not null)
+        {
+            var res = JsonConvert.DeserializeObject<List<CategoryResponse>>(categoryInCache);
+            return Result<List<CategoryResponse>>.Success(res);
+        }
+        var result = await _unitOfWork
+            .GetRepository<Category>()
+            .GetAll(x => x.IsDeleted == false)
+            .Select(x => new CategoryResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ImageUrl = x.ImageUrl,
+                CreatedDate = x.CreatedDate,
+                CreatedBy = x.CreatedBy,
+                UpdatedDate = x.UpdatedDate,
+                UpdatedBy = x.UpdatedBy,
+            })
+            .OrderByDescending(x => x.CreatedDate)
+            .ToListAsync();
+        var json = JsonConvert.SerializeObject(result);
+        await _cache.SetStringAsync(CacheKeys.FeaturedCategories, json);
+        return Result<List<CategoryResponse>>.Success(result);
     }
 
     public async Task<Result<CategoryResponse>> GetById(Guid id)
