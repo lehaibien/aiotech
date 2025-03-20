@@ -112,9 +112,6 @@ const components: Components = {
       root: {
         borderRadius: 16,
         fontWeight: 500,
-        "&:hover": {
-          backgroundColor: primary.main,
-        },
       },
     },
   },

@@ -2,7 +2,6 @@
 
 import { ApiResponse, GetByIdRequest } from "@/types/base";
 import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
-import { redirect } from "next/navigation";
 import { auth } from "./auth";
 
 /**
@@ -139,9 +138,7 @@ export async function putApi(
   }
 }
 
-export async function deleteApi(
-  action: string,
-): Promise<ApiResponse> {
+export async function deleteApi(action: string): Promise<ApiResponse> {
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     const url = getBaseUrl() + action;
@@ -182,9 +179,11 @@ export async function deleteListApi(
 ): Promise<ApiResponse> {
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    const baseHeader = await getAuthorizationHeader();
     const response = await fetch(getBaseUrl() + action, {
       method: "DELETE",
       headers: {
+        ...baseHeader,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(list),
@@ -226,7 +225,7 @@ function getBaseUrl(): string {
 async function getAuthorizationHeader() {
   const session = await auth();
   return {
-    Authorization: `Bearer ${session?.user ? session.user.accessToken : ""}`,
+    "Authorization": `Bearer ${session?.user.accessToken}`,
   };
 }
 
@@ -238,13 +237,16 @@ async function getAuthorizationHeader() {
  */
 async function handleResponse(response: Response): Promise<ApiResponse> {
   if (response.status === 401) {
-    redirect("/login");
+    return {
+      success: false,
+      message: "Bạn không có quyền truy cập",
+    };
   }
   if (response.status === 500) {
     return {
       success: false,
       message: "Lỗi server",
-    }
+    };
   }
   const json = await response.json();
   if (

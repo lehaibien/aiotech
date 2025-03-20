@@ -29,24 +29,34 @@ export function parseUUID(uuid: string): UUID {
 }
 
 /**
- * Formats a number with a given separator.
- *
- * @param {number} number - The number to format.
- * @param {string} [seperator='.'] - The separator to use for formatting. Defaults to '.'.
- * @returns {string} The formatted number as a string.
+ * Formats a number with custom thousand separators and decimal places
+ * 
+ * @param {number} number - The number to format
+ * @param {number} decimalPlaces - Number of decimal places to show (default: 3)
+ * @param {string} seperator - Character to use as thousand separator (default: ".")
+ * @returns {string} Formatted number string with specified separator and decimal places
+ * 
+ * @example
+ * // Returns "1.234,567"
+ * formatNumberWithSeperator(1234.5674, 3, ".")
+ * 
+ * @example
+ * // Returns "1,234.567" 
+ * formatNumberWithSeperator(1234.5674, 3, ",")
  */
 export function formatNumberWithSeperator(
   number: number,
-  seperator: string = "."
+  decimalPlaces: number = 0,
+  seperator: string = ".",
 ): string {
-  // Split number into integer and decimal parts
-  const [integerPart, decimalPart] = number.toFixed(3).split('.');
+  const [integerPart, decimalPart] = number.toFixed(decimalPlaces).split('.');
   
   // Format integer part with thousand separators
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, seperator);
+
+  const decimalZeros = "0".repeat(decimalPlaces);
   
-  // If there's a decimal part, use appropriate decimal separator
-  if (decimalPart !== undefined) {
+  if (decimalPart !== undefined && decimalPart !== decimalZeros) {
     return seperator === ',' 
       ? `${formattedInteger}.${decimalPart}`
       : `${formattedInteger},${decimalPart}`;
