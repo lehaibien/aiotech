@@ -40,12 +40,6 @@ export default async function ProductUpsertPage({
         images: [],
       };
       images = data.imageUrls;
-      // const imagePromises = data.imageUrls.map(async (url) => {
-      //   const response = await fetch(url);
-      //   const blob = await response.blob();
-      //   return new File([blob], url.substring(url.lastIndexOf('/') + 1));
-      // });
-      // images = await Promise.all(imagePromises);
     }
   }
   const ComboboxPromises = await Promise.all([
@@ -63,3 +57,5 @@ export default async function ProductUpsertPage({
     />
   );
 }
+
+

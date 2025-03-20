@@ -1,7 +1,17 @@
 import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
 import { API_URL } from "@/constant/apiUrl";
 import { getApiQuery } from "@/lib/apiClient";
+import dayjs from "@/lib/extended-dayjs";
+import { formatNumberWithSeperator } from "@/lib/utils";
 import { SaleReportRequest, SaleReportResponse } from "@/types";
+import {
+  AttachMoney,
+  Cancel,
+  CheckCircle,
+  Pending,
+  ShoppingCart,
+  TrendingUp,
+} from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -10,12 +20,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import dayjs from "@/lib/extended-dayjs";
 import "server-only";
 import SaleReportFilter from "./SaleReportFilter";
 import SalesChart from "./SalesChart";
-import { formatNumberWithSeperator } from "@/lib/utils";
-import { TrendingUp, ShoppingCart, AttachMoney, Cancel, CheckCircle, Pending } from "@mui/icons-material";
 
 const breadcrums = [
   {
@@ -175,7 +182,10 @@ export default async function SaleReportPage({
                     Đơn hàng đang thực hiện
                   </Typography>
                   <Typography variant="h5">
-                    {formatNumberWithSeperator(totalOrders - (totalCompletedOrders + totalCancelledOrders))}
+                    {formatNumberWithSeperator(
+                      totalOrders -
+                        (totalCompletedOrders + totalCancelledOrders)
+                    )}
                   </Typography>
                 </Box>
               </Stack>
