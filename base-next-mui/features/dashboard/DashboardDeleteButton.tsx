@@ -3,7 +3,6 @@ import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
 import { DataTableRef } from "@/components/core/DataTable";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { deleteListApi } from "@/lib/apiClient";
-import { ApiResponse } from "@/types";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { Button } from "@mui/material";
 import { useSnackbar } from "notistack";
@@ -22,31 +21,24 @@ export function DashboardDeleteButton({
   apiUrl,
 }: DashboardDeleteButtonProps) {
   const { enqueueSnackbar } = useSnackbar();
-  function triggerDelete() {
+  const triggerDelete = async () => {
     const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
     if (rowSelection.length > 0) {
       const ids = rowSelection.map((x) => x.toString());
-      deleteListApi(apiUrl, ids)
-        .then((res: ApiResponse) => {
-          if (res.success) {
-            enqueueSnackbar(`Xóa thành công ${ids.length} đối tượng`, {
-              variant: "success",
-            });
-            dataGridRef.current?.clearSelection();
-            dataGridRef.current?.reload();
-          } else {
-            enqueueSnackbar("Xóa thất bại: " + res.message, {
-              variant: "error",
-            });
-          }
-        })
-        .catch((error: Error) => {
-          enqueueSnackbar("Xóa thất bại: " + error.message, {
-            variant: "error",
-          });
+      const response = await deleteListApi(apiUrl, ids);
+      if (response.success) {
+        enqueueSnackbar(`Xóa thành công ${ids.length} đối tượng`, {
+          variant: "success",
         });
+        dataGridRef.current?.clearSelection();
+        dataGridRef.current?.reload();
+        return;
+      }
+      enqueueSnackbar("Xóa thất bại: " + response.message, {
+        variant: "error",
+      });
     }
-  }
+  };
 
   function onBeforeConfirmDelete(): boolean {
     const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];

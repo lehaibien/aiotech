@@ -30,7 +30,7 @@ export default function ComboBox<T extends FieldValues>({
             value={
               value
                 ? items.find(
-                    (item) => value.toString() === item.value.toLowerCase()
+                    (item) => String(value).toLowerCase() === String(item.value).toLowerCase()
                   ) ?? null
                 : null
             }
@@ -45,6 +45,9 @@ export default function ComboBox<T extends FieldValues>({
               />
             )}
             disableClearable={!clearable}
+            isOptionEqualToValue={(option, value) => 
+              String(option.value).toLowerCase() === String(value.value).toLowerCase()
+            }
           />
         );
       }}
