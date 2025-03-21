@@ -14,7 +14,7 @@ import {
   Rating,
   Stack,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +23,7 @@ import { memo, useState } from "react";
 
 type ProductCardProps = {
   product: ProductResponse;
-}
+};
 
 function ProductCard({ product }: ProductCardProps) {
   const theme = useTheme();
@@ -96,7 +96,13 @@ function ProductCard({ product }: ProductCardProps) {
         transition: "all 0.3s ease",
         "&:hover": {
           transform: "translateY(-8px)",
-          boxShadow: `0 4px 16px rgba(${parseInt(primary.main.slice(1, 3), 16)}, ${parseInt(primary.main.slice(3, 5), 16)}, ${parseInt(primary.main.slice(5, 7), 16)}, 0.2)`,
+          boxShadow: `0 4px 16px rgba(${parseInt(
+            primary.main.slice(1, 3),
+            16
+          )}, ${parseInt(primary.main.slice(3, 5), 16)}, ${parseInt(
+            primary.main.slice(5, 7),
+            16
+          )}, 0.2)`,
         },
         cursor: "pointer",
       }}
@@ -143,6 +149,20 @@ function ProductCard({ product }: ProductCardProps) {
           placeholder="blur"
           blurDataURL={currentImage}
         />
+        {product.discountPrice && (
+          <Chip
+            label={`-${Math.round(
+              (1 - product.discountPrice / product.price) * 100
+            )}%`}
+            color="error"
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+            }}
+          />
+        )}
       </CardMedia>
       <CardContent
         sx={{
@@ -183,10 +203,9 @@ function ProductCard({ product }: ProductCardProps) {
         </Box>
         {/* Pricing and actions */}
         <Stack gap={1}>
-          <Box
-          >
+          <Box>
             {/* Price display */}
-            <Stack >
+            <Stack>
               {discountPrice ? (
                 <>
                   <Typography
@@ -199,21 +218,12 @@ function ProductCard({ product }: ProductCardProps) {
                   >
                     {formatNumberWithSeperator(price)} đ
                   </Typography>
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    color="error"
-                  >
+                  <Typography variant="h6" fontWeight="bold" color="error">
                     {formatNumberWithSeperator(discountPrice)} đ
                   </Typography>
                 </>
               ) : (
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  color="error"
-                  noWrap
-                >
+                <Typography variant="h6" fontWeight="bold" color="error" noWrap>
                   {formatNumberWithSeperator(price)} đ
                 </Typography>
               )}
@@ -225,7 +235,7 @@ function ProductCard({ product }: ProductCardProps) {
                 precision={0.1}
                 size="small"
                 readOnly
-                sx={{ '& .MuiRating-icon': { fontSize: '1rem' } }}
+                sx={{ "& .MuiRating-icon": { fontSize: "1rem" } }}
               />
               <Typography variant="caption" color="text.secondary">
                 ({rating.toFixed(1)})
@@ -245,7 +255,7 @@ function ProductCard({ product }: ProductCardProps) {
             sx={{
               fontWeight: 700,
               py: 1,
-              '& .MuiButton-startIcon': { mr: 0.5 }
+              "& .MuiButton-startIcon": { mr: 0.5 },
             }}
           >
             Thêm vào giỏ hàng
@@ -256,6 +266,7 @@ function ProductCard({ product }: ProductCardProps) {
   );
 }
 
-export default memo(ProductCard, (prev, next) => 
-  JSON.stringify(prev.product) === JSON.stringify(next.product)
+export default memo(
+  ProductCard,
+  (prev, next) => JSON.stringify(prev.product) === JSON.stringify(next.product)
 );
