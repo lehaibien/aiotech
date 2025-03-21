@@ -92,6 +92,7 @@ export default function FilterDrawer({
     setCategory([]);
     setBrand([]);
     setPriceRange([0, defaultMaxPrice]);
+    router.push("/products");
   };
 
   const handleSubmit = () => {
