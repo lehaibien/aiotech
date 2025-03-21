@@ -102,10 +102,16 @@ export default function FilterDrawer({
     params.delete("minPrice");
     params.delete("maxPrice");
     params.delete("page");
-    if (category) params.set("category", flatCategory.join(","));
-    if (brand) params.set("brand", flatBrand.join(","));
-    params.set("minPrice", priceRange[0].toString());
-    params.set("maxPrice", priceRange[1].toString());
+    if (category.length > 0) {
+      params.set("category", flatCategory.join(","));
+    }
+    if (brand.length > 0) {
+      params.set("brand", flatBrand.join(","));
+    }
+    if (priceRange[0] > 0 || priceRange[1] < defaultMaxPrice) {
+      params.set("minPrice", priceRange[0].toString());
+      params.set("maxPrice", priceRange[1].toString());
+    }
 
     router.push(`?${params.toString()}`);
     setOpen(false);
