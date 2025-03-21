@@ -78,14 +78,19 @@ export const dashboardMenus: DashboardMenu[] = [
     icon: <BarChartOutlinedIcon />,
     children: [
       {
-        name: "Báo cáo doanh số",
+        name: "Báo cáo doanh thu",
         icon: <BarChartOutlinedIcon />,
         path: "/dashboard/reports/sale",
       },
+      // {
+      //   name: "Báo cáo đơn hàng",
+      //   icon: <ReceiptIcon />,
+      //   path: "/dashboard/reports/order",
+      // },
       {
-        name: "Báo cáo đơn hàng",
-        icon: <ReceiptIcon />,
-        path: "/dashboard/reports/order",
+        name: "Báo cáo khách hàng mua nhiều",
+        icon: <AccountCircleOutlinedIcon />,
+        path: "/dashboard/reports/top-customer",
       },
       {
         name: "Thống kê đánh giá sản phẩm",
@@ -106,11 +111,6 @@ export const dashboardMenus: DashboardMenu[] = [
         name: "Thống kê hiệu suất thương hiệu",
         icon: <BrandingWatermarkOutlinedIcon />,
         path: "/dashboard/reports/brand-performance",
-      },
-      {
-        name: "Báo cáo khách hàng mua nhiều",
-        icon: <AccountCircleOutlinedIcon />,
-        path: "/dashboard/reports/top-customer",
       },
     ],
   },

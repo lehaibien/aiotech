@@ -135,7 +135,8 @@ public class ReviewService : IReviewService
         var hasBought = await _unitOfWork
             .GetRepository<Order>()
             .GetAll(x =>
-                x.CustomerId == request.UserId
+                x.IsDeleted == false
+                && x.CustomerId == request.UserId
                 && !x.IsDeleted
                 && x.OrderItems.Any(y => y.ProductId == request.ProductId)
             )

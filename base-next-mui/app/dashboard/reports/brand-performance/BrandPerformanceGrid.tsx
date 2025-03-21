@@ -55,14 +55,14 @@ export function BrandPerformanceGrid({
       showCellVerticalBorder
       showColumnVerticalBorder
       pageSizeOptions={[10, 25, 50]}
+      paginationMode="client"
+      pagination={true}
       initialState={{
         pagination: {
           paginationModel: {
             pageSize: 10,
+            page: 0,
           },
-        },
-        sorting: {
-          sortModel: [{ field: "totalRevenue", sort: "desc" }],
         },
       }}
       slots={{

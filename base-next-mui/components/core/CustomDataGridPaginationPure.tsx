@@ -18,26 +18,37 @@ import {
   gridPaginationModelSelector,
   gridRowCountSelector,
   useGridApiContext,
+  useGridSelector,
 } from "@mui/x-data-grid";
 import React from "react";
 
 export function DataGridPaginationPure() {
   const apiRef = useGridApiContext();
-  const { page, pageSize } = gridPaginationModelSelector(apiRef);
-  const rowCount = gridRowCountSelector(apiRef);
+  
+  // Use useGridSelector to make component reactive to changes
+  const paginationModel = useGridSelector(apiRef, gridPaginationModelSelector);
+  const rowCount = useGridSelector(apiRef, gridRowCountSelector);
+  const { page, pageSize } = paginationModel;
   const totalPage = Math.ceil(rowCount / pageSize);
 
   // Handle page change via input
   const handlePageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newPage = Number(event.target.value) - 1;
     if (!isNaN(newPage) && newPage >= 0 && newPage < totalPage) {
-      apiRef.current.setPage(newPage);
+      apiRef.current.setPaginationModel({
+        page: newPage,
+        pageSize: pageSize,
+      });
     }
   };
 
   // Handle page size change
   const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
-    apiRef.current.setPageSize(Number(event.target.value));
+    const newPageSize = Number(event.target.value);
+    apiRef.current.setPaginationModel({
+      page: 0,
+      pageSize: newPageSize,
+    });
   };
 
   return (

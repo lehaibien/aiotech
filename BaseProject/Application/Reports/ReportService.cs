@@ -26,19 +26,22 @@ public class ReportService : IReportService
     {
         var orders = await _unitOfWork
             .GetRepository<Order>()
-            .GetAll()
-            .Where(o => o.CreatedDate >= request.StartDate && o.CreatedDate <= request.EndDate)
+            .GetAll(o =>
+                o.CreatedDate >= request.StartDate
+                && o.CreatedDate <= request.EndDate
+                && o.IsDeleted == false
+            )
             .ToListAsync(cancellationToken);
 
         var allMonths = new List<DateTime>();
         for (var month = request.StartDate; month <= request.EndDate; month = month.AddMonths(1))
         {
-            allMonths.Add(new DateTime(month.Year, month.Month, 1)); // First day of the month
+            allMonths.Add(new DateTime(month.Year, month.Month, 1));
         }
 
         // Group orders by month
         var groupedOrders = orders
-            .GroupBy(o => new DateTime(o.CreatedDate.Year, o.CreatedDate.Month, 1)) // Group by the first day of the month
+            .GroupBy(o => new DateTime(o.CreatedDate.Year, o.CreatedDate.Month, 1))
             .ToDictionary(g => g.Key, g => g.ToList());
 
         // Build the report for each month
@@ -62,7 +65,7 @@ public class ReportService : IReportService
                 Date = month,
                 Revenue = totalRevenue,
                 TotalOrder = monthlyOrders.Count,
-                CompletedOrder = completedOrders.Count,
+                CompletedOrder = completedOrders.Count(o => o.Status == OrderStatus.Completed),
                 CancelledOrder = monthlyOrders.Count(o => o.Status == OrderStatus.Cancelled),
                 AverageOrderValue = averageOrderValue,
             };
