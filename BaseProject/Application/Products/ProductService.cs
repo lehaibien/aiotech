@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
 using Application.Images;
-using Application.Mail;
 using Application.Products.Dtos;
 using AutoDependencyRegistration.Attributes;
 using AutoMapper;
@@ -212,7 +211,7 @@ public class ProductService : IProductService
         }
         var result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll()
+            .GetAll(x => x.Stock >= 10)
             .Select(x => new ProductResponse
             {
                 Id = x.Id,
@@ -229,8 +228,8 @@ public class ProductService : IProductService
                 IsFeatured = x.IsFeatured,
             })
             .Where(x => x.IsFeatured)
-            .OrderByDescending(x => x.Rating)
-            .ThenByDescending(x => x.CreatedDate)
+            .OrderByDescending(x => x.CreatedDate)
+            .ThenByDescending(x => x.Rating)
             .Take(top)
             .ToListAsync();
 
@@ -248,9 +247,11 @@ public class ProductService : IProductService
         {
             return Result<List<ProductResponse>>.Failure("Sản phẩm không tồn tại");
         }
-        var result = await _unitOfWork
+
+        // Get all potential related products
+        var allRelatedProducts = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll(x => x.Id != request.Id && x.CategoryId == entity.CategoryId)
+            .GetAll(x => x.Id != request.Id)
             .Select(x => new ProductResponse
             {
                 Id = x.Id,
@@ -265,11 +266,57 @@ public class ProductService : IProductService
                 CreatedDate = x.CreatedDate,
                 Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
                 IsFeatured = x.IsFeatured,
+                CategoryId = x.CategoryId,
+                BrandId = x.BrandId,
             })
-            .OrderByDescending(x => x.Rating)
-            .OrderByDescending(x => x.CreatedDate)
-            .Take(request.Limit)
             .ToListAsync();
+
+        // Process in memory
+        var result = new List<ProductResponse>();
+
+        // First priority: same category
+        var sameCategoryProducts = allRelatedProducts
+            .Where(x => x.CategoryId == entity.CategoryId)
+            .OrderByDescending(x => x.Rating)
+            .ThenByDescending(x => x.CreatedDate)
+            .Take(request.Limit)
+            .ToList();
+
+        result.AddRange(sameCategoryProducts);
+
+        if (result.Count < request.Limit)
+        {
+            // Second priority: same brand, different category
+            var remainingCount = request.Limit - result.Count;
+            var sameBrandProducts = allRelatedProducts
+                .Where(x =>
+                    x.BrandId == entity.BrandId
+                    && x.CategoryId != entity.CategoryId
+                    && !result.Select(r => r.Id).Contains(x.Id)
+                )
+                .OrderByDescending(x => x.Rating)
+                .ThenByDescending(x => x.CreatedDate)
+                .Take(remainingCount)
+                .ToList();
+
+            result.AddRange(sameBrandProducts);
+        }
+
+        if (result.Count < request.Limit)
+        {
+            // Third priority: other products
+            var remainingCount = request.Limit - result.Count;
+            var otherProducts = allRelatedProducts
+                .Where(x => !result.Select(r => r.Id).Contains(x.Id))
+                .OrderByDescending(x => x.IsFeatured)
+                .ThenByDescending(x => x.Rating)
+                .ThenByDescending(x => x.CreatedDate)
+                .Take(remainingCount)
+                .ToList();
+
+            result.AddRange(otherProducts);
+        }
+
         return Result<List<ProductResponse>>.Success(result);
     }
 

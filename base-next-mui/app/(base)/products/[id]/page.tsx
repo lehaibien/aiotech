@@ -3,6 +3,7 @@ import "server-only";
 import { API_URL } from "@/constant/apiUrl";
 import ImageGallery from "@/features/products/single/ImageGallery";
 import ProductInfo from "@/features/products/single/ProductInfo";
+import RelatedProducts from "@/features/products/single/RelatedProductSection";
 import ReviewSection from "@/features/products/single/ReviewSection";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
@@ -18,7 +19,7 @@ import {
   Divider,
   Grid2 as Grid,
   Paper,
-  Typography
+  Typography,
 } from "@mui/material";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -84,17 +85,36 @@ export default async function ProductDetail({
         >
           Quay lại cửa hàng
         </Button>
-        
+
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
             <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
             Trang chủ
           </Link>
-          <Link href="/products" style={{ display: 'flex', alignItems: 'center', color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            href="/products"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
             <ShoppingBagIcon sx={{ mr: 0.5 }} fontSize="small" />
             Sản phẩm
           </Link>
-          <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            color="text.primary"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             {product.name}
           </Typography>
         </Breadcrumbs>
@@ -104,11 +124,13 @@ export default async function ProductDetail({
       <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 4, borderRadius: 2 }}>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 5 }}>
-            <Box sx={{ 
-              borderRadius: 1, 
-              overflow: 'hidden',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-            }}>
+            <Box
+              sx={{
+                borderRadius: 1,
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              }}
+            >
               <ImageGallery images={product.imageUrls} />
             </Box>
           </Grid>
@@ -120,15 +142,17 @@ export default async function ProductDetail({
 
       {/* Product Description */}
       <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 4, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
           Mô tả sản phẩm
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Box sx={{ 
-          '& img': { maxWidth: '100%', height: 'auto' },
-          '& ul, & ol': { pl: 3 },
-          '& p': { mb: 1.5 }
-        }}>
+        <Box
+          sx={{
+            "& img": { maxWidth: "100%", height: "auto" },
+            "& ul, & ol": { pl: 3 },
+            "& p": { mb: 1.5 },
+          }}
+        >
           <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </Box>
       </Paper>
@@ -137,13 +161,8 @@ export default async function ProductDetail({
       <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
         <ReviewSection productId={product.id} />
       </Paper>
-      
-      {/* Uncomment when ready to implement */}
-      {/* <ProductTabSection id={product.id} description={product.description} /> */}
-      {/* <RelatedProducts
-            category={product.category}
-            currentProductId={product.id}
-          /> */}
+
+      <RelatedProducts productId={product.id} />
     </Container>
   );
 }

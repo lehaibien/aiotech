@@ -66,11 +66,11 @@ public class ProductController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("top/{top:int}")]
-    public async Task<IActionResult> GetTopProducts(int top)
+    [HttpGet("top")]
+    public async Task<IActionResult> GetTopProducts([FromQuery] int count = 8)
     {
         var response = new ApiResponse();
-        var result = await _service.GetTopProducts(top);
+        var result = await _service.GetTopProducts(count);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -81,11 +81,11 @@ public class ProductController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("featured/{top:int}")]
-    public async Task<IActionResult> GetFeaturedProducts(int top)
+    [HttpGet("featured")]
+    public async Task<IActionResult> GetFeaturedProducts([FromQuery] int count = 8)
     {
         var response = new ApiResponse();
-        var result = await _service.GetFeaturedProducts(top);
+        var result = await _service.GetFeaturedProducts(count);
         if (result.IsFailure)
         {
             response.Success = false;

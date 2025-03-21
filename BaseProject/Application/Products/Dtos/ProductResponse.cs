@@ -7,7 +7,9 @@ public class ProductResponse
     public string Name { get; set; } = null!;
     public decimal Price { get; set; }
     public decimal? DiscountPrice { get; set; }
+    public Guid BrandId { get; set; }
     public string Brand { get; set; } = string.Empty;
+    public Guid CategoryId { get; set; }
     public string Category { get; set; } = string.Empty;
     public double Rating { get; set; }
     public int Stock { get; set; }

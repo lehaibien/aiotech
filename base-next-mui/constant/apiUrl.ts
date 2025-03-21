@@ -31,6 +31,7 @@ export const API_URL = {
   productTop: "product/top",
   productFeatured: "product/featured",
   productSearch: "product/search",
+  productRelated: "product/related",
 
   // cart
   cart: "cart",
