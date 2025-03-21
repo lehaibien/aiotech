@@ -4,12 +4,12 @@ import { BestSeller } from "@/features/home/BestSeller";
 import { FeaturedCategories } from "@/features/home/FeaturedCategories";
 import { LatestBlog } from "@/features/home/LatestBlog";
 import { NewArrival } from "@/features/home/NewArrival";
-import { getApi, getListApi } from "@/lib/apiClient";
+import { getApi, getApiQuery, getListApi } from "@/lib/apiClient";
 import {
   CategoryResponse,
   PaginatedList,
   PostPreviewResponse,
-  ProductResponse
+  ProductResponse,
 } from "@/types";
 import { BannerConfiguration } from "@/types/config";
 import { Container } from "@mui/material";
@@ -28,17 +28,18 @@ export default async function Home() {
     imageUrl: "",
   };
 
+  let topProducts: ProductResponse[] = [];
   let newProducts: ProductResponse[] = [];
   let featuredCategories: CategoryResponse[] = [];
   let posts: PostPreviewResponse[] = [];
   const bannerPromise = getApi(API_URL.bannerConfig);
-  const topProductsPromise = getApi(API_URL.productTop + "/8");
-  const featuredProductsPromise = getApi(API_URL.productFeatured + "/8");
   const featuredCategoriesPromise = getListApi(API_URL.category, {
     pageIndex: 0,
     pageSize: 16,
     textSearch: "",
   });
+  const topProductsPromise = getApiQuery(API_URL.productTop, {});
+  const featuredProductsPromise = getApiQuery(API_URL.productFeatured, {});
   const postsPromise = getListApi(API_URL.postPreview, {
     pageIndex: 0,
     pageSize: 10,
@@ -47,7 +48,7 @@ export default async function Home() {
 
   const [
     bannerResponse,
-    newProductsResponse,
+    topProductsResponse,
     featuredProductsResponse,
     featuredCategoriesResponse,
     postsResponse,
@@ -70,17 +71,17 @@ export default async function Home() {
     console.error("Failed to load banner config: ", bannerResponse.message);
   }
 
-  if (newProductsResponse.success) {
-    newProducts = newProductsResponse.data as ProductResponse[];
+  if (topProductsResponse.success) {
+    topProducts = topProductsResponse.data as ProductResponse[];
   } else {
-    console.error("Failed to load new products: ", newProductsResponse.message);
+    console.error("Failed to load top products: ", topProductsResponse.message);
   }
 
   if (featuredProductsResponse.success) {
     newProducts = featuredProductsResponse.data as ProductResponse[];
   } else {
     console.error(
-      "Failed to load featured products: ",
+      "Failed to load new products: ",
       featuredProductsResponse.message
     );
   }
@@ -119,7 +120,7 @@ export default async function Home() {
 
       <FeaturedCategories categories={featuredCategories} />
 
-      <BestSeller products={newProducts} />
+      <BestSeller products={topProducts} />
 
       <NewArrival products={newProducts} />
 

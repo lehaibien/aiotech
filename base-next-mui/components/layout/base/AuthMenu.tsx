@@ -3,6 +3,7 @@
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { Avatar, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
@@ -53,7 +54,7 @@ export function AuthMenu() {
             >
               {session.user.name ?? "Nguoi Dung"}
             </Typography>
-            <Avatar
+            {/* <Avatar
               sizes="small"
               alt={session.user.name ?? "user-avatar"}
               src={session.user.image ?? "/user-avatar.png"}
@@ -67,7 +68,26 @@ export function AuthMenu() {
                   md: 28,
                 },
               }}
-            />
+            /> */}
+            <Avatar
+              sx={{
+                width: {
+                  xs: 24,
+                  md: 28,
+                },
+                height: {
+                  xs: 24,
+                  md: 28,
+                },
+              }}
+            >
+              <Image
+                src={session.user.image ?? "/user-avatar.png"}
+                width={28}
+                height={28}
+                alt={session.user.name ?? "user-avatar"}
+              />
+            </Avatar>
           </IconButton>
           <Menu
             anchorEl={anchorEl}
