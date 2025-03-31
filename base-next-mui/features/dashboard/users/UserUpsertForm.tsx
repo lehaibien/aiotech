@@ -1,6 +1,6 @@
 "use client";
 
-import ComboBox from "@/components/core/ComboBox";
+import ControlledComboBox from "@/components/core/ControlledComboBox";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
@@ -187,7 +187,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <FormLabel htmlFor="roleId" required>
             Vai trò
           </FormLabel>
-          <ComboBox control={control} items={roleCombobox} name="roleId" />
+          <ControlledComboBox control={control} items={roleCombobox} name="roleId" />
           {/* <TextField
                   required
                   id='roleId'

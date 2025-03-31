@@ -1,5 +1,9 @@
 "use client";
 
+import ControlledComboBox from "@/components/core/ControlledComboBox";
+import RichTextEditor, {
+  RichTextEditorRef,
+} from "@/components/core/RichTextEditor";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
@@ -15,13 +19,12 @@ import { useSnackbar } from "notistack";
 import { useEffect, useRef, useState } from "react";
 import {
   AutocompleteElement,
+  Control,
+  FieldValues,
   TextFieldElement,
   useForm,
 } from "react-hook-form-mui";
 import ImageUpload from "./ImageUpload";
-import RichTextEditor, {
-  RichTextEditorRef,
-} from "@/components/core/RichTextEditor";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
@@ -171,7 +174,7 @@ function ProductUpsertForm({
                   fullWidth
                   size="small"
                   InputProps={{
-                    inputProps: { min: 0 },
+                    inputProps: { min: 0, max: Number.MAX_SAFE_INTEGER },
                   }}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -214,7 +217,7 @@ function ProductUpsertForm({
                 />
               </Grid>
               <Grid size={6}>
-                <AutocompleteElement
+                {/* <AutocompleteElement
                   options={brands}
                   control={control}
                   name="brandId"
@@ -245,40 +248,22 @@ function ProductUpsertForm({
                     output: (event, value: ComboBoxItem | null) =>
                       value?.value || "",
                   }}
+                /> */}
+                <ControlledComboBox
+                  control={control as unknown as Control<FieldValues>}
+                  name="brandId"
+                  label="Thương hiệu"
+                  items={brands}
+                  required
                 />
               </Grid>
               <Grid size={6}>
-                <AutocompleteElement
-                  options={categories}
-                  control={control}
+                <ControlledComboBox
+                  control={control as unknown as Control<FieldValues>}
                   name="categoryId"
                   label="Danh mục"
-                  autocompleteProps={{
-                    size: "small",
-                    autoHighlight: true,
-                    noOptionsText: "Không có kết quả",
-                    getOptionLabel(option: ComboBoxItem) {
-                      return option.text || "";
-                    },
-                    isOptionEqualToValue(
-                      option: ComboBoxItem,
-                      newValue: ComboBoxItem
-                    ) {
-                      return (
-                        option.value.toLowerCase() ===
-                        newValue.value.toLowerCase()
-                      );
-                    },
-                  }}
-                  transform={{
-                    input: (value: string) =>
-                      categories.find(
-                        (category) =>
-                          category.value.toLowerCase() === value.toLowerCase()
-                      ) || null,
-                    output: (event, value: ComboBoxItem | null) =>
-                      value?.value || "",
-                  }}
+                  items={categories}
+                  required
                 />
               </Grid>
               <Grid size={12}>
