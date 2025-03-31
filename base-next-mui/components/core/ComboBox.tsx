@@ -1,56 +1,27 @@
-import { ComboBoxItem } from '@/types';
-import { Autocomplete, TextField } from '@mui/material';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { ComboBoxItem } from "@/types";
+import { Autocomplete, TextField } from "@mui/material";
 
-interface ComboBoxProps<T extends FieldValues> {
+interface ComboBoxProps {
   items: ComboBoxItem[];
-  control: Control<T>;
-  name: Path<T>;
-  clearable?: boolean;
+  value?: unknown;
+  error?: Error | undefined;
+  onChange: (value: unknown | null) => void;
 }
 
-export default function ComboBox<T extends FieldValues>({
-  items,
-  control,
-  name,
-  clearable = true,
-}: ComboBoxProps<T>) {
+export function ComboBox({ items, value, error, onChange }: ComboBoxProps) {
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState: { error } }) => {
-        const { onChange, value } = field;
-        return (
-          <Autocomplete
-            autoHighlight
-            noOptionsText='Không có kết quả'
-            options={items}
-            getOptionLabel={(option) => option.text || ''}
-            value={
-              value
-                ? items.find(
-                    (item) => String(value).toLowerCase() === String(item.value).toLowerCase()
-                  ) ?? null
-                : null
-            }
-            onChange={(_, newValue) => {
-              onChange(newValue ? newValue.value : null);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!error}
-                helperText={error?.message}
-              />
-            )}
-            disableClearable={!clearable}
-            isOptionEqualToValue={(option, value) => 
-              String(option.value).toLowerCase() === String(value.value).toLowerCase()
-            }
-          />
-        );
+    <Autocomplete
+      autoHighlight
+      noOptionsText="Không có kết quả"
+      options={items}
+      getOptionLabel={(option) => option.text || ""}
+      value={value ? items.find((item) => value === item.value) ?? null : null}
+      onChange={(_, newValue) => {
+        onChange(newValue ? newValue.value : null);
       }}
+      renderInput={(params) => (
+        <TextField {...params} error={!!error} helperText={error?.message} />
+      )}
     />
   );
 }
