@@ -12,8 +12,7 @@ services:
       - "3000:2400"
     networks:
       - reverse-proxy
-    depends_on:
-      - backend
+
   backend:
     build: ./BaseProject/
     container_name: aiotech_api
@@ -70,40 +69,40 @@ services:
       - backend
     volumes:
       - database-data:/var/opt/mssql
-  umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
-    container_name: aiotech_umami
-    ports:
-      - "8000:3000"
-    environment:
-      DATABASE_URL: postgresql://umami:umami@db:5432/umami
-      DATABASE_TYPE: postgresql
-      APP_SECRET: 55HKzswuhkItXkovyTnWP9MGruBO9vVb
-    depends_on:
-      db:
-        condition: service_healthy
-    init: true
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl http://localhost:3001/api/heartbeat"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  db:
-    image: postgres:15-alpine
-    container_name: aiotech_umami_db
-    environment:
-      POSTGRES_DB: umami
-      POSTGRES_USER: umami
-      POSTGRES_PASSWORD: umami
-    volumes:
-      - umami-db-data:/var/lib/postgresql/data
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+  # umami:
+  #   image: ghcr.io/umami-software/umami:postgresql-latest
+  #   container_name: aiotech_umami
+  #   ports:
+  #     - "8000:3000"
+  #   environment:
+  #     DATABASE_URL: postgresql://umami:umami@db:5432/umami
+  #     DATABASE_TYPE: postgresql
+  #     APP_SECRET: 55HKzswuhkItXkovyTnWP9MGruBO9vVb
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   init: true
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl http://localhost:3001/api/heartbeat"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: aiotech_umami_db
+  #   environment:
+  #     POSTGRES_DB: umami
+  #     POSTGRES_USER: umami
+  #     POSTGRES_PASSWORD: umami
+  #   volumes:
+  #     - umami-db-data:/var/lib/postgresql/data
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
 
 volumes:
   database-data:
