@@ -1,22 +1,39 @@
-import StarterKit from "@tiptap/starter-kit";
+import Color from "@tiptap/extension-color";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
+import TextStyle from "@tiptap/extension-text-style";
+import StarterKit from "@tiptap/starter-kit";
 import {
+  MenuButtonAddTable,
+  MenuButtonAlignCenter,
+  MenuButtonAlignJustify,
+  MenuButtonAlignLeft,
+  MenuButtonAlignRight,
   MenuButtonBlockquote,
   MenuButtonBold,
   MenuButtonBulletedList,
+  MenuButtonEditLink,
   MenuButtonItalic,
   MenuButtonOrderedList,
+  MenuButtonRedo,
   MenuButtonStrikethrough,
   MenuButtonSubscript,
   MenuButtonSuperscript,
+  MenuButtonTextColor,
   MenuButtonUnderline,
+  MenuButtonUndo,
   MenuControlsContainer,
   MenuDivider,
   MenuSelectHeading,
   RichTextEditor as MuiRichTextEditor,
   RichTextEditorRef as MuiRichTextEditorRef,
+  TableBubbleMenu,
 } from "mui-tiptap";
 import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from "react";
 
@@ -38,10 +55,22 @@ function RichTextEditor(
     content: rteRef.current?.editor?.getHTML(),
   }));
 
-  const extensions = [StarterKit, Superscript, Subscript, Underline];
+  const extensions = [
+    StarterKit,
+    Superscript,
+    Subscript,
+    Underline,
+    TextAlign,
+    Table,
+    TableCell,
+    TableHeader,
+    TableRow,
+    Color,
+    TextStyle,
+  ];
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="shadow-sm">
       <MuiRichTextEditor
         ref={rteRef}
         extensions={extensions}
@@ -53,21 +82,33 @@ function RichTextEditor(
           }
         }}
         renderControls={() => (
-          <MenuControlsContainer className="px-4 py-2 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+          <MenuControlsContainer className="px-4 py-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <MenuSelectHeading className="hover:bg-gray-100 rounded p-1" />
+              <MenuSelectHeading className="rounded p-1" />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonBold className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonItalic className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonUnderline className="hover:bg-gray-100 rounded p-1" />
+              <MenuButtonBold className="rounded p-1" />
+              <MenuButtonItalic className="rounded p-1" />
+              <MenuButtonUnderline className="rounded p-1" />
+              <MenuButtonTextColor className="rounded p-1" />
+              <MenuDivider className="!mx-2!h-6" />
+              <MenuButtonAlignLeft className="rounded p-1" />
+              <MenuButtonAlignCenter className="rounded p-1" />
+              <MenuButtonAlignRight className="rounded p-1" />
+              <MenuButtonAlignJustify className="rounded p-1" />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonSuperscript className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonSubscript className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonStrikethrough className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonBlockquote className="hover:bg-gray-100 rounded p-1" />
+              <MenuButtonSuperscript className="rounded p-1" />
+              <MenuButtonSubscript className="rounded p-1" />
+              <MenuButtonStrikethrough className="rounded p-1" />
+              <MenuButtonBlockquote className="rounded p-1" />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonOrderedList className="hover:bg-gray-100 rounded p-1" />
-              <MenuButtonBulletedList className="hover:bg-gray-100 rounded p-1" />
+              <MenuButtonOrderedList className="rounded p-1" />
+              <MenuButtonBulletedList className="rounded p-1" />
+              <MenuButtonEditLink className="rounded p-1" />
+              <MenuButtonAddTable className="rounded p-1" />
+              <TableBubbleMenu className="rounded p-1" />
+              <MenuDivider className="!mx-2!h-6" />
+              <MenuButtonUndo className="rounded p-1" />
+              <MenuButtonRedo className="rounded p-1" />
             </div>
           </MenuControlsContainer>
         )}
@@ -108,7 +149,7 @@ const fixListStyles = `
 `;
 
 // Add the global styles in your component
-const styleElement = document.createElement('style');
+const styleElement = document.createElement("style");
 styleElement.innerHTML = fixListStyles;
 document.head.appendChild(styleElement);
 
