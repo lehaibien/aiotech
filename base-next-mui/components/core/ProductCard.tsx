@@ -202,46 +202,42 @@ function ProductCard({ product }: ProductCardProps) {
           </Typography>
         </Box>
         {/* Pricing and actions */}
-        <Stack gap={1}>
-          <Box>
-            {/* Price display */}
-            <Stack>
-              {discountPrice ? (
-                <>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      textDecoration: "line-through",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {formatNumberWithSeperator(price)} đ
-                  </Typography>
-                  <Typography variant="h6" fontWeight="bold" color="error">
-                    {formatNumberWithSeperator(discountPrice)} đ
-                  </Typography>
-                </>
-              ) : (
-                <Typography variant="h6" fontWeight="bold" color="error" noWrap>
+        <Stack gap={0.5}>
+          {/* Price display */}
+            {discountPrice ? (
+              <>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    textDecoration: "line-through",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {formatNumberWithSeperator(price)} đ
                 </Typography>
-              )}
-            </Stack>
-            {/* Rating */}
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Rating
-                value={rating}
-                precision={0.1}
-                size="small"
-                readOnly
-                sx={{ "& .MuiRating-icon": { fontSize: "1rem" } }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                ({rating.toFixed(1)})
+                <Typography variant="h6" fontWeight="bold" color="error">
+                  {formatNumberWithSeperator(discountPrice)} đ
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="h6" fontWeight="bold" color="error" noWrap>
+                {formatNumberWithSeperator(price)} đ
               </Typography>
-            </Stack>
-          </Box>
+            )}
+          {/* Rating */}
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            <Rating
+              value={rating}
+              precision={0.1}
+              size="small"
+              readOnly
+              sx={{ "& .MuiRating-icon": { fontSize: "1rem" } }}
+            />
+            <Typography variant="caption" color="text.secondary">
+              ({rating.toFixed(1)})
+            </Typography>
+          </Stack>
           {/* Add to cart button */}
           <Button
             fullWidth
@@ -255,6 +251,7 @@ function ProductCard({ product }: ProductCardProps) {
             sx={{
               fontWeight: 700,
               py: 1,
+              width: "80%",
               "& .MuiButton-startIcon": { mr: 0.5 },
             }}
           >
