@@ -20,7 +20,7 @@ public class CategoryEntityConfiguration : IEntityTypeConfiguration<Category>
             .HasPrincipalKey(x => x.Id)
             .HasConstraintName("FK_Product_CategoryId")
             .OnDelete(DeleteBehavior.Restrict);
-        builder.HasIndex(x => x.Name).IsUnique();
+        builder.HasIndex(x => x.Name);
         builder.ToTable("Category");
     }
 }

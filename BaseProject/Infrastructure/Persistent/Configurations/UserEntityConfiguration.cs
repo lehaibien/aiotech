@@ -39,8 +39,8 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(x => x.UserId)
             .HasPrincipalKey(x => x.Id)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.HasIndex(x => x.Email).IsUnique();
-        builder.HasIndex(x => x.UserName).IsUnique();
+        builder.HasIndex(x => x.Email);
+        builder.HasIndex(x => x.UserName);
         builder.HasIndex(x => x.RoleId);
         builder.ToTable("User");
     }

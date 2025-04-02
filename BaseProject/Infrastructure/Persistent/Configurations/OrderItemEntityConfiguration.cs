@@ -14,7 +14,7 @@ public class OrderItemEntityConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(x => x.ProductId).IsRequired();
         builder.Property(x => x.Quantity).IsRequired().HasDefaultValue(1);
         builder.ToTable(b => b.HasCheckConstraint("CK_OrderItem_Quantity", "Quantity > 0"));
-        builder.Property(x => x.Price).IsRequired().HasPrecision(10, 2).HasDefaultValue(0);
+        builder.Property(x => x.Price).IsRequired().HasPrecision(18, 2).HasDefaultValue(0);
         builder.ToTable(b => b.HasCheckConstraint("CK_OrderItem_Price", "Price >= 0"));
         builder
             .HasOne(x => x.Order)

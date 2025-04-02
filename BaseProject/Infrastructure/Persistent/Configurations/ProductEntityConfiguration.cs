@@ -7,8 +7,8 @@ namespace Infrastructure.Persistent.Configurations;
 
 public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
 {
-    private readonly ValueComparer<List<string>> _urlComparer = new ValueComparer<List<string>>(
-        (c1, c2) => c1.SequenceEqual(c2),
+    private readonly ValueComparer<List<string>> _urlComparer = new(
+        (c1, c2) => c1!.SequenceEqual(c2!),
         c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
         c => c.ToList()
     );
@@ -20,8 +20,8 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Sku).IsRequired().IsUnicode().HasMaxLength(50);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
         builder.Property(x => x.Description);
-        builder.Property(x => x.Price).IsRequired().HasPrecision(10, 2);
-        builder.Property(x => x.DiscountPrice).HasPrecision(10, 2);
+        builder.Property(x => x.Price).IsRequired().HasPrecision(18, 2);
+        builder.Property(x => x.DiscountPrice).HasPrecision(18, 2);
         builder.ToTable(b => b.HasCheckConstraint("CK_Product_Price", "Price > 0"));
         builder.ToTable(b =>
             b.HasCheckConstraint(
@@ -40,7 +40,7 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
             )
             .Metadata.SetValueComparer(_urlComparer);
         builder.Property(x => x.IsFeatured).IsRequired().HasDefaultValue(false);
-        builder.HasQueryFilter(x => x.IsDeleted == false);
+        builder.HasQueryFilter(x => !x.IsDeleted);
         // Relationships
         builder
             .HasOne(p => p.Category)
@@ -66,7 +66,7 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
             .HasConstraintName("FK_Review_ProductId")
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => x.Sku).IsUnique();
+        builder.HasIndex(x => x.Sku);
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => new { x.CategoryId, x.BrandId });
         builder.ToTable("Product");

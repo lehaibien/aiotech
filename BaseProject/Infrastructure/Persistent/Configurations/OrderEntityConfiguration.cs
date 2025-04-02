@@ -12,14 +12,14 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.CustomerId).IsRequired();
         builder.Property(x => x.TrackingNumber).IsUnicode(false).IsRequired();
-        builder.Property(x => x.Tax);
-        builder.Property(x => x.TotalPrice);
+        builder.Property(x => x.Tax).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.TotalPrice).HasPrecision(18, 2).IsRequired();
         builder
             .Property(x => x.Status)
             .HasConversion(v => v.ToString(), v => (OrderStatus)Enum.Parse(typeof(OrderStatus), v));
         builder.Property(x => x.Note);
         builder.Property(x => x.CancelReason);
-        builder.HasQueryFilter(x => x.IsDeleted == false);
+        builder.HasQueryFilter(x => !x.IsDeleted);
         builder
             .HasOne(x => x.Customer)
             .WithMany(x => x.Orders)
