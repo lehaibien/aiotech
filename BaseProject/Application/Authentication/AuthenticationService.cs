@@ -89,13 +89,26 @@ public class AuthenticationService : IAuthenticationService
             var role = await _unitOfWork
                 .GetRepository<Role>()
                 .FindAsync(r => r.Name == CommonConst.DefaultRole);
+            if (role is null)
+            {
+                role = new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = CommonConst.DefaultRole,
+                    CreatedDate = DateTime.UtcNow,
+                    CreatedBy = "system",
+                    IsDeleted = false,
+                };
+                _unitOfWork.GetRepository<Role>().Add(role);
+                await _unitOfWork.SaveChangesAsync();
+            }
             var randomPassword = Guid.NewGuid().ToString()[..8];
             var password = EncryptionHelper.HashPassword(randomPassword, out var salt);
             using var httpClient = new HttpClient();
             var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
             var fileName = email + DateTime.UtcNow.ToString("yyyyMMddHHmmss");
             var fullName = fileName + ".png";
-            var contentType = "image/png";
+            const string contentType = "image/png";
             var stream = new MemoryStream(imageBytes);
             var file = new FormFile(stream, 0, stream.Length, fileName, fullName)
             {
@@ -127,7 +140,11 @@ public class AuthenticationService : IAuthenticationService
             await _unitOfWork.SaveChangesAsync();
         }
 
-        user.Role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == user.RoleId);
+        var nRole = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == user.RoleId);
+        if (nRole != null)
+        {
+            user.Role = nRole;
+        }
         var accessToken = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();
         var response = new TokenResult(accessToken, refreshToken);
@@ -174,7 +191,7 @@ public class AuthenticationService : IAuthenticationService
         user.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
         user.Salt = Convert.ToBase64String(salt);
         user.CreatedDate = DateTime.UtcNow;
-        user.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        user.CreatedBy = _contextAccessor.HttpContext?.User.Identity?.Name ?? "system";
         _unitOfWork.GetRepository<User>().Add(user);
         await _unitOfWork.SaveChangesAsync();
         var result = _mapper.Map<UserResponse>(user);
@@ -242,7 +259,7 @@ public class AuthenticationService : IAuthenticationService
         entity.Password = EncryptionHelper.HashPassword(request.NewPassword, out var salt);
         entity.Salt = Convert.ToBase64String(salt);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = _contextAccessor.HttpContext?.User.Identity?.Name ?? "system";
         _unitOfWork.GetRepository<User>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
@@ -330,7 +347,7 @@ public class AuthenticationService : IAuthenticationService
 
     private string GenerateUrl(string token)
     {
-        var url = _contextAccessor.HttpContext.Request.GetDisplayUrl();
+        var url = _contextAccessor.HttpContext?.Request.GetDisplayUrl();
         return $"{url}?token={token}";
     }
 }

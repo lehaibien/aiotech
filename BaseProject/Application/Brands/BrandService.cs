@@ -209,7 +209,7 @@ public class BrandService : IBrandService
     {
         var result = await _unitOfWork
             .GetRepository<Brand>()
-            .GetAll(x => x.IsDeleted == false)
+            .GetAll()
             .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
             .ToListAsync();
         return Result<List<ComboBoxItem>>.Success(result);
