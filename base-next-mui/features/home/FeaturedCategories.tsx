@@ -22,7 +22,7 @@ export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
       </HighlightTypography>
       <Grid container spacing={3}>
         {categories.map((category) => (
-          <Grid size={{ xs: 6, sm: 4, md: 3, lg: 12 / 8 }} key={category.id}>
+          <Grid size={{ xs: 6, md: 3, lg: 12 / 8 }} key={category.id}>
             <CategoryCard name={category.name} imageUrl={category.imageUrl} />
           </Grid>
         ))}

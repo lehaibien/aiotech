@@ -251,7 +251,6 @@ function ProductCard({ product }: ProductCardProps) {
             sx={{
               fontWeight: 700,
               py: 1,
-              width: "80%",
               "& .MuiButton-startIcon": { mr: 0.5 },
             }}
           >
