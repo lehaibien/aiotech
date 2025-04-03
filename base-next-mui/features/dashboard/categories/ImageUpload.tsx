@@ -26,16 +26,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, image }) => {
       </Button>
       {image && (
         <Image
-          src={URL.createObjectURL(image) || "/placeholder.svg"}
+          src={URL.createObjectURL(image) || "/image-not-found.jpg"}
           alt={`Uploaded`}
-          loading="lazy"
-          width={600}
-          height={400}
+          width={300}
+          height={0}
           style={{
-            objectFit: "fill",
-            width: "100%",
+            width: "auto",
+            height: "auto",
+            aspectRatio: 4 / 3,
+            objectFit: "contain",
             backgroundColor: "white",
-            aspectRatio: 3 / 2,
           }}
         />
       )}

@@ -24,7 +24,7 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -81,16 +81,31 @@ export function BrandUpsertForm({ brand: data }: BrandUpsertFormProps) {
   };
   useEffect(() => {
     const getImage = async (url: string) => {
-      if (url === "") {
+      if (!url) return undefined;
+
+      try {
+        // Replace docker internal host with localhost if needed
+        const imageUrl = url.includes("host.docker.internal")
+          ? url.replace("host.docker.internal", "localhost")
+          : url;
+
+        const response = await fetch(imageUrl, {
+          mode: "cors", // Enable CORS
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch image");
+
+        const blob = await response.blob();
+        return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+      } catch (err) {
+        console.error("Image fetch error:", err);
         return undefined;
       }
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new File([blob], url.substring(url.lastIndexOf("/") + 1));
     };
+
     getImage(data.imageUrl)
-      .then((image) => setImage(image))
-      .catch((err) => console.error(err));
+      .then(setImage)
+      .catch((err) => console.error("Image processing error:", err));
   }, [data.imageUrl]);
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>

@@ -26,16 +26,16 @@ function ImageUpload({ onUpload, image }: ImageUploadProps) {
       </Button>
       {image && (
         <Image
-          src={URL.createObjectURL(image) || "/placeholder.svg"}
+          src={URL.createObjectURL(image) || "/image-not-found.jpg"}
           alt={`Uploaded`}
-          loading="lazy"
-          width={200}
-          height={200}
+          width={300}
+          height={0}
           style={{
-            objectFit: "cover",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "white",
+            width: 'auto',
+            height: 'auto',
+            aspectRatio: 4 / 3,
+            objectFit: 'contain',
+            backgroundColor: 'white',
           }}
         />
       )}
