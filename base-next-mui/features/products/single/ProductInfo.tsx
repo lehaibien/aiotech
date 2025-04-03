@@ -1,6 +1,6 @@
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { ProductDetailResponse } from "@/types/product";
-import { Box, Rating, Stack, Typography } from "@mui/material";
+import { Box, Chip, Rating, Stack, Typography } from "@mui/material";
 import { AddToCartButton } from "./AddToCartButton";
 
 interface ProductInfoProps {
@@ -40,14 +40,38 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           ({product.rating.toFixed(1)})
         </Typography>
       </Box>
-      <Typography variant="h5" fontWeight="bold" color="error.main">
-        {formatNumberWithSeperator(product.price)} VNĐ
-      </Typography>
+      {product.discountPrice ? (
+        <Stack direction="row" gap={1} alignItems="center">
+          <Typography variant="h5" fontWeight="bold" color="error">
+            {formatNumberWithSeperator(product.discountPrice)} VNĐ
+          </Typography>
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            sx={{ textDecoration: "line-through" }}
+          >
+            {formatNumberWithSeperator(product.price)} VNĐ
+          </Typography>
+          <Chip
+            label={`-${(
+              ((product.price - product.discountPrice) / product.price) *
+              100
+            ).toFixed(2)}%`}
+            color="error"
+            size="small"
+            variant="outlined"
+          />
+        </Stack>
+      ) : (
+        <Typography variant="h5" fontWeight="bold" color="error">
+          {formatNumberWithSeperator(product.price)} VNĐ
+        </Typography>
+      )}
       <Box display="flex" alignItems="center">
         <AddToCartButton
           productId={product.id}
           productName={product.name}
-          productPrice={product.price}
+          productPrice={product.discountPrice ?? product.price}
           productImage={product.imageUrls[0]}
         />
         <Typography variant="body2" ml={2}>

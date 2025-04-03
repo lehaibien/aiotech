@@ -50,7 +50,7 @@ function ProductCard({ product }: ProductCardProps) {
       addToCart({
         productId: id,
         productName: name,
-        productPrice: price,
+        productPrice: discountPrice ?? price,
         productImage: thumbnails[0],
         quantity: 1,
       });
