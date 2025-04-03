@@ -3,7 +3,7 @@
 import NoRowOverlay from "@/components/core/NoRowOverlay";
 import useColumns from "@/hooks/useColumns";
 import { useDataTableFetch } from "@/hooks/useDataTableFetch";
-import { Box } from "@mui/material";
+import { alpha, Box } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
@@ -148,7 +148,11 @@ function DataTable<T>(
         density={density}
         showCellVerticalBorder
         showColumnVerticalBorder
-        sx={{
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.paper,
+          "& .MuiDataGrid-columnHeader": {
+            backgroundColor: alpha(theme.palette.background.paper, 0.3),
+          },
           "& .MuiDataGrid-cell:focus": {
             outline: "none",
           },
@@ -164,7 +168,10 @@ function DataTable<T>(
           "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
             py: "22px",
           },
-        }}
+          "& .MuiDataGrid-selectedRowCount": {
+            display: "none",
+          }
+        })}
       />
     </Box>
   );

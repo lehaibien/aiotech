@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import NoRowOverlay from '@/components/core/NoRowOverlay';
-import { PaginatedList } from '@/types';
-import { Box } from '@mui/material';
+import NoRowOverlay from "@/components/core/NoRowOverlay";
+import useColumns from "@/hooks/useColumns";
+import useDataGridData from "@/hooks/useGridData";
+import { PaginatedList } from "@/types";
+import { alpha, Box } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
   GridDensity,
   GridPaginationModel,
   GridRowSelectionModel,
-} from '@mui/x-data-grid';
-import { usePathname } from 'next/navigation';
-import React, { useImperativeHandle } from 'react';
-import DataGridPagination from './CustomDataGridPagination';
-import ErrorOverlay from './ErrorOverlay';
-import useColumns from '@/hooks/useColumns';
-import useDataGridData from '@/hooks/useGridData';
+} from "@mui/x-data-grid";
+import { usePathname } from "next/navigation";
+import React, { useImperativeHandle } from "react";
+import DataGridPagination from "./CustomDataGridPagination";
+import ErrorOverlay from "./ErrorOverlay";
 
 export type CustomDataGridProps<T> = {
   columns: GridColDef[];
@@ -38,7 +38,7 @@ function CustomDataGrid<T>(
     checkboxSelection,
     withRowNumber,
     height = 600,
-    density = 'standard',
+    density = "standard",
     loadData,
   }: CustomDataGridProps<T>,
   ref: React.ForwardedRef<CustomDataGridRef>
@@ -92,13 +92,13 @@ function CustomDataGrid<T>(
   );
 
   return (
-    <Box height={height} width={'100%'}>
+    <Box height={height} width={"100%"}>
       <DataGrid
         rows={row}
         rowCount={rowCount}
         columns={gridColumn}
         checkboxSelection={checkboxSelection}
-        paginationMode='server'
+        paginationMode="server"
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
         rowSelectionModel={rowSelectionModel}
@@ -119,34 +119,41 @@ function CustomDataGrid<T>(
           ),
           noRowsOverlay: error
             ? () => (
-                <ErrorOverlay message={'Lỗi tải dữ liệu: ' + error.message} />
+                <ErrorOverlay message={"Lỗi tải dữ liệu: " + error.message} />
               )
             : NoRowOverlay,
           noResultsOverlay: NoRowOverlay,
         }}
         slotProps={{
           loadingOverlay: {
-            variant: 'circular-progress',
+            variant: "circular-progress",
           },
         }}
-        getRowHeight={() => 'auto'}
+        getRowHeight={() => "auto"}
         density={density}
         showCellVerticalBorder
         sx={(theme) => ({
-          '& .MuiDataGrid-cell': {
-            display: 'flex',
-            alignItems: 'center',
+          backgroundColor: theme.palette.background.paper,
+          "& .MuiDataGrid-columnHeader": {
+            backgroundColor: alpha(theme.palette.background.paper, 0.3),
+          },
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            display: "flex",
+            alignItems: "center",
             px: 1,
           },
-          '& .MuiDataGrid-iconSeparator': {
-            color: theme.palette.divider,
+          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
+          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+            py: "15px",
           },
-          '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
-          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-            py: '15px',
+          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+            py: "22px",
           },
-          '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
-            py: '22px',
+          "& .MuiDataGrid-selectedRowCount": {
+            display: "none",
           },
         })}
       />
