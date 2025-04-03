@@ -34,7 +34,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, image }) => {
             width: "auto",
             height: "auto",
             aspectRatio: 4 / 3,
-            objectFit: "contain",
+            objectFit: "fill",
             backgroundColor: "white",
           }}
         />

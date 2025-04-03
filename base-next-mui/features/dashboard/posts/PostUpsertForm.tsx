@@ -1,5 +1,8 @@
 "use client";
 
+import RichTextEditor, {
+  RichTextEditorRef,
+} from "@/components/core/RichTextEditor";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
@@ -20,9 +23,6 @@ import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useEffect, useRef, useState } from "react";
 import { SwitchElement, TextFieldElement, useForm } from "react-hook-form-mui";
-import RichTextEditor, {
-  RichTextEditorRef,
-} from "@/components/core/RichTextEditor";
 import ImageUpload from "./ImageUpload";
 
 type PostUpsertFormProps = {
@@ -86,16 +86,31 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
 
   useEffect(() => {
     const getImage = async (url: string) => {
-      if (url === "") {
+      if (!url) return undefined;
+
+      try {
+        // Replace docker internal host with localhost if needed
+        const imageUrl = url.includes("host.docker.internal")
+          ? url.replace("host.docker.internal", "localhost")
+          : url;
+
+        const response = await fetch(imageUrl, {
+          mode: "cors", // Enable CORS
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch image");
+
+        const blob = await response.blob();
+        return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+      } catch (err) {
+        console.error("Image fetch error:", err);
         return undefined;
       }
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new File([blob], url.substring(url.lastIndexOf("/") + 1));
     };
+
     getImage(post.imageUrl)
-      .then((image) => setImage(image))
-      .catch((err) => console.error(err));
+      .then(setImage)
+      .catch((err) => console.error("Image processing error:", err));
   }, [post.imageUrl]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -163,7 +178,11 @@ export function PostUpsertForm({ post }: PostUpsertFormProps) {
           color="primary"
           disabled={isLoading}
         >
-          {isLoading ? "Đang xử lý..." : post.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+          {isLoading
+            ? "Đang xử lý..."
+            : post.id === EMPTY_UUID
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </Box>
     </form>

@@ -33,8 +33,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, image }) => {
       </Button>
       <Box
         sx={(theme) => ({
-          width: 800,
-          height: 450,
+          width: 1200,
+          height: 630,
           border: `1px solid ${theme.palette.divider}`,
           position: "relative",
         })}
@@ -44,12 +44,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onUpload, image }) => {
             src={URL.createObjectURL(image) || "/placeholder.svg"}
             alt={`Uploaded`}
             loading="lazy"
-            width={800}
-            height={450}
+            width={1200}
+            height={630}
             style={{
-              objectFit: "contain",
-              width: "100%",
-              height: "100%",
+              width: "auto",
+              height: "auto",
+              aspectRatio: 1200 / 630,
+              objectFit: "fill",
               backgroundColor: "white",
             }}
           />

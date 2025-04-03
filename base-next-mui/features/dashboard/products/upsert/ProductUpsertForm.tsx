@@ -117,17 +117,42 @@ export function ProductUpsertForm({
   };
 
   useEffect(() => {
-    const loadDefaultImages = async () => {
-      const imagePromises = defaultImages.map(async (url) => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new File([blob], url.substring(url.lastIndexOf("/") + 1));
-      });
-      const loadedImages = await Promise.all(imagePromises);
-      setImages(loadedImages);
+    const getImages = async (urls: string[]) => {
+      if (urls.length == 0) return [];
+
+      try {
+        // Replace docker internal host with localhost if needed
+        const imageUrls = urls.map((url) => {
+          return url.includes("host.docker.internal")
+            ? url.replace("host.docker.internal", "localhost")
+            : url;
+        });
+
+        const responses = await Promise.all(
+          imageUrls.map(async (url) => {
+            const response = await fetch(url, {
+              mode: "cors", // Enable CORS
+            });
+            if (!response.ok) throw new Error("Failed to fetch image");
+
+            const blob = await response.blob();
+            return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+          })
+        );
+
+        const files: File[] = responses.filter(
+          (file) => file !== undefined
+        ) as File[];
+        return files;
+      } catch (err) {
+        console.error("Image fetch error:", err);
+        return [];
+      }
     };
 
-    loadDefaultImages();
+    getImages(defaultImages)
+      .then(setImages)
+      .catch((err) => console.error("Image processing error:", err));
   }, [defaultImages]);
 
   return (
