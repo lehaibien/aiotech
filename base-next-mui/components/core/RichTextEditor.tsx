@@ -88,31 +88,110 @@ function RichTextEditor(
         renderControls={() => (
           <MenuControlsContainer className="px-4 py-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <MenuSelectHeading className="rounded p-1" />
+              <MenuSelectHeading
+                className="rounded p-1"
+                labels={{
+                  heading1: "Tiêu đề 1",
+                  heading2: "Tiêu đề 2",
+                  heading3: "Tiêu đề 3",
+                  heading4: "Tiêu đề 4",
+                  heading5: "Tiêu đề 5",
+                  heading6: "Tiêu đề 6",
+                  paragraph: "Văn bản",
+                }}
+              />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonBold className="rounded p-1" />
-              <MenuButtonItalic className="rounded p-1" />
-              <MenuButtonUnderline className="rounded p-1" />
-              <MenuButtonTextColor className="rounded p-1" />
+              <MenuButtonBold className="rounded p-1" tooltipLabel="Chữ đậm" />
+              <MenuButtonItalic
+                className="rounded p-1"
+                tooltipLabel="Chữ nghiêng"
+              />
+              <MenuButtonUnderline
+                className="rounded p-1"
+                tooltipLabel="Chữ gạch chân"
+              />
+              <MenuButtonTextColor
+                className="rounded p-1"
+                tooltipLabel="Chọn màu chữ"
+                labels={{
+                  cancelButton: "Hủy",
+                  saveButton: "Chọn",
+                  removeColorButton: "Xóa màu",
+                  removeColorButtonTooltipTitle: "Xóa màu",
+                  textFieldPlaceholder: "Ví dụ: #ff0000",
+                }}
+              />
               <MenuDivider className="!mx-2!h-6" />
-              <MenuButtonAlignLeft className="rounded p-1" />
-              <MenuButtonAlignCenter className="rounded p-1" />
-              <MenuButtonAlignRight className="rounded p-1" />
-              <MenuButtonAlignJustify className="rounded p-1" />
+              <MenuButtonAlignLeft
+                className="rounded p-1"
+                tooltipLabel="Căn lề trái"
+              />
+              <MenuButtonAlignCenter
+                className="rounded p-1"
+                tooltipLabel="Căn giữa"
+              />
+              <MenuButtonAlignRight
+                className="rounded p-1"
+                tooltipLabel="Căn lề phải"
+              />
+              <MenuButtonAlignJustify
+                className="rounded p-1"
+                tooltipLabel="Căn đều"
+              />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonSuperscript className="rounded p-1" />
-              <MenuButtonSubscript className="rounded p-1" />
-              <MenuButtonStrikethrough className="rounded p-1" />
-              <MenuButtonBlockquote className="rounded p-1" />
+              <MenuButtonSuperscript
+                className="rounded p-1"
+                tooltipLabel="Chỉ số trên"
+              />
+              <MenuButtonSubscript
+                className="rounded p-1"
+                tooltipLabel="Chỉ số dưới"
+              />
+              <MenuButtonStrikethrough
+                className="rounded p-1"
+                tooltipLabel="Chữ gạch ngang"
+              />
+              <MenuButtonBlockquote
+                className="rounded p-1"
+                tooltipLabel="Câu trích dẫn"
+              />
               <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonOrderedList className="rounded p-1" />
-              <MenuButtonBulletedList className="rounded p-1" />
-              <MenuButtonEditLink className="rounded p-1" />
-              <MenuButtonAddTable className="rounded p-1" />
-              <TableBubbleMenu className="rounded p-1" />
+              <MenuButtonOrderedList
+                className="rounded p-1"
+                tooltipLabel="Danh sách có thứ tự"
+              />
+              <MenuButtonBulletedList
+                className="rounded p-1"
+                tooltipLabel="Danh sách không thứ tự"
+              />
+              <MenuButtonEditLink
+                className="rounded p-1"
+                tooltipLabel="Chỉnh sửa liên kết"
+              />
+              <MenuButtonAddTable
+                className="rounded p-1"
+                tooltipLabel="Thêm bảng"
+              />
+              <TableBubbleMenu
+                className="rounded p-1"
+                labels={{
+                  insertRowAbove: "Chèn hàng trên",
+                  insertRowBelow: "Chèn hàng dưới",
+                  deleteRow: "Xóa hàng",
+                  insertColumnBefore: "Chèn cột trước",
+                  insertColumnAfter: "Chèn cột sau",
+                  deleteColumn: "Xóa cột",
+                  mergeCells: "Gộp ô",
+                  splitCell: "Chia ô",
+                  deleteTable: "Xóa bảng",
+                  toggleHeaderCell: "Chuyển đổi ô tiêu đề",
+                  toggleHeaderRow: "Chuyển đổi hàng tiêu đề",
+                  toggleHeaderColumn: "Chuyển đổi cột tiêu đề",
+                }}
+              />
               <MenuDivider className="!mx-2!h-6" />
-              <MenuButtonUndo className="rounded p-1" />
-              <MenuButtonRedo className="rounded p-1" />
+              <MenuButtonUndo className="rounded p-1" tooltipLabel="Hoàn tác" />
+              <MenuButtonRedo className="rounded p-1" tooltipLabel="Làm lại" />
             </div>
           </MenuControlsContainer>
         )}
