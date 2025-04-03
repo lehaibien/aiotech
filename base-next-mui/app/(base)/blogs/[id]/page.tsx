@@ -395,7 +395,7 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
               <Card
                 key={post.id}
                 sx={{
-                  height: { xs: "auto", md: 350 },
+                  height: "auto",
                   borderRadius: 2,
                   overflow: "hidden",
                   transition: "all 0.3s ease-in-out",
