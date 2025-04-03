@@ -54,21 +54,6 @@ export function AuthMenu() {
             >
               {session.user.name ?? "Nguoi Dung"}
             </Typography>
-            {/* <Avatar
-              sizes="small"
-              alt={session.user.name ?? "user-avatar"}
-              src={session.user.image ?? "/user-avatar.png"}
-              sx={{
-                width: {
-                  xs: 24,
-                  md: 28,
-                },
-                height: {
-                  xs: 24,
-                  md: 28,
-                },
-              }}
-            /> */}
             <Avatar
               sx={{
                 width: {
