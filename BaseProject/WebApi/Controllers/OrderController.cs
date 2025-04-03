@@ -10,10 +10,12 @@ namespace WebApi.Controllers;
 public class OrderController : ControllerBase
 {
     private readonly IOrderService _service;
+    private readonly ILogger<OrderController> _logger;
 
-    public OrderController(IOrderService service)
+    public OrderController(IOrderService service, ILogger<OrderController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]

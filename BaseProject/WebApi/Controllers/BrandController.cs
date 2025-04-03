@@ -85,7 +85,7 @@ public class BrandController : ControllerBase
 
         response.Data = result.Data;
         _logger.LogInformation(
-            "A brand with id {Id} name {Name} has been updated",
+            "A brand with id {Id} and name {Name} has been updated",
             request.Id,
             request.Name
         );
