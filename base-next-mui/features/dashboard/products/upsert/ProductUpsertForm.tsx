@@ -11,20 +11,20 @@ import { convertObjectToFormData } from "@/lib/utils";
 import { ComboBoxItem } from "@/types";
 import { type ProductRequest, ProductRequestSchema } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Grid2 as Grid, Paper, Typography } from "@mui/material";
+import { Grid2 as Grid, Paper, Typography } from "@mui/material";
 import { MuiChipsInput } from "mui-chips-input";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  AutocompleteElement,
   Control,
   FieldValues,
   TextFieldElement,
   useForm,
 } from "react-hook-form-mui";
 import ImageUpload from "./ImageUpload";
+import { FormActions } from "./ProductFormActions";
+import { SectionTitle } from "./ProductSectionTitle";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
@@ -33,7 +33,12 @@ type ProductUpsertFormProps = {
   product: ProductRequest;
 };
 
-function ProductUpsertForm({
+const featuredOptions = [
+  { value: "true", text: "Có" },
+  { value: "false", text: "Không" },
+];
+
+export function ProductUpsertForm({
   brands,
   categories,
   product,
@@ -42,6 +47,7 @@ function ProductUpsertForm({
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const rteRef = useRef<RichTextEditorRef>(null);
+
   const { control, handleSubmit } = useForm<ProductRequest>({
     defaultValues: {
       ...product,
@@ -49,90 +55,93 @@ function ProductUpsertForm({
     },
     resolver: zodResolver(ProductRequestSchema),
   });
+
   const [chips, setChips] = useState<string[]>(product.tags ?? []);
   const [images, setImages] = useState<File[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChipChange = (newChips: string[]) => {
+  const handleChipChange = useCallback((newChips: string[]) => {
     setChips(newChips);
-  };
+  }, []);
 
-  const handleImageUpload = (newImages: File[]) => {
-    setImages((prevImages) => [...prevImages, ...newImages]);
-  };
-  // Modify the onSubmit handler to handle null values:
+  const handleImageUpload = useCallback((newImages: File[]) => {
+    setImages((prev) => [...prev, ...newImages]);
+  }, []);
+
+  const handleSubmitSuccess = useCallback(
+    (message: string) => {
+      enqueueSnackbar(message, { variant: "success" });
+      router.push("/dashboard/products");
+    },
+    [enqueueSnackbar, router]
+  );
+
+  const handleSubmitError = useCallback(
+    (message: string) => {
+      enqueueSnackbar(message, { variant: "error" });
+    },
+    [enqueueSnackbar]
+  );
+
   const onSubmit = async (data: ProductRequest) => {
     setIsLoading(true);
-    const request: ProductRequest = {
-      ...data,
-      discountPrice: data.discountPrice || undefined, // Convert empty/null to undefined
-      description: rteRef.current?.content ?? "",
-      tags: chips,
-      images: images,
-    };
-    const formData = convertObjectToFormData(request);
-    if (product.id === EMPTY_UUID) {
-      const response = await postApi(API_URL.product, formData);
+    try {
+      const request: ProductRequest = {
+        ...data,
+        discountPrice: data.discountPrice || undefined,
+        description: rteRef.current?.content ?? "",
+        tags: chips,
+        images,
+      };
+
+      const formData = convertObjectToFormData(request);
+      const action = product.id === EMPTY_UUID ? postApi : putApi;
+      const response = await action(API_URL.product, formData);
+
       if (response.success) {
-        enqueueSnackbar("Thêm mới sản phẩm thành công", {
-          variant: "success",
-        });
-        router.push("/dashboard/products");
+        handleSubmitSuccess(
+          product.id === EMPTY_UUID
+            ? "Thêm mới sản phẩm thành công"
+            : "Cập nhật sản phẩm thành công"
+        );
       } else {
-        enqueueSnackbar(response.message, { variant: "error" });
+        handleSubmitError(
+          response.message ?? "Đã xảy ra lỗi khi xử lý yêu cầu"
+        );
       }
-    } else {
-      const response = await putApi(API_URL.product, formData);
-      if (response.success) {
-        enqueueSnackbar("Cập nhật sản phẩm thành công", {
-          variant: "success",
-        });
-        router.push("/dashboard/products");
-      } else {
-        enqueueSnackbar(response.message, { variant: "error" });
-      }
+    } catch (error) {
+      handleSubmitError("Đã xảy ra lỗi khi xử lý yêu cầu");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
+
   useEffect(() => {
-    const imagePromises = defaultImages.map(async (url) => {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new File([blob], url.substring(url.lastIndexOf("/") + 1));
-    });
-    Promise.all(imagePromises).then((res) => {
-      setImages(res);
-    });
+    const loadDefaultImages = async () => {
+      const imagePromises = defaultImages.map(async (url) => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+      });
+      const loadedImages = await Promise.all(imagePromises);
+      setImages(loadedImages);
+    };
+
+    loadDefaultImages();
   }, [defaultImages]);
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      style={{
-        position: "relative",
-      }}
+      style={{ position: "relative" }}
     >
       <Grid container spacing={4}>
+        {/* Product Information Section */}
         <Grid size={{ sm: 12, md: 8 }}>
-          <Paper
-            elevation={1}
-            sx={{
-              p: 2,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 3,
-                fontWeight: 600,
-                color: "primary.main",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              Thông tin chung
-            </Typography>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <SectionTitle>Thông tin chung</SectionTitle>
+
             <Grid container spacing={2}>
               <Grid size={12}>
                 <TextFieldElement
@@ -193,15 +202,13 @@ function ProductUpsertForm({
                   size="small"
                 />
               </Grid>
+
               <Grid size={6}>
-                <AutocompleteElement
+                {/* <AutocompleteElement
                   control={control}
                   name="isFeatured"
                   label="Nổi bật"
-                  options={[
-                    { value: "true", text: "Có" },
-                    { value: "false", text: "Không" },
-                  ]}
+                  options={featuredOptions}
                   autocompleteProps={{
                     disableClearable: true,
                     getOptionLabel: (option) => option.text,
@@ -212,43 +219,19 @@ function ProductUpsertForm({
                       value: String(value),
                       text: value ? "Có" : "Không",
                     }),
-                    output: (event, value) => value?.value === "true",
-                  }}
-                />
-              </Grid>
-              <Grid size={6}>
-                {/* <AutocompleteElement
-                  options={brands}
-                  control={control}
-                  name="brandId"
-                  label="Thương hiệu"
-                  autocompleteProps={{
-                    size: "small",
-                    autoHighlight: true,
-                    noOptionsText: "Không có kết quả",
-                    getOptionLabel(option: ComboBoxItem) {
-                      return option.text || "";
-                    },
-                    isOptionEqualToValue(
-                      option: ComboBoxItem,
-                      newValue: ComboBoxItem
-                    ) {
-                      return (
-                        option.value.toLowerCase() ===
-                        newValue.value.toLowerCase()
-                      );
-                    },
-                  }}
-                  transform={{
-                    input: (value: string) =>
-                      brands.find(
-                        (brand) =>
-                          brand.value.toLowerCase() === value.toLowerCase()
-                      ) || null,
-                    output: (event, value: ComboBoxItem | null) =>
-                      value?.value || "",
+                    output: (_, value) => value?.value === "true",
                   }}
                 /> */}
+                <ControlledComboBox
+                  control={control as unknown as Control<FieldValues>}
+                  name="isFeatured"
+                  label="Nổi bật"
+                  items={featuredOptions}
+                  required
+                />
+              </Grid>
+
+              <Grid size={6}>
                 <ControlledComboBox
                   control={control as unknown as Control<FieldValues>}
                   name="brandId"
@@ -257,6 +240,7 @@ function ProductUpsertForm({
                   required
                 />
               </Grid>
+
               <Grid size={6}>
                 <ControlledComboBox
                   control={control as unknown as Control<FieldValues>}
@@ -266,6 +250,7 @@ function ProductUpsertForm({
                   required
                 />
               </Grid>
+
               <Grid size={12}>
                 <MuiChipsInput
                   fullWidth
@@ -273,82 +258,34 @@ function ProductUpsertForm({
                   value={chips}
                   onChange={handleChipChange}
                   label="Thẻ"
+                  placeholder="Nhập và nhấn Enter để thêm thẻ"
+                />
+              </Grid>
+
+              <Grid size={12}>
+                <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
+                  Mô tả
+                </Typography>
+                <RichTextEditor
+                  ref={rteRef}
+                  defaultContent={product.description ?? ""}
                 />
               </Grid>
             </Grid>
-            <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
-              Mô tả
-            </Typography>
-            <RichTextEditor
-              ref={rteRef}
-              defaultContent={product.description ?? ""}
-            />
           </Paper>
         </Grid>
 
+        {/* Product Images Section */}
         <Grid size={{ sm: 12, md: 4 }}>
-          <Paper
-            elevation={1}
-            sx={{
-              p: 2,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                mb: 3,
-                fontWeight: 600,
-                color: "primary.main",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              Ảnh sản phẩm
-            </Typography>
+          <Paper elevation={1} sx={{ p: 2 }}>
+            <SectionTitle>Ảnh sản phẩm</SectionTitle>
             <ImageUpload onUpload={handleImageUpload} images={images} />
           </Paper>
         </Grid>
       </Grid>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-end",
-          position: "sticky",
-          bottom: 0,
-          right: 0,
-          zIndex: 1000,
-          background: "background.paper",
-          p: 2,
-          gap: 1,
-        }}
-      >
-        <Button
-          LinkComponent={Link}
-          href="/dashboard/products"
-          type="button"
-          variant="contained"
-          color="inherit"
-          disabled={isLoading}
-        >
-          Hủy
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={isLoading}
-        >
-          {isLoading
-            ? "Đang xử lý..."
-            : product.id === EMPTY_UUID
-            ? "Thêm mới"
-            : "Cập nhật"}
-        </Button>
-      </Box>
+
+      {/* Form Actions */}
+      <FormActions isLoading={isLoading} isNew={product.id === EMPTY_UUID} />
     </form>
   );
 }
-
-export default ProductUpsertForm;

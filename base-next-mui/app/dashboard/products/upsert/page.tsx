@@ -1,6 +1,6 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
-import ProductUpsertForm from "@/features/dashboard/products/upsert/ProductUpsertForm";
+import { ProductUpsertForm } from "@/features/dashboard/products/upsert/ProductUpsertForm";
 import { getApi, getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import {
@@ -42,12 +42,12 @@ export default async function ProductUpsertPage({
       images = data.imageUrls;
     }
   }
-  const ComboboxPromises = await Promise.all([
+  const [brandComboboxResponse, categoryComboboxResponse] = await Promise.all([
     getApi(API_URL.brandComboBox),
     getApi(API_URL.categoryComboBox),
   ]);
-  brandCombobox = (ComboboxPromises[0].data as ComboBoxItem[]) ?? [];
-  categoryCombobox = (ComboboxPromises[1].data as ComboBoxItem[]) ?? [];
+  brandCombobox = brandComboboxResponse.data as ComboBoxItem[];
+  categoryCombobox = categoryComboboxResponse.data as ComboBoxItem[];
   return (
     <ProductUpsertForm
       defaultImages={images}
@@ -57,5 +57,3 @@ export default async function ProductUpsertPage({
     />
   );
 }
-
-

@@ -1,12 +1,12 @@
 import { ComboBoxItem } from "@/types";
 import { Autocomplete, TextField } from "@mui/material";
-import { Control, Controller, FieldValues, Path } from "react-hook-form";
+import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
 interface ControlledComboBoxProps<T extends FieldValues> {
   items: ComboBoxItem[];
   control: Control<T>;
   label?: string;
-  name: Path<T>;
+  name: FieldPath<T>;
   clearable?: boolean;
   required?: boolean;
   size?: "small" | "medium";
