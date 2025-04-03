@@ -19,15 +19,16 @@ public class CartService : ICartService
 
     public async Task<Result<List<CartItemResponse>>> GetCartByUserId(Guid userId)
     {
-        var cart = await _unitOfWork.GetRepository<Domain.Entities.CartItem>()
+        var cart = await _unitOfWork
+            .GetRepository<CartItem>()
             .GetAll(x => x.UserId == userId)
             .Select(x => new CartItemResponse
             {
                 ProductId = x.ProductId,
                 ProductName = x.Product.Name,
                 ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.Price,
-                Quantity = x.Quantity
+                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
+                Quantity = x.Quantity,
             })
             .ToListAsync();
         return Result<List<CartItemResponse>>.Success(cart);
@@ -35,7 +36,8 @@ public class CartService : ICartService
 
     public async Task<Result<List<CartItemResponse>>> AddToCart(CartRequest request)
     {
-        var cart = await _unitOfWork.GetRepository<CartItem>()
+        var cart = await _unitOfWork
+            .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId && x.ProductId == request.ProductId)
             .FirstOrDefaultAsync();
         if (cart is not null)
@@ -49,14 +51,15 @@ public class CartService : ICartService
             {
                 UserId = request.UserId,
                 ProductId = request.ProductId,
-                Quantity = 1
+                Quantity = 1,
             };
             _unitOfWork.GetRepository<CartItem>().Add(newCart);
         }
 
         await _unitOfWork.SaveChangesAsync();
-        
-        var cartList = await _unitOfWork.GetRepository<CartItem>()
+
+        var cartList = await _unitOfWork
+            .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId)
             .Include(x => x.Product)
             .Select(x => new CartItemResponse
@@ -64,17 +67,18 @@ public class CartService : ICartService
                 ProductId = x.ProductId,
                 ProductName = x.Product.Name,
                 ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.Price,
-                Quantity = x.Quantity
+                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
+                Quantity = x.Quantity,
             })
             .ToListAsync();
-        
+
         return Result<List<CartItemResponse>>.Success(cartList);
     }
 
     public async Task<Result<List<CartItemResponse>>> RemoveFromCart(CartRemoveItemRequest request)
     {
-        var cart = await _unitOfWork.GetRepository<CartItem>()
+        var cart = await _unitOfWork
+            .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId && x.ProductId == request.ProductId)
             .FirstOrDefaultAsync();
         if (cart is null)
@@ -84,8 +88,9 @@ public class CartService : ICartService
 
         _unitOfWork.GetRepository<CartItem>().Delete(cart);
         await _unitOfWork.SaveChangesAsync();
-        
-        var cartList = await _unitOfWork.GetRepository<CartItem>()
+
+        var cartList = await _unitOfWork
+            .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId)
             .Include(x => x.Product)
             .Select(x => new CartItemResponse
@@ -93,8 +98,8 @@ public class CartService : ICartService
                 ProductId = x.ProductId,
                 ProductName = x.Product.Name,
                 ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.Price,
-                Quantity = x.Quantity
+                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
+                Quantity = x.Quantity,
             })
             .ToListAsync();
         return Result<List<CartItemResponse>>.Success(cartList);
