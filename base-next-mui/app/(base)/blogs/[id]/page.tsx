@@ -31,6 +31,7 @@ import { HTMLPartToTextPart, parseUUID } from "@/lib/utils";
 import type {
   PostResponse
 } from "@/types";
+import TableOfContents from "@/features/blog/TableOfContents";
 
 export async function generateMetadata({
   params,
@@ -148,318 +149,321 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
       </Box>
 
       {/* Main Content */}
-      <Paper
-        elevation={2}
-        sx={{
-          borderRadius: 2,
-          overflow: "hidden",
-          mb: 4,
-          transition: "all 0.3s ease-in-out",
-        }}
-      >
-        {/* Featured Image */}
-        <Box sx={{ position: "relative" }}>
-          <Chip
-            label="Bài viết"
-            size="small"
-            color="primary"
-            sx={{
-              position: "absolute",
-              top: 16,
-              left: 16,
-              zIndex: 2,
-              fontWeight: 500,
-              fontSize: "0.75rem",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            }}
-          />
-          <Box
-            sx={{
-              position: "relative",
-              height: { xs: 250, sm: 350, md: 450 },
-              width: "100%",
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                width: "100%",
-                height: "30%",
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
-                zIndex: 1,
-              },
-            }}
-          >
-            <Image
-              src={post.imageUrl}
-              alt={post.title}
-              width={1200}
-              height={630}
-              priority
-              style={{
-                width: "100%",
-                height: "100%",
-                aspectRatio: 1200 / 630,
-                objectFit: "fill",
-              }}
-            />
-          </Box>
+      <Box sx={{ display: "flex", gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
+        {/* Table of Contents - left sidebar */}
+        <Box sx={{ width: { xs: 0, md: 280 }, flexShrink: 0 }}>
+          <TableOfContents html={post.content} />
         </Box>
 
-        {/* Content */}
-        <Box sx={{ p: { xs: 3, md: 5 } }}>
-          {/* Title and Meta */}
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              gutterBottom
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: "1.75rem", sm: "2.25rem", md: "2.75rem" },
-                lineHeight: 1.2,
-                mb: 2,
-              }}
-            >
-              {post.title}
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                gap: { xs: 2, md: 3 },
-                mb: 3,
-              }}
-            >
+        {/* Article Content - main column */}
+        <Box sx={{ flexGrow: 1 }}>
+          <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden", mb: 4 }}>
+            {/* Featured Image */}
+            <Box sx={{ position: "relative" }}>
+              <Chip
+                label="Bài viết"
+                size="small"
+                color="primary"
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  left: 16,
+                  zIndex: 2,
+                  fontWeight: 500,
+                  fontSize: "0.75rem",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                }}
+              />
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.75,
-                }}
-              >
-                <CalendarTodayIcon
-                  fontSize="small"
-                  sx={{ color: "text.secondary" }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", fontWeight: 500 }}
-                >
-                  {formattedDate}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.75,
-                }}
-              >
-                <AccessTimeIcon
-                  fontSize="small"
-                  sx={{ color: "text.secondary" }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", fontWeight: 500 }}
-                >
-                  {hours}:{minutes}
-                </Typography>
-              </Box>
-
-              {post.tags && post.tags.length > 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    mt: { xs: 1, md: 0 },
-                  }}
-                >
-                  {post.tags.map((tag, index) => (
-                    <Chip
-                      key={index}
-                      label={tag}
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        borderRadius: 1,
-                        fontSize: "0.75rem",
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
-            </Box>
-
-            <Divider />
-          </Box>
-
-          {/* Post Content */}
-          <Box
-            sx={{
-              typography: "body1",
-              "& img": {
-                maxWidth: "100%",
-                height: "auto",
-                borderRadius: 1,
-                my: 2,
-              },
-              "& figure": { m: 0, my: 3 },
-              "& figcaption": {
-                textAlign: "center",
-                fontStyle: "italic",
-                mt: 1,
-                color: "text.secondary",
-              },
-              "& h2": { mt: 4, mb: 2, fontWeight: 700, fontSize: "1.75rem" },
-              "& h3": { mt: 3, mb: 2, fontWeight: 600, fontSize: "1.5rem" },
-              "& p": { mb: 2, lineHeight: 1.7 },
-              "& a": {
-                color: "primary.main",
-                textDecoration: "none",
-                "&:hover": { textDecoration: "underline" },
-              },
-              "& blockquote": {
-                borderLeft: "4px solid",
-                borderColor: "primary.main",
-                pl: 2,
-                py: 1,
-                my: 3,
-                mx: 0,
-                fontStyle: "italic",
-                bgcolor: "action.hover",
-                borderRadius: "0 4px 4px 0",
-              },
-              "& ul, & ol": { pl: 3, mb: 2, listStyleType: "disc" },
-              "& li": { mb: 1 },
-              "& pre": {
-                p: 2,
-                borderRadius: 1,
-                bgcolor: "grey.900",
-                color: "common.white",
-                overflow: "auto",
-                fontSize: "0.875rem",
-              },
-              "& code": {
-                fontFamily: "monospace",
-                bgcolor: "action.hover",
-                p: 0.5,
-                borderRadius: 0.5,
-                fontSize: "0.875em",
-              },
-            }}
-          >
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
-          </Box>
-        </Box>
-      </Paper>
-
-      {/* Related Posts */}
-      {relatedPosts.length > 0 && (
-        <Box sx={{ mt: 5 }}>
-          <Typography
-            variant="h5"
-            component="h2"
-            gutterBottom
-            sx={{
-              fontWeight: 700,
-              mb: 3,
-              pb: 1,
-              borderBottom: "2px solid",
-              borderColor: "primary.main",
-              display: "inline-block",
-            }}
-          >
-            Bài viết liên quan
-          </Typography>
-
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                md: "repeat(3, 1fr)",
-              },
-              gap: 3,
-            }}
-          >
-            {relatedPosts.map((post) => (
-              <Card
-                key={post.id}
-                sx={{
-                  height: "auto",
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  transition: "all 0.3s ease-in-out",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                  "&:hover": {
-                    transform: "translateY(-8px)",
-                    boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+                  position: "relative",
+                  width: "100%",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "30%",
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
+                    zIndex: 1,
                   },
                 }}
               >
-                <Link
-                  href={`/blogs/${post.id}`}
+                <Image
+                  src={post.imageUrl}
+                  alt={post.title}
+                  width={1200}
+                  height={630}
+                  priority
                   style={{
-                    textDecoration: "none",
-                    display: "block",
-                    height: "100%",
+                    width: "100%",
+                    aspectRatio: 1200 / 630,
+                    objectFit: "fill",
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Content */}
+            <Box sx={{ p: { xs: 3, md: 5 }, display: "flex", flexDirection: "column" }}>
+              {/* Title and Meta */}
+              <Box sx={{ mb: 4 }}>
+                <Typography
+                  variant="h3"
+                  component="h1"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: "1.75rem", sm: "2.25rem", md: "2.75rem" },
+                    lineHeight: 1.2,
+                    mb: 2,
                   }}
                 >
-                  <Box sx={{ position: "relative", height: 180 }}>
-                    <Image
-                      src={post.imageUrl}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 600px) 100vw, 400px"
-                      style={{
-                        objectFit: "cover",
-                      }}
+                  {post.title}
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    gap: { xs: 2, md: 3 },
+                    mb: 3,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.75,
+                    }}
+                  >
+                    <CalendarTodayIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
                     />
-                  </Box>
-                  <CardContent>
                     <Typography
-                      variant="h6"
-                      component="h3"
+                      variant="body2"
+                      sx={{ color: "text.secondary", fontWeight: 500 }}
+                    >
+                      {formattedDate}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.75,
+                    }}
+                  >
+                    <AccessTimeIcon
+                      fontSize="small"
+                      sx={{ color: "text.secondary" }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary", fontWeight: 500 }}
+                    >
+                      {hours}:{minutes}
+                    </Typography>
+                  </Box>
+
+                  {post.tags && post.tags.length > 0 && (
+                    <Box
                       sx={{
-                        fontWeight: 600,
-                        mb: 2,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        color: "text.primary",
-                        transition: "color 0.2s",
-                        "&:hover": { color: "primary.main" },
+                        display: "flex",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: 1,
+                        mt: { xs: 1, md: 0 },
                       }}
                     >
-                      {post.title}
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <CalendarTodayIcon
-                        fontSize="small"
-                        sx={{ fontSize: "0.9rem", color: "text.secondary" }}
-                      />
-                      <Typography variant="caption" color="text.secondary">
-                        {postDate.format("DD/MM/YYYY")}
-                      </Typography>
+                      {post.tags.map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            borderRadius: 1,
+                            fontSize: "0.75rem",
+                          }}
+                        />
+                      ))}
                     </Box>
-                  </CardContent>
-                </Link>
-              </Card>
-            ))}
-          </Box>
+                  )}
+                </Box>
+
+                <Divider />
+              </Box>
+
+              {/* Post Content */}
+              <Box
+                sx={{
+                  typography: "body1",
+                  "& img": {
+                    maxWidth: "100%",
+                    height: "auto",
+                    borderRadius: 1,
+                    my: 2,
+                  },
+                  "& figure": { m: 0, my: 3 },
+                  "& figcaption": {
+                    textAlign: "center",
+                    fontStyle: "italic",
+                    mt: 1,
+                    color: "text.secondary",
+                  },
+                  "& h2": { mt: 4, mb: 2, fontWeight: 700, fontSize: "1.75rem" },
+                  "& h3": { mt: 3, mb: 2, fontWeight: 600, fontSize: "1.5rem" },
+                  "& p": { mb: 2, lineHeight: 1.7 },
+                  "& a": {
+                    color: "primary.main",
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  },
+                  "& blockquote": {
+                    borderLeft: "4px solid",
+                    borderColor: "primary.main",
+                    pl: 2,
+                    py: 1,
+                    my: 3,
+                    mx: 0,
+                    fontStyle: "italic",
+                    bgcolor: "action.hover",
+                    borderRadius: "0 4px 4px 0",
+                  },
+                  "& ul, & ol": { pl: 3, mb: 2, listStyleType: "disc" },
+                  "& li": { mb: 1 },
+                  "& pre": {
+                    p: 2,
+                    borderRadius: 1,
+                    bgcolor: "grey.900",
+                    color: "common.white",
+                    overflow: "auto",
+                    fontSize: "0.875rem",
+                  },
+                  "& code": {
+                    fontFamily: "monospace",
+                    bgcolor: "action.hover",
+                    p: 0.5,
+                    borderRadius: 0.5,
+                    fontSize: "0.875em",
+                  },
+                }}
+              >
+                <div 
+                  id="post-content"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
+                />
+              </Box>
+            </Box>
+          </Paper>
+
+          {/* Related Posts */}
+          {relatedPosts.length > 0 && (
+            <Box sx={{ mt: 5 }}>
+              <Typography
+                variant="h5"
+                component="h2"
+                gutterBottom
+                sx={{
+                  fontWeight: 700,
+                  mb: 3,
+                  pb: 1,
+                  borderBottom: "2px solid",
+                  borderColor: "primary.main",
+                  display: "inline-block",
+                }}
+              >
+                Bài viết liên quan
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                  },
+                  gap: 3,
+                }}
+              >
+                {relatedPosts.map((post) => (
+                  <Card
+                    key={post.id}
+                    sx={{
+                      height: "auto",
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      transition: "all 0.3s ease-in-out",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      "&:hover": {
+                        transform: "translateY(-8px)",
+                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+                      },
+                    }}
+                  >
+                    <Link
+                      href={`/blogs/${post.id}`}
+                      style={{
+                        textDecoration: "none",
+                        display: "block",
+                        height: "100%",
+                      }}
+                    >
+                      <Box sx={{ position: "relative", height: 180 }}>
+                        <Image
+                          src={post.imageUrl}
+                          alt={post.title}
+                          fill
+                          sizes="(max-width: 600px) 100vw, 400px"
+                          style={{
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+                      <CardContent>
+                        <Typography
+                          variant="h6"
+                          component="h3"
+                          sx={{
+                            fontWeight: 600,
+                            mb: 2,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            color: "text.primary",
+                            transition: "color 0.2s",
+                            "&:hover": { color: "primary.main" },
+                          }}
+                        >
+                          {post.title}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <CalendarTodayIcon
+                            fontSize="small"
+                            sx={{ fontSize: "0.9rem", color: "text.secondary" }}
+                          />
+                          <Typography variant="caption" color="text.secondary">
+                            {postDate.format("DD/MM/YYYY")}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                ))}
+              </Box>
+            </Box>
+          )}
         </Box>
-      )}
+      </Box>
     </>
   );
 }
