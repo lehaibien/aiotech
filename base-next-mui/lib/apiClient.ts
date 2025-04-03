@@ -4,270 +4,136 @@ import { ApiResponse, GetByIdRequest } from "@/types/base";
 import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
 import { auth } from "./auth";
 
-/**
- * Sends a GET request to the specified action endpoint with the given request data and returns the response.
- * @param action The endpoint to send the request to.
- * @param request The data to include in the request body.
- * @returns A promise that resolves with the response from the server, or an error message if the request fails.
- */
-export async function getListApi(
-  action: string,
-  request: object
-): Promise<ApiResponse> {
-  const baseHeader = await getAuthorizationHeader();
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const response = await fetch(
-      getBaseUrl() + action + "?" + toQueryString(request),
-      {
-        headers: baseHeader,
-      }
-    );
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
+const API_CONFIG = {
+  rejectUnauthorized: "0",
+  defaultHeaders: {
+    "Content-Type": "application/json",
+  },
+};
 
-/**
- * Sends a GET request to the specified action endpoint with the given request data and returns the response.
- * @param action The endpoint to send the request to.
- * @param request The data to include in the request body.
- * @returns A promise that resolves with the response from the server, or an error message if the request fails.
- */
-export async function getApiQuery(
-  action: string,
-  request: object
+// Base fetch wrapper
+async function fetchApi(
+  url: string,
+  method: string,
+  data?: unknown,
+  headers?: Record<string, string>
 ): Promise<ApiResponse> {
   try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(
-      getBaseUrl() + action + "?" + toQueryString(request),
-      {
-        headers: baseHeader,
-      }
-    );
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = API_CONFIG.rejectUnauthorized;
+    const authHeader = await getAuthorizationHeader();
 
-export async function getApi(action: string): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(getBaseUrl() + action, {
-      headers: baseHeader,
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    console.error(error);
-    return handleError(error);
-  }
-}
-
-export async function getByIdApi(
-  action: string,
-  request: GetByIdRequest
-): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(getBaseUrl() + action + "/" + request.id, {
-      headers: baseHeader,
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function postApi(
-  action: string,
-  request: object
-): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const isFormData = request instanceof FormData;
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(getBaseUrl() + action, {
-      method: "POST",
-      headers: isFormData
-        ? baseHeader
-        : {
-            ...baseHeader,
-            "Content-Type": "application/json",
-          },
-      body: isFormData ? request : JSON.stringify(request),
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function putApi(
-  action: string,
-  request: unknown
-): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const isFormData = request instanceof FormData;
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(getBaseUrl() + action, {
-      method: "PUT",
-      headers: isFormData
-        ? baseHeader
-        : {
-            ...baseHeader,
-            "Content-Type": "application/json",
-          },
-      body: isFormData ? request : JSON.stringify(request),
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function deleteApi(action: string): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const url = getBaseUrl() + action;
-    const baseHeader = await getAuthorizationHeader();
     const response = await fetch(url, {
-      method: "DELETE",
-      headers: baseHeader,
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function deleteApiQuery(
-  action: string,
-  request: object
-): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const url = getBaseUrl() + action + toQueryString(request);
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: baseHeader,
-    });
-    const json = await handleResponse(response);
-    return json;
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function deleteListApi(
-  action: string,
-  list: string[]
-): Promise<ApiResponse> {
-  try {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    const baseHeader = await getAuthorizationHeader();
-    const response = await fetch(getBaseUrl() + action, {
-      method: "DELETE",
+      method,
       headers: {
-        ...baseHeader,
-        "Content-Type": "application/json",
+        ...authHeader,
+        ...headers,
       },
-      body: JSON.stringify(list),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
-    const json = await handleResponse(response);
-    return json;
+
+    return await handleResponse(response);
   } catch (error) {
     return handleError(error);
   }
+}
+
+// Helper functions
+function buildUrl(action: string, queryParams?: object): string {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  const query = queryParams ? `?${toQueryString(queryParams)}` : "";
+  return `${baseUrl}${action}${query}`;
 }
 
 function toQueryString(params: object): string {
-  const queryString = Object.keys(params)
-    .map((key) => {
-      const value = params[key as keyof object];
-      if (value === null || value === undefined || value === "") {
-        return "";
-      }
-      if (Array.isArray(value)) {
-        return [...value]
-          .map((item) => {
-            return encodeURIComponent(key) + "=" + encodeURIComponent(item);
-          })
-          .join("&");
-      }
-      return (
-        encodeURIComponent(key) + "=" + encodeURIComponent(value as string)
-      );
-    })
-    .filter((s) => s !== "")
+  return Object.entries(params)
+    .filter(([, value]) => value != null && value !== "")
+    .flatMap(([key, value]) =>
+      Array.isArray(value)
+        ? value.map(
+            (item) => `${encodeURIComponent(key)}=${encodeURIComponent(item)}`
+          )
+        : [`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`]
+    )
     .join("&");
-  return queryString;
-}
-
-function getBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL || "";
 }
 
 async function getAuthorizationHeader() {
   const session = await auth();
   return {
-    "Authorization": `Bearer ${session?.user.accessToken}`,
+    Authorization: `Bearer ${session?.user.accessToken}`,
   };
 }
 
-/**
- * Handles the response from a fetch request.
- *
- * @param response The fetch response object.
- * @returns A Promise that resolves to an ApiResponse object.
- */
+// CRUD Operations
+export async function getListApi(action: string, request: object) {
+  return fetchApi(buildUrl(action, request), "GET");
+}
+
+export async function getApiQuery(action: string, request: object) {
+  return fetchApi(buildUrl(action, request), "GET");
+}
+
+export async function getApi(action: string) {
+  return fetchApi(buildUrl(action), "GET");
+}
+
+export async function getByIdApi(action: string, request: GetByIdRequest) {
+  return fetchApi(buildUrl(`${action}/${request.id}`), "GET");
+}
+
+export async function postApi(action: string, request: unknown) {
+  const isFormData = request instanceof FormData;
+  return fetchApi(
+    buildUrl(action),
+    "POST",
+    request,
+    isFormData ? undefined : API_CONFIG.defaultHeaders
+  );
+}
+
+export async function putApi(action: string, request: unknown) {
+  const isFormData = request instanceof FormData;
+  return fetchApi(
+    buildUrl(action),
+    "PUT",
+    request,
+    isFormData ? undefined : API_CONFIG.defaultHeaders
+  );
+}
+
+export async function deleteApi(action: string) {
+  return fetchApi(buildUrl(action), "DELETE");
+}
+
+export async function deleteApiQuery(action: string, request: object) {
+  return fetchApi(buildUrl(action, request), "DELETE");
+}
+
+export async function deleteListApi(action: string, list: string[]) {
+  return fetchApi(buildUrl(action), "DELETE", list, API_CONFIG.defaultHeaders);
+}
+
+// Response handlers
 async function handleResponse(response: Response): Promise<ApiResponse> {
   if (response.status === 401) {
-    return {
-      success: false,
-      message: "Bạn không có quyền truy cập",
-    };
+    return { success: false, message: "Unauthorized access" };
   }
+
   if (response.status === 500) {
-    return {
-      success: false,
-      message: "Lỗi server",
-    };
+    return { success: false, message: "Server error" };
   }
+
   const json = await response.json();
-  if (
-    response.status === 400 &&
-    json.title === "One or more validation errors occurred."
-  ) {
+
+  if (response.status === 400 && json.title?.includes("validation errors")) {
     const firstError = json.errors[Object.keys(json.errors)[0]];
-    return {
-      success: false,
-      message: firstError[0],
-    };
+    return { success: false, message: firstError || "Validation failed" };
   }
+
   return json;
 }
 
-function handleError(error: unknown) {
-  if (isDynamicServerError(error)) {
-    throw error;
-  }
-  return {
-    success: false,
-    message: (error as Error).message,
-  };
+function handleError(error: unknown): ApiResponse {
+  if (isDynamicServerError(error)) throw error;
+  return { success: false, message: (error as Error).message };
 }
