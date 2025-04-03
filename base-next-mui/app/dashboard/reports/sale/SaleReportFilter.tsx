@@ -20,8 +20,8 @@ export default function SaleReportFilter({
   const [startDate, setStartDate] = useState<Dayjs | null>(defaultStartDate);
   const [endDate, setEndDate] = useState<Dayjs | null>(defaultEndDate);
   const onApplyFilter = () => {
-    const start = startDate?.toISOString();
-    const end = endDate?.toISOString();
+    const start = dayjs(startDate).toJSON();
+    const end = dayjs(endDate).toJSON();
     router.push(`/dashboard/reports/sale?start_date=${start}&end_date=${end}`);
   };
 
