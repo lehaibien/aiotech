@@ -45,7 +45,7 @@ export default async function SaleReportPage({
     : dayjs.utc().startOf("year");
   const endDate = searchParams?.end_date
     ? dayjs(searchParams?.end_date)
-    : dayjs.utc().endOf("year");
+    : dayjs.utc().endOf("year").subtract(1, "day");
   const request: SaleReportRequest = {
     startDate: startDate.startOf("month").toJSON(),
     endDate: endDate.endOf("month").toJSON(),

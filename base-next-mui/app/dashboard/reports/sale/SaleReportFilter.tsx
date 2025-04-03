@@ -17,49 +17,53 @@ export default function SaleReportFilter({
   defaultEndDate,
 }: SaleReportFilterProps) {
   const router = useRouter();
-  const [startDate, setStartDate] = useState<Dayjs | null>(defaultStartDate);
-  const [endDate, setEndDate] = useState<Dayjs | null>(defaultEndDate);
+  const [startDate, setStartDate] = useState<Dayjs | null>(
+    defaultStartDate || dayjs().startOf("year")
+  );
+  const [endDate, setEndDate] = useState<Dayjs | null>(
+    defaultEndDate || dayjs().startOf("year").add(1, "year").subtract(1, "day")
+  );
+
   const onApplyFilter = () => {
+    if (!startDate || !endDate || dayjs(startDate).isAfter(endDate)) return;
     const start = dayjs(startDate).toJSON();
     const end = dayjs(endDate).toJSON();
     router.push(`/dashboard/reports/sale?start_date=${start}&end_date=${end}`);
   };
 
-  const handleStartDateClose = () => {
-    if (dayjs(startDate).isAfter(endDate)) {
-      setStartDate(endDate);
-      return;
-    }
+  const handleStartDateChange = (newValue: Dayjs | null) => {
+    if (!newValue) return;
+    setStartDate(newValue);
+    // Ensure endDate is exactly one year after and greater than startDate
+    const newEndDate = newValue.add(1, "year");
+    setEndDate(
+      newEndDate.isAfter(newValue) ? newEndDate : newValue.add(1, "day")
+    );
   };
 
-  const handleEndDateClose = () => {
-    const endDayjs = dayjs(endDate);
-    if (endDayjs.isBefore(startDate)) {
-      setEndDate(startDate);
+  const handleEndDateChange = (newValue: Dayjs | null) => {
+    if (!newValue) return;
+    // Ensure endDate is greater than startDate
+    if (startDate && newValue.isBefore(startDate)) {
+      setEndDate(startDate.add(1, "day"));
       return;
     }
-    if (
-      startDate !== null &&
-      endDate !== null &&
-      endDayjs.diff(startDate, "months") > 12
-    ) {
-      setEndDate(startDate.add(12, "month"));
-      return;
-    }
+    setEndDate(newValue);
   };
+
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
       <ReportMonthFilter
         label="Từ tháng"
         value={startDate}
-        onChange={setStartDate}
-        onClose={handleStartDateClose}
+        onChange={handleStartDateChange}
       />
       <ReportMonthFilter
         label="Đến tháng"
         value={endDate}
-        onChange={setEndDate}
-        onClose={handleEndDateClose}
+        onChange={handleEndDateChange}
+        minDate={startDate ? dayjs(startDate).add(1, "month") : undefined}
+        maxDate={startDate? dayjs(startDate).add(1, "year").subtract(1, "day") : undefined}
       />
       <Button onClick={onApplyFilter} variant="contained" color="info">
         Lọc

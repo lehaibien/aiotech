@@ -37,6 +37,10 @@ export default function SalesChart({ data }: SalesChartProps) {
           tickMinStep: hasNonZeroValues ? Math.max(1, minPrice / 10) : 1,
           valueFormatter: (value) =>
             formatNumberWithSeperator(value ?? 0) + " đ",
+          labelStyle: {
+            transform: "translate(30px, -270px)",
+            textAnchor: "end",
+          },
         },
       ]}
       series={[
