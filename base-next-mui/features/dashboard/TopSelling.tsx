@@ -40,11 +40,15 @@ export function TopSelling({ data }: TopSellingProps) {
             <Image
               src={prd.imageUrls[0]}
               alt={prd.name}
-              width={50}
-              height={50}
+              width={100}
+              height={100}
+              style={{ objectFit: "contain" }}
             />
           </ListItemAvatar>
-          <ListItemText primary={prd.name} secondary={`Số lượng: ${prd.sales}`} />
+          <ListItemText
+            primary={prd.name}
+            secondary={`Số lượng: ${prd.sales}`}
+          />
         </ListItem>
       ))}
     </List>

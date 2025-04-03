@@ -41,7 +41,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
               fontSize: 12,
             },
             labelStyle: {
-              transform: "translate(100px, -160px)",
+              transform: "translate(30px, -180px)",
               textAnchor: "end",
             },
           },
@@ -55,7 +55,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
           },
         ]}
         height={400}
-        margin={{ left: 80 }}
+        margin={{ left: 100 }}
         sx={{
           ".MuiLineElement-root": {
             strokeWidth: 2,

@@ -1,5 +1,11 @@
 import { StockAlert } from "@/types";
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
 
 type StockAlertSectionProps = {
@@ -15,12 +21,15 @@ export function StockAlertSection({ data }: StockAlertSectionProps) {
     >
       {data.map((alert) => (
         <ListItem key={alert.productId}>
-          <Image
-            src={alert.productImage}
-            alt={alert.productName}
-            width={50}
-            height={50}
-          />
+          <ListItemAvatar>
+            <Image
+              src={alert.productImage}
+              alt={alert.productName}
+              width={100}
+              height={100}
+              style={{ objectFit: "contain" }}
+            />
+          </ListItemAvatar>
           <ListItemText
             primary={alert.productName}
             secondary={
