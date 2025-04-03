@@ -47,5 +47,6 @@ USER nextjs
 EXPOSE 2400
 
 ENV PORT=2400
+ENV HOSTNAME=0.0.0.0
 
-CMD HOSTNAME="0.0.0.0" node server.js
+CMD ["node", "server.js"]
