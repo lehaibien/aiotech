@@ -5,3 +5,4 @@ export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 export const TAX_VALUE = 0.08;
 export const DEFAULT_TIMEZONE = "Asia/Jakarta";
+export const LOW_STOCK_THRESHOLD = 5;

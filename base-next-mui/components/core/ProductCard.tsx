@@ -1,5 +1,6 @@
 "use client";
 
+import { LOW_STOCK_THRESHOLD } from "@/constant/common";
 import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { ProductResponse } from "@/types";
@@ -74,13 +75,13 @@ function ProductCard({ product }: ProductCardProps) {
 
   const getStockColor = () => {
     if (stock <= 0) return "error";
-    if (stock <= 10) return "warning";
+    if (stock <= LOW_STOCK_THRESHOLD) return "warning";
     return "success";
   };
 
   const getStockText = () => {
     if (stock <= 0) return "Hết hàng";
-    if (stock <= 10) return "Sắp hết hàng";
+    if (stock <= LOW_STOCK_THRESHOLD) return "Sắp hết hàng";
     return "Còn hàng";
   };
   return (
@@ -110,7 +111,7 @@ function ProductCard({ product }: ProductCardProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Stock status chip */}
-      {stock <= 10 && (
+      {stock <= LOW_STOCK_THRESHOLD && (
         <Chip
           label={getStockText()}
           color={getStockColor()}
