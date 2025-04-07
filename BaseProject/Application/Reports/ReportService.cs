@@ -99,7 +99,7 @@ public class ReportService : IReportService
         InventoryStatusReportRequest request
     )
     {
-        const int lowStockThreshold = 10;
+        const int lowStockThreshold = 5;
         var query = _unitOfWork
             .GetRepository<Product>()
             .GetAll()

@@ -14,8 +14,8 @@ public class PostEntityConfiguration : IEntityTypeConfiguration<Post>
         builder.Property(x => x.Content).IsRequired();
         builder.Property(x => x.ImageUrl).IsRequired();
         builder.Property(x => x.IsPublished).IsRequired().HasDefaultValue(true);
-        builder.HasQueryFilter(x => !x.IsDeleted && x.IsPublished);
-        builder.HasIndex(x => x.Title).HasFilter("IsPublished = 1");
+        builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.HasIndex(x => x.Title);
         builder.ToTable("Post");
     }
 }

@@ -7,7 +7,6 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shared;
 
@@ -144,7 +143,7 @@ public class PostService : IPostService
     {
         var entity = await _unitOfWork
             .GetRepository<Post>()
-            .GetAll()
+            .GetAll(x => x.IsPublished)
             .Select(x => new PostResponse
             {
                 Id = x.Id,
