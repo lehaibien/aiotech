@@ -143,7 +143,7 @@ public class PostService : IPostService
     {
         var entity = await _unitOfWork
             .GetRepository<Post>()
-            .GetAll(x => x.IsPublished)
+            .GetAll()
             .Select(x => new PostResponse
             {
                 Id = x.Id,
