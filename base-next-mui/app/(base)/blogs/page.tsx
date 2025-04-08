@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 async function fetchBlogPosts(
   page: number = 1,
-  pageSize: number = 9,
+  pageSize: number = 10,
   search: string = ""
 ): Promise<PaginatedList<PostPreviewResponse>> {
   const response = await getListApi(API_URL.postPreview, {
@@ -54,7 +54,7 @@ export default async function BlogsPage({
   searchParams?: { [key: string]: string | undefined };
 }) {
   const page = searchParams?.page ? parseInt(searchParams.page) : 1;
-  const pageSize = 9;
+  const pageSize = 8;
   const search = searchParams?.search || "";
 
   const { items, totalCount } = await fetchBlogPosts(page, pageSize, search);

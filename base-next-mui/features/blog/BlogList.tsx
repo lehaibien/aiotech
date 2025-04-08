@@ -47,8 +47,13 @@ export default function BlogList({
     <>
       <Grid container spacing={3}>
         {posts.map((post) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.id}>
-            <BlogCard post={post} />
+          <Grid size={{ xs: 12, sm: 6 }} key={post.id}>
+            <BlogCard
+              id={post.id}
+              title={post.title}
+              imageUrl={post.imageUrl}
+              createdDate={post.createdDate}
+            />
           </Grid>
         ))}
       </Grid>

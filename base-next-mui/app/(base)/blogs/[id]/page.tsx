@@ -10,8 +10,6 @@ import {
   Box,
   Breadcrumbs,
   Button,
-  Card,
-  CardContent,
   Chip,
   Divider,
   Paper,
@@ -26,12 +24,11 @@ import Link from "next/link";
 import NoItem from "@/components/core/NoItem";
 import { API_URL } from "@/constant/apiUrl";
 import { DEFAULT_TIMEZONE } from "@/constant/common";
+import BlogCard from "@/features/blog/BlogCard";
+import TableOfContents from "@/features/blog/TableOfContents";
 import { getApi, getByIdApi } from "@/lib/apiClient";
 import { HTMLPartToTextPart, parseUUID } from "@/lib/utils";
-import type {
-  PostResponse
-} from "@/types";
-import TableOfContents from "@/features/blog/TableOfContents";
+import type { PostResponse } from "@/types";
 
 export async function generateMetadata({
   params,
@@ -149,7 +146,13 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
       </Box>
 
       {/* Main Content */}
-      <Box sx={{ display: "flex", gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 4,
+          flexDirection: { xs: "column", md: "row" },
+        }}
+      >
         {/* Table of Contents - left sidebar */}
         <Box sx={{ width: { xs: 0, md: 280 }, flexShrink: 0 }}>
           <TableOfContents html={post.content} />
@@ -157,7 +160,10 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
 
         {/* Article Content - main column */}
         <Box sx={{ flexGrow: 1 }}>
-          <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden", mb: 4 }}>
+          <Paper
+            elevation={2}
+            sx={{ borderRadius: 2, overflow: "hidden", mb: 4 }}
+          >
             {/* Featured Image */}
             <Box sx={{ position: "relative" }}>
               <Chip
@@ -207,7 +213,13 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
             </Box>
 
             {/* Content */}
-            <Box sx={{ p: { xs: 3, md: 5 }, display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{
+                p: { xs: 3, md: 5 },
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               {/* Title and Meta */}
               <Box sx={{ mb: 4 }}>
                 <Typography
@@ -317,7 +329,12 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
                     mt: 1,
                     color: "text.secondary",
                   },
-                  "& h2": { mt: 4, mb: 2, fontWeight: 700, fontSize: "1.75rem" },
+                  "& h2": {
+                    mt: 4,
+                    mb: 2,
+                    fontWeight: 700,
+                    fontSize: "1.75rem",
+                  },
                   "& h3": { mt: 3, mb: 2, fontWeight: 600, fontSize: "1.5rem" },
                   "& p": { mb: 2, lineHeight: 1.7 },
                   "& a": {
@@ -353,9 +370,37 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
                     borderRadius: 0.5,
                     fontSize: "0.875em",
                   },
+                  "& table": {
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    mt: 3,
+                    mb: 3,
+                    border: "1px solid",
+                    borderColor: "grey.300",
+                  },
+                  "& th, & td": {
+                    border: "1px solid",
+                    borderColor: "grey.300",
+                    padding: 1,
+                    textAlign: "left",
+                  },
+                  "& th p, & td p": {
+                    margin: 0,
+                  },
+                  "& th": {
+                    fontWeight: 600,
+                    bgcolor: "grey.100",
+                  },
+                  "& hr": {
+                    border: "none",
+                    borderTop: "1px solid",
+                    borderColor: "grey.300",
+                    mt: 3,
+                    mb: 3,
+                  },
                 }}
               >
-                <div 
+                <div
                   id="post-content"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
@@ -394,70 +439,13 @@ export default async function PostPage({ params }: { params: { id: UUID } }) {
                 }}
               >
                 {relatedPosts.map((post) => (
-                  <Card
+                  <BlogCard
                     key={post.id}
-                    sx={{
-                      height: "auto",
-                      borderRadius: 2,
-                      overflow: "hidden",
-                      transition: "all 0.3s ease-in-out",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <Link
-                      href={`/blogs/${post.id}`}
-                      style={{
-                        textDecoration: "none",
-                        display: "block",
-                        height: "100%",
-                      }}
-                    >
-                      <Box sx={{ position: "relative", height: 180 }}>
-                        <Image
-                          src={post.imageUrl}
-                          alt={post.title}
-                          fill
-                          sizes="(max-width: 600px) 100vw, 400px"
-                          style={{
-                            objectFit: "cover",
-                          }}
-                        />
-                      </Box>
-                      <CardContent>
-                        <Typography
-                          variant="h6"
-                          component="h3"
-                          sx={{
-                            fontWeight: 600,
-                            mb: 2,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            color: "text.primary",
-                            transition: "color 0.2s",
-                            "&:hover": { color: "primary.main" },
-                          }}
-                        >
-                          {post.title}
-                        </Typography>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <CalendarTodayIcon
-                            fontSize="small"
-                            sx={{ fontSize: "0.9rem", color: "text.secondary" }}
-                          />
-                          <Typography variant="caption" color="text.secondary">
-                            {postDate.format("DD/MM/YYYY")}
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </Link>
-                  </Card>
+                    id={post.id}
+                    title={post.title}
+                    imageUrl={post.imageUrl}
+                    createdDate={post.createdDate}
+                  />
                 ))}
               </Box>
             </Box>

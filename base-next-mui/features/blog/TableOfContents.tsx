@@ -27,25 +27,76 @@ export default function TableOfContents({ html }: { html: string }) {
 
     setHeadings(extractedHeadings);
 
+    // Ensure headings have IDs in the actual DOM
+    const ensureHeadingIds = () => {
+      extractedHeadings.forEach(heading => {
+        const element = document.getElementById(heading.id);
+        if (!element) {
+          const matching = Array.from(document.querySelectorAll('h2, h3, h4')).find(el => 
+            el.textContent?.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') === heading.id
+          );
+          if (matching && !matching.id) {
+            matching.id = heading.id;
+          }
+        }
+      });
+    };
+
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
-      
+      ensureHeadingIds(); // Ensure all headings have IDs before checking
+      const viewportHeight = window.innerHeight;
+      const scrollPosition = window.scrollY + 130;
+      let activeHeading = null;
+      let minDistance = Infinity;
+
       for (const heading of extractedHeadings) {
         const element = document.getElementById(heading.id);
         if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetHeight = element.offsetHeight;
-          
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveId(heading.id);
-            break;
+          const rect = element.getBoundingClientRect();
+          const elementTop = rect.top + window.scrollY;
+          const distance = Math.abs(elementTop - scrollPosition);
+
+          if (rect.top <= viewportHeight / 2 && rect.bottom >= 0) {
+            if (distance < minDistance) {
+              minDistance = distance;
+              activeHeading = heading.id;
+            }
           }
         }
       }
+
+      if (activeHeading && activeHeading !== activeId) {
+        setActiveId(activeHeading);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Throttled scroll handler
+    let ticking = false;
+    const scrollHandler = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    // Initial setup with timeout to ensure DOM is ready
+    const initialize = () => {
+      ensureHeadingIds();
+      handleScroll();
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      window.addEventListener('resize', scrollHandler);
+    };
+
+    const timer = setTimeout(initialize, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', scrollHandler);
+      window.removeEventListener('resize', scrollHandler);
+    };
   }, [html]);
 
   const scrollToHeading = (id: string) => {

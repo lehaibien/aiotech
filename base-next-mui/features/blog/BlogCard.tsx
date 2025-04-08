@@ -1,7 +1,7 @@
 "use client";
 
-import { PostPreviewResponse } from "@/types/post";
 import { formatDate } from "@/lib/utils";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import {
   Box,
   Card,
@@ -11,14 +11,22 @@ import {
   Typography,
   alpha,
 } from "@mui/material";
+import Image from "next/image";
 import Link from "next/link";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 type BlogCardProps = {
-  post: PostPreviewResponse;
+  id: string;
+  title: string;
+  imageUrl: string;
+  createdDate: Date;
 };
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({
+  id,
+  title,
+  imageUrl,
+  createdDate,
+}: BlogCardProps) {
   return (
     <Card
       sx={{
@@ -36,7 +44,7 @@ export default function BlogCard({ post }: BlogCardProps) {
     >
       <CardActionArea
         component={Link}
-        href={`/blogs/${post.id}`}
+        href={`/blogs/${id}`}
         sx={{
           flexGrow: 1,
           display: "flex",
@@ -44,15 +52,19 @@ export default function BlogCard({ post }: BlogCardProps) {
           alignItems: "stretch",
         }}
       >
-        <CardMedia
-          component="img"
-          height="200"
-          image={post.imageUrl || "/image-not-found.jpg"}
-          alt={post.title}
-          sx={{
-            objectFit: "cover",
-          }}
-        />
+        <CardMedia>
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={1200}
+            height={630}
+            style={{
+              aspectRatio: 1200 / 630,
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
+        </CardMedia>
         <CardContent
           sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
         >
@@ -72,7 +84,7 @@ export default function BlogCard({ post }: BlogCardProps) {
               height: "2.8em",
             }}
           >
-            {post.title}
+            {title}
           </Typography>
 
           <Box
@@ -86,7 +98,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           >
             <CalendarTodayIcon sx={{ fontSize: "1rem", mr: 0.5 }} />
             <Typography variant="body2" color="text.secondary">
-              {formatDate(post.createdDate)}
+              {formatDate(createdDate)}
             </Typography>
           </Box>
         </CardContent>
