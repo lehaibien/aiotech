@@ -12,8 +12,8 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
   const scatterData = data.map((customer) => ({
     x: customer.daysSinceLastPurchase,
     y: customer.totalSpent,
+    z: customer.customerName,
     id: customer.customerId,
-    label: customer.customerName,
   }));
 
   return (
@@ -42,7 +42,7 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
             {
               data: scatterData,
               label: "Khách hàng",
-              valueFormatter: (value) => value.x.toString(),
+              valueFormatter: (value) => `${value.z}: ${value.y} VNĐ | ${value.x} ngày trước`,
             },
           ]}
           width={800}
