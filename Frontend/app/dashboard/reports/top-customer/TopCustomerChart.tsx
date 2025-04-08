@@ -42,7 +42,7 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
             {
               data: scatterData,
               label: "Khách hàng",
-              valueFormatter: (value) => `${value.z}: ${value.y} VNĐ | ${value.x} ngày trước`,
+              valueFormatter: (value) => `(${value.z}, ${value.y} VNĐ - ${value.x} ngày trước)`,
             },
           ]}
           width={800}

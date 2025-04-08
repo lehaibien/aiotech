@@ -2,7 +2,7 @@
 
 import { ReportMonthFilter } from "@/features/dashboard/reports/ReportMonthFilter";
 import dayjs from "@/lib/extended-dayjs";
-import { Box, Button, MenuItem, Select } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +21,7 @@ export default function TopCustomerFilter({
   const router = useRouter();
   const [startDate, setStartDate] = useState<Dayjs | null>(defaultStartDate);
   const [endDate, setEndDate] = useState<Dayjs | null>(defaultEndDate);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [count, setCount] = useState<number>(defaultCount || 10);
   const onApplyFilter = () => {
     const start = dayjs(startDate).toJSON();
@@ -67,16 +68,6 @@ export default function TopCustomerFilter({
         onChange={setEndDate}
         onClose={handleEndDateClose}
       />
-      <Select
-        label="Số lượng"
-        value={count}
-        onChange={(e) => setCount(Number(e.target.value))}
-        size="small"
-      >
-        <MenuItem value={10}>10</MenuItem>
-        <MenuItem value={20}>20</MenuItem>
-        <MenuItem value={50}>50</MenuItem>
-      </Select>
       <Button onClick={onApplyFilter} variant="contained" color="info">
         Lọc
       </Button>
