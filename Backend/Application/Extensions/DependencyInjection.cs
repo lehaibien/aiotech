@@ -2,7 +2,6 @@ using System.Reflection;
 using Application.Helpers;
 using Application.Jwt.Options;
 using Application.Options;
-using Application.SeedData;
 using Application.Users;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
@@ -30,9 +29,6 @@ public static class DependencyInjection
         var mapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(assembly));
         var mapper = mapperConfig.CreateMapper();
         services.AddSingleton(mapper);
-        // SEED DATA, SHOULD BE REMOVED IN PRODUCTION
-        // WARN: This is for development only
-        services.AddScoped<SeedDataService>();
         return services;
     }
 }

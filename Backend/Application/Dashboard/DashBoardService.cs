@@ -18,83 +18,88 @@ namespace Application.Dashboard
             var currentMonthStart = new DateTime(now.Year, now.Month, 1);
             var previousMonthStart = currentMonthStart.AddMonths(-1);
             var previousMonthEnd = previousMonthStart.AddMonths(1).AddDays(-1);
-            // RevenueCard? revenue = await _unitOfWork
-            //     .GetRepository<Order>()
-            //     .GetAll(o => o.Status == OrderStatus.Completed)
-            //     .GroupBy(_ => 1)
-            //     .Select(g => new
-            //     {
-            //         CurrentRevenue = g.Where(o =>
-            //                 o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
-            //             )
-            //             .Sum(o => o.TotalPrice),
-            //         PreviousRevenue = g.Where(o =>
-            //                 o.DeliveryDate >= previousMonthStart
-            //                 && o.DeliveryDate <= previousMonthEnd
-            //             )
-            //             .Sum(o => o.TotalPrice),
-            //     })
-            //     .Select(r => new RevenueCard
-            //     {
-            //         Revenue = r.CurrentRevenue,
-            //         RevenueDiff =
-            //             r.PreviousRevenue == 0
-            //                 ? (r.CurrentRevenue == 0 ? 0 : 100)
-            //                 : (r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue * 100,
-            //     })
-            //     .OrderByDescending(r => r.Revenue)
-            //     .FirstOrDefaultAsync();
-            OrderCard? order = await _unitOfWork
+            RevenueCard? revenue = await _unitOfWork
                 .GetRepository<Order>()
-                .GetAll()
-                .Where(o => o.Status == OrderStatus.Completed)
+                .GetAll(o => o.Status == OrderStatus.Completed)
                 .GroupBy(_ => 1)
-                .Select(x => new
+                .Select(g => new
                 {
-                    CurrentCount = x.Count(o =>
-                        o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
-                    ),
-                    PreviousCount = x.Count(o =>
-                        o.DeliveryDate >= previousMonthStart && o.DeliveryDate <= previousMonthEnd
-                    ),
-                })
-                .Select(x => new OrderCard
-                {
-                    Order = x.CurrentCount,
-                    OrderDiff =
-                        x.PreviousCount == 0
-                            ? (x.CurrentCount == 0 ? 0 : 100) // Adjust as needed
-                            : (x.CurrentCount - x.PreviousCount) / x.PreviousCount * 100,
-                })
-                .OrderByDescending(r => r.Order)
-                .FirstOrDefaultAsync();
-            AverageOrderValueCard? averageOrderValue = await _unitOfWork
-                .GetRepository<Order>()
-                .GetAll()
-                .Where(o => o.Status == OrderStatus.Completed)
-                .GroupBy(_ => 1)
-                .Select(x => new
-                {
-                    CurrentAverage = x.Where(o =>
+                    CurrentRevenue = g.Where(o =>
                             o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
                         )
-                        .Average(o => o.TotalPrice),
-                    PreviousAverage = x.Where(o =>
+                        .Sum(o => Convert.ToDouble(o.TotalPrice)),
+                    PreviousRevenue = g.Where(o =>
                             o.DeliveryDate >= previousMonthStart
                             && o.DeliveryDate <= previousMonthEnd
                         )
-                        .Average(o => o.TotalPrice),
+                        .Sum(o => Convert.ToDouble(o.TotalPrice)),
                 })
-                .Select(x => new AverageOrderValueCard
+                .Select(r => new RevenueCard
                 {
-                    AverageOrderValue = x.CurrentAverage,
-                    AverageOrderValueDiff =
-                        x.PreviousAverage == 0
-                            ? (x.CurrentAverage == 0 ? 0 : 100)
-                            : (x.CurrentAverage - x.PreviousAverage) / x.PreviousAverage * 100,
+                    Revenue = r.CurrentRevenue,
+                    RevenueDiff =
+                        r.PreviousRevenue == 0
+                            ? (r.CurrentRevenue == 0 ? 0 : 100)
+                            : (r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue * 100,
                 })
-                .OrderByDescending(r => r.AverageOrderValue)
+                .OrderByDescending(r => r.Revenue)
                 .FirstOrDefaultAsync();
+            OrderCard? order =
+                await _unitOfWork
+                    .GetRepository<Order>()
+                    .GetAll()
+                    .Where(o => o.Status == OrderStatus.Completed)
+                    .GroupBy(_ => 1)
+                    .Select(x => new
+                    {
+                        CurrentCount = x.Count(o =>
+                            o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
+                        ),
+                        PreviousCount = x.Count(o =>
+                            o.DeliveryDate >= previousMonthStart
+                            && o.DeliveryDate <= previousMonthEnd
+                        ),
+                    })
+                    .Select(x => new OrderCard
+                    {
+                        Order = x.CurrentCount,
+                        OrderDiff =
+                            x.PreviousCount == 0
+                                ? (x.CurrentCount == 0 ? 0 : 100)
+                                : (x.CurrentCount - x.PreviousCount) * 100 / x.PreviousCount,
+                    })
+                    .OrderByDescending(r => r.Order)
+                    .FirstOrDefaultAsync() ?? new OrderCard { Order = 0, OrderDiff = 0 };
+
+            AverageOrderValueCard? averageOrderValue =
+                await _unitOfWork
+                    .GetRepository<Order>()
+                    .GetAll()
+                    .Where(o => o.Status == OrderStatus.Completed)
+                    .GroupBy(_ => 1)
+                    .Select(x => new
+                    {
+                        CurrentAverage = x.Where(o =>
+                                o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
+                            )
+                            .Average(o => Convert.ToDouble(o.TotalPrice)),
+                        PreviousAverage = x.Where(o =>
+                                o.DeliveryDate >= previousMonthStart
+                                && o.DeliveryDate <= previousMonthEnd
+                            )
+                            .Average(o => Convert.ToDouble(o.TotalPrice)),
+                    })
+                    .Select(x => new AverageOrderValueCard
+                    {
+                        AverageOrderValue = x.CurrentAverage,
+                        AverageOrderValueDiff =
+                            x.PreviousAverage == null || x.PreviousAverage == 0
+                                ? (x.CurrentAverage == null || x.CurrentAverage == 0 ? 0 : 100)
+                                : (x.CurrentAverage - x.PreviousAverage) * 100 / x.PreviousAverage,
+                    })
+                    .OrderByDescending(r => r.AverageOrderValue)
+                    .FirstOrDefaultAsync()
+                ?? new AverageOrderValueCard { AverageOrderValue = 0, AverageOrderValueDiff = 0 };
             NewUserCard? newUser = await _unitOfWork
                 .GetRepository<User>()
                 .GetAll()
@@ -121,10 +126,8 @@ namespace Application.Dashboard
                 .FirstOrDefaultAsync();
             DashboardCard result = new()
             {
-                // Revenue = revenue?.Revenue ?? 0,
-                // RevenueDiff = revenue?.RevenueDiff ?? 0,
-                Revenue = 0,
-                RevenueDiff = 0,
+                Revenue = revenue?.Revenue ?? 0,
+                RevenueDiff = revenue?.RevenueDiff ?? 0,
                 Order = order?.Order ?? 0,
                 OrderDiff = order?.OrderDiff ?? 0,
                 AverageOrderValue = averageOrderValue?.AverageOrderValue ?? 0,
@@ -164,8 +167,8 @@ namespace Application.Dashboard
         public async Task<Result<List<DashboardSale>>> GetDashboardSaleAsync()
         {
             DateTime now = DateTime.UtcNow;
-            DateTime firstMonthStart = new DateTime(now.Year, 1, 1);
-            DateTime lastMonthEnd = new DateTime(now.Year, 12, 31);
+            DateTime firstMonthStart = new(now.Year, 1, 1);
+            DateTime lastMonthEnd = new(now.Year, 12, 31);
             List<Order> orders = await _unitOfWork
                 .GetRepository<Order>()
                 .GetAll()
@@ -205,7 +208,7 @@ namespace Application.Dashboard
         }
 
         public async Task<Result<List<DashboardStockAlert>>> GetDashboardStockAlertAsync(
-            int stockThreshold = 10
+            int stockThreshold = 5
         )
         {
             List<DashboardStockAlert> result = await _unitOfWork
