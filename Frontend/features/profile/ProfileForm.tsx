@@ -89,6 +89,9 @@ export const ProfileForm = () => {
       setValue("givenName", data.givenName);
       setValue("phoneNumber", data.phoneNumber);
       setValue("address", data.address);
+      if(data.avatarUrl.startsWith("http://host.docker.internal:5554/")) {
+        data.avatarUrl = data.avatarUrl.replace("http://host.docker.internal:5554/", "http://localhost:5554/");
+      }
       setAvatarPreview(data.avatarUrl);
     }
   }, [data, setValue]);
