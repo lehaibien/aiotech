@@ -63,7 +63,7 @@ public class DashboardController : ControllerBase
     }
 
     [HttpGet("stock-alert")]
-    public async Task<IActionResult> GetDashboardStockAlertAsync(int stockThreshold = 10)
+    public async Task<IActionResult> GetDashboardStockAlertAsync(int stockThreshold = 5)
     {
         var response = new ApiResponse();
         var result = await _service.GetDashboardStockAlertAsync(stockThreshold);
