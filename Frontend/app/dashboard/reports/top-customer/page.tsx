@@ -49,7 +49,6 @@ export default async function TopCustomerReportPage({
   return (
     <Stack spacing={3}>
       <NavBreadcrumbs items={breadcrums} />
-      <NavBreadcrumbs items={breadcrums} />
       <Typography variant="h4" component="h1">
         Báo cáo khách hàng mua hàng nhiều nhất
       </Typography>
