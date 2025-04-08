@@ -98,12 +98,12 @@ export function AuthMenu() {
                 <Link href="/dashboard">Trang quản lý</Link>
               </MenuItem>
             )}
-            {(session.user.role.toLowerCase() === "shipper" ||
+            {/* {(session.user.role.toLowerCase() === "shipper" ||
               session.user.role.toLowerCase() === "admin") && (
               <MenuItem>
                 <Link href="/shipper">Quản lý giao hàng</Link>
               </MenuItem>
-            )}
+            )} */}
             <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
           </Menu>
         </>
