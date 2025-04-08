@@ -1,7 +1,7 @@
 name: aiotech_prod
 services:
   frontend:
-    build: ./base-next-mui
+    build: ./Frontend
     container_name: aiotech_web
     networks:
       - frontend
@@ -21,10 +21,10 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=2400"
   backend:
-    build: ./BaseProject/
+    build: ./Backend/
     container_name: aiotech_api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=true;MultipleActiveResultSets=true
       - RedisConnectionString=redis:6379
       - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=Production

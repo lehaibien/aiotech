@@ -17,7 +17,7 @@ services:
     build: ./Backend/
     container_name: aiotech_api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - RedisConnectionString=redis:6379
       - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
