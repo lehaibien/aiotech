@@ -1,7 +1,7 @@
 name: aiotech_dev
 services:
   frontend:
-    build: ./base-next-mui/
+    build: ./Frontend/
     container_name: aiotech_web
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:5554/
@@ -14,7 +14,7 @@ services:
       - reverse-proxy
 
   backend:
-    build: ./BaseProject/
+    build: ./Backend/
     container_name: aiotech_api
     environment:
       - ConnectionStrings__DefaultConnection=Server=database;Database=BaseProject;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
