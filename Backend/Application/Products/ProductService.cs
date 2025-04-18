@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using Application.Images;
 using Application.Products.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -15,7 +14,6 @@ using Shared;
 
 namespace Application.Products;
 
-[RegisterClassAsScoped]
 public class ProductService : IProductService
 {
     private readonly IUnitOfWork _unitOfWork;

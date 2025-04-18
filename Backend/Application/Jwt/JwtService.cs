@@ -3,14 +3,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Jwt.Options;
-using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Jwt;
 
-[RegisterClassAsSingleton]
 public class JwtService : IJwtService
 {
     private readonly JwtOption _options;

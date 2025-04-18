@@ -1,15 +1,16 @@
-import { API_URL } from "@/constant/apiUrl";
-import { EMPTY_UUID } from "@/constant/common";
-import { ProductUpsertForm } from "@/features/dashboard/products/upsert/ProductUpsertForm";
-import { getApi, getByIdApi } from "@/lib/apiClient";
-import { parseUUID } from "@/lib/utils";
+import { API_URL } from '@/constant/apiUrl';
+import { EMPTY_UUID } from '@/constant/common';
+import { ProductUpsertForm } from '@/features/dashboard/products/upsert/ProductUpsertForm';
+import { getApi, getByIdApi } from '@/lib/apiClient';
+import { parseUUID } from '@/lib/utils';
 import {
   ComboBoxItem,
   ProductRequest,
   ProductRequestDefault,
   ProductUpdateResponse,
-} from "@/types";
-import "server-only";
+} from '@/types';
+import { Stack, Typography } from '@mui/material';
+import 'server-only';
 
 export default async function ProductUpsertPage({
   searchParams,
@@ -20,7 +21,7 @@ export default async function ProductUpsertPage({
   let brandCombobox: ComboBoxItem[] = [];
   let categoryCombobox: ComboBoxItem[] = [];
   let images: string[] = [];
-  const parsedId = parseUUID(searchParams?.id ?? "");
+  const parsedId = parseUUID(searchParams?.id ?? '');
   if (parsedId !== EMPTY_UUID) {
     const response = await getByIdApi(API_URL.productRequest, { id: parsedId });
     if (response.success) {
@@ -36,7 +37,7 @@ export default async function ProductUpsertPage({
         categoryId: data.categoryId,
         tags: data.tags,
         isFeatured: data.isFeatured,
-        description: data.description ?? "",
+        description: data.description ?? '',
         images: [],
       };
       images = data.imageUrls;
@@ -49,11 +50,19 @@ export default async function ProductUpsertPage({
   brandCombobox = brandComboboxResponse.data as ComboBoxItem[];
   categoryCombobox = categoryComboboxResponse.data as ComboBoxItem[];
   return (
-    <ProductUpsertForm
-      defaultImages={images}
-      brands={brandCombobox}
-      categories={categoryCombobox}
-      product={product}
-    />
+    <Stack>
+      <Typography
+        component='h1'
+        variant='h4'>
+        {parsedId === null || parsedId === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật'}{' '}
+        sản phẩm
+      </Typography>
+      <ProductUpsertForm
+        defaultImages={images}
+        brands={brandCombobox}
+        categories={categoryCombobox}
+        product={product}
+      />
+    </Stack>
   );
 }

@@ -2,7 +2,6 @@ using System.Data;
 using System.Linq.Expressions;
 using Application.Images;
 using Application.Posts.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -12,7 +11,6 @@ using Shared;
 
 namespace Application.Posts;
 
-[RegisterClassAsScoped]
 public class PostService : IPostService
 {
     private const string FolderUpload = "posts";

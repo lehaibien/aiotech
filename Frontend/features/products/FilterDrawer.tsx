@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { formatNumberWithSeperator } from "@/lib/utils";
-import { ComboBoxItem } from "@/types";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import TuneIcon from "@mui/icons-material/Tune";
-import CloseIcon from "@mui/icons-material/Close";
-import FilterDropdown from "@/components/core/FilterDropDown";
+import FilterDropdown from '@/components/core/FilterDropDown';
+import { formatNumberWithSeperator } from '@/lib/utils';
+import { ComboBoxItem } from '@/types';
+import CloseIcon from '@mui/icons-material/Close';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import TuneIcon from '@mui/icons-material/Tune';
 import {
   Box,
   Button,
@@ -13,13 +13,13 @@ import {
   IconButton,
   Paper,
   Slider,
+  Stack,
   TextField,
   Typography,
-  alpha,
   useTheme,
-} from "@mui/material";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+} from '@mui/material';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 interface FilterDrawerProps {
   brands: ComboBoxItem[];
@@ -92,25 +92,25 @@ export default function FilterDrawer({
     setCategory([]);
     setBrand([]);
     setPriceRange([0, defaultMaxPrice]);
-    router.push("/products");
+    router.push('/products');
   };
 
   const handleSubmit = () => {
     const params = new URLSearchParams(searchParams);
-    params.delete("category");
-    params.delete("brand");
-    params.delete("minPrice");
-    params.delete("maxPrice");
-    params.delete("page");
+    params.delete('category');
+    params.delete('brand');
+    params.delete('minPrice');
+    params.delete('maxPrice');
+    params.delete('page');
     if (category.length > 0) {
-      params.set("category", flatCategory.join(","));
+      params.set('category', flatCategory.join(','));
     }
     if (brand.length > 0) {
-      params.set("brand", flatBrand.join(","));
+      params.set('brand', flatBrand.join(','));
     }
     if (priceRange[0] > 0 || priceRange[1] < defaultMaxPrice) {
-      params.set("minPrice", priceRange[0].toString());
-      params.set("maxPrice", priceRange[1].toString());
+      params.set('minPrice', priceRange[0].toString());
+      params.set('maxPrice', priceRange[1].toString());
     }
 
     router.push(`?${params.toString()}`);
@@ -121,142 +121,92 @@ export default function FilterDrawer({
     <div>
       <Button
         onClick={toggleDrawer(true)}
-        variant="outlined"
-        startIcon={<TuneIcon />}
-        sx={{
-          mb: 2,
-          borderRadius: 2,
-          px: 2,
-          py: 1,
-          fontWeight: 500,
-          transition: "all 0.2s ease",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: theme.shadows[2],
-            backgroundColor: alpha(theme.palette.primary.main, 0.08),
-          },
-        }}
-      >
+        variant='outlined'
+        startIcon={<TuneIcon />}>
         Lọc sản phẩm
       </Button>
 
       <Drawer
-        anchor="bottom"
+        anchor='bottom'
         open={open}
-        onClose={toggleDrawer(false)}
-        PaperProps={{
-          sx: {
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            maxHeight: "80vh",
-          },
-        }}
-      >
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            maxWidth: 800,
-            mx: "auto",
-            width: "100%",
-          }}
-        >
+        onClose={toggleDrawer(false)}>
+        <Stack
+          gap={2}
+          padding={2}>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <FilterListIcon color="primary" />
-              <Typography variant="h6" fontWeight={600}>
-                Bộ lọc sản phẩm
-              </Typography>
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <FilterListIcon />
+              <Typography variant='h6'>Bộ lọc sản phẩm</Typography>
             </Box>
-            <IconButton onClick={toggleDrawer(false)} size="small">
+            <IconButton
+              onClick={toggleDrawer(false)}
+              size='small'>
               <CloseIcon />
             </IconButton>
           </Box>
 
           <Box
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
               gap: 2,
-            }}
-          >
+            }}>
             <FilterDropdown
-              title="Danh mục"
+              title='Danh mục'
               items={categories}
-              size="medium"
-              width="100%"
+              size='small'
+              width='100%'
               initialValue={categoryValues}
               onValueChange={handleCategoryChange}
             />
 
             <FilterDropdown
-              title="Thương hiệu"
+              title='Thương hiệu'
               items={brands}
-              size="medium"
-              width="100%"
+              size='small'
+              width='100%'
               initialValue={brandValues}
               onValueChange={handleBrandChange}
             />
           </Box>
 
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              borderRadius: 2,
-              bgcolor: alpha(theme.palette.primary.main, 0.04),
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-              Khoảng giá
-            </Typography>
+          <Paper>
+            <Typography gutterBottom>Khoảng giá</Typography>
 
-            <Box sx={{ px: 2, pt: 1, pb: 2 }}>
+            <Box>
               <Slider
                 value={priceRange}
                 onChange={(_, newValue) => setPriceRange(newValue as number[])}
-                valueLabelDisplay="auto"
+                valueLabelDisplay='auto'
                 min={0}
                 max={defaultMaxPrice}
                 valueLabelFormat={(value) =>
                   `${formatNumberWithSeperator(value)} đ`
                 }
                 sx={{
-                  "& .MuiSlider-thumb": {
-                    height: 20,
-                    width: 20,
-                    "&:hover, &.Mui-focusVisible": {
-                      boxShadow: `0px 0px 0px 8px ${alpha(
-                        theme.palette.primary.main,
-                        0.16
-                      )}`,
-                    },
+                  mx: 1,
+                  '& .MuiSlider-thumb': {
+                    height: 16,
+                    width: 16,
                   },
-                  mb: 3,
                 }}
               />
 
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   gap: 2,
-                }}
-              >
+                }}>
                 <TextField
-                  label="Giá tối thiểu"
-                  type="number"
+                  label='Giá tối thiểu'
+                  type='number'
                   value={priceRange[0]}
                   onChange={(e) =>
                     setPriceRange([Number(e.target.value), priceRange[1]])
@@ -265,19 +215,18 @@ export default function FilterDrawer({
                     inputProps: { min: 0, max: priceRange[1] },
                   }}
                   sx={{
-                    width: "100%",
+                    width: '100%',
                   }}
-                  size="small"
+                  size='small'
                 />
                 <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.text.secondary }}
-                >
+                  variant='body2'
+                  sx={{ color: theme.palette.text.secondary }}>
                   đến
                 </Typography>
                 <TextField
-                  label="Giá tối đa"
-                  type="number"
+                  label='Giá tối đa'
+                  type='number'
                   value={priceRange[1]}
                   onChange={(e) =>
                     setPriceRange([priceRange[0], Number(e.target.value)])
@@ -286,25 +235,25 @@ export default function FilterDrawer({
                     inputProps: { min: priceRange[0], max: defaultMaxPrice },
                   }}
                   sx={{
-                    width: "100%",
+                    width: '100%',
                   }}
-                  size="small"
+                  size='small'
                 />
               </Box>
 
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
-              >
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}>
                 <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.text.secondary }}
-                >
+                  variant='body2'
+                  sx={{ color: theme.palette.text.secondary }}>
                   {formatNumberWithSeperator(priceRange[0])} đ
                 </Typography>
                 <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.text.secondary }}
-                >
+                  variant='body2'
+                  sx={{ color: theme.palette.text.secondary }}>
                   {formatNumberWithSeperator(priceRange[1])} đ
                 </Typography>
               </Box>
@@ -313,52 +262,26 @@ export default function FilterDrawer({
 
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              pt: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
               gap: 2,
-            }}
-          >
+            }}>
             <Button
-              variant="outlined"
-              onClick={handleReset}
-              sx={{
-                borderRadius: 2,
-                px: 3,
-                py: 1,
-                fontWeight: 500,
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.error.main, 0.04),
-                  borderColor: theme.palette.error.main,
-                  color: theme.palette.error.main,
-                },
-                flex: 1,
-              }}
-            >
+              fullWidth
+              variant='contained'
+              color='info'
+              onClick={handleReset}>
               Đặt lại
             </Button>
             <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-              sx={{
-                borderRadius: 2,
-                px: 3,
-                py: 1,
-                fontWeight: 600,
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: theme.shadows[4],
-                },
-                flex: 2,
-              }}
-            >
+              fullWidth
+              variant='contained'
+              color='primary'
+              onClick={handleSubmit}>
               Áp dụng bộ lọc
             </Button>
           </Box>
-        </Paper>
+        </Stack>
       </Drawer>
     </div>
   );

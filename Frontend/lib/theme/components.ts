@@ -1,61 +1,99 @@
-import { Components, CssVarsTheme, Theme } from "@mui/material";
-import { error, grey } from "./colors";
+// theme/components.ts
+import { Components } from '@mui/material/styles/components';
+import { error, primary } from './colors';
 
-const components: Components<
-  Omit<Theme, "components" | "palette"> & CssVarsTheme
-> = {
-  MuiPagination: {
+const components: Components = {
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: 4,
+        transition: 'all 0.3s ease-in-out',
+        boxShadow: 'none',
+        '&:hover': {
+          transform: 'none',
+          boxShadow: 'none',
+        },
+      },
+      outlined: {
+        borderWidth: 2,
+        '&:hover': {
+          borderWidth: 2,
+        },
+      },
+    },
     defaultProps: {
-      variant: "outlined",
-      color: "primary",
+      color: 'inherit',
+      'aria-label': 'Button',
+    },
+  },
+  MuiCard: {
+    styleOverrides: {
+      root: {
+        borderRadius: 4,
+        boxShadow: 'none',
+        '&:hover': {
+          boxShadow: 'none',
+        },
+      },
+    },
+  },
+  MuiPaper: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+        boxShadow: 'none',
+      },
     },
   },
   MuiTextField: {
-    defaultProps: {
-      size: "small",
-      variant: "outlined",
-    },
     styleOverrides: {
-      root: ({ ownerState, theme }) => ({
-        ...(ownerState.color === "info" && {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "8px",
-            fontWeight: 600,
+      root: {
+        '& .MuiOutlinedInput-root': {
+          borderRadius: 8,
+          '&:hover fieldset': {
+            borderColor: primary.main,
           },
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: grey[300],
+          '&.Mui-focused fieldset': {
+            borderColor: primary.main,
           },
-        }),
-        ...(ownerState.disabled === true && {
-          "& .MuiOutlinedInput-root": {
-            backgroundColor: theme.palette.background.paper,
-          },
-        }),
-      }),
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+          color: primary.main,
+        },
+      },
     },
   },
   MuiFormLabel: {
     styleOverrides: {
       asterisk: {
-        color: error[500],
+        color: error.main,
       },
     },
   },
-  MuiButton: {
+  MuiDialog: {
     styleOverrides: {
-      root: () => ({
-        minWidth: 0,
-        minHeight: 0,
-        fontWeight: 600,
-        textTransform: "none",
-      }),
-      sizeLarge: {
-        padding: ".6rem 2.5rem",
+      paper: {
+        borderRadius: 12,
       },
     },
-    defaultProps: {
-      color: "inherit",
-      "aria-label": "Button",
+  },
+  MuiChip: {
+    styleOverrides: {
+      root: {
+        borderRadius: 16,
+        fontWeight: 500,
+      },
+    },
+  },
+  MuiTab: {
+    styleOverrides: {
+      root: {
+        textTransform: 'none',
+        fontWeight: 600,
+        '&.Mui-selected': {
+          color: primary.main,
+        },
+      },
     },
   },
 };

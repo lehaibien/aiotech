@@ -113,6 +113,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <TextField
             autoFocus
             required
+            size="small"
             id="userName"
             {...register("userName")}
             error={errors.userName ? true : false}
@@ -126,6 +127,9 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <TextField
             required
             id="email"
+            size="small"
+            type="email"
+            autoComplete="email"
             {...register("email")}
             error={errors.email ? true : false}
             helperText={errors.email ? errors.email.message : undefined}
@@ -145,6 +149,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <TextField
             required
             id="familyName"
+            size="small"
             {...register("familyName")}
             error={errors.familyName ? true : false}
             helperText={
@@ -159,6 +164,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <TextField
             required
             id="givenName"
+            size="small"
             {...register("givenName")}
             error={errors.givenName ? true : false}
             helperText={errors.givenName ? errors.givenName.message : undefined}
@@ -176,6 +182,9 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <FormLabel htmlFor="phoneNumber">Số điện thoại</FormLabel>
           <TextField
             id="phoneNumber"
+            size="small"
+            type="tel"
+            autoComplete="tel"
             {...register("phoneNumber")}
             error={errors.phoneNumber ? true : false}
             helperText={
@@ -187,16 +196,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
           <FormLabel htmlFor="roleId" required>
             Vai trò
           </FormLabel>
-          <ControlledComboBox control={control} items={roleCombobox} name="roleId" />
-          {/* <TextField
-                  required
-                  id='roleId'
-                  {...register('roleId')}
-                  error={errors.roleId ? true : false}
-                  helperText={
-                    errors.roleId ? errors.roleId.message : undefined
-                  }
-                /> */}
+          <ControlledComboBox control={control} items={roleCombobox} name="roleId" size="small"/>
         </FormControl>
       </Box>
       <FormControl margin="normal" fullWidth>
@@ -204,6 +204,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
         <TextField
           id="password"
           {...register("password")}
+          size="small"
           error={errors.password ? true : false}
           type="password"
           helperText={errors.password ? errors.password.message : undefined}

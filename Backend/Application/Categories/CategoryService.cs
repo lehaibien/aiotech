@@ -2,12 +2,10 @@
 using System.Linq.Expressions;
 using Application.Categories.Dtos;
 using Application.Images;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
@@ -15,7 +13,6 @@ using Shared;
 
 namespace Application.Categories;
 
-[RegisterClassAsScoped]
 public class CategoryService : ICategoryService
 {
     private const string FolderUpload = "categories";

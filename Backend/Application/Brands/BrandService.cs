@@ -2,8 +2,6 @@
 using System.Linq.Expressions;
 using Application.Brands.Dtos;
 using Application.Images;
-using AutoDependencyRegistration.Attributes;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
@@ -12,24 +10,20 @@ using Shared;
 
 namespace Application.Brands;
 
-[RegisterClassAsScoped]
 public class BrandService : IBrandService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
     private const string FolderUpload = "brands";
 
     public BrandService(
         IUnitOfWork unitOfWork,
-        IMapper mapper,
         IHttpContextAccessor contextAccessor,
         IImageService imageService
     )
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _contextAccessor = contextAccessor;
         _imageService = imageService;
     }
@@ -40,14 +34,14 @@ public class BrandService : IBrandService
     )
     {
         var brandQuery = _unitOfWork.GetRepository<Brand>().GetAll();
-        if (!string.IsNullOrEmpty(request.TextSearch))
+        if(!string.IsNullOrEmpty(request.TextSearch))
         {
             brandQuery = brandQuery.Where(x =>
                 x.Name.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
         var sortCol = GetSortExpression(request.SortColumn);
-        if (sortCol is null)
+        if(sortCol is null)
         {
             brandQuery = brandQuery
                 .OrderByDescending(x => x.UpdatedDate)
@@ -55,7 +49,7 @@ public class BrandService : IBrandService
         }
         else
         {
-            if (request.SortOrder?.ToLower() == "desc")
+            if(request.SortOrder?.ToLower() == "desc")
             {
                 brandQuery = brandQuery.OrderByDescending(sortCol);
             }
@@ -68,16 +62,7 @@ public class BrandService : IBrandService
         var result = await brandQuery
             .Skip(request.PageIndex * request.PageSize)
             .Take(request.PageSize)
-            .Select(x => new BrandResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                ImageUrl = x.ImageUrl,
-                CreatedDate = x.CreatedDate,
-                CreatedBy = x.CreatedBy,
-                UpdatedDate = x.UpdatedDate,
-                UpdatedBy = x.UpdatedBy,
-            })
+            .ProjectToBrandResponse()
             .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
@@ -92,12 +77,12 @@ public class BrandService : IBrandService
     public async Task<Result<BrandResponse>> GetById(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
         }
 
-        var response = _mapper.Map<BrandResponse>(entity);
+        var response = entity.MapToBrandResponse();
         return Result<BrandResponse>.Success(response);
     }
 
@@ -106,11 +91,12 @@ public class BrandService : IBrandService
         var isExists = await _unitOfWork
             .GetRepository<Brand>()
             .FindAsync(x => x.Name == request.Name);
-        if (isExists != null)
+        if(isExists != null)
         {
             return Result<BrandResponse>.Failure("Thương hiệu đã tồn tại");
         }
-        var entity = _mapper.Map<Brand>(request);
+        // var entity = _mapper.Map<Brand>(request);
+        var entity = request.MapToBrand();
         entity.Id = Guid.NewGuid();
         entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
@@ -119,14 +105,14 @@ public class BrandService : IBrandService
             ImageType.Category,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
-        if (uploadResult.IsFailure)
+        if(uploadResult.IsFailure)
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
         entity.ImageUrl = uploadResult.Data;
         _unitOfWork.GetRepository<Brand>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<BrandResponse>(entity);
+        var response = entity.MapToBrandResponse();
         return Result<BrandResponse>.Success(response);
     }
 
@@ -135,22 +121,22 @@ public class BrandService : IBrandService
         var isExists = await _unitOfWork
             .GetRepository<Brand>()
             .AnyAsync(x => x.Name == request.Name && x.Id != request.Id);
-        if (isExists)
+        if(isExists)
         {
             return Result<BrandResponse>.Failure("Thương hiệu đã tồn tại");
         }
         var entity = await _unitOfWork.GetRepository<Brand>().FindAsync(x => x.Id == request.Id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
         }
-        _mapper.Map(request, entity);
+        entity = request.ApplyToBrand(entity);
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        if (entity.ImageUrl is not null)
+        if(entity.ImageUrl is not null)
         {
             var deleteResult = _imageService.DeleteByUrl(entity.ImageUrl);
-            if (deleteResult.IsFailure)
+            if(deleteResult.IsFailure)
             {
                 return Result<BrandResponse>.Failure(deleteResult.Message);
             }
@@ -161,21 +147,21 @@ public class BrandService : IBrandService
             ImageType.Category,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
-        if (uploadResult.IsFailure)
+        if(uploadResult.IsFailure)
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
         entity.ImageUrl = uploadResult.Data;
         _unitOfWork.GetRepository<Brand>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<BrandResponse>(entity);
+        var response = entity.MapToBrandResponse();
         return Result<BrandResponse>.Success(response);
     }
 
     public async Task<Result<string>> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result<string>.Failure("Thương hiệu không tồn tại");
         }
@@ -189,10 +175,10 @@ public class BrandService : IBrandService
 
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
-        foreach (var id in ids)
+        foreach(var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
-            if (entity is null)
+            if(entity is null)
             {
                 return Result<string>.Failure("Thương hiệu không tồn tại");
             }

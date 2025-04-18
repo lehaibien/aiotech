@@ -1,0 +1,93 @@
+name: aiotech_dev
+services:
+  backend:
+    build: .
+    container_name: aiotech_api
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ConnectionStrings__Redis=redis:6379
+      - ConnectionStrings__ElasticSearch=http://elastic_search:9200
+      - ELASTICSEARCH_PASSWORD=123456
+      - SEQ_URL=http://seq:80
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - ASPNETCORE_URLS=http://+:5554
+      - BE_StaticUrl=http://localhost:5554/static
+    depends_on:
+      database:
+        condition: service_started
+      redis:
+        condition: service_started
+      seq:
+        condition: service_started
+    ports:
+      - "5554:5554"
+    networks:
+      - backend
+    volumes:
+      - wwwroot:/app/wwwroot
+
+  seq:
+    image: datalust/seq:latest
+    container_name: aiotech_seq
+    ports:
+      - "5341:80"  # Seq UI on http://localhost:5341
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - backend
+  redis:
+    image: redis:latest
+    container_name: aiotech_redis
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_DATABASES: 16
+      REDIS_MAXMEMORY: 1gb
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: aiotech_db
+    ports:
+      - "1433:1433"
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=S3cr3tP@ssw0rd
+      - MSSQL_MEMORY_LIMIT_MB=1024
+      - MSSQL_TEMPDB_MEMORY_OPTIMIZED=ON
+      - ACCEPT_EULA="Y"
+    networks:
+      - backend
+    volumes:
+      - database-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "S3cr3tP@ssw0rd" -Q "SELECT 1" -b -o /dev/null
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+  elastic_search:
+    image: "docker.elastic.co/elasticsearch/elasticsearch-wolfi:9.0.0"
+    container_name: aiotech_elastic_search
+    ports:
+      - 9200:9200
+    environment:
+      - ELASTIC_PASSWORD=123456
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+
+volumes:
+  database-data:
+  wwwroot:
+  redis_data:
+  elastic_data:
+
+networks:
+  backend:
+    driver: bridge

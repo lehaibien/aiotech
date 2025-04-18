@@ -1,5 +1,4 @@
 ﻿using Application.Carts.Dtos;
-using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,6 @@ using Shared;
 
 namespace Application.Carts;
 
-[RegisterClassAsScoped]
 public class CartService : ICartService
 {
     private readonly IUnitOfWork _unitOfWork;

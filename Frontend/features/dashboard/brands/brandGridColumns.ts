@@ -7,7 +7,7 @@ export const brandGridColumns: GridColDef<BrandResponse>[] = [
   {
     field: 'imageUrl',
     headerName: 'Logo',
-    width: 250,
+    width: 200,
     align: 'center',
     renderCell: BrandImageRenderer,
     sortable: false,

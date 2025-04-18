@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { formatDate } from "@/lib/utils";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { formatDate } from '@/lib/utils';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {
   Box,
   Card,
@@ -9,10 +9,9 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  alpha,
-} from "@mui/material";
-import Image from "next/image";
-import Link from "next/link";
+} from '@mui/material';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type BlogCardProps = {
   id: string;
@@ -28,30 +27,11 @@ export default function BlogCard({
   createdDate,
 }: BlogCardProps) {
   return (
-    <Card
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        transition: "transform 0.3s, box-shadow 0.3s",
-        "&:hover": {
-          transform: "translateY(-5px)",
-          boxShadow: (theme) =>
-            `0 10px 20px ${alpha(theme.palette.primary.main, 0.15)}`,
-        },
-      }}
-      elevation={2}
-    >
+    <Card>
       <CardActionArea
         component={Link}
         href={`/blogs/${id}`}
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "stretch",
-        }}
-      >
+        sx={{}}>
         <CardMedia>
           <Image
             src={imageUrl}
@@ -60,44 +40,42 @@ export default function BlogCard({
             height={630}
             style={{
               aspectRatio: 1200 / 630,
-              objectFit: "cover",
-              objectPosition: "center",
+              objectFit: 'cover',
             }}
           />
         </CardMedia>
         <CardContent
-          sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
-        >
+          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Typography
             gutterBottom
-            variant="h6"
-            component="h2"
+            variant='h6'
+            component='h2'
             sx={{
               fontWeight: 600,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
               WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
+              WebkitBoxOrient: 'vertical',
               mb: 1,
               lineHeight: 1.4,
-              height: "2.8em",
-            }}
-          >
+              height: '2.8em',
+            }}>
             {title}
           </Typography>
 
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              mt: "auto",
-              color: "text.secondary",
-              fontSize: "0.875rem",
-            }}
-          >
-            <CalendarTodayIcon sx={{ fontSize: "1rem", mr: 0.5 }} />
-            <Typography variant="body2" color="text.secondary">
+              display: 'flex',
+              alignItems: 'center',
+              mt: 'auto',
+              color: 'text.secondary',
+              fontSize: '0.875rem',
+            }}>
+            <CalendarTodayIcon sx={{ fontSize: '1rem', mr: 0.5 }} />
+            <Typography
+              variant='body2'
+              color='text.secondary'>
               {formatDate(createdDate)}
             </Typography>
           </Box>

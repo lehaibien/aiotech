@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
 using Application.Reviews.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -11,7 +10,6 @@ using Shared;
 
 namespace Application.Reviews;
 
-[RegisterClassAsScoped]
 public class ReviewService : IReviewService
 {
     private readonly IUnitOfWork _unitOfWork;

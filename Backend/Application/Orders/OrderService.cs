@@ -6,7 +6,6 @@ using Application.Mail;
 using Application.Notification;
 using Application.Options;
 using Application.Orders.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -19,7 +18,6 @@ using Shared;
 
 namespace Application.Orders;
 
-[RegisterClassAsScoped]
 public class OrderService : IOrderService
 {
     private readonly IHttpContextAccessor _contextAccessor;
@@ -59,15 +57,15 @@ public class OrderService : IOrderService
     )
     {
         var orderQuery = _unitOfWork.GetRepository<Order>().GetAll();
-        if (request.Statuses.Count > 0)
+        if(request.Statuses.Count > 0)
         {
             orderQuery = orderQuery.Where(x => request.Statuses.Contains(x.Status));
         }
-        if (request.CustomerId.HasValue && request.CustomerId != Guid.Empty)
+        if(request.CustomerId.HasValue && request.CustomerId != Guid.Empty)
         {
             orderQuery = orderQuery.Where(x => x.CustomerId == request.CustomerId);
         }
-        if (!string.IsNullOrEmpty(request.TextSearch))
+        if(!string.IsNullOrEmpty(request.TextSearch))
         {
             orderQuery = orderQuery.Where(x =>
                 x.Name.ToLower().Contains(request.TextSearch.ToLower())
@@ -75,7 +73,7 @@ public class OrderService : IOrderService
                 || x.TrackingNumber.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+        if(request.SortOrder?.ToLower() == "desc")
         {
             orderQuery = orderQuery.OrderByDescending(GetSortExpression(request.SortColumn));
         }
@@ -141,13 +139,13 @@ public class OrderService : IOrderService
                     {
                         ProductId = y.ProductId,
                         ProductName = y.Product.Name,
-                        Price = (double)y.Product.Price,
+                        Price = (double) y.Product.Price,
                         Quantity = y.Quantity,
                     })
                     .ToList(),
             })
             .FirstOrDefaultAsync(x => x.Id == id);
-        if (entity is null)
+        if(entity is null)
             return Result<OrderResponse>.Failure("Đơn hàng không tồn tại");
 
         return Result<OrderResponse>.Success(entity);
@@ -213,12 +211,12 @@ public class OrderService : IOrderService
             .GetRepository<Product>()
             .GetAll(x => productIds.Contains(x.Id))
             .ToList();
-        foreach (var product in products)
+        foreach(var product in products)
         {
             var productId = product.Id;
             var quantity =
                 request.OrderItems.FirstOrDefault(x => x.ProductId == productId)?.Quantity ?? 0;
-            if (product.Stock < quantity)
+            if(product.Stock < quantity)
             {
                 return Result<string>.Failure("Sản phẩm đã hết hàng");
             }
@@ -228,7 +226,7 @@ public class OrderService : IOrderService
         entity.Id = request.Id == Guid.Empty ? Guid.NewGuid() : request.Id;
         entity.TrackingNumber = GenerateTrackingNumber();
         entity.Status = OrderStatus.Pending;
-        foreach (var item in entity.OrderItems)
+        foreach(var item in entity.OrderItems)
         {
             item.Id = Guid.NewGuid();
             item.OrderId = entity.Id;
@@ -279,7 +277,7 @@ public class OrderService : IOrderService
         entity.TrackingNumber = GenerateTrackingNumber();
         entity.Status = OrderStatus.Pending;
         var items = _mapper.Map<List<OrderItem>>(request.OrderItems);
-        foreach (var item in items)
+        foreach(var item in items)
         {
             item.Id = Guid.NewGuid();
             item.OrderId = entity.Id;
@@ -298,10 +296,10 @@ public class OrderService : IOrderService
     public async Task<Result<OrderResponse>> Update(OrderRequest request)
     {
         var isExists = await _unitOfWork.GetRepository<Order>().AnyAsync(x => x.Id != request.Id);
-        if (isExists)
+        if(isExists)
             return Result<OrderResponse>.Failure("Đơn hàng đã tồn tại");
         var entity = await _unitOfWork.GetRepository<Order>().FindAsync(x => x.Id == request.Id);
-        if (entity is null)
+        if(entity is null)
             return Result<OrderResponse>.Failure("Đơn hàng không tồn tại");
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.UtcNow;
@@ -315,7 +313,7 @@ public class OrderService : IOrderService
     public async Task<Result<string>> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-        if (entity is null)
+        if(entity is null)
             return Result<string>.Failure("Đơn hàng không tồn tại");
         entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
@@ -327,10 +325,10 @@ public class OrderService : IOrderService
 
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
-        foreach (var id in ids)
+        foreach(var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-            if (entity is null)
+            if(entity is null)
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
@@ -347,28 +345,28 @@ public class OrderService : IOrderService
         var role = _contextAccessor
             .HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)
             ?.Value;
-        if (role == "Shipper" && request.Status != OrderStatus.Delivered)
+        if(role == "Shipper" && request.Status != OrderStatus.Delivered)
         {
             return Result.Failure("Bạn không có quyền thực hiện hành động này");
         }
-        if (role != "Admin" && role != "Shipper")
+        if(role is not "Admin" and not "Shipper")
         {
             return Result.Failure("Bạn không có quyền thực hiện hành động này");
         }
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
-        if (entity.Status == OrderStatus.Cancelled)
+        if(entity.Status == OrderStatus.Cancelled)
         {
             return Result.Failure("Đơn hàng đã bị hủy");
         }
-        if (request.Status == OrderStatus.Delivered)
+        if(request.Status == OrderStatus.Delivered)
         {
             entity.DeliveryDate = DateTime.UtcNow;
         }
-        if (
+        if(
             entity.Status == OrderStatus.Delivered
             && request.Status != OrderStatus.Delivered
             && entity.Status != OrderStatus.Completed
@@ -391,10 +389,10 @@ public class OrderService : IOrderService
 
     public async Task<Result<string>> ChangeStatusList(List<Guid> ids, OrderStatus status)
     {
-        foreach (var id in ids)
+        foreach(var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-            if (entity is null)
+            if(entity is null)
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             entity.Status = status;
             entity.UpdatedDate = DateTime.UtcNow;
@@ -414,7 +412,7 @@ public class OrderService : IOrderService
             .Include(o => o.OrderItems)
             .ThenInclude(i => i.Product)
             .FirstOrDefaultAsync(o => o.Id == id);
-        if (entity is null)
+        if(entity is null)
             return Result<byte[]>.Failure("Đơn hàng không tồn tại");
         var document = new OrderReceiptDocument(entity);
         var pdfBytes = Document.Create(document.Compose).GeneratePdf();
@@ -428,20 +426,20 @@ public class OrderService : IOrderService
         var paymentResponse = new PaymentResponse();
         try
         {
-            if (!string.IsNullOrWhiteSpace(bankCode))
+            if(!string.IsNullOrWhiteSpace(bankCode))
             {
                 var pay = new VnPayLibrary();
                 paymentResponse = pay.GetFullResponseData(queryCollection, _option.HashSecret);
             }
-            else if (!string.IsNullOrEmpty(partnerCode))
+            else if(!string.IsNullOrEmpty(partnerCode))
             {
                 paymentResponse = await _momoLibrary.PaymentExecuteAsync(queryCollection);
             }
             var orderId = Guid.Parse(paymentResponse.OrderId);
-            if (!paymentResponse.Success)
+            if(!paymentResponse.Success)
             {
                 var deleteOrder = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderId);
-                if (deleteOrder is not null)
+                if(deleteOrder is not null)
                 {
                     _unitOfWork.GetRepository<Order>().Delete(deleteOrder);
                     await _unitOfWork.SaveChangesAsync();
@@ -465,7 +463,7 @@ public class OrderService : IOrderService
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.Product)
                 .FirstOrDefaultAsync(x => x.Id == orderId);
-            if (order is not null)
+            if(order is not null)
             {
                 order.Status = OrderStatus.Paid;
                 var cartItems = await _unitOfWork
@@ -477,7 +475,7 @@ public class OrderService : IOrderService
                     .GetRepository<Product>()
                     .GetAll(x => cartItems.Select(x => x.ProductId).Contains(x.Id))
                     .ToListAsync();
-                foreach (var product in products)
+                foreach(var product in products)
                 {
                     var item = cartItems.FirstOrDefault(x => x.ProductId == product.Id)!;
                     product.Stock -= item.Quantity;
@@ -530,19 +528,19 @@ public class OrderService : IOrderService
     public async Task<Result> Cancel(OrderCancelRequest request)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
-        if (order is null)
+        if(order is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
-        if (
-            order.Status != OrderStatus.Pending
-            && order.Status != OrderStatus.Paid
-            && order.Status != OrderStatus.Processing
+        if(
+            order.Status is not OrderStatus.Pending
+            and not OrderStatus.Paid
+            and not OrderStatus.Processing
         )
         {
             return Result.Failure("Không thể hủy đơn hàng");
         }
-        if (order.Status == OrderStatus.Cancelled)
+        if(order.Status == OrderStatus.Cancelled)
         {
             return Result.Failure("Đơn hàng đã được hủy");
         }
@@ -561,11 +559,11 @@ public class OrderService : IOrderService
     public async Task<Result> Confirm(Guid id)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-        if (order is null)
+        if(order is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
-        if (order.Status != OrderStatus.Delivered)
+        if(order.Status != OrderStatus.Delivered)
         {
             return Result.Failure("Không thể xác nhận đơn hàng");
         }
@@ -583,9 +581,9 @@ public class OrderService : IOrderService
     private string GenerateTrackingNumber()
     {
         var random = new Random();
-        const string prefix = "ORD";
-        string dateTimePart = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        int randomNumber = random.Next(100, 1000);
+        const string prefix = "AIO";
+        var dateTimePart = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        var randomNumber = random.Next(100, 1000);
         return $"{prefix}{dateTimePart}{randomNumber}";
     }
 

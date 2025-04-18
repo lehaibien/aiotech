@@ -1,6 +1,6 @@
-import { ComboBoxItem } from "@/types";
-import { Autocomplete, TextField } from "@mui/material";
-import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
+import { ComboBoxItem } from '@/types';
+import { Autocomplete, TextField } from '@mui/material';
+import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 
 interface ControlledComboBoxProps<T extends FieldValues> {
   items: ComboBoxItem[];
@@ -9,7 +9,7 @@ interface ControlledComboBoxProps<T extends FieldValues> {
   name: FieldPath<T>;
   clearable?: boolean;
   required?: boolean;
-  size?: "small" | "medium";
+  size?: 'small' | 'medium';
 }
 
 export default function ControlledComboBox<T extends FieldValues>({
@@ -19,7 +19,7 @@ export default function ControlledComboBox<T extends FieldValues>({
   name,
   clearable = true,
   required = false,
-  size = "small",
+  size = 'medium',
 }: ControlledComboBoxProps<T>) {
   return (
     <Controller
@@ -30,10 +30,10 @@ export default function ControlledComboBox<T extends FieldValues>({
         return (
           <Autocomplete
             autoHighlight
-            noOptionsText="Không có kết quả"
+            noOptionsText='Không có kết quả'
             options={items}
             size={size}
-            getOptionLabel={(option) => option.text || ""}
+            getOptionLabel={(option) => option.text || ''}
             value={
               value
                 ? items.find(

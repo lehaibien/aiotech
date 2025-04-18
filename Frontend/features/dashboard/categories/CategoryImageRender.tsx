@@ -8,12 +8,12 @@ export function CategoryImageRender(
     <Image
       src={params.row.imageUrl ?? '/image-not-found.jpg'}
       alt={`${params.row.name}`}
-      width={300}
-      height={0}
+      width={600}
+      height={400}
       style={{
-        width: 'auto',
-        height: 'auto',
-        aspectRatio: 3/2,
+        aspectRatio: 3 / 2,
+        objectFit: 'fill',
+        backgroundColor: 'white',
       }}
     />
   );

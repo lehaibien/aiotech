@@ -47,7 +47,7 @@ export default function SalesChart({ data }: SalesChartProps) {
         {
           dataKey: "revenue",
           label: "Doanh thu",
-          color: alpha(theme.palette.tertiary?.main ?? "#000", 0.7),
+          color: alpha(theme.palette.success?.main ?? "#000", 0.7),
           valueFormatter: (value) =>
             formatNumberWithSeperator(value ?? 0) + " đ",
           showMark: true,
@@ -76,14 +76,11 @@ export default function SalesChart({ data }: SalesChartProps) {
         },
       }}
       tooltip={{
-        trigger: "item",
+        trigger: "axis",
         slotProps: {
           popper: {
             sx: {
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              borderRadius: 1,
-              padding: 1,
+              boxShadow: "none",
             },
           },
         },

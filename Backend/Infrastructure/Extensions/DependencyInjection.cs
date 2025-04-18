@@ -1,5 +1,8 @@
+using Application.Files;
+using Application.Images;
 using Application.Mail;
 using Domain.UnitOfWork;
+using Infrastructure.Files;
 using Infrastructure.Mail;
 using Infrastructure.Persistent;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +41,8 @@ public static class DependencyInjection
         });
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IFileService, FileService>();
+        services.AddScoped<IImageService, ImageService>();
         return services;
     }
 }

@@ -1,8 +1,8 @@
-import { DEFAULT_TIMEZONE } from "@/constant/common";
-import dayjs from "@/lib/extended-dayjs";
-import { DatePicker, DatePickerProps } from "@mui/x-date-pickers";
-import { Dayjs } from "dayjs";
-import { useMemo } from "react";
+import { DEFAULT_TIMEZONE } from '@/constant/common';
+import dayjs from '@/lib/extended-dayjs';
+import { DatePicker, DatePickerProps } from '@mui/x-date-pickers';
+import { Dayjs } from 'dayjs';
+import { useMemo } from 'react';
 
 type ReportMonthFilterProps = {
   value: Dayjs | null;
@@ -31,9 +31,9 @@ export function ReportMonthFilter({
       {...props}
       value={actualValue}
       onChange={handleOnChange}
-      views={["year", "month"]}
-      format="MM/YYYY"
-      slotProps={{ textField: { variant: "outlined" } }}
+      views={['year', 'month']}
+      format='MM/YYYY'
+      slotProps={{ textField: { variant: 'outlined', size: 'small' } }}
     />
   );
 }

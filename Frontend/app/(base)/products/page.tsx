@@ -1,69 +1,66 @@
-import "server-only";
+import 'server-only';
 
-import { API_URL } from "@/constant/apiUrl";
-import { getApi, getListApi } from "@/lib/apiClient";
+import { API_URL } from '@/constant/apiUrl';
+import FilterDrawer from '@/features/products/FilterDrawer';
+import ShopList from '@/features/products/ShopList';
+import { ShopSort } from '@/features/products/ShopSort';
+import { getApi, getListApi } from '@/lib/apiClient';
 import {
   ComboBoxItem,
   GetListFilteredProductRequest,
   PaginatedList,
   ProductResponse,
   ProductSort,
-} from "@/types";
+} from '@/types';
 import {
   Box,
   Breadcrumbs,
   CircularProgress,
-  Container,
-  Paper,
   Stack,
   Typography,
-} from "@mui/material";
-import { Metadata } from "next";
-import { Suspense } from "react";
-import FilterDrawer from "@/features/products/FilterDrawer";
-import ShopList from "@/features/products/ShopList";
-import { ShopSort } from "@/features/products/ShopSort";
-import HomeIcon from "@mui/icons-material/Home";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import Link from "next/link";
+} from '@mui/material';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Suspense } from 'react';
+
+type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
 export const metadata: Metadata = {
-  title: "Cửa hàng | AioTech",
+  title: 'Cửa hàng | AioTech',
   description:
-    "Mua sắm thiết bị điện tử chính hãng với giá tốt nhất tại AioTech",
-  keywords: ["thiết bị điện tử", "mua sắm", "công nghệ", "AioTech", "cửa hàng"],
+    'Mua sắm thiết bị điện tử chính hãng với giá tốt nhất tại AioTech',
+  keywords: ['thiết bị điện tử', 'mua sắm', 'công nghệ', 'AioTech', 'cửa hàng'],
   openGraph: {
-    title: "AioTech - Cửa hàng thiết bị điện tử chính hãng",
+    title: 'AioTech - Cửa hàng thiết bị điện tử chính hãng',
     description:
-      "Mua sắm thiết bị điện tử tại AioTech với đa dạng sản phẩm và dịch vụ hậu mãi tốt nhất",
-    url: "https://aiotech.cloud/products",
-    siteName: "AioTech",
+      'Mua sắm thiết bị điện tử tại AioTech với đa dạng sản phẩm và dịch vụ hậu mãi tốt nhất',
+    url: 'https://aiotech.cloud/products',
+    siteName: 'AioTech',
     images: [
       {
-        url: "https://aiotech.cloud/images/logo.png",
+        url: 'https://aiotech.cloud/images/logo.png',
         width: 500,
         height: 500,
-        alt: "AioTech logo",
+        alt: 'AioTech logo',
       },
     ],
-    type: "website",
+    type: 'website',
   },
 };
 
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | undefined };
+  searchParams?: SearchParams;
 }) {
+  const params = await searchParams;
   const pageSize = 12;
-  const page = searchParams?.page ? Number(searchParams?.page) : 1;
-  const category = searchParams?.category;
-  const brand = searchParams?.brand;
-  const minPrice = searchParams?.minPrice ? Number(searchParams?.minPrice) : 0;
-  const maxPrice = searchParams?.maxPrice
-    ? Number(searchParams?.maxPrice)
-    : Infinity;
-  const sort = searchParams?.sort;
+  const page = params?.page ? Number(params?.page) : 1;
+  const category = params?.category;
+  const brand = params?.brand;
+  const minPrice = params?.minPrice ? Number(params?.minPrice) : 0;
+  const maxPrice = params?.maxPrice ? Number(params?.maxPrice) : Infinity;
+  const sort = params?.sort;
 
   let dataList: PaginatedList<ProductResponse> = {
     items: [],
@@ -77,16 +74,16 @@ export default async function ShopPage({
   const brandPromise = getApi(API_URL.brandComboBox);
   let currentSort = ProductSort.Default;
   switch (sort) {
-    case "price_asc":
+    case 'price_asc':
       currentSort = ProductSort.PriceAsc;
       break;
-    case "price_desc":
+    case 'price_desc':
       currentSort = ProductSort.PriceDesc;
       break;
-    case "newest":
+    case 'newest':
       currentSort = ProductSort.Newest;
       break;
-    case "oldest":
+    case 'oldest':
       currentSort = ProductSort.Oldest;
       break;
     default:
@@ -96,7 +93,7 @@ export default async function ShopPage({
   const request: GetListFilteredProductRequest = {
     pageIndex: page - 1,
     pageSize: pageSize,
-    textSearch: "",
+    textSearch: '',
     brands: brand,
     categories: category,
     minPrice: Number(minPrice),
@@ -125,80 +122,64 @@ export default async function ShopPage({
     brands = brandResponse.data as ComboBoxItem[];
   }
   return (
-    <Container maxWidth="xl">
+    <Stack gap={1}>
       {/* Breadcrumbs Navigation */}
-      <Box mb={3}>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link
-            href="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-            Trang chủ
-          </Link>
-          <Typography
-            color="text.primary"
-            sx={{ display: "flex", alignItems: "center" }}
-          >
-            <ShoppingBagIcon sx={{ mr: 0.5 }} fontSize="small" />
-            Sản phẩm
-          </Typography>
-        </Breadcrumbs>
-      </Box>
+      <Breadcrumbs aria-label='breadcrumb'>
+        <Link
+          href='/'
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}>
+          Trang chủ
+        </Link>
+        <Typography>Sản phẩm</Typography>
+      </Breadcrumbs>
 
-      <Paper elevation={1} sx={{ p: { xs: 2, md: 3 }, borderRadius: 2, mb: 4 }}>
+      <Box>
         <Typography
-          variant="h5"
-          component="h1"
-          gutterBottom
-          sx={{ fontWeight: 600, mb: 3 }}
-        >
+          variant='h5'
+          component='h1'
+          gutterBottom>
           Danh sách sản phẩm
         </Typography>
 
         <Stack spacing={3}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: { xs: "wrap", sm: "nowrap" },
-              gap: 2,
-            }}
-          >
+          <Stack
+            direction='row'
+            justifyContent='space-between'
+            alignItems='center'>
             <FilterDrawer
               brands={brands}
               categories={categories}
-              defaultBrands={brand?.split(",")}
-              defaultCategories={category?.split(",")}
+              defaultBrands={brand?.split(',')}
+              defaultCategories={category?.split(',')}
             />
-            <ShopSort defaultSort={sort ?? "default"} />
-          </Box>
+            <ShopSort defaultSort={sort ?? 'default'} />
+          </Stack>
 
-          <Box sx={{ position: "relative", minHeight: "200px" }}>
+          <Box sx={{ position: 'relative', minHeight: '200px' }}>
             <Suspense
-              key={"Products page"}
+              key={'Products page'}
               fallback={
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "300px",
-                  }}
-                >
-                  <CircularProgress size={60} thickness={4} />
-                  <Typography variant="body1" sx={{ ml: 2 }}>
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '300px',
+                  }}>
+                  <CircularProgress
+                    size={60}
+                    thickness={4}
+                  />
+                  <Typography
+                    variant='body1'
+                    sx={{ ml: 2 }}>
                     Đang tải sản phẩm...
                   </Typography>
                 </Box>
-              }
-            >
+              }>
               <ShopList
                 items={dataList.items}
                 currentPage={page}
@@ -207,7 +188,7 @@ export default async function ShopPage({
             </Suspense>
           </Box>
         </Stack>
-      </Paper>
-    </Container>
+      </Box>
+    </Stack>
   );
 }

@@ -1,25 +1,28 @@
-import { API_URL } from "@/constant/apiUrl";
-import { getApi, postApi } from "@/lib/apiClient";
-import { convertObjectToFormData, parseUUID } from "@/lib/utils";
-import { ProfileFormData, profileSchema, UserProfileResponse } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import EditIcon from "@mui/icons-material/Edit";
+'use client';
+
+import { ControlledTextField } from '@/components/core/ControlledTextField';
+import { API_URL } from '@/constant/apiUrl';
+import { postApi } from '@/lib/apiClient';
+import { convertObjectToFormData, parseUUID } from '@/lib/utils';
+import { ProfileFormData, profileSchema } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   Avatar,
   Box,
   Button,
   FormLabel,
+  Grid2 as Grid,
   IconButton,
-  Stack,
   TextField,
-} from "@mui/material";
-import { useSession } from "next-auth/react";
-import { useSnackbar } from "notistack";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { TextFieldElement, useForm } from "react-hook-form-mui";
-import useSWR from "swr";
-import { EmailChangeDialog } from "./EmailChangeDialog";
+} from '@mui/material';
+import { useSession } from 'next-auth/react';
+import { useSnackbar } from 'notistack';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { EmailChangeDialog } from './EmailChangeDialog';
+import { useProfileData } from './hooks/useProfileData';
 
 export const ProfileForm = () => {
   const { data: session } = useSession();
@@ -29,20 +32,7 @@ export const ProfileForm = () => {
 
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
 
-  const userFetcher = useCallback(async () => {
-    const response = await getApi(API_URL.user + `/${userId}/profile`);
-    if (response.success) {
-      return response.data as UserProfileResponse;
-    } else {
-      throw new Error(response.message);
-    }
-  }, [userId]);
-
-  const { data, isValidating, error } = useSWR<UserProfileResponse>(userId, {
-    fetcher: userFetcher,
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-  });
+  const { data, isValidating, error, mutate } = useProfileData(userId || '');
 
   const { control, handleSubmit, setValue } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -57,13 +47,13 @@ export const ProfileForm = () => {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setValue("image", file);
+      setValue('image', file);
       setAvatarPreview(URL.createObjectURL(file));
     }
   };
 
   const onSubmit = (data: ProfileFormData) => {
-    const parsedId = parseUUID(userId || "");
+    const parsedId = parseUUID(userId || '');
     const extendedData = {
       ...data,
       id: parsedId,
@@ -72,12 +62,13 @@ export const ProfileForm = () => {
     // TODO: Send formData to api
     postApi(API_URL.userProfile, formData).then((response) => {
       if (response.success) {
-        enqueueSnackbar("Cập nhật tài khoản thành công", {
-          variant: "success",
+        enqueueSnackbar('Cập nhật tài khoản thành công', {
+          variant: 'success',
         });
+        mutate();
       } else {
-        enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-          variant: "error",
+        enqueueSnackbar('Lỗi xảy ra: ' + response.message, {
+          variant: 'error',
         });
       }
     });
@@ -85,102 +76,131 @@ export const ProfileForm = () => {
 
   useEffect(() => {
     if (data) {
-      setValue("familyName", data.familyName);
-      setValue("givenName", data.givenName);
-      setValue("phoneNumber", data.phoneNumber);
-      setValue("address", data.address);
-      if(data.avatarUrl.startsWith("http://host.docker.internal:5554/")) {
-        data.avatarUrl = data.avatarUrl.replace("http://host.docker.internal:5554/", "http://localhost:5554/");
+      setValue('familyName', data.familyName);
+      setValue('givenName', data.givenName);
+      setValue('phoneNumber', data.phoneNumber);
+      setValue('address', data.address);
+      if (data.avatarUrl.startsWith('http://host.docker.internal:5554/')) {
+        data.avatarUrl = data.avatarUrl.replace(
+          'http://host.docker.internal:5554/',
+          'http://localhost:5554/'
+        );
       }
       setAvatarPreview(data.avatarUrl);
     }
   }, [data, setValue]);
 
   if (error) {
-    enqueueSnackbar("Lỗi xảy ra: " + error.message, { variant: "error" });
+    enqueueSnackbar('Lỗi xảy ra: ' + error.message, { variant: 'error' });
   }
   if (isValidating) return <div>Đang tải...</div>;
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", p: 3 }}>
+    <Box sx={{ mx: 'auto' }}>
       {/* Avatar Section */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
         <input
-          accept="image/*"
-          id="avatar-upload"
-          type="file"
+          accept='image/*'
+          id='avatar-upload'
+          type='file'
           hidden
           onChange={handleAvatarChange}
         />
-        <label htmlFor="avatar-upload">
-          <IconButton component="span">
-            <Avatar src={avatarPreview} sx={{ width: 100, height: 100 }} />
+        <label htmlFor='avatar-upload'>
+          <IconButton component='span'>
+            <Avatar
+              src={avatarPreview}
+              sx={{ width: 100, height: 100 }}
+            />
             <CloudUploadIcon
-              sx={{ position: "absolute", bottom: 0, right: 0 }}
+              sx={{ position: 'absolute', bottom: 0, right: 0 }}
             />
           </IconButton>
         </label>
       </Box>
+      <Grid
+        component='form'
+        container
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormLabel htmlFor='familyName'>Họ</FormLabel>
+          <ControlledTextField
+            control={control}
+            name='familyName'
+            fullWidth
+            size='small'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormLabel
+            htmlFor='givenName'
+            required>
+            Tên
+          </FormLabel>
+          <ControlledTextField
+            control={control}
+            name='givenName'
+            fullWidth
+            size='small'
+            required
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormLabel
+            htmlFor='email'
+            required>
+            Email
+          </FormLabel>
+          <TextField
+            name='email'
+            fullWidth
+            size='small'
+            value={data?.email}
+            disabled
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={() => setEmailDialogOpen(true)}>
+                  <EditIcon />
+                </IconButton>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormLabel htmlFor='phoneNumber'>Số điện thoại</FormLabel>
+          <ControlledTextField
+            control={control}
+            name='phoneNumber'
+            fullWidth
+            size='small'
+          />
+        </Grid>
+        <Grid size={12}>
+          <FormLabel
+            htmlFor='address'
+            required>
+            Địa chỉ
+          </FormLabel>
+          <ControlledTextField
+            control={control}
+            name='address'
+            multiline
+            size='small'
+            minRows={3}
+            required
+            fullWidth
+          />
+        </Grid>
 
-      {/* Profile Form */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3}>
-          <Box>
-            <FormLabel htmlFor="familyName">Họ</FormLabel>
-            <TextFieldElement control={control} name="familyName" fullWidth />
-          </Box>
-          <Box>
-            <FormLabel htmlFor="givenName" required>
-              Tên
-            </FormLabel>
-            <TextFieldElement
-              control={control}
-              name="givenName"
-              required
-              fullWidth
-            />
-          </Box>
-          <Box>
-            <FormLabel htmlFor="email" required>
-              Email
-            </FormLabel>
-            <TextField
-              name="email"
-              fullWidth
-              value={data?.email}
-              disabled
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={() => setEmailDialogOpen(true)}>
-                    <EditIcon />
-                  </IconButton>
-                ),
-              }}
-            />
-          </Box>
-          <Box>
-            <FormLabel htmlFor="phoneNumber">Số điện thoại</FormLabel>
-            <TextFieldElement control={control} name="phoneNumber" fullWidth />
-          </Box>
-          <Box>
-            <FormLabel htmlFor="address" required>
-              Địa chỉ
-            </FormLabel>
-            <TextFieldElement
-              control={control}
-              name="address"
-              multiline
-              minRows={2}
-              required
-              fullWidth
-            />
-          </Box>
-
-          <Button type="submit" variant="contained" size="large">
-            Lưu
-          </Button>
-        </Stack>
-      </form>
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'>
+          Lưu
+        </Button>
+      </Grid>
 
       <EmailChangeDialog
         oldEmail={data?.email}

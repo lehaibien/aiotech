@@ -6,3 +6,4 @@ export const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 export const TAX_VALUE = 0.08;
 export const DEFAULT_TIMEZONE = "Asia/Jakarta";
 export const LOW_STOCK_THRESHOLD = 5;
+export const IMAGE_TYPES = ["png", "jpeg", "jpg"];

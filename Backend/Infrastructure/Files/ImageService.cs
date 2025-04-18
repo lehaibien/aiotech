@@ -1,7 +1,6 @@
 ﻿using Application.Files;
 using Application.Helpers;
 using Application.Images;
-using AutoDependencyRegistration.Attributes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Shared;
@@ -15,7 +14,6 @@ using SixLabors.ImageSharp.Processing;
 
 namespace Infrastructure.Files;
 
-[RegisterClassAsSingleton]
 public class ImageService : IImageService
 {
     private const string ImageFolder = "images";

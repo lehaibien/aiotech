@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Application.Roles.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -11,7 +10,6 @@ using Shared;
 
 namespace Application.Roles;
 
-[RegisterClassAsScoped]
 public class RoleService : IRoleService
 {
     private readonly IUnitOfWork _unitOfWork;

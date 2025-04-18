@@ -1,6 +1,6 @@
 "use client";
 
-import NoItem from "@/components/core/NoItem";
+import {NoItem} from "@/components/core/NoItem";
 import { formatNumberWithSeperator, mapOrderStatus } from "@/lib/utils";
 import { OrderResponse } from "@/types/order";
 import {

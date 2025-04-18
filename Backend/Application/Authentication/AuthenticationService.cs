@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using Application.Authentication.Dtos;
 using Application.Helpers;
@@ -7,7 +6,6 @@ using Application.Images;
 using Application.Jwt;
 using Application.Mail;
 using Application.Users.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -18,7 +16,6 @@ using Shared;
 
 namespace Application.Authentication;
 
-[RegisterClassAsScoped]
 public class AuthenticationService : IAuthenticationService
 {
     private readonly IHttpContextAccessor _contextAccessor;

@@ -7,7 +7,7 @@ export const postGridColumns: GridColDef<PostResponse>[] = [
   {
     field: "imageUrl",
     headerName: "Ảnh bìa",
-    width: 300,
+    width: 315,
     headerAlign: "center",
     align: "center",
     renderCell: ImageRenderer,

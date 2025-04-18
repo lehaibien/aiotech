@@ -1,14 +1,16 @@
-import Color from "@tiptap/extension-color";
-import Subscript from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import TextStyle from "@tiptap/extension-text-style";
-import StarterKit from "@tiptap/starter-kit";
+'use client';
+
+import Color from '@tiptap/extension-color';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import TextStyle from '@tiptap/extension-text-style';
+import StarterKit from '@tiptap/starter-kit';
 import {
   MenuButtonAddTable,
   MenuButtonAlignCenter,
@@ -34,8 +36,8 @@ import {
   RichTextEditor as MuiRichTextEditor,
   RichTextEditorRef as MuiRichTextEditorRef,
   TableBubbleMenu,
-} from "mui-tiptap";
-import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from "react";
+} from 'mui-tiptap';
+import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from 'react';
 
 type RichTextEditorProps = {
   defaultContent: string;
@@ -74,129 +76,138 @@ function RichTextEditor(
   ];
 
   return (
-    <div className="shadow-sm">
+    <div className='border'>
       <MuiRichTextEditor
         ref={rteRef}
         extensions={extensions}
         content={defaultContent}
         onUpdate={({ editor }) => {
           // Force the ref to update its content
-          if (ref && typeof ref === "object" && ref.current) {
+          if (ref && typeof ref === 'object' && ref.current) {
             ref.current.content = editor.getHTML();
           }
         }}
         renderControls={() => (
-          <MenuControlsContainer className="px-4 py-2">
-            <div className="flex items-center gap-2 flex-wrap">
+          <MenuControlsContainer className='px-4 py-2'>
+            <div className='flex items-center gap-2 flex-wrap'>
               <MenuSelectHeading
-                className="rounded p-1"
+                className='rounded p-1'
                 labels={{
-                  heading1: "Tiêu đề 1",
-                  heading2: "Tiêu đề 2",
-                  heading3: "Tiêu đề 3",
-                  heading4: "Tiêu đề 4",
-                  heading5: "Tiêu đề 5",
-                  heading6: "Tiêu đề 6",
-                  paragraph: "Văn bản",
+                  heading1: 'Tiêu đề 1',
+                  heading2: 'Tiêu đề 2',
+                  heading3: 'Tiêu đề 3',
+                  heading4: 'Tiêu đề 4',
+                  heading5: 'Tiêu đề 5',
+                  heading6: 'Tiêu đề 6',
+                  paragraph: 'Văn bản',
                 }}
               />
-              <MenuDivider className="!mx-2 !h-6" />
-              <MenuButtonBold className="rounded p-1" tooltipLabel="Chữ đậm" />
+              <MenuDivider className='!mx-2 !h-6' />
+              <MenuButtonBold
+                className='rounded p-1'
+                tooltipLabel='Chữ đậm'
+              />
               <MenuButtonItalic
-                className="rounded p-1"
-                tooltipLabel="Chữ nghiêng"
+                className='rounded p-1'
+                tooltipLabel='Chữ nghiêng'
               />
               <MenuButtonUnderline
-                className="rounded p-1"
-                tooltipLabel="Chữ gạch chân"
+                className='rounded p-1'
+                tooltipLabel='Chữ gạch chân'
               />
               <MenuButtonTextColor
-                className="rounded p-1"
-                tooltipLabel="Chọn màu chữ"
+                className='rounded p-1'
+                tooltipLabel='Chọn màu chữ'
                 labels={{
-                  cancelButton: "Hủy",
-                  saveButton: "Chọn",
-                  removeColorButton: "Xóa màu",
-                  removeColorButtonTooltipTitle: "Xóa màu",
-                  textFieldPlaceholder: "Ví dụ: #ff0000",
+                  cancelButton: 'Hủy',
+                  saveButton: 'Chọn',
+                  removeColorButton: 'Xóa màu',
+                  removeColorButtonTooltipTitle: 'Xóa màu',
+                  textFieldPlaceholder: 'Ví dụ: #ff0000',
                 }}
               />
-              <MenuDivider className="!mx-2!h-6" />
+              <MenuDivider className='!mx-2!h-6' />
               <MenuButtonAlignLeft
-                className="rounded p-1"
-                tooltipLabel="Căn lề trái"
+                className='rounded p-1'
+                tooltipLabel='Căn lề trái'
               />
               <MenuButtonAlignCenter
-                className="rounded p-1"
-                tooltipLabel="Căn giữa"
+                className='rounded p-1'
+                tooltipLabel='Căn giữa'
               />
               <MenuButtonAlignRight
-                className="rounded p-1"
-                tooltipLabel="Căn lề phải"
+                className='rounded p-1'
+                tooltipLabel='Căn lề phải'
               />
               <MenuButtonAlignJustify
-                className="rounded p-1"
-                tooltipLabel="Căn đều"
+                className='rounded p-1'
+                tooltipLabel='Căn đều'
               />
-              <MenuDivider className="!mx-2 !h-6" />
+              <MenuDivider className='!mx-2 !h-6' />
               <MenuButtonSuperscript
-                className="rounded p-1"
-                tooltipLabel="Chỉ số trên"
+                className='rounded p-1'
+                tooltipLabel='Chỉ số trên'
               />
               <MenuButtonSubscript
-                className="rounded p-1"
-                tooltipLabel="Chỉ số dưới"
+                className='rounded p-1'
+                tooltipLabel='Chỉ số dưới'
               />
               <MenuButtonStrikethrough
-                className="rounded p-1"
-                tooltipLabel="Chữ gạch ngang"
+                className='rounded p-1'
+                tooltipLabel='Chữ gạch ngang'
               />
               <MenuButtonBlockquote
-                className="rounded p-1"
-                tooltipLabel="Câu trích dẫn"
+                className='rounded p-1'
+                tooltipLabel='Câu trích dẫn'
               />
-              <MenuDivider className="!mx-2 !h-6" />
+              <MenuDivider className='!mx-2 !h-6' />
               <MenuButtonOrderedList
-                className="rounded p-1"
-                tooltipLabel="Danh sách có thứ tự"
+                className='rounded p-1'
+                tooltipLabel='Danh sách có thứ tự'
               />
               <MenuButtonBulletedList
-                className="rounded p-1"
-                tooltipLabel="Danh sách không thứ tự"
+                className='rounded p-1'
+                tooltipLabel='Danh sách không thứ tự'
               />
               <MenuButtonEditLink
-                className="rounded p-1"
-                tooltipLabel="Chỉnh sửa liên kết"
+                className='rounded p-1'
+                tooltipLabel='Chỉnh sửa liên kết'
               />
               <MenuButtonAddTable
-                className="rounded p-1"
-                tooltipLabel="Thêm bảng"
+                className='rounded p-1'
+                tooltipLabel='Thêm bảng'
               />
               <TableBubbleMenu
-                className="rounded p-1"
+                className='rounded p-1'
                 labels={{
-                  insertRowAbove: "Chèn hàng trên",
-                  insertRowBelow: "Chèn hàng dưới",
-                  deleteRow: "Xóa hàng",
-                  insertColumnBefore: "Chèn cột trước",
-                  insertColumnAfter: "Chèn cột sau",
-                  deleteColumn: "Xóa cột",
-                  mergeCells: "Gộp ô",
-                  splitCell: "Chia ô",
-                  deleteTable: "Xóa bảng",
-                  toggleHeaderCell: "Chuyển đổi ô tiêu đề",
-                  toggleHeaderRow: "Chuyển đổi hàng tiêu đề",
-                  toggleHeaderColumn: "Chuyển đổi cột tiêu đề",
+                  insertRowAbove: 'Chèn hàng trên',
+                  insertRowBelow: 'Chèn hàng dưới',
+                  deleteRow: 'Xóa hàng',
+                  insertColumnBefore: 'Chèn cột trước',
+                  insertColumnAfter: 'Chèn cột sau',
+                  deleteColumn: 'Xóa cột',
+                  mergeCells: 'Gộp ô',
+                  splitCell: 'Chia ô',
+                  deleteTable: 'Xóa bảng',
+                  toggleHeaderCell: 'Chuyển đổi ô tiêu đề',
+                  toggleHeaderRow: 'Chuyển đổi hàng tiêu đề',
+                  toggleHeaderColumn: 'Chuyển đổi cột tiêu đề',
                 }}
               />
-              <MenuDivider className="!mx-2!h-6" />
-              <MenuButtonUndo className="rounded p-1" tooltipLabel="Hoàn tác" />
-              <MenuButtonRedo className="rounded p-1" tooltipLabel="Làm lại" />
+              <MenuDivider className='!mx-2!h-6' />
+              <MenuButtonUndo
+                className='rounded p-1'
+                tooltipLabel='Hoàn tác'
+              />
+              <MenuButtonRedo
+                className='rounded p-1'
+                tooltipLabel='Làm lại'
+              />
             </div>
           </MenuControlsContainer>
         )}
         RichTextFieldProps={{
-          className: "min-h-[400px] p-4 prose max-w-none",
+          className: 'min-h-[400px] p-4 prose max-w-none',
         }}
       />
     </div>
@@ -226,13 +237,17 @@ const fixListStyles = `
     outline: none;
   }
 
-  .ProseMirror h1 { font-size: 2rem; margin: 1rem 0; }
-  .ProseMirror h2 { font-size: 1.75rem; margin: 0.875rem 0; }
-  .ProseMirror h3 { font-size: 1.5rem; margin: 0.75rem 0; }
+  .ProseMirror h1 { font-size: 2.5rem; margin: 1rem 0; line-height: 1.2; }
+  .ProseMirror h2 { font-size: 2rem; margin: 0.875rem 0;  line-height: 1.25; }
+  .ProseMirror h3 { font-size: 1.75rem; margin: 0.75rem 0;  line-height: 1.3; }
+  .ProseMirror h4 { font-size: 1.5rem; margin: 0.625rem 0; line-height: 1.4; }
+  .ProseMirror h5 { font-size: 1.25rem; margin: 0.5rem 0;  line-height: 1.5; }
+  .ProseMirror h6 { font-size: 1.1rem; margin: 0.375rem 0; line-height: 1.6; }
+  .ProseMirror p { margin: 0.5rem 0; line-height: 1.5; }
 `;
 
 // Add the global styles in your component
-const styleElement = document.createElement("style");
+const styleElement = document.createElement('style');
 styleElement.innerHTML = fixListStyles;
 document.head.appendChild(styleElement);
 

@@ -1,12 +1,10 @@
 using Application.Files;
-using AutoDependencyRegistration.Attributes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Shared;
 
 namespace Infrastructure.Files;
 
-[RegisterClassAsSingleton]
 public class FileService : IFileService
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -154,10 +152,10 @@ public class FileService : IFileService
         }
 
         var result = DeleteFileByUrl(fileUrl);
-        if (!result)
-        {
-            return Result.Failure("File not found");
-        }
+        // if (!result)
+        // {
+        //     return Result.Failure("File not found");
+        // }
 
         return Result.Success();
     }
@@ -167,10 +165,10 @@ public class FileService : IFileService
         foreach (var fileUrl in fileUrls)
         {
             var result = DeleteFileByUrl(fileUrl);
-            if (!result)
-            {
-                return Result.Failure(fileUrl + ": File not found");
-            }
+            // if (!result)
+            // {
+            //     return Result.Failure(fileUrl + ": File not found");
+            // }
         }
 
         return Result.Success();
