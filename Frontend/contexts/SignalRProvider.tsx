@@ -44,7 +44,6 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
       newConnection
         .start()
         .then(() => {
-          // console.log("SignalR Connected");
           setConnection(newConnection);
         })
         .catch((err: Error) => {

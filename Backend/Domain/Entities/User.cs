@@ -19,4 +19,5 @@ public class User : BaseEntity
     public virtual Role Role { get; set; } = null!;
     public virtual ICollection<Order> Orders { get; set; } = [];
     public virtual ICollection<Review> Reviews { get; set; } = [];
+    public virtual ICollection<WishlistItem> WishlistItems { get; set; } = [];
 }

@@ -1,8 +1,8 @@
 import { formatNumberWithSeperator } from '@/lib/utils';
 import { ProductDetailResponse } from '@/types/product';
-import { Box, Button, Chip, Rating, Stack, Typography } from '@mui/material';
+import { Box, Chip, Rating, Stack, Typography } from '@mui/material';
 import { AddToCartButton } from './AddToCartButton';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { AddToWishlist } from './AddToWishlist';
 
 interface ProductInfoProps {
   product: ProductDetailResponse;
@@ -82,12 +82,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           productPrice={product.discountPrice ?? product.price}
           productImage={product.imageUrls[0]}
         />
-        <Button
-          variant='contained'
-          color='secondary'
-          startIcon={<FavoriteBorderIcon />}>
-          Thêm vào yêu thích
-        </Button>
+        <AddToWishlist productId={product.id} />
         <Typography
           variant='body2'
           ml={2}>

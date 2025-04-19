@@ -2,10 +2,11 @@
 
 import { LOW_STOCK_THRESHOLD } from '@/constant/common';
 import useCart from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 import { formatNumberWithSeperator } from '@/lib/utils';
 import { ProductResponse } from '@/types';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import {
   Box,
   Button,
@@ -15,7 +16,7 @@ import {
   Chip,
   Rating,
   Stack,
-  Typography
+  Typography,
 } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -39,6 +40,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   } = product;
   const { enqueueSnackbar } = useSnackbar();
   const { addToCart } = useCart();
+  const { addToWishlist } = useWishlist();
   const [currentImage, setCurrentImage] = useState(thumbnails[0]);
 
   const handleAddToCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -56,6 +58,21 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       return;
     }
     enqueueSnackbar('Sản phẩm đã hết hàng', { variant: 'error' });
+  };
+
+  const handleAddToWishlistClick = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const message = await addToWishlist(id);
+    if (message === '') {
+      enqueueSnackbar('Đã thêm sản phẩm vào danh sách yêu thích', {
+        variant: 'success',
+      });
+    } else {
+      enqueueSnackbar(message, { variant: 'error' });
+    }
   };
 
   const handleMouseEnter = () => {
@@ -180,14 +197,15 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </Typography>
         </Box>
         {/* Pricing and actions */}
-        <Stack gap={0.5}>
+        <Stack spacing={1}>
           {/* Price display */}
           {discountPrice ? (
-            <>
+            <div>
               <Typography
-                variant='body2'
+                variant='caption'
                 color='text.secondary'
                 sx={{
+                  lineHeight: 1,
                   textDecoration: 'line-through',
                   whiteSpace: 'nowrap',
                 }}>
@@ -200,7 +218,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 noWrap>
                 {formatNumberWithSeperator(discountPrice)} đ
               </Typography>
-            </>
+            </div>
           ) : (
             <Typography
               variant='h6'
@@ -213,14 +231,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           {/* Rating */}
           <Stack
             direction='row'
-            alignItems='center'
-            spacing={0.5}>
+            alignItems='center'>
             <Rating
               value={rating}
               precision={0.1}
               size='small'
               readOnly
-              sx={{ '& .MuiRating-icon': { fontSize: '1rem' } }}
             />
             <Typography
               variant='caption'
@@ -251,9 +267,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               variant='outlined'
               color='primary'
               size='small'
-              onClick={() => {}}
+              onClick={handleAddToWishlistClick}
               data-umami-event='Yêu thích sản phẩm'>
-              <FavoriteIcon fontSize='small' />
+              <FavoriteBorderIcon fontSize='small' />
             </Button>
           </Stack>
         </Stack>

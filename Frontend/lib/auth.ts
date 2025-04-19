@@ -246,26 +246,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.refreshToken = token.refreshToken;
       return session;
     },
-    // jwt({ token, account, profile, session }) {
-    //   console.log(token, account, profile, session);
-    //   if (account?.provider == 'credentials') {
-    //     return {
-    //       ...token,
-    //       accessToken: account.access_token,
-    //       refreshToken: account.refresh_token,
-    //     };
-    //   }
-    //   return {
-    //     ...token,
-    //     // role: user.role,
-    //   };
-    // },
-    // session({ session, token, user }) {
-    //   console.log(session, token, user.role);
-    //   return {
-    //     ...session,
-    //   };
-    // },
   },
   session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
   pages: {

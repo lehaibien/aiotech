@@ -39,7 +39,6 @@ export default async function SaleReportPage({
     endDate: endDate.endOf("month").toJSON(),
     customerUsername: customerUsername,
   };
-  console.log(request);
   let chartData: OrderReportResponse[] = [];
   const response = await getApiQuery(API_URL.orderReport, request);
   if (response.success) {

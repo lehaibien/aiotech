@@ -101,7 +101,6 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
   const handleDeleteComment = async (index: number) => {
     if (data && data[index].id) {
       const response = await deleteApi(API_URL.review + `/${data[index].id}`);
-      console.log(response);
       if (!response.success) {
         enqueueSnackbar(response.message, { variant: 'error' });
         return;
