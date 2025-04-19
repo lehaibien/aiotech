@@ -383,7 +383,7 @@ public class ProductService : IProductService
         {
             return Result<ProductResponse>.Failure(uploadResult.Message);
         }
-        entity.ImageUrls = uploadResult.Data;
+        entity.ImageUrls = uploadResult.Value;
         _unitOfWork.GetRepository<Product>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         await _cache.RemoveAsync(CacheKeys.TopProducts);
@@ -425,7 +425,7 @@ public class ProductService : IProductService
             {
                 return Result<ProductResponse>.Failure(uploadResult.Message);
             }
-            entity.ImageUrls = uploadResult.Data;
+            entity.ImageUrls = uploadResult.Value;
         }
         _unitOfWork.GetRepository<Product>().Update(entity);
         await _unitOfWork.SaveChangesAsync();

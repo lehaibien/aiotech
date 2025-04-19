@@ -185,7 +185,7 @@ public class PostService : IPostService
             return Result<PostResponse>.Failure(uploadResult.Message);
         }
 
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Post>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<PostResponse>(entity);
@@ -227,7 +227,7 @@ public class PostService : IPostService
             return Result<PostResponse>.Failure(uploadResult.Message);
         }
 
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Post>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<PostResponse>(entity);

@@ -6,7 +6,7 @@ namespace Domain.UnitOfWork;
 public interface IRepository<T> where T : class
 {
     IQueryable<T> GetAll();
-    IQueryable<T> GetAll(Expression<Func<T, bool>> predicate, string[] includes = null);
+    IQueryable<T> GetAll(Expression<Func<T, bool>> predicate, string[] includes = null!);
     T? GetById(Guid id);
     Task<T?> GetByIdAsync(Guid id);
     T? Find(Expression<Func<T, bool>> predicate);

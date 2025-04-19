@@ -17,6 +17,7 @@ using Application.Reports;
 using Application.Reviews;
 using Application.Roles;
 using Application.Users;
+using Application.Wishlist;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,6 +77,7 @@ public static class DependencyInjection
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IWishlistService, WishlistService>();
         return services;
     }
 }

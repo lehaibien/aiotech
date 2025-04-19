@@ -152,7 +152,7 @@ public class UserService : IUserService
             {
                 return Result<UserResponse>.Failure(uploadResult.Message);
             }
-            user.AvatarUrl = uploadResult.Data;
+            user.AvatarUrl = uploadResult.Value;
         }
 
         _unitOfWork.GetRepository<User>().Add(user);
@@ -209,7 +209,7 @@ public class UserService : IUserService
             {
                 return Result<UserResponse>.Failure(uploadResult.Message);
             }
-            entity.AvatarUrl = uploadResult.Data;
+            entity.AvatarUrl = uploadResult.Value;
         }
         _unitOfWork.GetRepository<User>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -262,7 +262,7 @@ public class UserService : IUserService
                 return Result<UserResponse>.Failure(uploadResult.Message);
             }
 
-            user.AvatarUrl = uploadResult.Data;
+            user.AvatarUrl = uploadResult.Value;
         }
         _unitOfWork.GetRepository<User>().Update(user);
         await _unitOfWork.SaveChangesAsync();

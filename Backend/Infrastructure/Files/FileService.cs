@@ -111,7 +111,7 @@ public class FileService : IFileService
             {
                 return Result<List<FileUploadResult>>.Failure(result.Message);
             }
-            filePaths.Add(result.Data);
+            filePaths.Add(result.Value);
         }
         return Result<List<FileUploadResult>>.Success(filePaths);
     }

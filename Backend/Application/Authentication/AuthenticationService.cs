@@ -116,7 +116,7 @@ public class AuthenticationService : IAuthenticationService
             var uploadImageResult = await _imageService.UploadAsync(file, ImageType.Logo, "user");
             if (uploadImageResult.IsSuccess)
             {
-                newImageUrl = uploadImageResult.Data;
+                newImageUrl = uploadImageResult.Value;
             }
             user = new User
             {

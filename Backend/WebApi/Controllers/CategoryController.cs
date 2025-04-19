@@ -29,7 +29,7 @@ public class CategoryController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -45,7 +45,7 @@ public class CategoryController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -60,7 +60,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -75,7 +75,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -90,7 +90,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -105,7 +105,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -120,7 +120,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -135,7 +135,7 @@ public class CategoryController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 }

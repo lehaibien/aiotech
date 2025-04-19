@@ -34,7 +34,7 @@ public class ImageService : IImageService
         {
             return Result<string>.Failure(urlResult.Message);
         }
-        return Result<string>.Success(urlResult.Data);
+        return Result<string>.Success(urlResult.Value);
     }
 
     public Result<List<string>> GetImageUrls(List<string> fileNames, string folderName)
@@ -44,7 +44,7 @@ public class ImageService : IImageService
         {
             return Result<List<string>>.Failure(urlResult.Message);
         }
-        return Result<List<string>>.Success(urlResult.Data);
+        return Result<List<string>>.Success(urlResult.Value);
     }
 
     public Result<string> GetFileBase64(string fileName, string folderName)
@@ -54,7 +54,7 @@ public class ImageService : IImageService
         {
             return Result<string>.Failure(result.Message);
         }
-        return Result<string>.Success(result.Data);
+        return Result<string>.Success(result.Value);
     }
 
     public async Task<Result<string>> UploadAsync(
@@ -92,7 +92,7 @@ public class ImageService : IImageService
                 return Result<string>.Failure(originalResult.Message);
             }
 
-            var originalFileResult = originalResult.Data;
+            var originalFileResult = originalResult.Value;
 
             // Step 2: Create optimized version
             string optimizedExtension = ShouldPreservePngTransparency(file, extension)
@@ -135,7 +135,7 @@ public class ImageService : IImageService
             var result = await UploadAsync(file, imageType, folderName, cancellationToken);
             if (result.IsSuccess)
             {
-                results.Add(result.Data);
+                results.Add(result.Value);
             }
             else
             {

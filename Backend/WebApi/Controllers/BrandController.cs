@@ -32,7 +32,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -48,7 +48,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -65,7 +65,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         _logger.LogInformation("A brand with name {Name} has been created", request.Name);
         return Ok(response);
     }
@@ -83,7 +83,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         _logger.LogInformation(
             "A brand with id {Id} and name {Name} has been updated",
             request.Id,
@@ -105,7 +105,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         _logger.LogInformation("A brand with Id {Id} has been deleted.", id);
         return Ok(response);
     }
@@ -123,7 +123,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         _logger.LogInformation("A list of brand has been deleted. Ids: {Id}", ids);
         return Ok(response);
     }
@@ -140,7 +140,7 @@ public class BrandController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 }

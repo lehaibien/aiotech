@@ -156,7 +156,7 @@ public class CategoryService : ICategoryService
             return Result<CategoryResponse>.Failure(uploadResult.Message);
         }
 
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Category>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<CategoryResponse>(entity);
@@ -201,7 +201,7 @@ public class CategoryService : ICategoryService
             return Result<CategoryResponse>.Failure(uploadResult.Message);
         }
 
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Category>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<CategoryResponse>(entity);

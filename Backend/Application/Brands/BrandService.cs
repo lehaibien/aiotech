@@ -109,7 +109,7 @@ public class BrandService : IBrandService
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Brand>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToBrandResponse();
@@ -151,7 +151,7 @@ public class BrandService : IBrandService
         {
             return Result<BrandResponse>.Failure(uploadResult.Message);
         }
-        entity.ImageUrl = uploadResult.Data;
+        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Brand>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToBrandResponse();
