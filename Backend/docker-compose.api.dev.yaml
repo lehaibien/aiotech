@@ -7,6 +7,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ConnectionStrings__Redis=redis:6379
       - ConnectionStrings__ElasticSearch=http://elastic_search:9200
+      - ConnectionStrings__Minio=http://minio:9000
       - ELASTICSEARCH_PASSWORD=123456
       - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
@@ -77,8 +78,26 @@ services:
       - 9200:9200
     environment:
       - ELASTIC_PASSWORD=123456
+      - discovery.type=single-node
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+  minio:
+    image: minio/minio
+    container_name: aiotech_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # MinIO API
+      - "9001:9001" # MinIO Console
+    environment:
+      MINIO_ROOT_USER: aiotech
+      MINIO_ROOT_PASSWORD: 123456
+      MINIO_REGION_NAME: us-east-1
+    volumes:
+      - storage_data:/data
+    secrets:
+      - storage_password
     networks:
       - backend
 
@@ -87,6 +106,7 @@ volumes:
   wwwroot:
   redis_data:
   elastic_data:
+  storage_data:
 
 networks:
   backend:
