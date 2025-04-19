@@ -71,4 +71,7 @@ export const API_URL = {
   dashboardTopProduct: "dashboard/top-product",
   dashboardSale: "dashboard/sale",
   dashboardStockAlert: "dashboard/stock-alert",
+
+  // wishlist
+  wishlist: "wishlist",
 };
