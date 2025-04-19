@@ -96,8 +96,6 @@ services:
       MINIO_REGION_NAME: us-east-1
     volumes:
       - storage_data:/data
-    secrets:
-      - storage_password
     networks:
       - backend
 
