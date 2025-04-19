@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import {NoItem} from "@/components/core/NoItem";
-import { PostPreviewResponse } from "@/types/post";
-import ArticleIcon from "@mui/icons-material/Article";
-import { Box, Grid2 as Grid, Pagination } from "@mui/material";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback } from "react";
-import BlogCard from "./BlogCard";
+import { NoItem } from '@/components/core/NoItem';
+import { PostPreviewResponse } from '@/types/post';
+import ArticleIcon from '@mui/icons-material/Article';
+import { Box, Grid2 as Grid, Pagination } from '@mui/material';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback } from 'react';
+import BlogPostItem from '../home/BlogPostItem';
 
 type BlogListProps = {
   posts: PostPreviewResponse[];
@@ -25,7 +25,7 @@ export default function BlogList({
   const handlePageChange = useCallback(
     (event: React.ChangeEvent<unknown>, value: number) => {
       const params = new URLSearchParams(searchParams);
-      params.set("page", value.toString());
+      params.set('page', value.toString());
       router.push(`?${params.toString()}`);
     },
     [router, searchParams]
@@ -33,10 +33,10 @@ export default function BlogList({
 
   if (posts.length === 0) {
     return (
-      <Box sx={{ py: 8, textAlign: "center" }}>
+      <Box sx={{ py: 8, textAlign: 'center' }}>
         <NoItem
-          title="Không có bài viết nào"
-          description="Hiện tại chưa có bài viết nào được đăng. Vui lòng quay lại sau."
+          title='Không có bài viết nào'
+          description='Hiện tại chưa có bài viết nào được đăng. Vui lòng quay lại sau.'
           icon={ArticleIcon}
         />
       </Box>
@@ -45,27 +45,35 @@ export default function BlogList({
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid
+        container
+        spacing={3}>
         {posts.map((post) => (
-          <Grid size={{ xs: 12, sm: 6 }} key={post.id}>
-            <BlogCard
+          <Grid
+            size={{ xs: 12, sm: 6 }}
+            key={post.id}>
+            <BlogPostItem
               id={post.id}
               title={post.title}
               imageUrl={post.imageUrl}
               createdDate={post.createdDate}
+              imgHeight={315}
             />
           </Grid>
         ))}
       </Grid>
 
       {totalPages > 1 && (
-        <Box mt={4} display="flex" justifyContent="center">
+        <Box
+          mt={4}
+          display='flex'
+          justifyContent='center'>
           <Pagination
             count={totalPages}
             page={currentPage}
             onChange={handlePageChange}
-            color="primary"
-            size="large"
+            color='primary'
+            size='large'
             showFirstButton
             showLastButton
           />

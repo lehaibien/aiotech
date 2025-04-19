@@ -1,24 +1,22 @@
 import { HtmlContent } from '@/components/core/HtmlContent';
-import {NoItem} from '@/components/core/NoItem';
+import { NoItem } from '@/components/core/NoItem';
 import { API_URL } from '@/constant/apiUrl';
 import { DEFAULT_TIMEZONE } from '@/constant/common';
-import BlogCard from '@/features/blog/BlogCard';
 import TableOfContents from '@/features/blog/TableOfContents';
+import BlogPostItem from '@/features/home/BlogPostItem';
 import { getApi, getByIdApi } from '@/lib/apiClient';
 import dayjs from '@/lib/extended-dayjs';
 import { HTMLPartToTextPart, parseUUID } from '@/lib/utils';
 import type { PostResponse } from '@/types';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {
   Box,
   Breadcrumbs,
-  Button,
   Chip,
   Divider,
   Paper,
-  Typography,
+  Typography
 } from '@mui/material';
 import { Metadata } from 'next';
 import Image from 'next/image';
@@ -94,47 +92,27 @@ export default async function PostPage({ params }: { params: Params }) {
 
   return (
     <>
-      <Box sx={{ mb: 3 }}>
-        <Button
-          component={Link}
+      <Breadcrumbs
+        aria-label='breadcrumb'
+        sx={{ mb: 2 }}>
+        <Link
+          href='/'
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}>
+          Trang chủ
+        </Link>
+        <Link
           href='/blogs'
-          startIcon={<ArrowBackIcon />}
-          sx={{ mb: 2 }}
-          variant='text'
-          color='primary'>
-          Quay lại danh sách bài viết
-        </Button>
-
-        <Breadcrumbs
-          aria-label='breadcrumb'
-          sx={{ mb: 2 }}>
-          <Link
-            href='/'
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}>
-            Trang chủ
-          </Link>
-          <Link
-            href='/blogs'
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}>
-            Blog
-          </Link>
-          <Typography
-            color='text.primary'
-            sx={{ display: 'flex', alignItems: 'center' }}>
-            {post.title}
-          </Typography>
-        </Breadcrumbs>
-      </Box>
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}>
+          Tin tức
+        </Link>
+        <Typography>{post.title}</Typography>
+      </Breadcrumbs>
 
       <Box
         sx={{
@@ -203,10 +181,8 @@ export default async function PostPage({ params }: { params: Params }) {
               {/* Title and Meta */}
               <Box sx={{ mb: 4 }}>
                 <Typography
-                  variant='h1'
-                  component='h1'
-                  gutterBottom
-                  lineHeight={1.2}>
+                  component='h2'
+                  variant='h1'>
                   {post.title}
                 </Typography>
 
@@ -215,39 +191,27 @@ export default async function PostPage({ params }: { params: Params }) {
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
-                    gap: { xs: 2, md: 3 },
+                    gap: 2,
                     mb: 3,
                   }}>
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 0.75,
+                      gap: 1,
                     }}>
-                    <CalendarTodayIcon
-                      fontSize='small'
-                      sx={{ color: 'text.secondary' }}
-                    />
-                    <Typography
-                      variant='body2'
-                      sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      {formattedDate}
-                    </Typography>
+                    <CalendarTodayIcon fontSize='small' />
+                    <Typography variant='body2'>{formattedDate}</Typography>
                   </Box>
 
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 0.75,
+                      gap: 1,
                     }}>
-                    <AccessTimeIcon
-                      fontSize='small'
-                      sx={{ color: 'text.secondary' }}
-                    />
-                    <Typography
-                      variant='body2'
-                      sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                    <AccessTimeIcon fontSize='small' />
+                    <Typography variant='body2'>
                       {hours}:{minutes}
                     </Typography>
                   </Box>
@@ -259,7 +223,6 @@ export default async function PostPage({ params }: { params: Params }) {
                         alignItems: 'center',
                         flexWrap: 'wrap',
                         gap: 1,
-                        mt: { xs: 1, md: 0 },
                       }}>
                       {post.tags.map((tag, index) => (
                         <Chip
@@ -269,7 +232,6 @@ export default async function PostPage({ params }: { params: Params }) {
                           variant='outlined'
                           sx={{
                             borderRadius: 1,
-                            fontSize: '0.75rem',
                           }}
                         />
                       ))}
@@ -287,15 +249,12 @@ export default async function PostPage({ params }: { params: Params }) {
 
           {/* Related Posts */}
           {relatedPosts.length > 0 && (
-            <Box sx={{ mt: 5 }}>
+            <Box sx={{}}>
               <Typography
                 variant='h5'
                 component='h2'
                 gutterBottom
                 sx={{
-                  fontWeight: 700,
-                  mb: 3,
-                  pb: 1,
                   borderBottom: '2px solid',
                   borderColor: 'primary.main',
                   display: 'inline-block',
@@ -311,10 +270,10 @@ export default async function PostPage({ params }: { params: Params }) {
                     sm: 'repeat(2, 1fr)',
                     md: 'repeat(3, 1fr)',
                   },
-                  gap: 3,
+                  gap: 2,
                 }}>
                 {relatedPosts.map((post) => (
-                  <BlogCard
+                  <BlogPostItem
                     key={post.id}
                     id={post.id}
                     title={post.title}
