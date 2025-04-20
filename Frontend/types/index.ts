@@ -1,5 +1,4 @@
 export * from "./base";
-export * from "./role";
 export * from "./user";
 export * from "./category";
 export * from "./product";
@@ -9,5 +8,4 @@ export * from "./cart";
 export * from "./review";
 export * from "./report";
 export * from "./post";
-export * from "./notification";
 export * from "./dashboard";
