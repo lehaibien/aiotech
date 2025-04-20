@@ -2,7 +2,7 @@ import { ProductCard } from '@/components/core/ProductCard';
 import { API_URL } from '@/constant/apiUrl';
 import { getApiQuery } from '@/lib/apiClient';
 import { ProductResponse } from '@/types/product';
-import { Box, Grid2 as Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { UUID } from 'crypto';
 
 export default async function RelatedProducts({

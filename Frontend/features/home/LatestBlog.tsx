@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { HighlightTypography } from "@/components/core/HighlightTypography";
-import { PostPreviewResponse } from "@/types/post";
-import { Box, Button, Theme, useMediaQuery } from "@mui/material";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import BlogPostItem from "./BlogPostItem";
-import Link from "next/link";
+import { HighlightTypography } from '@/components/core/HighlightTypography';
+import { PostPreviewResponse } from '@/types/post';
+import { Box, Button } from '@mui/material';
+import Link from 'next/link';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import BlogPostItem from './BlogPostItem';
 
 const swiperBreakpoints = {
   320: {
@@ -31,53 +31,49 @@ type LatestBlogProps = {
 };
 
 export function LatestBlog({ posts }: LatestBlogProps) {
-  const isMobile = useMediaQuery((theme: Theme) =>
-    theme.breakpoints.down("sm")
-  );
-
   return (
     <Box
       sx={{
         mb: 4,
-        "& .swiper-button-next, .swiper-button-prev": {
-          color: "primary.main",
-          "&::after": {
-            fontSize: "16px",
+        '& .swiper-button-next, .swiper-button-prev': {
+          color: 'primary.main',
+          '&::after': {
+            fontSize: '16px',
           },
-          width: "24px",
-          height: "24px",
+          width: '24px',
+          height: '24px',
           padding: 2,
-          backgroundColor: "rgba(0, 0, 0, 0.15)",
-          borderRadius: "50%",
+          backgroundColor: 'rgba(0, 0, 0, 0.15)',
+          borderRadius: '50%',
         },
-      }}
-    >
+      }}>
       <Box
         sx={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
         <HighlightTypography
-          variant="h5"
-          component="h2"
+          variant='h5'
+          component='h2'
           gutterBottom
           sx={{
             fontWeight: 600,
-          }}
-        >
+          }}>
           Tin công nghệ mới nhất
         </HighlightTypography>
-        <Button component={Link} href="/blogs" variant="text" color="primary">
+        <Button
+          component={Link}
+          href='/blogs'
+          variant='text'
+          color='primary'>
           Xem thêm
         </Button>
       </Box>
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        navigation={!isMobile}
         pagination={{ clickable: true }}
         autoplay={{
           delay: 3000,
@@ -86,8 +82,7 @@ export function LatestBlog({ posts }: LatestBlogProps) {
         }}
         breakpoints={swiperBreakpoints}
         loop={true}
-        style={{ padding: "10px 0 40px 0" }}
-      >
+        style={{ padding: '10px 0 40px 0' }}>
         {posts.map((post) => (
           <SwiperSlide key={post.id}>
             <BlogPostItem

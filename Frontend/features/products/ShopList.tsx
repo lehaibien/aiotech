@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductResponse } from '@/types';
-import { Box, Grid2 as Grid, Pagination } from '@mui/material';
+import { Box, Grid, Pagination } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';

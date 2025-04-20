@@ -1,7 +1,7 @@
 import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { ProductCard } from "@/components/core/ProductCard";
 import { ProductResponse } from "@/types";
-import { Grid2 as Grid, Stack } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 
 type BestSellerProps = {
   products: ProductResponse[];

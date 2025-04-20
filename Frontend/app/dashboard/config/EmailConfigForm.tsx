@@ -9,7 +9,7 @@ import {
   Button,
   Paper,
   Typography,
-  Grid2 as Grid,
+  Grid,
   FormLabel,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';

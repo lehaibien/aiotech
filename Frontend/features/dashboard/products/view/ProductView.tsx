@@ -5,7 +5,7 @@ import {
   Button,
   Chip,
   Divider,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Stack,
   Typography,

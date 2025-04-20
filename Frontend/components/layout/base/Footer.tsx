@@ -12,7 +12,7 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Link,
   Stack,

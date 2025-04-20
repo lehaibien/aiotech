@@ -3,7 +3,7 @@
 import { NoItem } from '@/components/core/NoItem';
 import { PostPreviewResponse } from '@/types/post';
 import ArticleIcon from '@mui/icons-material/Article';
-import { Box, Grid2 as Grid, Pagination } from '@mui/material';
+import { Box, Grid, Pagination } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback } from 'react';
 import BlogPostItem from '../home/BlogPostItem';

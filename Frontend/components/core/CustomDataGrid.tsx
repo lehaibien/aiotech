@@ -1,21 +1,29 @@
-"use client";
+'use client';
 
-import NoRowOverlay from "@/components/core/NoRowOverlay";
-import useColumns from "@/hooks/useColumns";
-import useDataGridData from "@/hooks/useGridData";
-import { PaginatedList } from "@/types";
-import { alpha, Box } from "@mui/material";
+import NoRowOverlay from '@/components/core/NoRowOverlay';
+import useColumns from '@/hooks/useColumns';
+import useDataGridData from '@/hooks/useGridData';
+import { PaginatedList } from '@/types';
+import { alpha, Box } from '@mui/material';
 import {
   DataGrid,
   GridColDef,
   GridDensity,
   GridPaginationModel,
   GridRowSelectionModel,
-} from "@mui/x-data-grid";
-import { usePathname } from "next/navigation";
-import React, { useImperativeHandle } from "react";
-import DataGridPagination from "./CustomDataGridPagination";
-import ErrorOverlay from "./ErrorOverlay";
+} from '@mui/x-data-grid';
+import { usePathname } from 'next/navigation';
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import DataGridPagination from './CustomDataGridPagination';
+import ErrorOverlay from './ErrorOverlay';
 
 export type CustomDataGridProps<T> = {
   columns: GridColDef[];
@@ -38,25 +46,31 @@ function CustomDataGrid<T>(
     checkboxSelection,
     withRowNumber,
     height = 600,
-    density = "standard",
+    density = 'standard',
     loadData,
   }: CustomDataGridProps<T>,
-  ref: React.ForwardedRef<CustomDataGridRef>
+  ref: ForwardedRef<CustomDataGridRef>
 ) {
   useImperativeHandle(ref, () => ({
     rowSelectionModel: rowSelectionModel,
     reload: () => mutate(),
-    clearSelection: () => setRowSelectionModel([]),
+    clearSelection: () =>
+      setRowSelectionModel({
+        type: 'include',
+        ids: new Set<string>(),
+      }),
   }));
 
   const pathName = usePathname();
-  const [paginationModel, setPaginationModel] =
-    React.useState<GridPaginationModel>({
-      page: 0,
-      pageSize: 10,
-    });
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 10,
+  });
   const [rowSelectionModel, setRowSelectionModel] =
-    React.useState<GridRowSelectionModel>([]);
+    useState<GridRowSelectionModel>({
+      type: 'include',
+      ids: new Set<string>(),
+    });
 
   // Add row number column if needed
   const gridColumn = useColumns({
@@ -69,22 +83,22 @@ function CustomDataGrid<T>(
     paginationModel,
     loadData,
   });
-  const rowRef = React.useRef(data?.items ?? []);
-  const row = React.useMemo(() => {
+  const rowRef = useRef(data?.items ?? []);
+  const row = useMemo(() => {
     if (Array.isArray(data?.items) && data?.items.length > 0) {
       rowRef.current = data.items;
     }
     return rowRef.current;
   }, [data?.items]);
-  const rowCountRef = React.useRef(data?.totalCount ?? 0);
-  const rowCount = React.useMemo(() => {
+  const rowCountRef = useRef(data?.totalCount ?? 0);
+  const rowCount = useMemo(() => {
     if (data?.totalCount !== undefined) {
       rowCountRef.current = data.totalCount;
     }
     return rowCountRef.current;
   }, [data?.totalCount]);
   // Handle pagination model change
-  const onPaginationModelChange = React.useCallback(
+  const onPaginationModelChange = useCallback(
     (newPaginationModel: GridPaginationModel) => {
       setPaginationModel(newPaginationModel);
     },
@@ -92,13 +106,15 @@ function CustomDataGrid<T>(
   );
 
   return (
-    <Box height={height} width={"100%"}>
+    <Box
+      height={height}
+      width={'100%'}>
       <DataGrid
         rows={row}
         rowCount={rowCount}
         columns={gridColumn}
         checkboxSelection={checkboxSelection}
-        paginationMode="server"
+        paginationMode='server'
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
         rowSelectionModel={rowSelectionModel}
@@ -119,41 +135,40 @@ function CustomDataGrid<T>(
           ),
           noRowsOverlay: error
             ? () => (
-                <ErrorOverlay message={"Lỗi tải dữ liệu: " + error.message} />
+                <ErrorOverlay message={'Lỗi tải dữ liệu: ' + error.message} />
               )
             : NoRowOverlay,
           noResultsOverlay: NoRowOverlay,
         }}
         slotProps={{
           loadingOverlay: {
-            variant: "circular-progress",
+            variant: 'circular-progress',
           },
         }}
-        getRowHeight={() => "auto"}
+        getRowHeight={() => 'auto'}
         density={density}
         showCellVerticalBorder
         sx={(theme) => ({
-          backgroundColor: theme.palette.background.paper,
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: alpha(theme.palette.background.paper, 0.3),
+          '& .MuiDataGrid-columnHeader': {
+            backgroundColor: alpha(theme.palette.background.paper, 0.1),
           },
-          "& .MuiDataGrid-cell:focus": {
-            outline: "none",
+          '& .MuiDataGrid-cell:focus': {
+            outline: 'none',
           },
-          "& .MuiDataGrid-cell": {
-            display: "flex",
-            alignItems: "center",
+          '& .MuiDataGrid-cell': {
+            display: 'flex',
+            alignItems: 'center',
             px: 1,
           },
-          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
-          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
-            py: "15px",
+          '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: 1 },
+          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+            py: 2,
           },
-          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
-            py: "22px",
+          '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+            py: 3,
           },
-          "& .MuiDataGrid-selectedRowCount": {
-            display: "none",
+          '& .MuiDataGrid-selectedRowCount': {
+            display: 'none',
           },
         })}
       />
@@ -161,4 +176,4 @@ function CustomDataGrid<T>(
   );
 }
 
-export default React.forwardRef(CustomDataGrid);
+export default forwardRef(CustomDataGrid);

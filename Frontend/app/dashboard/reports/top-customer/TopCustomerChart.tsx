@@ -26,15 +26,17 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
           xAxis={[
             {
               label: "Ngày kể từ lần mua cuối",
+              min: 0,
+              max: Math.max(...scatterData.map((item) => item.x)) + 1,
               tickMinStep: 1,
+              tickMaxStep: 7,
             },
           ]}
           yAxis={[
             {
               label: "Tổng chi",
               labelStyle: {
-                transform: "translate(20px, -160px)",
-                textAnchor: "end",
+                transform: "translate(30px, -165px)",
               },
             },
           ]}
@@ -42,12 +44,14 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
             {
               data: scatterData,
               label: "Khách hàng",
-              valueFormatter: (value) => `(${value.z}, ${value.y} VNĐ - ${value.x} ngày trước)`,
+              valueFormatter: (value) => `(${value?.z}, ${value?.y} VNĐ)`,
             },
           ]}
-          width={800}
-          height={400}
-          margin={{ left: 100 }}
+          grid={{ vertical: true, horizontal: true }}
+          sx={{
+            width: "100%",
+            height: "100%",
+          }}
         />
       </Box>
     </Card>

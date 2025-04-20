@@ -10,7 +10,7 @@ import {
   Box,
   Button,
   Container,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Stack,
   Typography,

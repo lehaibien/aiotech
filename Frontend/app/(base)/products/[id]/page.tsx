@@ -15,7 +15,7 @@ import {
   Breadcrumbs,
   Container,
   Divider,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Typography,
 } from '@mui/material';

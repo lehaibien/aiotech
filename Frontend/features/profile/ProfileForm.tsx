@@ -13,7 +13,7 @@ import {
   Box,
   Button,
   FormLabel,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   TextField,
 } from '@mui/material';

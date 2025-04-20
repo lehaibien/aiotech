@@ -1,5 +1,5 @@
 import { CheckCircle, Groups, Security, Update } from '@mui/icons-material';
-import { Box, Grid2 as Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { Metadata } from 'next';
 import Link from 'next/link';
 

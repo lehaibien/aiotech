@@ -25,7 +25,7 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Radio,
   RadioGroup,

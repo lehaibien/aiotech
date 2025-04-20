@@ -14,7 +14,7 @@ import {
   Box,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   Stack,
   Typography,
 } from '@mui/material';

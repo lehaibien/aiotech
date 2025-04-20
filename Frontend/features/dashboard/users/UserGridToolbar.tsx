@@ -21,18 +21,22 @@ export function UserGridToolbar({ dataGridRef }: UserGridToolbarProps) {
     router.push("/dashboard/users/upsert");
   }
   function triggerEdit() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
-    if (rowSelection.length === 0) {
+    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
+    if(rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }
-    if (rowSelection.length > 1) {
+    if (rowSelection.size === 0) {
+      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
+      return;
+    }
+    if (rowSelection.size > 1) {
       enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, {
         variant: "error",
       });
       return;
     }
-    const selectedData = rowSelection[0];
+    const selectedData = rowSelection.values().next().value;
     if (selectedData) {
       dataGridRef.current?.clearSelection();
       router.push(`/dashboard/users/upsert?id=${selectedData}`);

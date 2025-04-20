@@ -12,7 +12,7 @@ import { convertObjectToFormData } from '@/lib/utils';
 import { ComboBoxItem } from '@/types';
 import { type ProductRequest, ProductRequestSchema } from '@/types/product';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, FormLabel, Grid2 as Grid, Typography } from '@mui/material';
+import { Box, FormLabel, Grid, Typography } from '@mui/material';
 import { MuiChipsInput } from 'mui-chips-input';
 import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';

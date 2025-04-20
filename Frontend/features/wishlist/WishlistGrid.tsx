@@ -1,7 +1,7 @@
 'use client';
 
 import { wishlistItemsAtom } from '@/lib/globalState';
-import { Grid2 as Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { useAtomValue } from 'jotai';
 import { WishlistEmpty } from './WishlistEmpty';
 import { WishlistItemCard } from './WishlistItemCard';

@@ -16,7 +16,7 @@ import {
   Button,
   Divider,
   FormLabel,
-  Grid2 as Grid
+  Grid
 } from '@mui/material';
 import { MuiChipsInput } from 'mui-chips-input';
 import Link from 'next/link';
