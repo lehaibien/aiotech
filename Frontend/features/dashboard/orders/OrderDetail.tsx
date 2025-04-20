@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import {NoItem} from "@/components/core/NoItem";
-import { formatNumberWithSeperator, mapOrderStatus } from "@/lib/utils";
-import { OrderResponse } from "@/types/order";
+import { NoItem } from '@/components/core/NoItem';
+import { formatNumberWithSeperator, mapOrderStatus } from '@/lib/utils';
+import { OrderResponse } from '@/types/order';
 import {
   CalendarToday as CalendarIcon,
   CreditCard as CreditCardIcon,
@@ -13,8 +13,8 @@ import {
   Person as PersonIcon,
   Phone as PhoneIcon,
   LocalShipping as TruckIcon,
-} from "@mui/icons-material";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+} from '@mui/icons-material';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import {
   Box,
   Card,
@@ -30,8 +30,8 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import dayjs from "@/lib/extended-dayjs";
+} from '@mui/material';
+import dayjs from '@/lib/extended-dayjs';
 
 type OrderDetailProps = {
   order?: OrderResponse;
@@ -41,27 +41,37 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   if (!order)
     return (
       <NoItem
-        title="Đơn hàng không tồn tại"
-        description=""
+        title='Đơn hàng không tồn tại'
+        description=''
         icon={ReceiptIcon}
       />
     );
   return (
     <Box sx={{}}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+      <Grid
+        container
+        spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ height: '100%' }}>
+              <Typography
+                variant='h6'
+                gutterBottom>
                 Thông tin đơn hàng
               </Typography>
-              <List>
+              <List
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '100%',
+                }}>
                 <ListItem>
                   <ListItemIcon>
                     <PackageIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Mã đơn hàng"
+                    primary='Mã đơn hàng'
                     secondary={order.trackingNumber}
                   />
                 </ListItem>
@@ -70,8 +80,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <CalendarIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Ngày đặt hàng"
-                    secondary={dayjs(order.createdDate).format("DD/MM/YYYY")}
+                    primary='Ngày đặt hàng'
+                    secondary={dayjs(order.createdDate).format('DD/MM/YYYY')}
                   />
                 </ListItem>
                 <ListItem>
@@ -79,11 +89,11 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <TruckIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Ngày giao hàng"
+                    primary='Ngày giao hàng'
                     secondary={
                       order.deliveryDate
-                        ? dayjs(order.deliveryDate).format("DD/MM/YYYY")
-                        : "Chưa cập nhật"
+                        ? dayjs(order.deliveryDate).format('DD/MM/YYYY')
+                        : 'Chưa cập nhật'
                     }
                   />
                 </ListItem>
@@ -92,7 +102,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <PendingIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Trạng thái:"
+                    primary='Trạng thái:'
                     secondary={mapOrderStatus(order.status)}
                   />
                 </ListItem>
@@ -100,18 +110,29 @@ export default function OrderDetail({ order }: OrderDetailProps) {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ height: '100%' }}>
+              <Typography
+                variant='h6'
+                gutterBottom>
                 Thông tin khách hàng
               </Typography>
-              <List>
+              <List
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  height: '100%',
+                }}>
                 <ListItem>
                   <ListItemIcon>
                     <PersonIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Tên" secondary={order.name} />
+                  <ListItemText
+                    primary='Tên'
+                    secondary={order.name}
+                  />
                 </ListItem>
                 {order.phoneNumber && (
                   <ListItem>
@@ -119,7 +140,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                       <PhoneIcon />
                     </ListItemIcon>
                     <ListItemText
-                      primary="Số điện thoại"
+                      primary='Số điện thoại'
                       secondary={order.phoneNumber}
                     />
                   </ListItem>
@@ -128,14 +149,17 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   <ListItemIcon>
                     <MapPinIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Địa chỉ" secondary={order.address} />
+                  <ListItemText
+                    primary='Địa chỉ'
+                    secondary={order.address}
+                  />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <CreditCardIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Phương thức thanh toán"
+                    primary='Phương thức thanh toán'
                     secondary={order.paymentProvider}
                   />
                 </ListItem>
@@ -146,27 +170,29 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       </Grid>
       <Card sx={{ marginTop: 3 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography
+            variant='h6'
+            gutterBottom>
             Chi tiết đơn hàng
           </Typography>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Sản phẩm</TableCell>
-                <TableCell align="right">Giá</TableCell>
-                <TableCell align="right">Số lượng</TableCell>
-                <TableCell align="right">Thành tiền</TableCell>
+                <TableCell align='right'>Giá</TableCell>
+                <TableCell align='right'>Số lượng</TableCell>
+                <TableCell align='right'>Thành tiền</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {order.orderItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.productName}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align='right'>
                     {formatNumberWithSeperator(item.price)} đ
                   </TableCell>
-                  <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align='right'>{item.quantity}</TableCell>
+                  <TableCell align='right'>
                     {formatNumberWithSeperator(item.totalPrice)} đ
                   </TableCell>
                 </TableRow>
@@ -174,25 +200,23 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               <TableRow>
                 <TableCell
                   colSpan={3}
-                  align="right"
-                  sx={{ fontWeight: "bold" }}
-                >
+                  align='right'>
                   Thuế GTGT
                 </TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                <TableCell align='right'>
                   {formatNumberWithSeperator(order.tax)} đ
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
                   colSpan={3}
-                  align="right"
-                  sx={{ fontWeight: "bold" }}
-                >
-                  Thành tiền
+                  align='right'>
+                  <Typography variant='h6'>Thành tiền</Typography>
                 </TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                  {formatNumberWithSeperator(order.totalPrice)} đ
+                <TableCell align='right'>
+                  <Typography variant='h6'>
+                    {formatNumberWithSeperator(order.totalPrice)} đ
+                  </Typography>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -202,10 +226,12 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       {order.note && (
         <Card sx={{ marginTop: 3 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
+            <Typography
+              variant='h6'
+              gutterBottom>
               Ghi chú
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
               <FileTextIcon />
               <Typography>{order.note}</Typography>
             </Box>
