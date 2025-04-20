@@ -6,8 +6,7 @@ import { parseUUID } from '@/lib/utils';
 import {
   ComboBoxItem,
   ProductRequest,
-  ProductRequestDefault,
-  ProductUpdateResponse,
+  ProductUpdateResponse
 } from '@/types';
 import { Stack, Typography } from '@mui/material';
 import 'server-only';
@@ -17,7 +16,20 @@ export default async function ProductUpsertPage({
 }: {
   searchParams?: { [key: string]: string | undefined };
 }) {
-  let product: ProductRequest = ProductRequestDefault;
+  let product: ProductRequest = {
+    id: EMPTY_UUID,
+    sku: '',
+    name: '',
+    description: '',
+    price: 0,
+    discountPrice: 0,
+    stock: 0,
+    brandId: EMPTY_UUID,
+    categoryId: EMPTY_UUID,
+    tags: [],
+    images: [],
+    isFeatured: false,
+  };
   let brandCombobox: ComboBoxItem[] = [];
   let categoryCombobox: ComboBoxItem[] = [];
   let images: string[] = [];

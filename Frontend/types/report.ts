@@ -1,4 +1,4 @@
-import { UUID } from "crypto";
+import { UUID } from 'crypto';
 
 export type BaseReportRequest = {
   startDate: string;
@@ -10,13 +10,6 @@ export type SaleReportRequest = BaseReportRequest;
 export type OrderReportRequest = {
   customerUsername?: string;
 } & BaseReportRequest;
-
-export type InventoryStatusReportRequest = {
-  pageIndex: number;
-  pageSize: number;
-  brandId?: UUID;
-  categoryId?: UUID;
-};
 
 export type CategoryPerformanceReportRequest = BaseReportRequest;
 export type BrandPerformanceReportRequest = BaseReportRequest;
@@ -93,4 +86,4 @@ export type TopCustomerReportResponse = {
   latestPurchaseDate: Date;
   daysSinceLastPurchase: number;
   frequentlyPurchasedCategories: string[];
-}
+};

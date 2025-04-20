@@ -1,8 +1,3 @@
-export type SystemConfiguration = {
-  banner: BannerConfiguration;
-  email: EmailConfiguration;
-};
-
 export type BannerConfiguration = {
   title: string;
   description: string;
