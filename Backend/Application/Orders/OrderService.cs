@@ -137,6 +137,7 @@ public class OrderService : IOrderService
                 OrderItems = x
                     .OrderItems.Select(y => new OrderItemResponse
                     {
+                        Id = y.Id,
                         ProductId = y.ProductId,
                         ProductName = y.Product.Name,
                         Price = (double) y.Product.Price,
