@@ -34,7 +34,6 @@ export const SaleReportFilter = ({
 
   const handleStartDateChange = (newValue: Dayjs | null) => {
     setStartDate(newValue);
-    // Ensure endDate is exactly one year after and greater than startDate
     if (!newValue) {
       setEndDate(null);
       return;
@@ -47,7 +46,6 @@ export const SaleReportFilter = ({
 
   const handleEndDateChange = (newValue: Dayjs | null) => {
     if (!newValue) return;
-    // Ensure endDate is greater than startDate
     if (startDate && newValue.isBefore(startDate)) {
       setEndDate(startDate.add(1, 'day'));
       return;

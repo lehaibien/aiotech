@@ -9,6 +9,16 @@ import 'server-only';
 
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
+async function getSaleData(request: SaleReportRequest) {
+  const response = await getApiQuery(API_URL.saleReport, request);
+  if (response.success) {
+    return response.data as SaleReportResponse[];
+  } else {
+    console.error(response.message);
+    return [];
+  }
+}
+
 export default async function Page({
   searchParams,
 }: {
@@ -25,13 +35,7 @@ export default async function Page({
     startDate: startDate.startOf('month').toISOString(),
     endDate: endDate.endOf('month').toISOString(),
   };
-  let chartData: SaleReportResponse[] = [];
-  const response = await getApiQuery(API_URL.saleReport, request);
-  if (response.success) {
-    chartData = response.data as SaleReportResponse[];
-  } else {
-    console.error(response.message);
-  }
+  const chartData: SaleReportResponse[] = await getSaleData(request);
 
   const total = chartData
     .map((x) => x.revenue)
