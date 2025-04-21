@@ -11,7 +11,6 @@ import { tabsClasses } from '@mui/material/Tabs';
 import MuiToolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import AccountSection from './Account';
-import Searchbar from './SearchBar';
 import SideMenuMobile from './SideMenuMobile';
 
 const Toolbar = styled(MuiToolbar)({
@@ -66,7 +65,6 @@ export default function AppNavbar() {
           <Box
             display='flex'
             alignItems='center'>
-            <Searchbar />
             <AccountSection showText={false} />
             <MenuButton
               aria-label='menu'

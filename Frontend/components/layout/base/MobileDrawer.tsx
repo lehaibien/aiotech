@@ -1,6 +1,6 @@
 'use client';
 
-import { BaseNavigation } from '@/constant/baseMenu';
+import { baseNavItems } from '@/constant/routes';
 import { ComboBoxItem } from '@/types';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -75,13 +75,13 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
         <Box sx={{ width: 280, p: 2 }}>
           {/* Main Navigation */}
           <List sx={{ mb: 2 }}>
-            {BaseNavigation.map((nav, index) => (
-              <React.Fragment key={nav.name}>
+            {baseNavItems.map((nav, index) => (
+              <React.Fragment key={nav.title}>
                 <ListItem disablePadding>
                   <ListItemButton
                     LinkComponent={Link}
-                    href={nav.path ?? '/'}
-                    selected={pathName === nav.path}
+                    href={nav.href ?? '/'}
+                    selected={pathName === nav.href}
                     onClick={onClose}
                     sx={{
                       '&.Mui-selected': {
@@ -89,8 +89,12 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
                         fontWeight: 600,
                       },
                     }}>
-                    {nav.icon && <ListItemIcon>{nav.icon}</ListItemIcon>}
-                    <ListItemText primary={nav.name} />
+                    {nav.icon && (
+                      <ListItemIcon>
+                        <nav.icon />
+                      </ListItemIcon>
+                    )}
+                    <ListItemText primary={nav.title} />
                   </ListItemButton>
                 </ListItem>
 
