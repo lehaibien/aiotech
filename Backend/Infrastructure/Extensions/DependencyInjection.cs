@@ -23,7 +23,7 @@ public static class DependencyInjection
         );
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            connectionString = configuration.GetConnectionString("Docker");
+            connectionString = configuration.GetConnectionString("DatabaseConnection");
         }
 
         services.AddDbContext<ApplicationDbContext>(options =>

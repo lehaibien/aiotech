@@ -10,6 +10,7 @@ public class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
+        builder.Property(x => x.Code).IsRequired().IsUnicode(false).HasMaxLength(255);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(255);
         builder.HasQueryFilter(x => x.IsDeleted == false);
         builder
@@ -21,22 +22,25 @@ public class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
             new Role
             {
                 Id = Guid.Parse("85844E35-F6A0-4F8E-90C4-071366BF5FF6"),
-                Name = "Admin",
-                CreatedDate = DateTime.UtcNow,
+                Code = "admin",
+                Name = "Quản trị",
+                CreatedDate = new DateTime(2025, 1, 1),
                 CreatedBy = "system",
             },
             new Role
             {
                 Id = Guid.Parse("A8B42A83-B1BC-4937-99D9-0AAA70B896E5"),
-                Name = "User",
-                CreatedDate = DateTime.UtcNow,
+                Code = "user",
+                Name = "Khách hàng",
+                CreatedDate = new DateTime(2025, 1, 1),
                 CreatedBy = "system",
             },
             new Role
             {
                 Id = Guid.Parse("B2F02C43-4D58-45D2-84A4-CAF92A976672"),
-                Name = "Shipper",
-                CreatedDate = DateTime.UtcNow,
+                Code = "shipper",
+                Name = "Giao hàng",
+                CreatedDate = new DateTime(2025, 1, 1),
                 CreatedBy = "system",
             }
         );

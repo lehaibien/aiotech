@@ -13,10 +13,10 @@ export default auth(async (req) => {
   if (path.startsWith("/shipper") && !req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  if (path.startsWith("/dashboard") && req.auth?.user.role !== "Admin") {
+  if (path.startsWith("/dashboard") && req.auth?.user.role !== "admin") {
     return NextResponse.redirect(new URL("/no-access", req.url));
   }
-  if (path.startsWith("/shipper") && req.auth?.user.role !== "Shipper" && req.auth?.user.role!== "Admin") {
+  if (path.startsWith("/shipper") && req.auth?.user.role !== "shipper" && req.auth?.user.role!== "admin") {
     return NextResponse.redirect(new URL("/no-access", req.url));
   }
   if (path.startsWith("/profile") && !req.auth) {

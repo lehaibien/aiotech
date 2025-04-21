@@ -86,9 +86,9 @@ public static class DependencyInjection
     {
         services
             .AddAuthorizationBuilder()
-            .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
-            .AddPolicy("Manager", policy => policy.RequireRole("Manager"))
-            .AddPolicy("AdminOrManager", policy => policy.RequireRole("Admin", "Manager"));
+            .AddPolicy("Admin", policy => policy.RequireRole(RolePolicy.Admin))
+            .AddPolicy("Shipper", policy => policy.RequireRole(RolePolicy.Shipper))
+            .AddPolicy("AdminOrShipper", policy => policy.RequireRole(RolePolicy.AdminOrShipper));
         return services;
     }
 
