@@ -151,7 +151,7 @@ function DataTable<T>(
         }}
         slotProps={{
           loadingOverlay: {
-            variant: 'circular-progress',
+            variant: 'skeleton',
           },
         }}
         getRowHeight={() => 'auto'}

@@ -13,7 +13,7 @@ import {
   GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import { usePathname } from 'next/navigation';
-import React, {
+import {
   ForwardedRef,
   forwardRef,
   useCallback,
@@ -142,7 +142,7 @@ function CustomDataGrid<T>(
         }}
         slotProps={{
           loadingOverlay: {
-            variant: 'circular-progress',
+            variant: 'skeleton',
           },
         }}
         getRowHeight={() => 'auto'}
