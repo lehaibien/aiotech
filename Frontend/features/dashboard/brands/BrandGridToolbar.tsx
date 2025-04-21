@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 type BrandGridToolbarProps = {
-  dataGridRef: React.RefObject<DataTableRef>;
+  dataGridRef: React.RefObject<DataTableRef | null>;
   children?: React.ReactNode;
 };
 function BrandGridToolbar({ dataGridRef, children }: BrandGridToolbarProps) {

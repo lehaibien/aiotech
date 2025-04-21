@@ -1,10 +1,10 @@
-import { DataTableRef } from "@/components/core/DataTable";
-import { SearchToolBar } from "@/components/core/SearchToolBar";
-import { debounce } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import { DataTableRef } from '@/components/core/DataTable';
+import { SearchToolBar } from '@/components/core/SearchToolBar';
+import { debounce } from '@mui/material';
+import { useCallback, useMemo } from 'react';
 
 type DashboardSearchBarProps = {
-  dataGridRef: React.RefObject<DataTableRef>;
+  dataGridRef: React.RefObject<DataTableRef | null>;
 };
 
 export function DashboardSearchBar({ dataGridRef }: DashboardSearchBarProps) {
@@ -24,9 +24,9 @@ export function DashboardSearchBar({ dataGridRef }: DashboardSearchBarProps) {
     <SearchToolBar
       onChange={debouncedSearch}
       sx={(theme) => ({
-        marginLeft: "auto",
-        [theme.breakpoints.down("md")]: {
-          width: "100%",
+        marginLeft: 'auto',
+        [theme.breakpoints.down('md')]: {
+          width: '100%',
         },
       })}
     />

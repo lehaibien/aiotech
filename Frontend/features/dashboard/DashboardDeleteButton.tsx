@@ -9,8 +9,8 @@ import { useSnackbar } from 'notistack';
 
 type DashboardDeleteButtonProps = {
   dataGridRef:
-    | React.RefObject<CustomDataGridRef>
-    | React.RefObject<DataTableRef>;
+    | React.RefObject<CustomDataGridRef | null>
+    | React.RefObject<DataTableRef | null>;
   name: string;
   apiUrl: string;
 };
