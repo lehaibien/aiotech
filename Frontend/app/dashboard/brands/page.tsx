@@ -3,7 +3,7 @@ import { BrandContent } from "@/features/dashboard/brands/BrandContent";
 
 export default async function Page() {
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Typography variant="h5">Quản lý thương hiệu</Typography>
       <BrandContent />
     </Stack>

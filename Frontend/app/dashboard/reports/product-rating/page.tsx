@@ -29,7 +29,7 @@ export default async function ProductRatingPage() {
     });
 
   return (
-    <Stack>
+    <Stack spacing={2}>
       <Typography variant="h5">Thống kê đánh giá sản phẩm</Typography>
 
       <Box>

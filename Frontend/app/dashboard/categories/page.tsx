@@ -3,7 +3,7 @@ import { Stack, Typography } from "@mui/material";
 
 export default function Page() {
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Typography variant="h5">Quản lý danh mục sản phẩm</Typography>
       <CategoryContent />
     </Stack>

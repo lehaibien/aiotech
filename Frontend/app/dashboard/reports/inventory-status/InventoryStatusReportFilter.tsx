@@ -1,7 +1,7 @@
 "use client";
 
 import { ComboBoxItem } from "@/types";
-import { Autocomplete, Button, Paper, Stack, TextField } from "@mui/material";
+import { Autocomplete, Button, Stack, TextField } from "@mui/material";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -55,71 +55,48 @@ export default function InventoryStatusReportFilter({
   };
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 3,
-        borderRadius: 2,
-        mb: 4,
-      }}
-    >
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Autocomplete
-          id="brand-filter"
-          size="small"
-          options={brandList}
-          value={selectedBrand}
-          onChange={(_, newValue) => {
-            setSelectedBrand(newValue);
-          }}
-          isOptionEqualToValue={(option, value) => option.value === value.value}
-          getOptionLabel={(option) => option.text}
-          renderInput={(params) => (
-            <TextField {...params} label="Thương hiệu" />
-          )}
-          sx={{
-            flex: 1,
-            maxWidth: "25%",
-            minWidth: 200,
-          }}
-        />
-        <Autocomplete
-          id="category-filter"
-          size="small"
-          options={categoryList}
-          value={selectedCategory}
-          onChange={(_, newValue) => {
-            setSelectedCategory(newValue);
-          }}
-          isOptionEqualToValue={(option, value) => option.value === value.value}
-          getOptionLabel={(option) => option.text}
-          renderInput={(params) => <TextField {...params} label="Danh mục" />}
-          sx={{
-            flex: 1,
-            maxWidth: "25%",
-            minWidth: 200,
-          }}
-        />
-        <Button
-          onClick={onApplyFilter}
-          variant="contained"
-          color="primary"
-          sx={{
-            height: 40,
-            px: 3,
-            fontWeight: 600,
-            borderRadius: 1.5,
-            boxShadow: 2,
-            "&:hover": {
-              boxShadow: 4,
-              transform: "translateY(-2px)",
-            },
-            transition: "all 0.2s ease",
-          }}
-        >
-          Áp dụng bộ lọc
-        </Button>
-      </Stack>
-    </Paper>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <Autocomplete
+        id="brand-filter"
+        size="small"
+        options={brandList}
+        value={selectedBrand}
+        onChange={(_, newValue) => {
+          setSelectedBrand(newValue);
+        }}
+        isOptionEqualToValue={(option, value) => option.value === value.value}
+        getOptionLabel={(option) => option.text}
+        renderInput={(params) => <TextField {...params} label="Thương hiệu" />}
+        sx={{
+          flex: 1,
+          maxWidth: "25%",
+          minWidth: 200,
+        }}
+      />
+      <Autocomplete
+        id="category-filter"
+        size="small"
+        options={categoryList}
+        value={selectedCategory}
+        onChange={(_, newValue) => {
+          setSelectedCategory(newValue);
+        }}
+        isOptionEqualToValue={(option, value) => option.value === value.value}
+        getOptionLabel={(option) => option.text}
+        renderInput={(params) => <TextField {...params} label="Danh mục" />}
+        sx={{
+          flex: 1,
+          maxWidth: "25%",
+          minWidth: 200,
+        }}
+      />
+      <Button
+        onClick={onApplyFilter}
+        variant="contained"
+        color="primary"
+      >
+        Lọc
+      </Button>
+    </Stack>
   );
 }

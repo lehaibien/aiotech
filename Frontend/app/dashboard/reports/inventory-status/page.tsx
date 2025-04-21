@@ -28,7 +28,7 @@ export default async function OutOfStockReportPage({
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h4">Thống kê trạng thái kho</Typography>
+      <Typography variant="h5">Thống kê trạng thái kho</Typography>
       <InventoryStatusReportFilter
         brandList={brandList}
         categoryList={categoryList}

@@ -1,9 +1,10 @@
 "use client";
 
-import {DataGridPaginationPure} from "@/components/core/CustomDataGridPaginationPure";
+import { DataGridPaginationPure } from "@/components/core/CustomDataGridPaginationPure";
 import NoRowOverlay from "@/components/core/NoRowOverlay";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { BrandPerformanceReportResponse } from "@/types";
+import { alpha } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 const columns: GridColDef<BrandPerformanceReportResponse>[] = [
@@ -43,17 +44,14 @@ type BrandPerformanceGridProps = {
   data: BrandPerformanceReportResponse[];
 };
 
-export function BrandPerformanceGrid({
-  data,
-}: BrandPerformanceGridProps) {
+export const BrandPerformanceGrid = ({ data }: BrandPerformanceGridProps) => {
   return (
     <DataGrid
       rows={data}
       columns={columns}
       getRowId={(row) => row.brandId}
       disableRowSelectionOnClick
-      showCellVerticalBorder
-      showColumnVerticalBorder
+      disableColumnMenu
       pageSizeOptions={[10, 25, 50]}
       paginationMode="client"
       pagination={true}
@@ -70,6 +68,31 @@ export function BrandPerformanceGrid({
         noRowsOverlay: NoRowOverlay,
         noResultsOverlay: NoRowOverlay,
       }}
+      showCellVerticalBorder
+      showColumnVerticalBorder
+      sx={(theme) => ({
+        "& .MuiDataGrid-columnHeader": {
+          backgroundColor: alpha(theme.palette.background.paper, 0.1),
+        },
+        "& .MuiDataGrid-cell:focus": {
+          outline: "none",
+        },
+        "& .MuiDataGrid-cell": {
+          display: "flex",
+          alignItems: "center",
+          px: 1,
+        },
+        "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: 1 },
+        "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+          py: 2,
+        },
+        "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+          py: 3,
+        },
+        "& .MuiDataGrid-selectedRowCount": {
+          display: "none",
+        },
+      })}
     />
   );
-}
+};

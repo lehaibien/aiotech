@@ -33,7 +33,7 @@ export default async function ConfigurationPage() {
     console.error("Failed to load email config: ", emailResponse.message);
   }
   return (
-    <Stack gap={2}>
+    <Stack spacing={2}>
       <Typography variant="h5">Cài đặt hệ thống</Typography>
       <BannerConfigForm banner={banner} />
       <EmailConfigForm email={email} />

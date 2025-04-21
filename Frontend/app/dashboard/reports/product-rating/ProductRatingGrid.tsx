@@ -2,9 +2,9 @@
 
 import { DataGridPaginationPure } from "@/components/core/CustomDataGridPaginationPure";
 import NoRowOverlay from "@/components/core/NoRowOverlay";
-import { Box, Rating } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { ProductRatingReportResponse } from "@/types";
+import { alpha, Box, Rating } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 const columns: GridColDef<ProductRatingReportResponse>[] = [
   {
@@ -54,8 +54,7 @@ export function ProductRatingGrid({ data }: ProductRatingGridProps) {
       columns={columns}
       getRowId={(row) => row.productId}
       disableRowSelectionOnClick
-      showCellVerticalBorder
-      showColumnVerticalBorder
+      disableColumnMenu
       pageSizeOptions={[10, 25, 50]}
       initialState={{
         pagination: {
@@ -72,6 +71,31 @@ export function ProductRatingGrid({ data }: ProductRatingGridProps) {
         noRowsOverlay: NoRowOverlay,
         noResultsOverlay: NoRowOverlay,
       }}
+      showCellVerticalBorder
+      showColumnVerticalBorder
+      sx={(theme) => ({
+        "& .MuiDataGrid-columnHeader": {
+          backgroundColor: alpha(theme.palette.background.paper, 0.1),
+        },
+        "& .MuiDataGrid-cell:focus": {
+          outline: "none",
+        },
+        "& .MuiDataGrid-cell": {
+          display: "flex",
+          alignItems: "center",
+          px: 1,
+        },
+        "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: 1 },
+        "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+          py: 2,
+        },
+        "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+          py: 3,
+        },
+        "& .MuiDataGrid-selectedRowCount": {
+          display: "none",
+        },
+      })}
     />
   );
 }
