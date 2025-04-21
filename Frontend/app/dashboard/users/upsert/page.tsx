@@ -1,80 +1,78 @@
-import { API_URL } from "@/constant/apiUrl";
-import { EMPTY_UUID } from "@/constant/common";
-import { UserUpsertForm } from "@/features/dashboard/users/UserUpsertForm";
-import { getApi, getByIdApi } from "@/lib/apiClient";
-import { parseUUID } from "@/lib/utils";
-import { ComboBoxItem, UserRequest, UserResponse } from "@/types";
-import { Card, Typography } from "@mui/material";
-import "server-only";
-import dayjs from "@/lib/extended-dayjs";
+import { API_URL } from '@/constant/apiUrl';
+import { EMPTY_UUID } from '@/constant/common';
+import { UserUpsertForm } from '@/features/dashboard/users/UserUpsertForm';
+import { getApi, getByIdApi } from '@/lib/apiClient';
+import dayjs from '@/lib/extended-dayjs';
+import { parseUUID } from '@/lib/utils';
+import { ComboBoxItem, UserResponse } from '@/types';
+import { Stack, Typography } from '@mui/material';
+import 'server-only';
+
+type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | undefined };
+  searchParams: SearchParams;
 }) {
-  const uuid = parseUUID(searchParams?.id ?? "");
+  const { id } = await searchParams;
+  const uuid = parseUUID(id ?? '');
   let data: UserResponse = {
     id: EMPTY_UUID,
-    userName: "",
-    familyName: "",
-    givenName: "",
-    email: "",
-    phoneNumber: "",
-    avatarUrl: "",
+    userName: '',
+    familyName: '',
+    givenName: '',
+    email: '',
+    phoneNumber: '',
+    avatarUrl: '',
     roleId: EMPTY_UUID,
-    fullName: "",
-    role: "",
+    fullName: '',
+    role: '',
     createdDate: dayjs().toDate(),
-    createdBy: "",
+    createdBy: '',
     isLocked: false,
   };
   let roleCombobox: ComboBoxItem[] = [];
+  const roleComboboxResponse = await getApi(API_URL.roleComboBox);
+  if (roleComboboxResponse.success) {
+    roleCombobox = roleComboboxResponse.data as ComboBoxItem[];
+  } else {
+    console.error('Get role combobox error: ' + roleComboboxResponse.message);
+  }
 
   if (uuid !== EMPTY_UUID) {
     const response = await getByIdApi(API_URL.user, { id: uuid });
     if (response.success) {
-      const userData = response.data as UserRequest;
+      const userData = response.data as UserResponse;
+      const roleId = roleCombobox.find(
+        (item) => item.text.toLowerCase() === userData.role?.toLowerCase()
+      )?.value;
       data = {
         ...data,
-        id: parseUUID(userData.id ?? ""),
+        id: parseUUID(userData.id ?? ''),
         userName: userData.userName,
         givenName: userData.givenName,
         familyName: userData.familyName,
         email: userData.email,
         phoneNumber: userData.phoneNumber,
-        roleId: parseUUID(userData.roleId ?? ""),
+        roleId: parseUUID(roleId),
       };
     } else {
       console.error(response.message);
     }
   }
 
-  const roleComboboxResponse = await getApi(API_URL.roleComboBox);
-  if (roleComboboxResponse.success) {
-    roleCombobox = roleComboboxResponse.data as ComboBoxItem[];
-  } else {
-    console.error("Get role combobox error: " + roleComboboxResponse.message);
-  }
-
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        padding: 2,
-        display: "flex",
-        flexDirection: "column",
-        alignSelf: "center",
-      }}
-    >
+    <Stack spacing={2}>
       <Typography
-        component="h1"
-        variant="h5"
-      >
-        {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài
-        khoản
+        component='h1'
+        variant='h5'>
+        {data.id === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật'} tài khoản
       </Typography>
-      <UserUpsertForm data={data} roleCombobox={roleCombobox} />
-    </Card>
+      <UserUpsertForm
+        data={data}
+        roleCombobox={roleCombobox}
+      />
+    </Stack>
   );
 }

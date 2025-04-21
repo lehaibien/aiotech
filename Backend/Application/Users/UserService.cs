@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using Application.Helpers;
 using Application.Images;
 using Application.Users.Dtos;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
@@ -71,14 +70,14 @@ public class UserService : IUserService
 
     public async Task<Result<UserResponse>> GetById(Guid id)
     {
-        var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);
+        var entity = await _unitOfWork.GetRepository<User>().GetAll()
+            .ProjectToUserResponse()
+            .FirstOrDefaultAsync(x => x.Id == id);
         if(entity is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
-
-        var response = entity.MapToUserResponse();
-        return Result<UserResponse>.Success(response);
+        return Result<UserResponse>.Success(entity);
     }
 
     public async Task<Result<UserResponse>> GetByUsername(string username)

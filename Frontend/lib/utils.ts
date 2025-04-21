@@ -21,8 +21,8 @@ export function generateUUID(): UUID {
  * @param {string} uuid - The string to parse.
  * @returns {UUID} - The parsed UUID, or an empty UUID if the input is an empty string.
  */
-export function parseUUID(uuid: string): UUID {
-  if (uuid === "") {
+export function parseUUID(uuid: string | undefined): UUID {
+  if (uuid === undefined || uuid === "") {
     return EMPTY_UUID;
   }
   return uuid as UUID;
