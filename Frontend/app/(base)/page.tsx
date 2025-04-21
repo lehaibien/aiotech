@@ -11,7 +11,7 @@ import {
   PostPreviewResponse,
   ProductResponse,
 } from "@/types";
-import { BannerConfiguration } from "@/types/config";
+import { BannerConfiguration } from "@/types/sys-config";
 import { Container } from "@mui/material";
 import { Metadata } from "next";
 

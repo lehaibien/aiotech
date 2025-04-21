@@ -3,7 +3,7 @@
 import { ControlledTextField } from '@/components/core/ControlledTextField';
 import { API_URL } from '@/constant/apiUrl';
 import { postApi } from '@/lib/apiClient';
-import { EmailConfiguration } from '@/types/config';
+import { EmailConfiguration } from '@/types/sys-config';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,

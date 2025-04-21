@@ -1,7 +1,7 @@
 import NavBreadcrumbs from '@/components/core/NavBreadcrumbs';
 import { API_URL } from '@/constant/apiUrl';
 import { getApi } from '@/lib/apiClient';
-import { BannerConfiguration, EmailConfiguration } from '@/types/config';
+import { BannerConfiguration, EmailConfiguration } from '@/types/sys-config';
 import { Stack, Typography } from '@mui/material';
 import { BannerConfigForm } from './BannerConfigForm';
 import { EmailConfigForm } from './EmailConfigForm';
