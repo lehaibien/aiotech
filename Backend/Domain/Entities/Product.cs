@@ -1,6 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-
 namespace Domain.Entities;
 
 public class Product : BaseEntity
@@ -19,7 +16,7 @@ public class Product : BaseEntity
     public bool IsFeatured { get; set; }
 
     // Navigation properties
-    public virtual Brand? Brand { get; set; }
-    public virtual Category? Category { get; set; }
-    public virtual ICollection<Review> Reviews { get; set; } = [];
+    public Brand Brand { get; set; } = null!;
+    public Category Category { get; set; } = null!;
+    public ICollection<Review> Reviews { get; set; } = [];
 }

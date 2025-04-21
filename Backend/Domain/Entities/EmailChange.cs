@@ -9,6 +9,5 @@ public class EmailChange
     public DateTime CreatedDate { get; set; }
     public DateTime ExpiryDate { get; set; }
 
-    // Navigation properties
     public User User { get; set; } = null!;
 }
