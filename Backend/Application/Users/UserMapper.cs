@@ -7,7 +7,7 @@ public static class UserMapper
 {
     public static IQueryable<UserResponse> ProjectToUserResponse(this IQueryable<User> source)
     {
-        var result = source.Select(x => new UserResponse
+        return source.Select(x => new UserResponse
         {
             Id = x.Id,
             UserName = x.UserName,
@@ -24,12 +24,11 @@ public static class UserMapper
             IsDeleted = x.IsDeleted,
             Role = x.Role.Name,
         });
-        return result;
     }
 
     public static UserResponse MapToUserResponse(this User source)
     {
-        var result = new UserResponse
+        return new UserResponse
         {
             Id = source.Id,
             UserName = source.UserName,
@@ -45,12 +44,11 @@ public static class UserMapper
             IsLocked = source.IsLocked,
             IsDeleted = source.IsDeleted,
         };
-        return result;
     }
 
     public static User MapToUser(this UserRequest source)
     {
-        var result = new User
+        return new User
         {
             UserName = source.UserName,
             GivenName = source.GivenName,
@@ -59,7 +57,6 @@ public static class UserMapper
             PhoneNumber = source.PhoneNumber,
             RoleId = source.RoleId,
         };
-        return result;
     }
 
     public static User ApplyToUser(this UserRequest source, User user)
