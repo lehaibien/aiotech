@@ -34,7 +34,7 @@ export default async function Page() {
   let topProducts: DashboardTopProduct[] = [];
   let recentOrders: OrderResponse[] = [];
   let stockAlerts: StockAlert[] = [];
-  const kpiPromise = await getApi(API_URL.dashboardCard);
+  const kpiPromise = getApi(API_URL.dashboardCard);
   const dashboardSalePromise = getApi(API_URL.dashboardSale);
   const topProductsPromise = getApi(API_URL.dashboardTopProduct);
   const recentOrdersPromise = getApiQuery(API_URL.recentOrder, {
