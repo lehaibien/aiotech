@@ -144,7 +144,6 @@ public class AuthController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Value;
         _logger.LogInformation(
             "A user {UserName} has been created at {Timestamp}",
             request.UserName,
