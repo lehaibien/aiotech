@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
 
 type SaleCardProps = {

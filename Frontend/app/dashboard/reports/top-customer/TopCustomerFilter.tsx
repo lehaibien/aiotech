@@ -1,6 +1,6 @@
 "use client";
 
-import { ReportMonthFilter } from "@/features/dashboard/reports/ReportMonthFilter";
+import { MonthPicker } from "@/components/core/MonthPicker";
 import dayjs from "@/lib/extended-dayjs";
 import { Box, Button } from "@mui/material";
 import { Dayjs } from "dayjs";
@@ -56,13 +56,13 @@ export default function TopCustomerFilter({
   };
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
-      <ReportMonthFilter
+      <MonthPicker
         label="Từ tháng"
         value={startDate}
         onChange={setStartDate}
         onClose={handleStartDateClose}
       />
-      <ReportMonthFilter
+      <MonthPicker
         label="Đến tháng"
         value={endDate}
         onChange={setEndDate}
