@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { TopCustomerReportResponse } from "@/types/report";
-import { Box, Card, Typography } from "@mui/material";
-import { ScatterChart } from "@mui/x-charts/ScatterChart";
+import { TopCustomerReportResponse } from '@/types/report';
+import { Box, Stack, Typography } from '@mui/material';
+import { ScatterChart } from '@mui/x-charts/ScatterChart';
 
 type TopCustomerChartProps = {
   data: TopCustomerReportResponse[];
@@ -17,16 +17,18 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
   }));
 
   return (
-    <Card variant="outlined" sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+    <Stack spacing={2}>
+      <Typography
+        variant='h6'
+        gutterBottom>
         Hoạt động khách hàng và tổng chi
       </Typography>
-      <Box sx={{ width: "100%", height: 400 }}>
+      <Box sx={{ width: '100%', height: 400 }}>
         <ScatterChart
           xAxis={[
             {
-              label: "Ngày kể từ lần mua cuối",
-              min: 0,
+              label: 'Ngày kể từ lần mua cuối',
+              min: Math.min(...scatterData.map((item) => item.x)) - 3,
               max: Math.max(...scatterData.map((item) => item.x)) + 1,
               tickMinStep: 1,
               tickMaxStep: 7,
@@ -34,26 +36,25 @@ export default function TopCustomerChart({ data }: TopCustomerChartProps) {
           ]}
           yAxis={[
             {
-              label: "Tổng chi",
+              label: 'Tổng chi',
               labelStyle: {
-                transform: "translate(30px, -165px)",
+                transform: 'translate(30px, -165px)',
               },
             },
           ]}
           series={[
             {
               data: scatterData,
-              label: "Khách hàng",
+              label: 'Khách hàng',
               valueFormatter: (value) => `(${value?.z}, ${value?.y} VNĐ)`,
             },
           ]}
-          grid={{ vertical: true, horizontal: true }}
           sx={{
-            width: "100%",
-            height: "100%",
+            width: '100%',
+            height: '100%',
           }}
         />
       </Box>
-    </Card>
+    </Stack>
   );
 }
