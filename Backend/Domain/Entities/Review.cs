@@ -8,7 +8,6 @@ public class Review : BaseEntity
     public int Rating { get; set; }
     public string? Comment { get; set; }
 
-    // Navigation properties
-    public virtual Product? Product { get; set; }
-    public virtual User? User { get; set; }
+    public Product Product { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

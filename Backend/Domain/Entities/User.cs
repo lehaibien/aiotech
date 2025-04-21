@@ -9,15 +9,14 @@ public class User : BaseEntity
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
     public string? AvatarUrl { get; set; }
-    public string? Address { get; set; } = null!;
+    public string? Address { get; set; }
     public string Password { get; set; } = null!;
     public string Salt { get; set; } = null!;
     public Guid RoleId { get; set; }
     public bool IsLocked { get; set; }
 
-    // Navigation properties
-    public virtual Role Role { get; set; } = null!;
-    public virtual ICollection<Order> Orders { get; set; } = [];
-    public virtual ICollection<Review> Reviews { get; set; } = [];
-    public virtual ICollection<WishlistItem> WishlistItems { get; set; } = [];
+    public Role Role { get; set; } = null!;
+    public ICollection<Order> Orders { get; set; } = [];
+    public ICollection<Review> Reviews { get; set; } = [];
+    public ICollection<WishlistItem> WishlistItems { get; set; } = [];
 }

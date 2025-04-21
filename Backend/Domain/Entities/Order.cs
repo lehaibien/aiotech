@@ -15,10 +15,9 @@ public class Order : BaseEntity
     public string? Note { get; set; }
     public string? CancelReason { get; set; }
 
-    // Navigation properties
-    public virtual User Customer { get; set; } = null!;
-    public virtual Payment? Payment { get; set; }
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = [];
+    public User Customer { get; set; } = null!;
+    public Payment? Payment { get; set; }
+    public ICollection<OrderItem> OrderItems { get; set; } = [];
 }
 
 public enum OrderStatus
