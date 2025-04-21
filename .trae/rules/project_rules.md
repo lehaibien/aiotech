@@ -1,0 +1,1 @@
+Read rules from `.trae/rules` directory
