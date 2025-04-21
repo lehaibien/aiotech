@@ -1,13 +1,13 @@
-import { getListApi } from "@/lib/apiClient";
-import { GetListRequest, PaginatedList } from "@/types";
-import { GridPaginationModel, GridSortItem } from "@mui/x-data-grid";
-import React from "react";
-import useSWR from "swr";
+import { getListApi } from '@/lib/apiClient';
+import { GetListRequest, PaginatedList } from '@/types';
+import { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { useCallback, useMemo } from 'react';
+import useSWR from 'swr';
 
 type useDataTableFetchProps = {
   apiUrl: string;
   paginationModel: GridPaginationModel;
-  sortModel: GridSortItem;
+  sortModel: GridSortModel;
   textSearch: string;
 };
 
@@ -17,13 +17,13 @@ export function useDataTableFetch<T>({
   sortModel,
   textSearch,
 }: useDataTableFetchProps) {
-  const fetcher = React.useCallback(
+  const fetcher = useCallback(
     async ([apiUrl, page, pageSize, sortColumn, sortOrder, textSearch]: [
       string,
       number,
       number,
       string | undefined,
-      "asc" | "desc" | undefined,
+      'asc' | 'desc' | undefined,
       string
     ]): Promise<PaginatedList<T>> => {
       const request: GetListRequest = {
@@ -42,13 +42,13 @@ export function useDataTableFetch<T>({
     []
   );
 
-  const swrKey = React.useMemo(
+  const swrKey = useMemo(
     () => [
       apiUrl,
       paginationModel.page,
       paginationModel.pageSize,
-      sortModel?.field,
-      sortModel?.sort,
+      sortModel[0]?.field,
+      sortModel[0]?.sort,
       textSearch,
     ],
     [apiUrl, paginationModel, sortModel, textSearch]

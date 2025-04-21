@@ -23,7 +23,7 @@ import React, {
 import CustomDataGridPagination from './CustomDataGridPagination';
 import ErrorOverlay from './ErrorOverlay';
 
-export type DataTableProps = {
+type DataTableProps = {
   columns: GridColDef[];
   apiUrl: string;
   checkboxSelection?: boolean;
@@ -50,20 +50,6 @@ function DataTable<T>(
   }: DataTableProps,
   ref: ForwardedRef<DataTableRef>
 ) {
-  useImperativeHandle(ref, () => ({
-    rowSelectionModel: rowSelectionModel,
-    reload: () => mutate(),
-    search: (search: string) => {
-      textSearch.current = search;
-      mutate();
-    },
-    clearSelection: () =>
-      setRowSelectionModel({
-        type: 'include',
-        ids: new Set<string>(),
-      }),
-  }));
-
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
@@ -85,9 +71,26 @@ function DataTable<T>(
   const { data, error, isValidating, mutate } = useDataTableFetch<T>({
     apiUrl: apiUrl,
     paginationModel,
-    sortModel: sortModel[0],
+    sortModel: sortModel,
     textSearch: textSearch.current,
   });
+
+  useImperativeHandle(ref, () => ({
+    rowSelectionModel: rowSelectionModel,
+    reload: () => {
+      if (mutate) mutate();
+    },
+    search: (search: string) => {
+      textSearch.current = search;
+      if (mutate) mutate();
+    },
+    clearSelection: () =>
+      setRowSelectionModel({
+        type: 'include',
+        ids: new Set<string>(),
+      }),
+  }));
+
   const rowRef = React.useRef(data?.items ?? []);
   const row = React.useMemo(() => {
     if (Array.isArray(data?.items)) {
