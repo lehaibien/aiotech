@@ -1,5 +1,7 @@
 import { UUID } from "crypto";
 
+export type SearchParams = Promise<{ [key: string]: string | undefined }>;
+
 export type BaseGetListRequest = {
   textSearch: string;
   pageIndex: number;

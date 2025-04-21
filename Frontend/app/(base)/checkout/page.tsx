@@ -2,20 +2,17 @@ import { API_URL } from "@/constant/apiUrl";
 import { CheckoutComponent } from "@/features/checkout/CheckoutComponent";
 import { getApi } from "@/lib/apiClient";
 import { auth } from "@/lib/auth";
-import { UserProfileResponse } from "@/types";
-import { redirect } from "next/navigation";
+import { SearchParams, UserProfileResponse } from "@/types";
 import "server-only";
 
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | undefined };
+  searchParams: SearchParams;
 }) {
-  const isError = Boolean(searchParams?.error);
+  const { error } = await searchParams;
+  const isError = Boolean(error);
   const session = await auth();
-  if (!session) {
-    redirect("/login");
-  }
   let profile: UserProfileResponse = {
     familyName: "",
     givenName: "",
@@ -24,7 +21,7 @@ export default async function CheckoutPage({
     email: "",
     phoneNumber: "",
   };
-  const response = await getApi(API_URL.user + `/${session.user.id}/profile`);
+  const response = await getApi(API_URL.user + `/${session?.user.id}/profile`);
   if (response.success) {
     profile = response.data as UserProfileResponse;
   } else {
