@@ -40,7 +40,6 @@
     "@tiptap/starter-kit": "^2.11.5",
     "@types/uuid": "^10.0.0",
     "dayjs": "^1.11.13",
-    "fuse.js": "^7.1.0",
     "jotai": "^2.9.3",
     "jwt-decode": "^4.0.0",
     "mui-chips-input": "^7.0.1",
@@ -52,7 +51,6 @@
     "react-dom": "^19.1.0",
     "react-drag-drop-files": "^3.0.1",
     "react-hook-form": "^7.54.2",
-    "server-only": "^0.0.1",
     "swiper": "^11.2.4",
     "swr": "^2.2.5",
     "zod": "^3.23.8"
