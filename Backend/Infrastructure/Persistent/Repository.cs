@@ -163,7 +163,11 @@ public class Repository<T> : IRepository<T>
         return await _dbSet.AnyAsync(predicate, cancellationToken);
     }
 
-    public virtual IEnumerable<T> ExecuteStoredProcedure(string storedProcedureName, object model)
+    public virtual IEnumerable<T> ExecuteStoredProcedure<TModel>(
+        string storedProcedureName,
+        T model
+    )
+        where TModel : class
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
         {
@@ -186,11 +190,12 @@ public class Repository<T> : IRepository<T>
         return dataTable.ToList<T>();
     }
 
-    public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
+    public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync<TModel>(
         string storedProcedureName,
-        object model,
+        T model,
         CancellationToken cancellationToken = default
     )
+        where TModel : class
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
         {
@@ -215,7 +220,7 @@ public class Repository<T> : IRepository<T>
 
     public virtual IEnumerable<T> ExecuteStoredProcedure(
         string storedProcedureName,
-        params SqlParameter[]? parameters
+        SqlParameter[]? parameters
     )
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
@@ -238,8 +243,8 @@ public class Repository<T> : IRepository<T>
 
     public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
         string storedProcedureName,
-        CancellationToken cancellationToken = default,
-        params SqlParameter[]? parameters
+        SqlParameter[]? parameters,
+        CancellationToken cancellationToken = default
     )
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)

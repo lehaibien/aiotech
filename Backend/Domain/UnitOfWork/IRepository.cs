@@ -36,20 +36,19 @@ public interface IRepository<T>
         Expression<Func<T, bool>> predicate,
         CancellationToken cancellationToken = default
     );
-    IEnumerable<T> ExecuteStoredProcedure(string storedProcedureName, object model);
-    Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
+    IEnumerable<T> ExecuteStoredProcedure<TModel>(string storedProcedureName, T model)
+        where TModel : class;
+    Task<IEnumerable<T>> ExecuteStoredProcedureAsync<TModel>(
         string storedProcedureName,
-        object model,
+        T model,
         CancellationToken cancellationToken = default
-    );
-    IEnumerable<T> ExecuteStoredProcedure(
-        string storedProcedureName,
-        params SqlParameter[]? parameters
-    );
+    )
+        where TModel : class;
+    IEnumerable<T> ExecuteStoredProcedure(string storedProcedureName, SqlParameter[]? parameters);
     Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
         string storedProcedureName,
-        CancellationToken cancellationToken = default,
-        params SqlParameter[]? parameters
+        SqlParameter[]? parameters,
+        CancellationToken cancellationToken = default
     );
     void SaveChanges();
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
