@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Shared;
 
@@ -22,13 +23,15 @@ public class ProductService : IProductService
     private readonly IImageService _imageService;
     private const string FolderUpload = "products";
     private readonly IDistributedCache _cache;
+    private readonly ILogger<ProductService> _logger;
 
     public ProductService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IHttpContextAccessor contextAccessor,
         IImageService imageService,
-        IDistributedCache cache
+        IDistributedCache cache,
+        ILogger<ProductService> logger
     )
     {
         _unitOfWork = unitOfWork;
@@ -36,6 +39,7 @@ public class ProductService : IProductService
         _contextAccessor = contextAccessor;
         _imageService = imageService;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -364,11 +368,13 @@ public class ProductService : IProductService
 
     public async Task<Result<ProductResponse>> Create(CreateProductRequest request)
     {
+        _logger.LogInformation("Creating new product with SKU: {Sku}, Name: {Name}", request.Sku, request.Name);
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .FindAsync(x => x.Name == request.Name && x.Sku == request.Sku);
         if (isExists != null)
         {
+            _logger.LogWarning("Product already exists with SKU: {Sku} and Name: {Name} when trying to create", request.Sku, request.Name);
             return Result<ProductResponse>.Failure("Sản phẩm đã tồn tại");
         }
         var entity = _mapper.Map<Product>(request);
@@ -389,11 +395,13 @@ public class ProductService : IProductService
         await _cache.RemoveAsync(CacheKeys.TopProducts);
         await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         var response = _mapper.Map<ProductResponse>(entity);
+        _logger.LogInformation("Successfully created product with ID: {ProductId}", entity.Id);
         return Result<ProductResponse>.Success(response);
     }
 
     public async Task<Result<ProductResponse>> Update(UpdateProductRequest request)
     {
+        _logger.LogInformation("Updating product ID: {ProductId}", request.Id);
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .AnyAsync(x => x.Id != request.Id && x.Name == request.Name && x.Sku == request.Sku);
@@ -404,6 +412,7 @@ public class ProductService : IProductService
         var entity = await _unitOfWork.GetRepository<Product>().FindAsync(x => x.Id == request.Id);
         if (entity is null)
         {
+            _logger.LogWarning("Product not found for update with ID: {ProductId}", request.Id);
             return Result<ProductResponse>.Failure("Sản phẩm không tồn tại");
         }
         _mapper.Map(request, entity);
@@ -432,6 +441,7 @@ public class ProductService : IProductService
         await _cache.RemoveAsync(CacheKeys.TopProducts);
         await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
         var response = _mapper.Map<ProductResponse>(entity);
+        _logger.LogInformation("Successfully updated product with ID: {ProductId}", request.Id);
         return Result<ProductResponse>.Success(response);
     }
 
@@ -440,6 +450,7 @@ public class ProductService : IProductService
         var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(id);
         if (entity is null)
         {
+            _logger.LogWarning("Product not found for deletion with ID: {ProductId}", id);
             return Result<string>.Failure("Sản phẩm không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
@@ -449,6 +460,7 @@ public class ProductService : IProductService
         await _unitOfWork.SaveChangesAsync();
         await _cache.RemoveAsync(CacheKeys.TopProducts);
         await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
+        _logger.LogInformation("Successfully deleted product with ID: {ProductId}", id);
         return Result<string>.Success("Xóa thành công");
     }
 
@@ -469,6 +481,7 @@ public class ProductService : IProductService
         await _unitOfWork.SaveChangesAsync();
         await _cache.RemoveAsync(CacheKeys.TopProducts);
         await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
+        _logger.LogInformation("Successfully deleted {Count} products", ids.Count);
         return Result<string>.Success("Xóa thành công");
     }
 

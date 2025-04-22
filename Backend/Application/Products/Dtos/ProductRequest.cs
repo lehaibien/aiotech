@@ -13,6 +13,10 @@ public class ProductRequest
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
 
+    [Required(ErrorMessage = "Giá nhập sản phẩm không được để trống.")]
+    [Range(0, double.MaxValue, ErrorMessage = "Giá nhập sản phẩm không hợp lệ.")]
+    public double CostPrice { get; set; }
+
     [Required(ErrorMessage = "Giá sản phẩm không được để trống.")]
     [Range(0, double.MaxValue, ErrorMessage = "Giá sản phẩm không hợp lệ.")]
     public double Price { get; set; }
