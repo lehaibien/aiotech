@@ -1,39 +1,34 @@
-'use client';
+"use client";
 
-import ControlledComboBox from '@/components/core/ControlledComboBox';
-import { ControlledTextField } from '@/components/core/ControlledTextField';
+import ControlledComboBox from "@/components/core/ControlledComboBox";
+import { ControlledTextField } from "@/components/core/ControlledTextField";
 import RichTextEditor, {
   RichTextEditorRef,
-} from '@/components/core/RichTextEditor';
-import { API_URL } from '@/constant/apiUrl';
-import { EMPTY_UUID } from '@/constant/common';
-import { postApi, putApi } from '@/lib/apiClient';
-import { convertObjectToFormData } from '@/lib/utils';
-import { PostRequest, PostRequestSchema, PostResponse } from '@/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Box,
-  Button,
-  Divider,
-  FormLabel,
-  Grid
-} from '@mui/material';
-import { MuiChipsInput } from 'mui-chips-input';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useSnackbar } from 'notistack';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import ImageUpload from './ImageUpload';
+} from "@/components/core/RichTextEditor";
+import { API_URL } from "@/constant/apiUrl";
+import { EMPTY_UUID } from "@/constant/common";
+import { postApi, putApi } from "@/lib/apiClient";
+import { convertObjectToFormData } from "@/lib/utils";
+import { postRequestSchema } from "@/schemas/postSchema";
+import { PostRequest, PostResponse } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Button, Divider, FormLabel, Grid } from "@mui/material";
+import { MuiChipsInput } from "mui-chips-input";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "notistack";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import ImageUpload from "./ImageUpload";
 
 const publishComboBox = [
   {
-    text: 'Xuất bản',
-    value: 'true',
+    text: "Xuất bản",
+    value: "true",
   },
   {
-    text: 'Chưa xuất bản',
-    value: 'false',
+    text: "Chưa xuất bản",
+    value: "false",
   },
 ];
 
@@ -46,8 +41,8 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const rteRef = useRef<RichTextEditorRef>(null);
   const { control, handleSubmit } = useForm<PostRequest>({
-    defaultValues: post as PostRequest,
-    resolver: zodResolver(PostRequestSchema),
+    defaultValues: post,
+    resolver: zodResolver(postRequestSchema),
   });
   const [chips, setChips] = useState<string[]>(post.tags);
   const [image, setImage] = useState<File>();
@@ -67,7 +62,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
     setIsLoading(true);
     const request: PostRequest = {
       ...data,
-      content: rteRef.current?.content ?? '',
+      content: rteRef.current?.content ?? "",
       image: image,
       tags: chips,
     };
@@ -75,22 +70,22 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
     if (post.id === EMPTY_UUID) {
       const response = await postApi(API_URL.post, formData);
       if (response.success) {
-        enqueueSnackbar('Thêm mới bài viết thành công', {
-          variant: 'success',
+        enqueueSnackbar("Thêm mới bài viết thành công", {
+          variant: "success",
         });
-        router.push('/dashboard/posts');
+        router.push("/dashboard/posts");
       } else {
-        enqueueSnackbar(response.message, { variant: 'error' });
+        enqueueSnackbar(response.message, { variant: "error" });
       }
     } else {
       const response = await putApi(API_URL.post, formData);
       if (response.success) {
-        enqueueSnackbar('Cập nhật bài viết thành công', {
-          variant: 'success',
+        enqueueSnackbar("Cập nhật bài viết thành công", {
+          variant: "success",
         });
-        router.push('/dashboard/posts');
+        router.push("/dashboard/posts");
       } else {
-        enqueueSnackbar(response.message, { variant: 'error' });
+        enqueueSnackbar(response.message, { variant: "error" });
       }
     }
     setIsLoading(false);
@@ -102,116 +97,104 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
 
       try {
         // Replace docker internal host with localhost if needed
-        const imageUrl = url.includes('host.docker.internal')
-          ? url.replace('host.docker.internal', 'localhost')
+        const imageUrl = url.includes("host.docker.internal")
+          ? url.replace("host.docker.internal", "localhost")
           : url;
 
         const response = await fetch(imageUrl, {
-          mode: 'cors', // Enable CORS
+          mode: "cors", // Enable CORS
         });
 
-        if (!response.ok) throw new Error('Failed to fetch image');
+        if (!response.ok) throw new Error("Failed to fetch image");
 
         const blob = await response.blob();
-        return new File([blob], url.substring(url.lastIndexOf('/') + 1));
+        return new File([blob], url.substring(url.lastIndexOf("/") + 1));
       } catch (err) {
-        console.error('Image fetch error:', err);
+        console.error("Image fetch error:", err);
         return undefined;
       }
     };
 
     getImage(post.imageUrl)
       .then(setImage)
-      .catch((err) => console.error('Image processing error:', err));
+      .catch((err) => console.error("Image processing error:", err));
   }, [post.imageUrl]);
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate>
-      <Grid
-        container
-        spacing={2}
-        alignItems='center'>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Grid container spacing={2} alignItems="center">
         <Grid size={{ xs: 12, md: 12 }}>
-          <FormLabel
-            required
-            htmlFor='title'>
+          <FormLabel required htmlFor="title">
             Tiêu đề
           </FormLabel>
           <ControlledTextField
             control={control}
-            name='title'
+            name="title"
             required
             fullWidth
-            size='small'
+            size="small"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor='tags'>Thẻ</FormLabel>
+          <FormLabel htmlFor="tags">Thẻ</FormLabel>
           <MuiChipsInput
-            name='tags'
+            name="tags"
             fullWidth
             value={chips}
             onChange={handleChipChange}
-            placeholder='Nhập thẻ và nhấn enter'
-            size='small'
+            placeholder="Nhập thẻ và nhấn enter"
+            size="small"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor='isPublished'>Trạng thái</FormLabel>
+          <FormLabel htmlFor="isPublished">Trạng thái</FormLabel>
           <ControlledComboBox
             items={publishComboBox}
             control={control}
-            name='isPublished'
-            size='small'
+            name="isPublished"
+            size="small"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 12 }}>
-          <FormLabel
-            htmlFor='image'
-            required>
+          <FormLabel htmlFor="image" required>
             Ảnh bìa
           </FormLabel>
-          <ImageUpload
-            onUpload={handleImageUpload}
-            image={image}
-          />
+          <ImageUpload onUpload={handleImageUpload} image={image} />
         </Grid>
         <Grid size={{ xs: 12, md: 12 }}>
-          <FormLabel htmlFor='content'>Nội dung</FormLabel>
-          <RichTextEditor
-            ref={rteRef}
-            defaultContent={post.content}
-          />
+          <FormLabel htmlFor="content">Nội dung</FormLabel>
+          <RichTextEditor ref={rteRef} defaultContent={post.content} />
         </Grid>
       </Grid>
       <Divider />
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
           gap: 1,
           mt: 2,
-        }}>
+        }}
+      >
         <Button
           LinkComponent={Link}
-          href='/dashboard/posts'
-          type='button'
-          variant='contained'
-          disabled={isLoading}>
+          href="/dashboard/posts"
+          type="button"
+          variant="contained"
+          disabled={isLoading}
+        >
           Hủy
         </Button>
         <Button
-          type='submit'
-          variant='contained'
-          color='primary'
-          disabled={isLoading}>
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
           {isLoading
-            ? 'Đang xử lý...'
+            ? "Đang xử lý..."
             : post.id === EMPTY_UUID
-            ? 'Thêm mới'
-            : 'Cập nhật'}
+            ? "Thêm mới"
+            : "Cập nhật"}
         </Button>
       </Box>
     </form>

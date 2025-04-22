@@ -9,7 +9,7 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import Image from 'next/image';
 
 type CartItemProps = {

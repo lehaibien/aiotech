@@ -2,7 +2,7 @@
 
 import { ComboBoxItem } from "@/types";
 import { Autocomplete, Button, Stack, TextField } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

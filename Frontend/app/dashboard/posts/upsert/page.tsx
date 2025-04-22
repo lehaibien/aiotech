@@ -1,28 +1,28 @@
-import { API_URL } from '@/constant/apiUrl';
-import { EMPTY_UUID } from '@/constant/common';
-import { PostUpsertForm } from '@/features/dashboard/posts/upsert/PostUpsertForm';
-import { getByIdApi } from '@/lib/apiClient';
-import dayjs from '@/lib/extended-dayjs';
-import { parseUUID } from '@/lib/utils';
-import { PostResponse } from '@/types';
-import { Stack, Typography } from '@mui/material';
-import 'server-only';
+import { API_URL } from "@/constant/apiUrl";
+import { EMPTY_UUID } from "@/constant/common";
+import { PostUpsertForm } from "@/features/dashboard/posts/upsert/PostUpsertForm";
+import { getByIdApi } from "@/lib/apiClient";
+import dayjs from "@/lib/extended-dayjs";
+import { parseUUID } from "@/lib/utils";
+import { PostResponse, SearchParams } from "@/types";
+import { Stack, Typography } from "@mui/material";
 
 export default async function UpsertPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | undefined };
+  searchParams: SearchParams;
 }) {
+  const { id } = await searchParams;
+  const parsedId = parseUUID(id);
   let post: PostResponse = {
     id: EMPTY_UUID,
-    title: '',
-    content: '',
-    imageUrl: '',
+    title: "",
+    content: "",
+    imageUrl: "",
     isPublished: false,
     tags: [],
     createdDate: dayjs().toDate(),
   };
-  const parsedId = parseUUID(searchParams?.id ?? '');
   if (parsedId !== EMPTY_UUID) {
     const response = await getByIdApi(API_URL.post, { id: parsedId });
     if (response.success) {
@@ -30,11 +30,9 @@ export default async function UpsertPage({
     }
   }
   return (
-    <Stack>
-      <Typography
-        component='h1'
-        variant='h4'>
-        {post.id === null || post.id === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật'}{' '}
+    <Stack spacing={2}>
+      <Typography component="h1" variant="h4">
+        {post.id === null || post.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}{" "}
         bài viết
       </Typography>
       <PostUpsertForm post={post} />

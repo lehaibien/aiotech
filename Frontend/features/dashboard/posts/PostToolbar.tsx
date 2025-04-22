@@ -16,7 +16,7 @@ import { useSnackbar } from "notistack";
 import React from "react";
 
 type PostToolbarProps = {
-  dataGridRef: React.RefObject<DataTableRef>;
+  dataGridRef: React.RefObject<DataTableRef | null>;
   children?: React.ReactNode;
 };
 
@@ -25,7 +25,7 @@ export function PostToolbar({ dataGridRef, children }: PostToolbarProps) {
   const router = useRouter();
   function triggerView() {
     const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
-    if(rowSelection?.size === undefined) {
+    if (rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }
@@ -41,7 +41,7 @@ export function PostToolbar({ dataGridRef, children }: PostToolbarProps) {
     }
     const selectedData = rowSelection.values().next().value;
     if (selectedData) {
-      router.push(`/blogs/${selectedData}`);
+      router.push(`/dashboard/posts/view?id=${selectedData}`);
     }
   }
   function triggerAdd() {
@@ -50,7 +50,7 @@ export function PostToolbar({ dataGridRef, children }: PostToolbarProps) {
   }
   function triggerEdit() {
     const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
-    if(rowSelection?.size === undefined) {
+    if (rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }

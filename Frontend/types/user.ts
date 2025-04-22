@@ -6,7 +6,7 @@ import {
   userRegisterSchema,
   userRequestSchema,
 } from '@/schemas/userSchema';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { z } from 'zod';
 import { BaseResponse } from './base';
 

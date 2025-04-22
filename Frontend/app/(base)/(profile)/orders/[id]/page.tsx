@@ -1,30 +1,36 @@
-import "server-only";
-import { parseUUID } from "@/lib/utils";
-import { EMPTY_UUID } from "@/constant/common";
-import { getByIdApi } from "@/lib/apiClient";
-import { OrderResponse } from "@/types";
 import { API_URL } from "@/constant/apiUrl";
-import { Box, Button } from "@mui/material";
-import Link from "next/link";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { OrderDetailAction } from "@/features/orders/OrderDetailAction";
+import { EMPTY_UUID } from "@/constant/common";
 import OrderDetail from "@/features/orders/OrderDetail";
+import { OrderDetailAction } from "@/features/orders/OrderDetailAction";
+import { getByIdApi } from "@/lib/apiClient";
+import { parseUUID } from "@/lib/utils";
+import { OrderResponse } from "@/types";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Box, Button } from "@mui/material";
+import { UUID } from "@/types";
+import Link from "next/link";
+
+type OrderDetailParams = Promise<{
+  id: string;
+}>;
+
+async function getOrderDetail(id: UUID) {
+  const response = await getByIdApi(API_URL.order, { id });
+  if (response.success) {
+    return response.data as OrderResponse;
+  }
+  console.error(response.message);
+  return undefined;
+}
 
 export default async function OrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: OrderDetailParams;
 }) {
-  let order: OrderResponse | undefined = undefined;
-  const uuid = parseUUID(params.id);
-  if (uuid !== EMPTY_UUID) {
-    const response = await getByIdApi(API_URL.order, { id: uuid });
-    if (response.success) {
-      order = response.data as OrderResponse;
-    } else {
-      console.error(response.message);
-    }
-  }
+  const { id } = await params;
+  const uuid = parseUUID(id);
+  const order = await getOrderDetail(uuid);
   return (
     <>
       <Box

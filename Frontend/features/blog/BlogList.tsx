@@ -47,7 +47,7 @@ export default function BlogList({
     <>
       <Grid
         container
-        spacing={3}>
+        spacing={2}>
         {posts.map((post) => (
           <Grid
             size={{ xs: 12, sm: 6 }}
@@ -65,7 +65,6 @@ export default function BlogList({
 
       {totalPages > 1 && (
         <Box
-          mt={4}
           display='flex'
           justifyContent='center'>
           <Pagination
@@ -73,7 +72,7 @@ export default function BlogList({
             page={currentPage}
             onChange={handlePageChange}
             color='primary'
-            size='large'
+            shape='rounded'
             showFirstButton
             showLastButton
           />

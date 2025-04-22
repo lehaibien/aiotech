@@ -1,7 +1,7 @@
 "use client";
 
 import { List } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import CartItemComponent from "./CartItemComponent";
 import useCart from "@/hooks/useCart";
 

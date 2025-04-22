@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { API_URL } from '@/constant/apiUrl';
 import FilterDrawer from '@/features/products/FilterDrawer';
 import ShopList from '@/features/products/ShopList';

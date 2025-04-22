@@ -1,5 +1,3 @@
-import "server-only";
-
 import RootClientProvider from "@/contexts/RootClientProvider";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";

@@ -1,14 +1,11 @@
-import { API_URL } from '@/constant/apiUrl';
-import { EMPTY_UUID } from '@/constant/common';
-import { UserUpsertForm } from '@/features/dashboard/users/UserUpsertForm';
-import { getApi, getByIdApi } from '@/lib/apiClient';
-import dayjs from '@/lib/extended-dayjs';
-import { parseUUID } from '@/lib/utils';
-import { ComboBoxItem, UserResponse } from '@/types';
-import { Stack, Typography } from '@mui/material';
-import 'server-only';
-
-type SearchParams = Promise<{ [key: string]: string | undefined }>;
+import { API_URL } from "@/constant/apiUrl";
+import { EMPTY_UUID } from "@/constant/common";
+import { UserUpsertForm } from "@/features/dashboard/users/UserUpsertForm";
+import { getApi, getByIdApi } from "@/lib/apiClient";
+import dayjs from "@/lib/extended-dayjs";
+import { parseUUID } from "@/lib/utils";
+import { ComboBoxItem, SearchParams, UserResponse } from "@/types";
+import { Stack, Typography } from "@mui/material";
 
 export default async function Page({
   searchParams,
@@ -16,20 +13,20 @@ export default async function Page({
   searchParams: SearchParams;
 }) {
   const { id } = await searchParams;
-  const uuid = parseUUID(id ?? '');
+  const uuid = parseUUID(id ?? "");
   let data: UserResponse = {
     id: EMPTY_UUID,
-    userName: '',
-    familyName: '',
-    givenName: '',
-    email: '',
-    phoneNumber: '',
-    avatarUrl: '',
+    userName: "",
+    familyName: "",
+    givenName: "",
+    email: "",
+    phoneNumber: "",
+    avatarUrl: "",
     roleId: EMPTY_UUID,
-    fullName: '',
-    role: '',
+    fullName: "",
+    role: "",
     createdDate: dayjs().toDate(),
-    createdBy: '',
+    createdBy: "",
     isLocked: false,
   };
   let roleCombobox: ComboBoxItem[] = [];
@@ -37,7 +34,7 @@ export default async function Page({
   if (roleComboboxResponse.success) {
     roleCombobox = roleComboboxResponse.data as ComboBoxItem[];
   } else {
-    console.error('Get role combobox error: ' + roleComboboxResponse.message);
+    console.error("Get role combobox error: " + roleComboboxResponse.message);
   }
 
   if (uuid !== EMPTY_UUID) {
@@ -49,7 +46,7 @@ export default async function Page({
       )?.value;
       data = {
         ...data,
-        id: parseUUID(userData.id ?? ''),
+        id: parseUUID(userData.id ?? ""),
         userName: userData.userName,
         givenName: userData.givenName,
         familyName: userData.familyName,
@@ -64,15 +61,10 @@ export default async function Page({
 
   return (
     <Stack spacing={2}>
-      <Typography
-        component='h1'
-        variant='h5'>
-        {data.id === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật'} tài khoản
+      <Typography component="h1" variant="h5">
+        {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài khoản
       </Typography>
-      <UserUpsertForm
-        data={data}
-        roleCombobox={roleCombobox}
-      />
+      <UserUpsertForm data={data} roleCombobox={roleCombobox} />
     </Stack>
   );
 }

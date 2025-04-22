@@ -5,7 +5,6 @@ import { parseUUID } from "@/lib/utils";
 import { CategoryResponse } from "@/types";
 import { Card, Typography } from "@mui/material";
 import dayjs from "@/lib/extended-dayjs";
-import "server-only";
 import { CategoryUpsertForm } from "@/features/dashboard/categories/upsert/CategoryUpsertForm";
 
 export default async function CategoryUpsertPage({

@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import Color from '@tiptap/extension-color';
-import Subscript from '@tiptap/extension-subscript';
-import Superscript from '@tiptap/extension-superscript';
-import Table from '@tiptap/extension-table';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import TableRow from '@tiptap/extension-table-row';
-import TextAlign from '@tiptap/extension-text-align';
-import Underline from '@tiptap/extension-underline';
-import TextStyle from '@tiptap/extension-text-style';
-import StarterKit from '@tiptap/starter-kit';
+import Color from "@tiptap/extension-color";
+import Image from "@tiptap/extension-image";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
+import StarterKit from "@tiptap/starter-kit";
 import {
   MenuButtonAddTable,
   MenuButtonAlignCenter,
@@ -21,6 +22,7 @@ import {
   MenuButtonBold,
   MenuButtonBulletedList,
   MenuButtonEditLink,
+  MenuButtonImageUpload,
   MenuButtonItalic,
   MenuButtonOrderedList,
   MenuButtonRedo,
@@ -36,8 +38,14 @@ import {
   RichTextEditor as MuiRichTextEditor,
   RichTextEditorRef as MuiRichTextEditorRef,
   TableBubbleMenu,
-} from 'mui-tiptap';
-import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from 'react';
+} from "mui-tiptap";
+import {
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 
 type RichTextEditorProps = {
   defaultContent: string;
@@ -73,141 +81,155 @@ function RichTextEditor(
     TableRow,
     Color,
     TextStyle,
+    Image,
   ];
 
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const styleElement = document.createElement("style");
+      styleElement.innerHTML = fixListStyles;
+      document.head.appendChild(styleElement);
+      return () => {
+        document.head.removeChild(styleElement);
+      };
+    }
+  }, []);
+
+  const handleImageUpload = async (files: File[]) => {
+    console.log(files);
+    return [];
+  };
+
   return (
-    <div className='border'>
+    <div className="border">
       <MuiRichTextEditor
         ref={rteRef}
         extensions={extensions}
         content={defaultContent}
         onUpdate={({ editor }) => {
           // Force the ref to update its content
-          if (ref && typeof ref === 'object' && ref.current) {
+          if (ref && typeof ref === "object" && ref.current) {
             ref.current.content = editor.getHTML();
           }
         }}
         renderControls={() => (
-          <MenuControlsContainer className='px-4 py-2'>
-            <div className='flex items-center gap-2 flex-wrap'>
+          <MenuControlsContainer className="px-4 py-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <MenuSelectHeading
-                className='rounded p-1'
+                className="rounded p-1"
                 labels={{
-                  heading1: 'Tiêu đề 1',
-                  heading2: 'Tiêu đề 2',
-                  heading3: 'Tiêu đề 3',
-                  heading4: 'Tiêu đề 4',
-                  heading5: 'Tiêu đề 5',
-                  heading6: 'Tiêu đề 6',
-                  paragraph: 'Văn bản',
+                  heading1: "Tiêu đề 1",
+                  heading2: "Tiêu đề 2",
+                  heading3: "Tiêu đề 3",
+                  heading4: "Tiêu đề 4",
+                  heading5: "Tiêu đề 5",
+                  heading6: "Tiêu đề 6",
+                  paragraph: "Văn bản",
                 }}
               />
-              <MenuDivider className='!mx-2 !h-6' />
-              <MenuButtonBold
-                className='rounded p-1'
-                tooltipLabel='Chữ đậm'
-              />
+              <MenuDivider />
+              <MenuButtonBold className="rounded p-1" tooltipLabel="Chữ đậm" />
               <MenuButtonItalic
-                className='rounded p-1'
-                tooltipLabel='Chữ nghiêng'
+                className="rounded p-1"
+                tooltipLabel="Chữ nghiêng"
               />
               <MenuButtonUnderline
-                className='rounded p-1'
-                tooltipLabel='Chữ gạch chân'
+                className="rounded p-1"
+                tooltipLabel="Chữ gạch chân"
               />
               <MenuButtonTextColor
-                className='rounded p-1'
-                tooltipLabel='Chọn màu chữ'
+                className="rounded p-1"
+                tooltipLabel="Chọn màu chữ"
                 labels={{
-                  cancelButton: 'Hủy',
-                  saveButton: 'Chọn',
-                  removeColorButton: 'Xóa màu',
-                  removeColorButtonTooltipTitle: 'Xóa màu',
-                  textFieldPlaceholder: 'Ví dụ: #ff0000',
+                  cancelButton: "Hủy",
+                  saveButton: "Chọn",
+                  removeColorButton: "Xóa màu",
+                  removeColorButtonTooltipTitle: "Xóa màu",
+                  textFieldPlaceholder: "Ví dụ: #ff0000",
                 }}
               />
-              <MenuDivider className='!mx-2!h-6' />
+              <MenuDivider className="!mx-2!h-6" />
               <MenuButtonAlignLeft
-                className='rounded p-1'
-                tooltipLabel='Căn lề trái'
+                className="rounded p-1"
+                tooltipLabel="Căn lề trái"
               />
               <MenuButtonAlignCenter
-                className='rounded p-1'
-                tooltipLabel='Căn giữa'
+                className="rounded p-1"
+                tooltipLabel="Căn giữa"
               />
               <MenuButtonAlignRight
-                className='rounded p-1'
-                tooltipLabel='Căn lề phải'
+                className="rounded p-1"
+                tooltipLabel="Căn lề phải"
               />
               <MenuButtonAlignJustify
-                className='rounded p-1'
-                tooltipLabel='Căn đều'
+                className="rounded p-1"
+                tooltipLabel="Căn đều"
               />
-              <MenuDivider className='!mx-2 !h-6' />
+              <MenuDivider />
               <MenuButtonSuperscript
-                className='rounded p-1'
-                tooltipLabel='Chỉ số trên'
+                className="rounded p-1"
+                tooltipLabel="Chỉ số trên"
               />
               <MenuButtonSubscript
-                className='rounded p-1'
-                tooltipLabel='Chỉ số dưới'
+                className="rounded p-1"
+                tooltipLabel="Chỉ số dưới"
               />
               <MenuButtonStrikethrough
-                className='rounded p-1'
-                tooltipLabel='Chữ gạch ngang'
+                className="rounded p-1"
+                tooltipLabel="Chữ gạch ngang"
               />
               <MenuButtonBlockquote
-                className='rounded p-1'
-                tooltipLabel='Câu trích dẫn'
+                className="rounded p-1"
+                tooltipLabel="Câu trích dẫn"
               />
-              <MenuDivider className='!mx-2 !h-6' />
+              <MenuDivider />
               <MenuButtonOrderedList
-                className='rounded p-1'
-                tooltipLabel='Danh sách có thứ tự'
+                className="rounded p-1"
+                tooltipLabel="Danh sách có thứ tự"
               />
               <MenuButtonBulletedList
-                className='rounded p-1'
-                tooltipLabel='Danh sách không thứ tự'
+                className="rounded p-1"
+                tooltipLabel="Danh sách không thứ tự"
+              />
+              <MenuDivider />
+              <MenuButtonImageUpload
+                className="rounded p-1"
+                tooltipLabel="Chèn hình ảnh"
+                onUploadFiles={handleImageUpload}
               />
               <MenuButtonEditLink
-                className='rounded p-1'
-                tooltipLabel='Chỉnh sửa liên kết'
+                className="rounded p-1"
+                tooltipLabel="Chỉnh sửa liên kết"
               />
               <MenuButtonAddTable
-                className='rounded p-1'
-                tooltipLabel='Thêm bảng'
+                className="rounded p-1"
+                tooltipLabel="Thêm bảng"
               />
               <TableBubbleMenu
-                className='rounded p-1'
+                className="rounded p-1"
                 labels={{
-                  insertRowAbove: 'Chèn hàng trên',
-                  insertRowBelow: 'Chèn hàng dưới',
-                  deleteRow: 'Xóa hàng',
-                  insertColumnBefore: 'Chèn cột trước',
-                  insertColumnAfter: 'Chèn cột sau',
-                  deleteColumn: 'Xóa cột',
-                  mergeCells: 'Gộp ô',
-                  splitCell: 'Chia ô',
-                  deleteTable: 'Xóa bảng',
-                  toggleHeaderCell: 'Chuyển đổi ô tiêu đề',
-                  toggleHeaderRow: 'Chuyển đổi hàng tiêu đề',
-                  toggleHeaderColumn: 'Chuyển đổi cột tiêu đề',
+                  insertRowAbove: "Chèn hàng trên",
+                  insertRowBelow: "Chèn hàng dưới",
+                  deleteRow: "Xóa hàng",
+                  insertColumnBefore: "Chèn cột trước",
+                  insertColumnAfter: "Chèn cột sau",
+                  deleteColumn: "Xóa cột",
+                  mergeCells: "Gộp ô",
+                  splitCell: "Chia ô",
+                  deleteTable: "Xóa bảng",
+                  toggleHeaderCell: "Chuyển đổi ô tiêu đề",
+                  toggleHeaderRow: "Chuyển đổi hàng tiêu đề",
+                  toggleHeaderColumn: "Chuyển đổi cột tiêu đề",
                 }}
               />
-              <MenuDivider className='!mx-2!h-6' />
-              <MenuButtonUndo
-                className='rounded p-1'
-                tooltipLabel='Hoàn tác'
-              />
-              <MenuButtonRedo
-                className='rounded p-1'
-                tooltipLabel='Làm lại'
-              />
+              <MenuDivider className="!mx-2!h-6" />
+              <MenuButtonUndo className="rounded p-1" tooltipLabel="Hoàn tác" />
+              <MenuButtonRedo className="rounded p-1" tooltipLabel="Làm lại" />
             </div>
           </MenuControlsContainer>
         )}
         RichTextFieldProps={{
-          className: 'min-h-[400px] p-4 prose max-w-none',
+          className: "min-h-[400px] p-4 prose max-w-none",
         }}
       />
     </div>
@@ -245,10 +267,5 @@ const fixListStyles = `
   .ProseMirror h6 { font-size: 1.1rem; margin: 0.375rem 0; line-height: 1.6; }
   .ProseMirror p { margin: 0.5rem 0; line-height: 1.5; }
 `;
-
-// Add the global styles in your component
-const styleElement = document.createElement('style');
-styleElement.innerHTML = fixListStyles;
-document.head.appendChild(styleElement);
 
 export default forwardRef(RichTextEditor);

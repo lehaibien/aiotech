@@ -1,6 +1,6 @@
 import { DEFAULT_TIMEZONE, EMPTY_UUID } from '@/constant/common';
 import dayjs from '@/lib/extended-dayjs';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { Dayjs } from 'dayjs';
 
 /**

@@ -16,7 +16,7 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 

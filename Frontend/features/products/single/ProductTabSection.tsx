@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Tab, Tabs } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import React from "react";
 import ReviewSection from "./ReviewSection";
 

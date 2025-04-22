@@ -41,20 +41,17 @@ export default function FilterDrawer({
   const [brand, setBrand] = useState<string[]>(defaultBrands);
   const [priceRange, setPriceRange] = useState<number[]>([0, defaultMaxPrice]);
 
-  // Convert category text values to category values for FilterDropdown
   const categoryValues = useMemo(
     () =>
       categories.filter((x) => category?.includes(x.text)).map((x) => x.value),
     [categories, category]
   );
 
-  // Convert brand text values to brand values for FilterDropdown
   const brandValues = useMemo(
     () => brands.filter((x) => brand?.includes(x.text)).map((x) => x.value),
     [brands, brand]
   );
 
-  // For URL parameters, we need the text values
   const flatCategory = useMemo(
     () => categories.map((x) => x.text).filter((x) => category?.includes(x)),
     [categories, category]
@@ -72,7 +69,6 @@ export default function FilterDrawer({
     setOpen(newOpen);
   };
 
-  // Handle category selection from FilterDropdown
   const handleCategoryChange = (values: string[]) => {
     const selectedCategories = categories
       .filter((x) => values.includes(x.value))
@@ -80,7 +76,6 @@ export default function FilterDrawer({
     setCategory(selectedCategories);
   };
 
-  // Handle brand selection from FilterDropdown
   const handleBrandChange = (values: string[]) => {
     const selectedBrands = brands
       .filter((x) => values.includes(x.value))
@@ -121,7 +116,6 @@ export default function FilterDrawer({
     <div>
       <Button
         onClick={toggleDrawer(true)}
-        variant='outlined'
         startIcon={<TuneIcon />}>
         Lọc sản phẩm
       </Button>

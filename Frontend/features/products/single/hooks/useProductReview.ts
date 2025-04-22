@@ -4,7 +4,7 @@ import {
   GetListReviewByProductIdRequest,
   ReviewProductResponse,
 } from '@/types';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { useCallback } from 'react';
 import useSWR from 'swr';
 

@@ -1,13 +1,14 @@
-import { productRequestSchema } from '@/schemas/productSchema';
-import { UUID } from 'crypto';
-import { z } from 'zod';
-import { BaseGetListRequest } from './base';
+import { productRequestSchema } from "@/schemas/productSchema";
+import { UUID } from "@/types";
+import { z } from "zod";
+import { BaseGetListRequest } from "./base";
 
 export type ProductDetailResponse = {
   id: UUID;
   sku: string;
   name: string;
   description: string;
+  costPrice: number;
   price: number;
   discountPrice?: number;
   stock: number;
@@ -23,6 +24,7 @@ export type ProductResponse = {
   id: UUID;
   sku: string;
   name: string;
+  costPrice: number;
   price: number;
   discountPrice?: number;
   category: string;
@@ -38,6 +40,7 @@ export type ProductUpdateResponse = {
   sku: string;
   name: string;
   description: string;
+  costPrice: number;
   price: number;
   discountPrice?: number;
   stock: number;

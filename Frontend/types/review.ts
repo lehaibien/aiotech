@@ -1,5 +1,5 @@
 import { reviewRequestSchema } from '@/schemas/reviewSchema';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { z } from 'zod';
 import { BaseGetListRequest, BaseResponse } from './base';
 

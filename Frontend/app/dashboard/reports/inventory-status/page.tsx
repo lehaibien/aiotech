@@ -3,7 +3,6 @@ import { getApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, SearchParams } from "@/types";
 import { Stack, Typography } from "@mui/material";
-import "server-only";
 import InventoryStatusReportFilter from "./InventoryStatusReportFilter";
 import InventoryStatusReportGrid from "./InventoryStatusReportGrid";
 

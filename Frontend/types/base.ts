@@ -1,4 +1,4 @@
-import { UUID } from "crypto";
+export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
@@ -12,9 +12,9 @@ export type GetListRequest = {
   pageIndex: number;
   pageSize: number;
   sortColumn?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
   textSearch: string;
-}
+};
 
 export type GetByIdRequest = {
   id: UUID;

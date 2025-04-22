@@ -7,7 +7,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 import PrintIcon from "@mui/icons-material/Print";
 import { Box, Button } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";

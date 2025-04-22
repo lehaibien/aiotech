@@ -1,5 +1,5 @@
 import { BrandRequestSchema } from '@/schemas/brandSchema';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { z } from 'zod';
 import { BaseResponse } from './base';
 

@@ -3,7 +3,7 @@ import { API_URL } from '@/constant/apiUrl';
 import { getApiQuery } from '@/lib/apiClient';
 import { ProductResponse } from '@/types/product';
 import { Box, Grid, Typography } from '@mui/material';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 
 export default async function RelatedProducts({
   productId,

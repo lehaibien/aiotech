@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useSnackbar } from 'notistack';

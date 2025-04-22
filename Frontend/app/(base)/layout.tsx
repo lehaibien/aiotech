@@ -1,5 +1,3 @@
-import 'server-only';
-
 import Footer from '@/components/layout/base/Footer';
 import Header from '@/components/layout/base/Header';
 import { Container } from '@mui/material';

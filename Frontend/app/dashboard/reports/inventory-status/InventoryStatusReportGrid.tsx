@@ -6,7 +6,7 @@ import { API_URL } from "@/constant/apiUrl";
 import { getListApi } from "@/lib/apiClient";
 import { InventoryStatusReportResponse, PaginatedList } from "@/types";
 import { GridColDef } from "@mui/x-data-grid";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import { useCallback, useEffect, useRef } from "react";
 
 const columns: GridColDef<InventoryStatusReportResponse>[] = [

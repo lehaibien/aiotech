@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { HtmlContent } from '@/components/core/HtmlContent';
 import { API_URL } from '@/constant/apiUrl';
 import ImageGallery from '@/features/products/single/ImageGallery';

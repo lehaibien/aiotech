@@ -1,5 +1,5 @@
 import { postRequestSchema } from '@/schemas/postSchema';
-import { UUID } from 'crypto';
+import { UUID } from "@/types";
 import { z } from 'zod';
 
 export type PostPreviewResponse = {

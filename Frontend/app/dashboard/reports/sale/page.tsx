@@ -5,7 +5,6 @@ import { getApiQuery } from '@/lib/apiClient';
 import dayjs from '@/lib/extended-dayjs';
 import { SaleReportRequest, SaleReportResponse, SearchParams } from '@/types';
 import { Box, Stack, Typography } from '@mui/material';
-import 'server-only';
 
 async function getSaleData(request: SaleReportRequest) {
   const response = await getApiQuery(API_URL.saleReport, request);

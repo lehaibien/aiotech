@@ -3,7 +3,7 @@
 import { Button } from "@mui/material"
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import useCart from "@/hooks/useCart";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 
 type AddToCartButtonProps = {
     productId: UUID;
