@@ -148,7 +148,7 @@ public class CategoryService : ICategoryService
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
-            ImageType.Category,
+            ImageType.Branding,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)
@@ -193,7 +193,7 @@ public class CategoryService : ICategoryService
 
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
-            ImageType.Category,
+            ImageType.Branding,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)

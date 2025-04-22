@@ -177,7 +177,7 @@ public class PostService : IPostService
         entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
-            ImageType.BlogFeatured,
+            ImageType.Blog,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)
@@ -219,7 +219,7 @@ public class PostService : IPostService
 
         var uploadResult = await _imageService.UploadAsync(
             request.Image,
-            ImageType.BlogFeatured,
+            ImageType.Blog,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
         if (uploadResult.IsFailure)

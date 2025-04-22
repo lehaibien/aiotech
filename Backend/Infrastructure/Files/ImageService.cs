@@ -188,78 +188,10 @@ public class ImageService : IImageService
     private async Task<Image> ProcessImageAsync(string sourceFilePath, ImageType imageType)
     {
         var image = await Image.LoadAsync(sourceFilePath);
-
-        switch (imageType)
+        var resizeOption = GetResizeOption(imageType);
+        if (resizeOption is not null)
         {
-            case ImageType.ProductThumbnail:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(300, 300), Mode = ResizeMode.Crop }
-                    )
-                );
-                break;
-
-            case ImageType.ProductDetail:
-                image.Mutate(x =>
-                    x.Resize(new ResizeOptions { Size = new Size(800, 800), Mode = ResizeMode.Max })
-                );
-                break;
-
-            case ImageType.Banner:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(1600, 400), Mode = ResizeMode.Crop }
-                    )
-                );
-                break;
-
-            case ImageType.BannerMobile:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(800, 400), Mode = ResizeMode.Crop }
-                    )
-                );
-                break;
-
-            case ImageType.Category:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(600, 400), Mode = ResizeMode.Stretch }
-                    )
-                );
-                break;
-
-            case ImageType.CategoryHeader:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(1200, 300), Mode = ResizeMode.Stretch }
-                    )
-                );
-                break;
-
-            case ImageType.BlogFeatured:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions { Size = new Size(1200, 630), Mode = ResizeMode.Crop }
-                    )
-                );
-                break;
-
-            case ImageType.BlogContent:
-                image.Mutate(x =>
-                    x.Resize(
-                        new ResizeOptions
-                        {
-                            Size = new Size(800, 0), // Width only, maintain aspect ratio
-                            Mode = ResizeMode.Max,
-                        }
-                    )
-                );
-                break;
-
-            case ImageType.Logo:
-                // For logos, we might just want to optimize without resizing
-                break;
+            image.Mutate(x => x.Resize(resizeOption));
         }
 
         return image;
@@ -269,7 +201,7 @@ public class ImageService : IImageService
     {
         IImageEncoder encoder = extension.ToLowerInvariant() switch
         {
-            ".jpg" or ".jpeg" => new JpegEncoder { Quality = 80 }, // 80% quality is a good balance
+            ".jpg" or ".jpeg" => new JpegEncoder { Quality = 80 },
             ".png" => new PngEncoder
             {
                 CompressionLevel = PngCompressionLevel.BestCompression,
@@ -307,20 +239,42 @@ public class ImageService : IImageService
     /// <summary>
     /// Gets the dimensions for a specified image type
     /// </summary>
-    public (int width, int height) GetDimensionsForImageType(ImageType imageType)
+    public static ResizeOptions? GetResizeOption(ImageType imageType)
     {
         return imageType switch
         {
-            ImageType.ProductThumbnail => (300, 300),
-            ImageType.ProductDetail => (800, 800),
-            ImageType.Banner => (1600, 400),
-            ImageType.BannerMobile => (800, 400),
-            ImageType.Category => (600, 400),
-            ImageType.CategoryHeader => (1200, 300),
-            ImageType.BlogFeatured => (1200, 630),
-            ImageType.BlogContent => (800, 0),
-            ImageType.Logo => (0, 0), // No specific dimensions
-            _ => (0, 0),
+            ImageType.ProductThumbnail => new ResizeOptions
+            {
+                Size = new Size(300, 300),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.ProductDetail => new ResizeOptions
+            {
+                Size = new Size(800, 800),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.Banner => new ResizeOptions
+            {
+                Size = new Size(1200, 400),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.Branding => new ResizeOptions
+            {
+                Size = new Size(600, 400),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.BlogThumbnail => new ResizeOptions
+            {
+                Size = new Size(450, 300),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.Blog => new ResizeOptions
+            {
+                Size = new Size(1200, 630),
+                Mode = ResizeMode.Stretch,
+            },
+            ImageType.Logo => null,
+            _ => null,
         };
     }
 }
