@@ -12,6 +12,7 @@ public class Product : BaseEntity
     public int Stock { get; set; }
     public Guid BrandId { get; set; }
     public Guid CategoryId { get; set; }
+    public string ThumbnailUrl { get; set; } = null!;
     public List<string> ImageUrls { get; set; } = [];
     public List<string> Tags { get; set; } = [];
     public bool IsFeatured { get; set; }
