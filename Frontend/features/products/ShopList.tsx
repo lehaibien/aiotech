@@ -1,15 +1,15 @@
 'use client';
 
-import { ProductResponse } from '@/types';
+import { NoItem } from '@/components/core/NoItem';
+import { ProductCard } from '@/components/core/ProductCard';
+import { ProductListItemResponse } from '@/types';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { Box, Grid, Pagination } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import { ProductCard } from '@/components/core/ProductCard';
-import { NoItem } from '@/components/core/NoItem';
 
 type ShopListProps = {
-  items: ProductResponse[];
+  items: ProductListItemResponse[];
   currentPage: number;
   totalPage: number;
 };

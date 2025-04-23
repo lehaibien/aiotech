@@ -29,7 +29,7 @@ export const API_URL = {
   productFiltered: "product/filtered",
   productRequest: "product/request",
   productTop: "product/top",
-  productFeatured: "product/featured",
+  productNewest: "product/newest",
   productSearch: "product/search",
   productRelated: "product/related",
 

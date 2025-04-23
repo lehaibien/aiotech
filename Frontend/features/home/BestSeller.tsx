@@ -1,13 +1,13 @@
 import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { ProductCard } from "@/components/core/ProductCard";
-import { ProductResponse } from "@/types";
+import { ProductListItemResponse } from "@/types";
 import { Grid, Stack } from "@mui/material";
 
 type BestSellerProps = {
-  products: ProductResponse[];
+  items: ProductListItemResponse[];
 };
 
-export function BestSeller({ products }: BestSellerProps) {
+export const BestSeller = ({ items }: BestSellerProps) => {
   return (
     <Stack spacing={2}>
       <HighlightTypography
@@ -21,7 +21,7 @@ export function BestSeller({ products }: BestSellerProps) {
         Sản phẩm bán chạy
       </HighlightTypography>
       <Grid container spacing={4}>
-        {products.map((product) => (
+        {items.map((product) => (
           <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={product.id}>
             <ProductCard product={product} />
           </Grid>
@@ -29,4 +29,4 @@ export function BestSeller({ products }: BestSellerProps) {
       </Grid>
     </Stack>
   );
-}
+};

@@ -1,5 +1,5 @@
 import { API_URL } from "@/constant/apiUrl";
-import { Banner } from "@/features/home/Banner";
+import { HeroBanner } from "@/features/home/Banner";
 import { BestSeller } from "@/features/home/BestSeller";
 import { FeaturedCategories } from "@/features/home/FeaturedCategories";
 import { LatestBlog } from "@/features/home/LatestBlog";
@@ -9,7 +9,7 @@ import {
   CategoryResponse,
   PaginatedList,
   PostPreviewResponse,
-  ProductResponse,
+  ProductListItemResponse,
 } from "@/types";
 import { BannerConfiguration } from "@/types/sys-config";
 import { Container } from "@mui/material";
@@ -23,13 +23,13 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   let bannerConfig: BannerConfiguration = {
-    title: "",
+    title: "AioTech",
     description: "",
-    imageUrl: "",
+    imageUrl: "/hero-banner.jpg",
   };
 
-  let topProducts: ProductResponse[] = [];
-  let newProducts: ProductResponse[] = [];
+  let topProducts: ProductListItemResponse[] = [];
+  let newestProducts: ProductListItemResponse[] = [];
   let featuredCategories: CategoryResponse[] = [];
   let posts: PostPreviewResponse[] = [];
   const bannerPromise = getApi(API_URL.bannerConfig);
@@ -39,7 +39,7 @@ export default async function Home() {
     textSearch: "",
   });
   const topProductsPromise = getApiQuery(API_URL.productTop, {});
-  const featuredProductsPromise = getApiQuery(API_URL.productFeatured, {});
+  const featuredProductsPromise = getApiQuery(API_URL.productNewest, {});
   const postsPromise = getListApi(API_URL.postPreview, {
     pageIndex: 0,
     pageSize: 10,
@@ -63,22 +63,17 @@ export default async function Home() {
   if (bannerResponse.success) {
     bannerConfig = bannerResponse.data as BannerConfiguration;
   } else {
-    bannerConfig = {
-      title: "AioTech",
-      description: "",
-      imageUrl: "/hero-banner.jpg",
-    };
     console.error("Failed to load banner config: ", bannerResponse.message);
   }
 
   if (topProductsResponse.success) {
-    topProducts = topProductsResponse.data as ProductResponse[];
+    topProducts = topProductsResponse.data as ProductListItemResponse[];
   } else {
     console.error("Failed to load top products: ", topProductsResponse.message);
   }
 
   if (featuredProductsResponse.success) {
-    newProducts = featuredProductsResponse.data as ProductResponse[];
+    newestProducts = featuredProductsResponse.data as ProductListItemResponse[];
   } else {
     console.error(
       "Failed to load new products: ",
@@ -111,8 +106,7 @@ export default async function Home() {
         gap: 2,
       }}
     >
-      {/* Hero Banner */}
-      <Banner
+      <HeroBanner
         title={bannerConfig.title}
         description={bannerConfig.description}
         imageUrl={bannerConfig.imageUrl}
@@ -120,9 +114,9 @@ export default async function Home() {
 
       <FeaturedCategories categories={featuredCategories} />
 
-      <BestSeller products={topProducts} />
+      <BestSeller items={topProducts} />
 
-      <NewArrival products={newProducts} />
+      <NewArrival items={newestProducts} />
 
       <LatestBlog posts={posts} />
     </Container>

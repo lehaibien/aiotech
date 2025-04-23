@@ -4,7 +4,7 @@ import { LOW_STOCK_THRESHOLD } from "@/constant/common";
 import useCart from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNumberWithSeperator } from "@/lib/utils";
-import { ProductResponse } from "@/types";
+import { ProductListItemResponse } from "@/types";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {
@@ -21,27 +21,17 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
-import { useState } from "react";
 
 type ProductCardProps = {
-  product: ProductResponse;
+  product: ProductListItemResponse;
 };
 
 export const ProductCard = ({ product }: ProductCardProps) => {
-  const {
-    id,
-    name,
-    imageUrls: thumbnails,
-    brand,
-    price,
-    discountPrice,
-    rating,
-    stock,
-  } = product;
+  const { id, name, brand, price, discountPrice, rating, thumbnailUrl, stock } =
+    product;
   const { enqueueSnackbar } = useSnackbar();
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist();
-  const [currentImage, setCurrentImage] = useState(thumbnails[0]);
   const discountPercent =
     discountPrice && ((1 - discountPrice / price) * 100).toFixed(0);
 
@@ -53,7 +43,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         productId: id,
         productName: name,
         productPrice: discountPrice ?? price,
-        productImage: thumbnails[0],
+        productImage: thumbnailUrl,
         quantity: 1,
       });
       enqueueSnackbar("Đã thêm sản phẩm vào giỏ hàng", { variant: "success" });
@@ -75,16 +65,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     } else {
       enqueueSnackbar(message, { variant: "error" });
     }
-  };
-
-  const handleMouseEnter = () => {
-    if (thumbnails.length > 1) {
-      setCurrentImage(thumbnails[1]);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setCurrentImage(thumbnails[0]);
   };
 
   const getStockColor = () => {
@@ -139,17 +119,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         }}
       >
         <Image
-          src={currentImage}
+          src={thumbnailUrl}
           height={300}
           width={300}
           alt={name}
           style={{
             objectFit: "contain",
           }}
-          placeholder="blur"
-          blurDataURL={currentImage}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
         />
         {product.discountPrice && (
           <Chip
