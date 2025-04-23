@@ -24,10 +24,15 @@ services:
     build: ./Backend/
     container_name: aiotech_api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=true;MultipleActiveResultSets=true
-      - RedisConnectionString=redis:6379
-      - SEQ_URL=http://seq:80
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ConnectionStrings__Redis=redis:6379
+      - ConnectionStrings__ElasticSearch=elastic_search:9200
+      - ConnectionStrings__Minio=minio:9000
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - MINIO_ROOT_USER=aiotech
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+      - SEQ_URL=seq:80
+      - ASPNETCORE_ENVIRONMENT=PRODUCTION
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=https://api.aiotech.cloud/static
     depends_on:

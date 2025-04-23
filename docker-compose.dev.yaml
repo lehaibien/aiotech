@@ -21,8 +21,10 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ConnectionStrings__Redis=redis:6379
       - ConnectionStrings__ElasticSearch=http://elastic_search:9200
-      - ConnectionStrings__Minio=http://minio:9000
+      - ConnectionStrings__Minio=minio:9000
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - MINIO_ROOT_USER=aiotech
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
       - SEQ_URL=http://seq:80
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
       - ASPNETCORE_URLS=http://+:5554
