@@ -3,6 +3,33 @@ import { UUID } from "@/types";
 import { z } from "zod";
 import { BaseGetListRequest } from "./base";
 
+export type ProductResponse = {
+  id: UUID;
+  sku: string;
+  name: string;
+  costPrice: number;
+  price: number;
+  discountPrice?: number;
+  category: string;
+  brand: string;
+  imageUrls: string[];
+  rating: number;
+  stock: number;
+  createdDate: Date;
+};
+
+export type ProductListItemResponse = {
+  id: UUID;
+  name: string;
+  price: number;
+  discountPrice?: number;
+  stock: number;
+  brand: string;
+  rating: number;
+  thumbnailUrl: string;
+  tags: string[];
+};
+
 export type ProductDetailResponse = {
   id: UUID;
   sku: string;
@@ -18,21 +45,6 @@ export type ProductDetailResponse = {
   imageUrls: string[];
   rating: number;
   isFeatured?: boolean;
-};
-
-export type ProductResponse = {
-  id: UUID;
-  sku: string;
-  name: string;
-  costPrice: number;
-  price: number;
-  discountPrice?: number;
-  category: string;
-  brand: string;
-  imageUrls: string[];
-  rating: number;
-  stock: number;
-  createdDate: Date;
 };
 
 export type ProductUpdateResponse = {
