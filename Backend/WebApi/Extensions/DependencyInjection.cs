@@ -109,23 +109,4 @@ public static class DependencyInjection
         loggingBuilder.AddSerilog(logger);
         return loggingBuilder;
     }
-
-    public static IServiceCollection ConfigureRedis(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
-    {
-        services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration =
-                Environment.GetEnvironmentVariable("ConnectionStrings__Redis")
-                ?? configuration.GetConnectionString("RedisConnection");
-            options.ConfigurationOptions = new ConfigurationOptions
-            {
-                AbortOnConnectFail = true,
-                EndPoints = { options.Configuration },
-            };
-        });
-        return services;
-    }
 }

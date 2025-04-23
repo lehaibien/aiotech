@@ -7,6 +7,7 @@ using Application.Configurations;
 using Application.Dashboard;
 using Application.Discounts;
 using Application.Helpers;
+using Application.Images;
 using Application.Jwt;
 using Application.Jwt.Options;
 using Application.Options;
@@ -63,6 +64,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<MomoLibrary>();
+        services.AddScoped<IStorageImageService, StorageImageService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IBrandService, BrandService>();
         services.AddScoped<ICartService, CartService>();

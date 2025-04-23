@@ -24,9 +24,8 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 var configuration = builder.Configuration;
 builder.Services
     .AddHttpContextAccessor()
-    .ConfigureRedis(configuration)
-    .AddApplication(configuration)
     .AddInfrastructure(configuration)
+    .AddApplication(configuration)
     .ConfigureExceptionHandler()
     .ConfigureCors(configuration)
     .ConfigureAuthentication(configuration)
