@@ -10,8 +10,8 @@ public interface IBrandService
         CancellationToken cancellationToken = default
     );
     Task<Result<BrandResponse>> GetById(Guid id);
-    Task<Result<BrandResponse>> Create(CreateBrandRequest request);
-    Task<Result<BrandResponse>> Update(UpdateBrandRequest request);
+    Task<Result<BrandResponse>> Create(BrandRequest request);
+    Task<Result<BrandResponse>> Update(BrandRequest request);
     Task<Result<string>> Delete(Guid id);
     Task<Result<string>> DeleteList(List<Guid> ids);
     Task<Result<List<ComboBoxItem>>> GetComboBox();

@@ -35,6 +35,12 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
             .HasConstraintName("FK_Order_OrderItemId")
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder
+            .HasOne(x => x.Payment)
+            .WithOne(x => x.Order)
+            .HasConstraintName("FK_Order_PaymentId")
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => x.CustomerId);
         builder.HasIndex(x => x.TrackingNumber).IsUnique();
         builder.ToTable("Order");

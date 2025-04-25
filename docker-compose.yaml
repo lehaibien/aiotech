@@ -24,17 +24,20 @@ services:
     build: ./Backend/
     container_name: aiotech_api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=true;MultipleActiveResultSets=true
-      - RedisConnectionString=redis:6379
-      - SEQ_URL=http://seq:80
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=${DB_PASSWORD};Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - ConnectionStrings__Redis=redis:6379
+      - ConnectionStrings__ElasticSearch=elastic_search:9200
+      - ConnectionStrings__Minio=minio:9000
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - MINIO_ROOT_USER=aiotech
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+      - SEQ_URL=seq:80
+      - ASPNETCORE_ENVIRONMENT=PRODUCTION
       - ASPNETCORE_URLS=http://+:5554
       - BE_StaticUrl=https://api.aiotech.cloud/static
-      - DOTNET_GCHeapCount=2  # Match vCPU count
-      - DOTNET_ServerGarbageCollection=1
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_started
       seq:
@@ -49,11 +52,6 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5554"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.4'
-          memory: 256M
 
   seq:
     image: datalust/seq:latest
@@ -74,18 +72,12 @@ services:
     container_name: aiotech_redis
     command: 
       - redis-server 
-      - --maxmemory 256mb  # Reduced from 1GB
+      - --maxmemory 1GB
       - --maxmemory-policy allkeys-lru
-      - --save ""  # Disable persistence
     volumes:
       - redis_data:/data
     networks:
       - backend
-    deploy:
-      resources:
-        limits:
-          cpus: '0.3'
-          memory: 300M
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -108,14 +100,6 @@ services:
       interval: 5s
       timeout: 30s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: '0.8'
-          memory: 1500M
-        reservations:
-          cpus: '0.5' 
-          memory: 1000M
 
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest

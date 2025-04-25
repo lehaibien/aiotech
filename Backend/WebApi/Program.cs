@@ -5,17 +5,14 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using QuestPDF.Infrastructure;
-using Serilog;
-using StackExchange.Redis;
-using WebApi;
+using WebApi.Extensions;
 using WebApi.Middleware;
 
 QuestPDF.Settings.License = LicenseType.Community;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder
-    .Services.AddControllers()
+builder.Services
+    .AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -25,23 +22,17 @@ builder
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var configuration = builder.Configuration;
-builder
-    .Services.AddDefaultConfig(configuration)
+builder.Services
+    .AddHttpContextAccessor()
+    .AddInfrastructure(configuration)
     .AddApplication(configuration)
-    .AddInfrastructure(configuration);
-builder.Services.AddControllers();
+    .ConfigureExceptionHandler()
+    .ConfigureCors(configuration)
+    .ConfigureAuthentication(configuration)
+    .ConfigureAuthorization();
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration =
-        Environment.GetEnvironmentVariable("RedisConnectionString")
-        ?? configuration.GetConnectionString("RedisConnection");
-    options.ConfigurationOptions = new ConfigurationOptions
-    {
-        AbortOnConnectFail = true,
-        EndPoints = { options.Configuration },
-    };
-});
+builder.Logging.ConfigureLogger(configuration);
+builder.Services.AddControllers();
 
 builder.Services.AddSignalR();
 
@@ -86,26 +77,19 @@ builder.Services.AddSwaggerGen(c =>
     );
 });
 
-var logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.WithCorrelationId()
-    .Enrich.FromLogContext()
-    .CreateLogger();
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-if (app.Environment.IsProduction())
+if(app.Environment.IsProduction())
+{
     app.UseExceptionHandler();
-
+}
 app.UseHttpsRedirection();
 
 app.UseStaticFiles(

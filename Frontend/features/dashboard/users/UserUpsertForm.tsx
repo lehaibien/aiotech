@@ -1,18 +1,15 @@
-"use client";
+'use client';
 
-import ControlledComboBox from "@/components/core/ControlledComboBox";
-import { API_URL } from "@/constant/apiUrl";
-import { EMPTY_UUID } from "@/constant/common";
-import { postApi, putApi } from "@/lib/apiClient";
-import { convertObjectToFormData } from "@/lib/utils";
-import {
-  ComboBoxItem,
-  UserRequest,
-  UserRequestSchema,
-  UserResponse,
-} from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import ControlledComboBox from '@/components/core/ControlledComboBox';
+import { ControlledTextField } from '@/components/core/ControlledTextField';
+import { API_URL } from '@/constant/apiUrl';
+import { EMPTY_UUID } from '@/constant/common';
+import { postApi, putApi } from '@/lib/apiClient';
+import { convertObjectToFormData } from '@/lib/utils';
+import { userRequestSchema } from '@/schemas/userSchema';
+import { ComboBoxItem, UserRequest, UserResponse } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import {
   Avatar,
   Box,
@@ -20,13 +17,14 @@ import {
   FormControl,
   FormLabel,
   IconButton,
-} from "@mui/material";
-import TextField from "@mui/material/TextField";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+  Stack,
+} from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSnackbar } from 'notistack';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type UserUpsertFormProps = {
   data: UserResponse;
@@ -38,48 +36,30 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
   const router = useRouter();
   const [avatarPreview, setAvatarPreview] = useState(data.avatarUrl);
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    control,
-    formState: { errors },
-  } = useForm<UserRequest>({
-    defaultValues: { ...data, password: "" },
-    resolver: zodResolver(UserRequestSchema),
+  const { register, handleSubmit, setValue, control } = useForm<UserRequest>({
+    defaultValues: { ...data, password: '' },
+    resolver: zodResolver(userRequestSchema),
   });
   const onSubmit = async (request: UserRequest) => {
     setIsLoading(true);
     const formData = convertObjectToFormData(request);
     try {
-      if (data.id === EMPTY_UUID) {
-        const response = await postApi(API_URL.user, formData);
-        if (response.success) {
-          enqueueSnackbar("Thêm mới tài khoản thành công", {
-            variant: "success",
-          });
-          router.push("/dashboard/users");
-        } else {
-          enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-            variant: "error",
-          });
-        }
+      const action = data.id === EMPTY_UUID ? postApi : putApi;
+      const actionMessage = data.id === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật';
+      const response = await action(API_URL.user, formData);
+      if (response.success) {
+        enqueueSnackbar(`${actionMessage} tài khoản thành công`, {
+          variant: 'success',
+        });
+        router.push('/dashboard/users');
       } else {
-        const response = await putApi(API_URL.user, formData);
-        if (response.success) {
-          enqueueSnackbar("Cập nhật tài khoản thành công", {
-            variant: "success",
-          });
-          router.push("/dashboard/users");
-        } else {
-          enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-            variant: "error",
-          });
-        }
+        enqueueSnackbar('Lỗi xảy ra: ' + response.message, {
+          variant: 'error',
+        });
       }
     } catch (err) {
-      enqueueSnackbar("Lỗi xảy ra: " + (err as Error).message, {
-        variant: "error",
+      enqueueSnackbar('Lỗi xảy ra: ' + (err as Error).message, {
+        variant: 'error',
       });
     }
     setIsLoading(false);
@@ -87,179 +67,184 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setValue("image", file);
+      setValue('image', file);
       setAvatarPreview(URL.createObjectURL(file));
     }
   };
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Stack
+      component='form'
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      spacing={2}>
       <TextField
-        type="hidden"
-        {...register("id")}
+        type='hidden'
+        {...register('id')}
         sx={{
-          display: "none",
+          display: 'none',
         }}
       />
       <Box
         sx={{
-          display: { sm: "block", md: "flex" },
+          display: { sm: 'block', md: 'flex' },
           gap: 2,
-        }}
-      >
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="userName" required>
+        }}>
+        <FormControl fullWidth>
+          <FormLabel
+            htmlFor='userName'
+            required>
             Tên tài khoản
           </FormLabel>
-          <TextField
-            autoFocus
+          <ControlledTextField
             required
-            id="userName"
-            {...register("userName")}
-            error={errors.userName ? true : false}
-            helperText={errors.userName ? errors.userName.message : undefined}
+            control={control}
+            name='userName'
+            size='small'
+            autoFocus
           />
         </FormControl>
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="email" required>
+        <FormControl fullWidth>
+          <FormLabel
+            htmlFor='email'
+            required>
             Email
           </FormLabel>
-          <TextField
+          <ControlledTextField
             required
-            id="email"
-            {...register("email")}
-            error={errors.email ? true : false}
-            helperText={errors.email ? errors.email.message : undefined}
+            control={control}
+            name='email'
+            size='small'
+            type='email'
+            autoComplete='email'
           />
         </FormControl>
       </Box>
       <Box
         sx={{
-          display: { sm: "block", md: "flex" },
+          display: { sm: 'block', md: 'flex' },
           gap: 2,
-        }}
-      >
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="familyName" required>
+        }}>
+        <FormControl fullWidth>
+          <FormLabel
+            htmlFor='familyName'
+            required>
             Họ
           </FormLabel>
-          <TextField
+          <ControlledTextField
             required
-            id="familyName"
-            {...register("familyName")}
-            error={errors.familyName ? true : false}
-            helperText={
-              errors.familyName ? errors.familyName.message : undefined
-            }
+            control={control}
+            name='familyName'
+            size='small'
           />
         </FormControl>
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="givenName" required>
+        <FormControl fullWidth>
+          <FormLabel
+            htmlFor='givenName'
+            required>
             Tên
           </FormLabel>
-          <TextField
+          <ControlledTextField
             required
-            id="givenName"
-            {...register("givenName")}
-            error={errors.givenName ? true : false}
-            helperText={errors.givenName ? errors.givenName.message : undefined}
+            control={control}
+            name='givenName'
+            size='small'
           />
         </FormControl>
       </Box>
 
       <Box
         sx={{
-          display: { sm: "block", md: "flex" },
+          display: { sm: 'block', md: 'flex' },
           gap: 2,
-        }}
-      >
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="phoneNumber">Số điện thoại</FormLabel>
-          <TextField
-            id="phoneNumber"
-            {...register("phoneNumber")}
-            error={errors.phoneNumber ? true : false}
-            helperText={
-              errors.phoneNumber ? errors.phoneNumber.message : undefined
-            }
+        }}>
+        <FormControl fullWidth>
+          <FormLabel htmlFor='phoneNumber'>Số điện thoại</FormLabel>
+          <ControlledTextField
+            control={control}
+            name='phoneNumber'
+            size='small'
+            type='tel'
+            autoComplete='tel'
           />
         </FormControl>
-        <FormControl margin="normal" fullWidth>
-          <FormLabel htmlFor="roleId" required>
+        <FormControl fullWidth>
+          <FormLabel
+            htmlFor='roleId'
+            required>
             Vai trò
           </FormLabel>
-          <ControlledComboBox control={control} items={roleCombobox} name="roleId" />
-          {/* <TextField
-                  required
-                  id='roleId'
-                  {...register('roleId')}
-                  error={errors.roleId ? true : false}
-                  helperText={
-                    errors.roleId ? errors.roleId.message : undefined
-                  }
-                /> */}
+          <ControlledComboBox
+            control={control}
+            items={roleCombobox}
+            name='roleId'
+            size='small'
+            compareBy='text'
+          />
         </FormControl>
       </Box>
-      <FormControl margin="normal" fullWidth>
-        <FormLabel htmlFor="password">Password</FormLabel>
-        <TextField
-          id="password"
-          {...register("password")}
-          error={errors.password ? true : false}
-          type="password"
-          helperText={errors.password ? errors.password.message : undefined}
+      <FormControl fullWidth>
+        <FormLabel htmlFor='password'>Password</FormLabel>
+        <ControlledTextField
+          control={control}
+          name='password'
+          size='small'
+          type='password'
+          autoComplete='current-password'
         />
       </FormControl>
-      <FormControl margin="normal" fullWidth>
-        <FormLabel htmlFor="avatar-upload">Hình ảnh</FormLabel>
+      <FormControl fullWidth>
+        <FormLabel htmlFor='avatar-upload'>Hình ảnh</FormLabel>
         <Box>
           <input
-            accept="image/*"
-            id="avatar-upload"
-            name="avatar-upload"
-            type="file"
+            accept='image/*'
+            id='avatar-upload'
+            name='avatar-upload'
+            type='file'
             hidden
             onChange={handleAvatarChange}
           />
-          <label htmlFor="avatar-upload">
-            <IconButton disableRipple component="span">
+          <label htmlFor='avatar-upload'>
+            <IconButton
+              disableRipple
+              component='span'>
               <Avatar
                 src={avatarPreview}
                 sx={{ width: 100, height: 100, mb: 1 }}
               />
               <CloudUploadIcon
-                sx={{ position: "absolute", bottom: 8, right: 8 }}
+                sx={{ position: 'absolute', bottom: 8, right: 8 }}
               />
             </IconButton>
           </label>
         </Box>
       </FormControl>
       <FormControl
-        margin="normal"
         fullWidth
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-end",
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
           gap: 1,
-        }}
-      >
+        }}>
         <Button
-          type="button"
+          type='button'
           LinkComponent={Link}
-          href="/dashboard/users"
-          variant="contained"
-          disabled={isLoading}
-        >
+          href='/dashboard/users'
+          variant='contained'
+          disabled={isLoading}>
           Hủy
         </Button>
-        <Button type="submit" variant="contained" color="primary">
+        <Button
+          type='submit'
+          variant='contained'
+          color='primary'>
           {isLoading
-            ? "Đang xử lý..."
+            ? 'Đang xử lý...'
             : data.id === EMPTY_UUID
-            ? "Thêm mới"
-            : "Cập nhật"}
+            ? 'Thêm mới'
+            : 'Cập nhật'}
         </Button>
       </FormControl>
-    </Box>
+    </Stack>
   );
 }

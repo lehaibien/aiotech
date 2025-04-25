@@ -1,20 +1,21 @@
-"use client";
+'use client';
 
-import { DashboardMenu, dashboardMenus } from "@/constant/dashboardMenu";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Box, Collapse, useTheme } from "@mui/material";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Fragment, useState } from "react";
+import { dashboardNavItems } from '@/constant/routes';
+import { DashboardNavItem } from '@/types/ui';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Box, Collapse, useTheme } from '@mui/material';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Fragment, useState } from 'react';
 
 export default function MenuContent() {
   const pathname = usePathname();
-  const realPath = pathname ?? "/dashboard";
+  const realPath = pathname ?? '/dashboard';
   const theme = useTheme();
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
@@ -25,73 +26,76 @@ export default function MenuContent() {
     }));
   };
 
-  const getParentBackgroundColor = (item: DashboardMenu) => {
-    if (item.children === undefined && realPath === item.path) {
+  const getParentBackgroundColor = (item: DashboardNavItem) => {
+    if (item.items === undefined && realPath === item.href) {
       return theme.palette.action.selected;
     }
     if (
-      item.children?.map((x) => x.path).includes(realPath) &&
-      !open[item.name]
+      item.items?.map((x) => x.href).includes(realPath) &&
+      !open[item.title]
     ) {
       return theme.palette.action.selected;
     }
-    return "transparent";
+    return 'transparent';
   };
-  const renderNavItems = (items: DashboardMenu[]) => (
+  const renderNavItems = (navItems: DashboardNavItem[]) => (
     <List>
-      {items.map((item) => (
-        <Fragment key={item.name}>
+      {navItems.map((navItem) => (
+        <Fragment key={navItem.title}>
           <ListItem
             disablePadding
             sx={{
-              backgroundColor: getParentBackgroundColor(item),
-            }}
-          >
-            {item.children ? (
-              <ListItemButton onClick={() => handleClick(item.name)}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} />
-                {open[item.name] ? <ExpandLess /> : <ExpandMore />}
+              backgroundColor: getParentBackgroundColor(navItem),
+            }}>
+            {navItem.items ? (
+              <ListItemButton onClick={() => handleClick(navItem.title)}>
+                <ListItemIcon>
+                  <navItem.icon></navItem.icon>
+                </ListItemIcon>
+                <ListItemText primary={navItem.title} />
+                {open[navItem.title] ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
             ) : (
               <ListItemButton
                 component={Link}
-                href={item.path ?? "/dashboard"}
-                selected={realPath === item.path}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} />
+                href={navItem.href ?? '/dashboard'}
+                selected={realPath === navItem.href}>
+                <ListItemIcon>
+                  <navItem.icon></navItem.icon>
+                </ListItemIcon>
+                <ListItemText primary={navItem.title} />
               </ListItemButton>
             )}
           </ListItem>
-          {item.children && (
+          {navItem.items && (
             <Collapse
-              in={open[item.name]}
-              timeout="auto"
+              in={open[navItem.title]}
+              timeout='auto'
               unmountOnExit
               sx={{
                 borderBottom: `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <List component="div" disablePadding>
-                {item.children.map((child) => (
+              }}>
+              <List
+                component='div'
+                disablePadding>
+                {navItem.items.map((item) => (
                   <ListItem
                     disablePadding
-                    key={child.name}
+                    key={item.title}
                     sx={{
                       backgroundColor:
-                        realPath === child.path
+                        realPath === item.href
                           ? theme.palette.action.selected
-                          : "transparent",
+                          : 'transparent',
                       paddingLeft: 2,
-                    }}
-                  >
+                    }}>
                     <ListItemButton
                       component={Link}
-                      href={child.path ?? "/dashboard"}
-                    >
-                      <ListItemIcon>{child.icon}</ListItemIcon>
-                      <ListItemText primary={child.name} />
+                      href={item.href ?? '/dashboard'}>
+                      <ListItemIcon>
+                        <item.icon></item.icon>
+                      </ListItemIcon>
+                      <ListItemText primary={item.title} />
                     </ListItemButton>
                   </ListItem>
                 ))}
@@ -105,10 +109,9 @@ export default function MenuContent() {
   return (
     <Box
       sx={{
-        overflowY: "auto",
-      }}
-    >
-      {renderNavItems(dashboardMenus)}
+        overflowY: 'auto',
+      }}>
+      {renderNavItems(dashboardNavItems)}
     </Box>
   );
 }

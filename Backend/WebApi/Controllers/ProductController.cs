@@ -2,7 +2,7 @@ using Application.Products;
 using Application.Products.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
-using WebApi.Model;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -20,17 +20,8 @@ public class ProductController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetListAsync([FromQuery] GetListRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.GetListAsync(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Data;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("filtered")]
@@ -38,62 +29,29 @@ public class ProductController : ControllerBase
         [FromQuery] GetListFilteredProductRequest request
     )
     {
-        var response = new ApiResponse();
         var result = await _service.GetListFilteredAsync(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Data;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] SearchProductRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Search(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.SearchAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpGet("top")]
     public async Task<IActionResult> GetTopProducts([FromQuery] int count = 8)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetTopProducts(count);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetTopProductsAsync(count);
+        return this.FromResult(result);
     }
 
-    [HttpGet("featured")]
-    public async Task<IActionResult> GetFeaturedProducts([FromQuery] int count = 8)
+    [HttpGet("newest")]
+    public async Task<IActionResult> GetNewestProducts([FromQuery] int count = 8)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetFeaturedProducts(count);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetNewestProductsAsync(count);
+        return this.FromResult(result);
     }
 
     [HttpGet("related")]
@@ -101,105 +59,49 @@ public class ProductController : ControllerBase
         [FromQuery] GetRelatedProductsRequest request
     )
     {
-        var response = new ApiResponse();
-        var result = await _service.GetRelatedProducts(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetRelatedProductsAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetByIdAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpGet("request/{id:guid}")]
     public async Task<IActionResult> GetRequestById(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetRequestById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetRequestByIdAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateProductRequest request)
+    public async Task<IActionResult> CreateAsync([FromForm] ProductRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Create(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.CreateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromForm] UpdateProductRequest request)
+    public async Task<IActionResult> UpdateAsync([FromForm] ProductRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Update(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.UpdateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.Delete(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.DeleteAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
-        var response = new ApiResponse();
-        var result = await _service.DeleteList(ids);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.DeleteListAsync(ids);
+        return this.FromResult(result);
     }
 }

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import NoRowOverlay from "@/components/core/NoRowOverlay";
-import useColumns from "@/hooks/useColumns";
-import { useDataTableFetch } from "@/hooks/useDataTableFetch";
-import { alpha, Box } from "@mui/material";
+import NoRowOverlay from '@/components/core/NoRowOverlay';
+import useColumns from '@/hooks/useColumns';
+import { useDataTableFetch } from '@/hooks/useDataTableFetch';
+import { alpha, Box } from '@mui/material';
 import {
   DataGrid,
   GridColDef,
@@ -11,7 +11,7 @@ import {
   GridPaginationModel,
   GridRowSelectionModel,
   GridSortModel,
-} from "@mui/x-data-grid";
+} from '@mui/x-data-grid';
 import React, {
   ForwardedRef,
   forwardRef,
@@ -19,11 +19,11 @@ import React, {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
-import CustomDataGridPagination from "./CustomDataGridPagination";
-import ErrorOverlay from "./ErrorOverlay";
+} from 'react';
+import CustomDataGridPagination from './CustomDataGridPagination';
+import ErrorOverlay from './ErrorOverlay';
 
-export type DataTableProps = {
+type DataTableProps = {
   columns: GridColDef[];
   apiUrl: string;
   checkboxSelection?: boolean;
@@ -46,31 +46,23 @@ function DataTable<T>(
     checkboxSelection,
     withRowNumber,
     height = 600,
-    density = "standard",
+    density = 'standard',
   }: DataTableProps,
   ref: ForwardedRef<DataTableRef>
 ) {
-  useImperativeHandle(ref, () => ({
-    rowSelectionModel: rowSelectionModel,
-    reload: () => mutate(),
-    search: (search: string) => {
-      textSearch.current = search;
-      mutate();
-    },
-    clearSelection: () => setRowSelectionModel([]),
-  }));
-
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
   });
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-  const textSearch = useRef("");
+  const textSearch = useRef('');
 
   const [rowSelectionModel, setRowSelectionModel] =
-    useState<GridRowSelectionModel>([]);
+    useState<GridRowSelectionModel>({
+      type: 'include',
+      ids: new Set<string>(),
+    });
 
-  // Add row number column if needed
   const gridColumn = useColumns({
     columns: columns,
     withRowNumber: withRowNumber,
@@ -79,9 +71,26 @@ function DataTable<T>(
   const { data, error, isValidating, mutate } = useDataTableFetch<T>({
     apiUrl: apiUrl,
     paginationModel,
-    sortModel: sortModel[0],
+    sortModel: sortModel,
     textSearch: textSearch.current,
   });
+
+  useImperativeHandle(ref, () => ({
+    rowSelectionModel: rowSelectionModel,
+    reload: () => {
+      if (mutate) mutate();
+    },
+    search: (search: string) => {
+      textSearch.current = search;
+      if (mutate) mutate();
+    },
+    clearSelection: () =>
+      setRowSelectionModel({
+        type: 'include',
+        ids: new Set<string>(),
+      }),
+  }));
+
   const rowRef = React.useRef(data?.items ?? []);
   const row = React.useMemo(() => {
     if (Array.isArray(data?.items)) {
@@ -96,7 +105,6 @@ function DataTable<T>(
     }
     return rowCountRef.current;
   }, [data?.totalCount]);
-  // Handle pagination model change
   const onPaginationModelChange = useCallback(
     (newPaginationModel: GridPaginationModel) => {
       setPaginationModel(newPaginationModel);
@@ -108,16 +116,18 @@ function DataTable<T>(
     setSortModel(newSortModel);
   }, []);
   return (
-    <Box height={height} width={"100%"}>
+    <Box
+      height={height}
+      width={'100%'}>
       <DataGrid
         rows={row}
         rowCount={rowCount}
         columns={gridColumn}
         checkboxSelection={checkboxSelection}
-        paginationMode="server"
+        paginationMode='server'
         paginationModel={paginationModel}
         onPaginationModelChange={onPaginationModelChange}
-        sortingMode="server"
+        sortingMode='server'
         sortModel={sortModel}
         onSortModelChange={onSortModelChange}
         rowSelectionModel={rowSelectionModel}
@@ -134,43 +144,42 @@ function DataTable<T>(
           ),
           noRowsOverlay: error
             ? () => (
-                <ErrorOverlay message={"Lỗi tải dữ liệu: " + error.message} />
+                <ErrorOverlay message={'Lỗi tải dữ liệu: ' + error.message} />
               )
             : NoRowOverlay,
           noResultsOverlay: NoRowOverlay,
         }}
         slotProps={{
           loadingOverlay: {
-            variant: "circular-progress",
+            variant: 'skeleton',
           },
         }}
-        getRowHeight={() => "auto"}
+        getRowHeight={() => 'auto'}
         density={density}
         showCellVerticalBorder
         showColumnVerticalBorder
         sx={(theme) => ({
-          backgroundColor: theme.palette.background.paper,
-          "& .MuiDataGrid-columnHeader": {
-            backgroundColor: alpha(theme.palette.background.paper, 0.3),
+          '& .MuiDataGrid-columnHeader': {
+            backgroundColor: alpha(theme.palette.background.paper, 0.1),
           },
-          "& .MuiDataGrid-cell:focus": {
-            outline: "none",
+          '& .MuiDataGrid-cell:focus': {
+            outline: 'none',
           },
-          "& .MuiDataGrid-cell": {
-            display: "flex",
-            alignItems: "center",
+          '& .MuiDataGrid-cell': {
+            display: 'flex',
+            alignItems: 'center',
             px: 1,
           },
-          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
-          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
-            py: "15px",
+          '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: 1 },
+          '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+            py: 2,
           },
-          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
-            py: "22px",
+          '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+            py: 3,
           },
-          "& .MuiDataGrid-selectedRowCount": {
-            display: "none",
-          }
+          '& .MuiDataGrid-selectedRowCount': {
+            display: 'none',
+          },
         })}
       />
     </Box>

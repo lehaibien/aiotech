@@ -28,7 +28,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -44,7 +44,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -60,7 +60,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -78,7 +78,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -96,7 +96,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -114,7 +114,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -132,7 +132,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -150,7 +150,7 @@ public class ReportController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 }

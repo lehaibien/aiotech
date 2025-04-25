@@ -1,4 +1,4 @@
-import { Box, Grid2 as Grid, SvgIconTypeMap } from "@mui/material";
+import { Box, Grid, SvgIconTypeMap } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import StatCard from "./StatCard";
 

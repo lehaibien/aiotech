@@ -1,5 +1,4 @@
-import { UUID } from "crypto";
-import { ProductDetailResponse } from "./product";
+import { UUID } from "@/types";
 
 export type CartItemRequest = {
   userId: UUID;
@@ -10,12 +9,6 @@ export type CartItemRequest = {
 export type RemoveCartItemRequest = {
   userId: UUID;
   productId: UUID;
-}
-
-export type CartItem = {
-  productId: UUID;
-  quantity: number;
-  product: ProductDetailResponse;
 }
 
 export type CartItemResponse = {

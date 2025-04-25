@@ -1,5 +1,4 @@
 using Application.Configurations.Dtos;
-using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using Shared;
 
 namespace Application.Configurations;
 
-[RegisterClassAsScoped]
 public class ConfigurationService : IConfigurationService
 {
     private readonly IUnitOfWork _unitOfWork;

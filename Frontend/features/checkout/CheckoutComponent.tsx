@@ -5,12 +5,8 @@ import { TAX_VALUE } from "@/constant/common";
 import { postApi } from "@/lib/apiClient";
 import { cartItemsAtom } from "@/lib/globalState";
 import { formatNumberWithSeperator, parseUUID } from "@/lib/utils";
-import {
-  CheckoutFormInput,
-  checkoutFormSchema,
-  CheckoutRequest,
-  PaymentMethods,
-} from "@/types";
+import { checkoutFormSchema } from "@/schemas/orderSchema";
+import { CheckoutFormInput, CheckoutRequest, PaymentMethods } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
@@ -25,7 +21,7 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Radio,
   RadioGroup,
@@ -48,12 +44,12 @@ type CheckoutComponentProps = {
   isError: boolean;
 };
 
-export function CheckoutComponent({
+export const CheckoutComponent = ({
   name,
   phoneNumber,
   address,
   isError = false,
-}: CheckoutComponentProps) {
+}: CheckoutComponentProps) => {
   const theme = useTheme();
   const router = useRouter();
   const [cartItems] = useAtom(cartItemsAtom);
@@ -504,4 +500,4 @@ export function CheckoutComponent({
       </form>
     </Box>
   );
-}
+};

@@ -1,30 +1,22 @@
-import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
 import { ProductRatingReportResponse } from "@/types";
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { ProductRatingGrid } from "./ProductRatingGrid";
 import { RatingDistributionChart } from "./RatingDistributionChart";
 
-const breadcrums = [
-  {
-    label: "",
-    href: "dashboard",
-  },
-  {
-    label: "Thống kê đánh giá sản phẩm",
-    href: "product-rating",
-  },
-];
-
-export default async function ProductRatingPage() {
-  let data: ProductRatingReportResponse[] = [];
+async function fetchProductRatingData() {
   const response = await getApi(API_URL.productRatingReport);
   if (response.success) {
-    data = response.data as ProductRatingReportResponse[];
+    return response.data as ProductRatingReportResponse[];
   } else {
     console.error("Error fetching product rating data:", response.message);
+    return [];
   }
+}
+
+export default async function ProductRatingPage() {
+  const data = await fetchProductRatingData();
   const chartData = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
   data
     .map((item) => item.ratingDistribution)
@@ -37,28 +29,25 @@ export default async function ProductRatingPage() {
     });
 
   return (
-    <Box>
-      <NavBreadcrumbs items={breadcrums} />
-      <Typography variant="h4" gutterBottom>
-        Thống kê đánh giá sản phẩm
-      </Typography>
+    <Stack spacing={2}>
+      <Typography variant="h5">Thống kê đánh giá sản phẩm</Typography>
 
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Biểu đồ phân phối đánh giá sản phẩm
-          </Typography>
-          <Box sx={{ height: 500, width: "100%" }}>
-            <RatingDistributionChart data={chartData} />
-          </Box>
-          <Typography variant="h6" gutterBottom>
-            Chi tiết đánh giá sản phẩm
-          </Typography>
-          <Box sx={{ height: 650, width: "100%" }}>
-            <ProductRatingGrid data={data} />
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Biểu đồ phân phối đánh giá sản phẩm
+        </Typography>
+        <Box sx={{ height: 500, width: "100%" }}>
+          <RatingDistributionChart data={chartData} />
+        </Box>
+      </Box>
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Chi tiết đánh giá sản phẩm
+        </Typography>
+        <Box sx={{ height: 650, width: "100%" }}>
+          <ProductRatingGrid data={data} />
+        </Box>
+      </Box>
+    </Stack>
   );
 }

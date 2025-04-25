@@ -1,20 +1,9 @@
-import { Stack, Typography } from "@mui/material";
-import { ConfigurationForm } from "./ConfigurationForm";
-import { BannerConfiguration, EmailConfiguration } from "@/types/config";
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
-import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
-
-const breadcrums = [
-  {
-    label: "",
-    href: "dashboard",
-  },
-  {
-    label: "Cài đặt hệ thống",
-    href: "?",
-  },
-];
+import { BannerConfiguration, EmailConfiguration } from "@/types/sys-config";
+import { Stack, Typography } from "@mui/material";
+import { BannerConfigForm } from "./BannerConfigForm";
+import { EmailConfigForm } from "./EmailConfigForm";
 
 export default async function ConfigurationPage() {
   let banner: BannerConfiguration = {
@@ -44,10 +33,10 @@ export default async function ConfigurationPage() {
     console.error("Failed to load email config: ", emailResponse.message);
   }
   return (
-    <Stack gap={2}>
-      <NavBreadcrumbs items={breadcrums} />
+    <Stack spacing={2}>
       <Typography variant="h5">Cài đặt hệ thống</Typography>
-      <ConfigurationForm banner={banner} email={email} />
+      <BannerConfigForm banner={banner} />
+      <EmailConfigForm email={email} />
     </Stack>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSignalR } from "@/providers/SignalRProvider";
+import { useSignalR } from "@/contexts/SignalRProvider";
 import { generateUUID } from "@/lib/utils";
 import { NotificationItem } from "@/types";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -16,7 +16,7 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
-import { UUID } from "crypto";
+import { UUID } from "@/types";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 

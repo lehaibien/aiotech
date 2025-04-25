@@ -8,7 +8,7 @@ import Stack from "@mui/material/Stack";
 import * as React from "react";
 import AccountSection from "../dashboard/Account";
 import Searchbar from "../dashboard/SearchBar";
-import { DashboardMenuContext } from "@/providers/DashboardMenuProvider";
+import { DashboardMenuContext } from "@/contexts/DashboardMenuProvider";
 
 export default function ShipperHeader() {
   const [open, setOpen] = React.useContext(DashboardMenuContext);

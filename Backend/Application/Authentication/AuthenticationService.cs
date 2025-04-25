@@ -1,13 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
+using Application.Abstractions;
 using Application.Authentication.Dtos;
 using Application.Helpers;
 using Application.Images;
 using Application.Jwt;
 using Application.Mail;
-using Application.Users.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -18,15 +15,16 @@ using Shared;
 
 namespace Application.Authentication;
 
-[RegisterClassAsScoped]
 public class AuthenticationService : IAuthenticationService
 {
+    private const string FolderUpload = "images/users";
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IJwtService _jwtService;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
     private readonly IImageService _imageService;
+    private readonly IStorageService _storageService;
 
     public AuthenticationService(
         IJwtService jwtService,
@@ -34,7 +32,8 @@ public class AuthenticationService : IAuthenticationService
         IHttpContextAccessor contextAccessor,
         IMapper mapper,
         IEmailService emailService,
-        IImageService imageService
+        IImageService imageService,
+        IStorageService storageService
     )
     {
         _jwtService = jwtService;
@@ -43,6 +42,7 @@ public class AuthenticationService : IAuthenticationService
         _mapper = mapper;
         _emailService = emailService;
         _imageService = imageService;
+        _storageService = storageService;
     }
 
     public async Task<Result<TokenResult>> Login(AuthLoginRequest request)
@@ -88,20 +88,7 @@ public class AuthenticationService : IAuthenticationService
         {
             var role = await _unitOfWork
                 .GetRepository<Role>()
-                .FindAsync(r => r.Name == CommonConst.DefaultRole);
-            if (role is null)
-            {
-                role = new Role
-                {
-                    Id = Guid.NewGuid(),
-                    Name = CommonConst.DefaultRole,
-                    CreatedDate = DateTime.UtcNow,
-                    CreatedBy = "system",
-                    IsDeleted = false,
-                };
-                _unitOfWork.GetRepository<Role>().Add(role);
-                await _unitOfWork.SaveChangesAsync();
-            }
+                .FindAsync(r => r.Name == CommonConst.DefaultRole)!;
             var randomPassword = Guid.NewGuid().ToString()[..8];
             var password = EncryptionHelper.HashPassword(randomPassword, out var salt);
             using var httpClient = new HttpClient();
@@ -115,12 +102,6 @@ public class AuthenticationService : IAuthenticationService
                 Headers = new HeaderDictionary(),
                 ContentType = contentType,
             };
-            var newImageUrl = string.Empty;
-            var uploadImageResult = await _imageService.UploadAsync(file, ImageType.Logo, "user");
-            if (uploadImageResult.IsSuccess)
-            {
-                newImageUrl = uploadImageResult.Data;
-            }
             user = new User
             {
                 Id = Guid.NewGuid(),
@@ -130,12 +111,16 @@ public class AuthenticationService : IAuthenticationService
                 GivenName = givenName,
                 Password = password,
                 Salt = Convert.ToBase64String(salt),
-                AvatarUrl = newImageUrl,
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
                 IsDeleted = false,
                 RoleId = role.Id,
             };
+            var uploadResult = await _storageService.UploadAsync(
+                file,
+                Path.Combine(FolderUpload, user.Id.ToString())
+            );
+            user.AvatarUrl = uploadResult.Url;
             _unitOfWork.GetRepository<User>().Add(user);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -151,52 +136,30 @@ public class AuthenticationService : IAuthenticationService
         return Result<TokenResult>.Success(response);
     }
 
-    public async Task<Result<string>> Register(AuthRegisterRequest request)
+    public async Task<Result> Register(AuthRegisterRequest request)
     {
         var isExist = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(u => u.UserName == request.UserName);
         if (isExist)
-            return Result<string>.Failure("Tài khoản đã tồn tại");
+            return Result.Failure("Tài khoản đã tồn tại");
         var isEmailExist = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(u => u.Email == request.Email);
         if (isEmailExist)
-            return Result<string>.Failure("Địa chỉ email đã được sử dụng");
+            return Result.Failure("Địa chỉ email đã được sử dụng");
         var user = _mapper.Map<User>(request);
-        /*if (request.Avatar is not null)
-        {
-            var avatar = await FileHandler.SaveFileAsync(request.Avatar, "UserAvatar");
-            user.AvatarUrl = avatar;
-        }*/
-        var role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Name == "User");
-        if (role == null)
-        {
-            var newRole = new Role
-            {
-                Id = Guid.NewGuid(),
-                Name = "User",
-                CreatedDate = DateTime.UtcNow,
-                CreatedBy = "system",
-                IsDeleted = false,
-            };
-            _unitOfWork.GetRepository<Role>().Add(newRole);
-            user.RoleId = newRole.Id;
-        }
-        else
-        {
-            user.RoleId = role.Id;
-        }
-
+        var role = await _unitOfWork
+            .GetRepository<Role>()
+            .FindAsync(r => r.Name == CommonConst.DefaultRole)!;
+        user.RoleId = role.Id;
         user.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
         user.Salt = Convert.ToBase64String(salt);
         user.CreatedDate = DateTime.UtcNow;
         user.CreatedBy = _contextAccessor.HttpContext?.User.Identity?.Name ?? "system";
         _unitOfWork.GetRepository<User>().Add(user);
         await _unitOfWork.SaveChangesAsync();
-        var result = _mapper.Map<UserResponse>(user);
-        result.Role = role?.Name ?? string.Empty;
-        return Result<string>.Success("Đăng ký thành công");
+        return Result.Success();
     }
 
     public async Task<Result> ConfirmEmail(ConfirmEmailRequest request)
@@ -265,15 +228,15 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
-    public async Task<Result<string>> ChangeEmail(ChangeEmailRequest request)
+    public async Task<Result> ChangeEmail(ChangeEmailRequest request)
     {
         // generate url for change email
         var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(request.Id);
         if (entity is null)
         {
-            return Result<string>.Failure("Tài khoản không tồn tại");
+            return Result.Failure("Tài khoản không tồn tại");
         }
-        var token = GenerateSecureToken();
+        var token = EncryptionHelper.GenerateSecureToken();
         var currentTime = DateTime.UtcNow;
         var changeEmail = new EmailChange
         {
@@ -286,10 +249,8 @@ public class AuthenticationService : IAuthenticationService
         };
         _unitOfWork.GetRepository<EmailChange>().Add(changeEmail);
         await _unitOfWork.SaveChangesAsync();
-        // generate url
         var url = GenerateUrl(token);
-        // send email to user
-        return Result<string>.Success(url);
+        return Result.Success();
     }
 
     public async Task<Result> ConfirmChangeEmail(ConfirmChangeEmailRequest request)
@@ -326,23 +287,6 @@ public class AuthenticationService : IAuthenticationService
         }
         // send email to user
         return Result.Success();
-    }
-
-    private string GenerateSecureToken(int length = 32)
-    {
-        // Define the length of the token in bytes (e.g., 32 bytes = 256 bits)
-        byte[] randomBytes = new byte[length];
-
-        // Use RandomNumberGenerator to generate random bytes
-        RandomNumberGenerator.Fill(randomBytes);
-
-        // Convert the random bytes to a Base64-encoded string for readability
-        string token = Convert.ToBase64String(randomBytes);
-
-        // Optionally, remove non-URL-safe characters (e.g., '+', '/', '=')
-        token = token.Replace('+', '-').Replace('/', '_').TrimEnd('=');
-
-        return token;
     }
 
     private string GenerateUrl(string token)

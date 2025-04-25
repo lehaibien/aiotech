@@ -1,15 +1,15 @@
 "use client";
 
-import { UserLoginRequest, UserLoginSchema } from "@/types";
+import { ControlledTextField } from "@/components/core/ControlledTextField";
+import { userLoginSchema } from "@/schemas/userSchema";
+import { UserLoginRequest } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormLabel,
-  TextField,
+  Stack
 } from "@mui/material";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -20,11 +20,9 @@ import { useForm } from "react-hook-form";
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UserLoginRequest>({ resolver: zodResolver(UserLoginSchema) });
+  const { control, handleSubmit } = useForm<UserLoginRequest>({
+    resolver: zodResolver(userLoginSchema),
+  });
   const onSubmit = async (data: UserLoginRequest) => {
     try {
       const result = await signIn("credentials", {
@@ -45,33 +43,33 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
   };
 
   return (
-    <Box
+    <Stack
       component="form"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        gap: 2,
-      }}
+      spacing={2}
+      width="100%"
     >
       <FormControl>
-        <FormLabel htmlFor="username">Tài khoản</FormLabel>
-        <TextField
+        <FormLabel htmlFor="username" required>
+          Tài khoản
+        </FormLabel>
+        <ControlledTextField
+          id="username"
+          name="username"
           autoFocus
           required
           fullWidth
-          variant="outlined"
-          color="primary"
-          {...register("username")}
-          error={errors.username ? true : false}
-          helperText={errors.username ? errors.username.message : undefined}
+          placeholder="Nhập tài khoản"
+          control={control}
+          size="small"
         />
       </FormControl>
       <FormControl>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <FormLabel htmlFor="password">Mật khẩu</FormLabel>
+          <FormLabel htmlFor="password" required>
+            Mật khẩu
+          </FormLabel>
           <Link
             href="/forgot-password"
             style={{
@@ -83,22 +81,17 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
             Quên mật khẩu?
           </Link>
         </Box>
-        <TextField
+        <ControlledTextField
+          id="password"
+          name="password"
+          type="password"
           required
           fullWidth
-          type="password"
-          placeholder="••••••"
-          variant="outlined"
-          color="primary"
-          {...register("password")}
-          error={errors.password ? true : false}
-          helperText={errors.password ? errors.password.message : undefined}
+          placeholder="Nhập mật khẩu"
+          control={control}
+          size="small"
         />
       </FormControl>
-      <FormControlLabel
-        control={<Checkbox value="remember" color="primary" />}
-        label="Ghi nhớ tôi"
-      />
       <Button
         type="submit"
         fullWidth
@@ -108,6 +101,6 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
       >
         Đăng nhập
       </Button>
-    </Box>
+    </Stack>
   );
 }

@@ -2,9 +2,11 @@
 
 import { LOW_STOCK_THRESHOLD } from "@/constant/common";
 import useCart from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { formatNumberWithSeperator } from "@/lib/utils";
-import { ProductResponse } from "@/types";
+import { ProductListItemResponse } from "@/types";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {
   Box,
   Button,
@@ -15,34 +17,23 @@ import {
   Rating,
   Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useSnackbar } from "notistack";
-import { memo, useState } from "react";
 
 type ProductCardProps = {
-  product: ProductResponse;
+  product: ProductListItemResponse;
 };
 
-function ProductCard({ product }: ProductCardProps) {
-  const theme = useTheme();
-  const {
-    id,
-    name,
-    imageUrls: thumbnails,
-    brand,
-    price,
-    discountPrice,
-    rating,
-    stock,
-  } = product;
+export const ProductCard = ({ product }: ProductCardProps) => {
+  const { id, name, brand, price, discountPrice, rating, thumbnailUrl, stock } =
+    product;
   const { enqueueSnackbar } = useSnackbar();
   const { addToCart } = useCart();
-  const [isHovered, setIsHovered] = useState(false);
-  const [currentImage, setCurrentImage] = useState(thumbnails[0]);
-  const primary = theme.palette.primary;
+  const { addToWishlist } = useWishlist();
+  const discountPercent =
+    discountPrice && ((1 - discountPrice / price) * 100).toFixed(0);
 
   const handleAddToCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -52,7 +43,7 @@ function ProductCard({ product }: ProductCardProps) {
         productId: id,
         productName: name,
         productPrice: discountPrice ?? price,
-        productImage: thumbnails[0],
+        productImage: thumbnailUrl,
         quantity: 1,
       });
       enqueueSnackbar("Đã thêm sản phẩm vào giỏ hàng", { variant: "success" });
@@ -61,16 +52,19 @@ function ProductCard({ product }: ProductCardProps) {
     enqueueSnackbar("Sản phẩm đã hết hàng", { variant: "error" });
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (thumbnails.length > 1) {
-      setCurrentImage(thumbnails[1]);
+  const handleAddToWishlistClick = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const message = await addToWishlist(id);
+    if (message === "") {
+      enqueueSnackbar("Đã thêm sản phẩm vào danh sách yêu thích", {
+        variant: "success",
+      });
+    } else {
+      enqueueSnackbar(message, { variant: "error" });
     }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setCurrentImage(thumbnails[0]);
   };
 
   const getStockColor = () => {
@@ -94,23 +88,8 @@ function ProductCard({ product }: ProductCardProps) {
         height: "100%",
         position: "relative",
         overflow: "hidden",
-        transition: "all 0.3s ease",
-        "&:hover": {
-          transform: "translateY(-8px)",
-          boxShadow: `0 4px 16px rgba(${parseInt(
-            primary.main.slice(1, 3),
-            16
-          )}, ${parseInt(primary.main.slice(3, 5), 16)}, ${parseInt(
-            primary.main.slice(5, 7),
-            16
-          )}, 0.2)`,
-        },
-        cursor: "pointer",
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      {/* Stock status chip */}
       {stock <= LOW_STOCK_THRESHOLD && (
         <Chip
           label={getStockText()}
@@ -125,36 +104,32 @@ function ProductCard({ product }: ProductCardProps) {
           }}
         />
       )}
-      {/* Product image */}
       <CardMedia
         sx={{
           position: "relative",
-          height: 220,
-          bgcolor: "background.paper",
+          height: 300,
           display: "flex",
+          backgroundColor: "background.default",
+          border: "1px solid",
+          borderBottom: "none",
+          borderColor: "background.paper",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
         }}
       >
         <Image
-          src={currentImage}
-          height={200}
-          width={200}
+          src={thumbnailUrl}
+          height={300}
+          width={300}
           alt={name}
           style={{
             objectFit: "contain",
-            transition: "transform 0.3s ease",
-            transform: isHovered ? "scale(1.05)" : "scale(1)",
           }}
-          placeholder="blur"
-          blurDataURL={currentImage}
         />
         {product.discountPrice && (
           <Chip
-            label={`-${Math.round(
-              (1 - product.discountPrice / product.price) * 100
-            )}%`}
+            label={discountPercent + "%"}
             color="error"
             size="small"
             sx={{
@@ -172,18 +147,12 @@ function ProductCard({ product }: ProductCardProps) {
           flexDirection: "column",
           justifyContent: "space-between",
           gap: 1,
-          p: 2,
+          px: 2,
+          py: 0,
         }}
       >
-        {/* Brand and product name */}
         <Box>
-          <Typography
-            variant="overline"
-            color="primary"
-            fontWeight="bold"
-            display="block"
-            noWrap
-          >
+          <Typography variant="overline" color="primary" noWrap>
             {brand}
           </Typography>
           <Typography
@@ -196,74 +165,72 @@ function ProductCard({ product }: ProductCardProps) {
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
-              lineHeight: 1.25,
             }}
           >
             {name}
           </Typography>
         </Box>
-        {/* Pricing and actions */}
-        <Stack gap={0.5}>
-          {/* Price display */}
-            {discountPrice ? (
-              <>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    textDecoration: "line-through",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {formatNumberWithSeperator(price)} đ
-                </Typography>
-                <Typography variant="h6" fontWeight="bold" color="error">
-                  {formatNumberWithSeperator(discountPrice)} đ
-                </Typography>
-              </>
-            ) : (
-              <Typography variant="h6" fontWeight="bold" color="error" noWrap>
+        <Stack spacing={1}>
+          {discountPrice ? (
+            <div>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  lineHeight: 1,
+                  textDecoration: "line-through",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {formatNumberWithSeperator(price)} đ
               </Typography>
-            )}
-          {/* Rating */}
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            <Rating
-              value={rating}
-              precision={0.1}
-              size="small"
-              readOnly
-              sx={{ "& .MuiRating-icon": { fontSize: "1rem" } }}
-            />
+              <Typography variant="h6" fontWeight={600} color="error" noWrap>
+                {formatNumberWithSeperator(discountPrice)} đ
+              </Typography>
+            </div>
+          ) : (
+            <Typography variant="h6" fontWeight={600} color="error" noWrap>
+              {formatNumberWithSeperator(price)} đ
+            </Typography>
+          )}
+          <Stack direction="row" alignItems="center">
+            <Rating value={rating} precision={0.1} size="small" readOnly />
             <Typography variant="caption" color="text.secondary">
               ({rating.toFixed(1)})
             </Typography>
           </Stack>
-          {/* Add to cart button */}
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            size="small"
-            disabled={stock <= 0}
-            startIcon={<AddShoppingCartIcon fontSize="small" />}
-            onClick={handleAddToCartClick}
-            data-umami-event="Thêm vào giỏ hàng"
+          <Stack
+            direction="row"
+            alignItems="center"
             sx={{
-              fontWeight: 700,
-              py: 1,
-              "& .MuiButton-startIcon": { mr: 0.5 },
+              mt: "auto",
+              gap: 1,
             }}
           >
-            Thêm vào giỏ hàng
-          </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="small"
+              disabled={stock <= 0}
+              onClick={handleAddToCartClick}
+              data-umami-event="Thêm vào giỏ hàng"
+            >
+              <AddShoppingCartIcon fontSize="medium" sx={{ mr: 1 }} />
+              Thêm vào giỏ
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={handleAddToWishlistClick}
+              data-umami-event="Yêu thích sản phẩm"
+            >
+              <FavoriteBorderIcon fontSize="medium" />
+            </Button>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>
   );
-}
-
-export default memo(
-  ProductCard,
-  (prev, next) => JSON.stringify(prev.product) === JSON.stringify(next.product)
-);
+};

@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   }
   try {
     const searchParams = request.nextUrl.searchParams;
+    if(Array.from(searchParams.keys()).length === 0) {
+      url = url + 'checkout?error=true';
+      return NextResponse.redirect(url);
+    }
     const queryString = toQueryString(searchParams);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}order/callback?${queryString}`

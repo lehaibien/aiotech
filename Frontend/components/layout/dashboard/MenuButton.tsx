@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardMenuContext } from "@/providers/DashboardMenuProvider";
+import { DashboardMenuContext } from "@/contexts/DashboardMenuProvider";
 import MenuIcon from "@mui/icons-material/Menu";
 import { IconButton } from "@mui/material";
 import { useContext } from "react";

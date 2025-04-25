@@ -1,4 +1,4 @@
-import DashboardMenuProvider from '@/providers/DashboardMenuProvider';
+import DashboardMenuProvider from '@/contexts/DashboardMenuProvider';
 import AppNavbar from '@/components/layout/dashboard/AppNavbar';
 import Header from '@/components/layout/dashboard/Header';
 import MainContent from '@/components/layout/dashboard/MainContent';

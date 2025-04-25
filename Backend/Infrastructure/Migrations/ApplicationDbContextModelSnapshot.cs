@@ -403,6 +403,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
@@ -434,12 +435,23 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
+
                     b.Property<string>("Tags")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThumbnailUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UpdatedBy")
@@ -453,8 +465,7 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("PK_PostId");
 
-                    b.HasIndex("Title")
-                        .HasFilter("IsPublished = 1");
+                    b.HasIndex("Title");
 
                     b.ToTable("Post", (string)null);
                 });
@@ -470,6 +481,10 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CostPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
@@ -529,6 +544,11 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Tags")
                         .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThumbnailUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -546,8 +566,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("Sku")
-                        .IsUnique();
+                    b.HasIndex("Sku");
 
                     b.HasIndex("CategoryId", "BrandId");
 
@@ -627,6 +646,12 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -668,26 +693,29 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("85844e35-f6a0-4f8e-90c4-071366bf5ff6"),
+                            Code = "admin",
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 4, 2, 14, 26, 44, 691, DateTimeKind.Utc).AddTicks(4419),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "Admin"
+                            Name = "Quản trị"
                         },
                         new
                         {
                             Id = new Guid("a8b42a83-b1bc-4937-99d9-0aaa70b896e5"),
+                            Code = "user",
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 4, 2, 14, 26, 44, 691, DateTimeKind.Utc).AddTicks(4422),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "User"
+                            Name = "Khách hàng"
                         },
                         new
                         {
                             Id = new Guid("b2f02c43-4d58-45d2-84a4-caf92a976672"),
+                            Code = "shipper",
                             CreatedBy = "system",
-                            CreatedDate = new DateTime(2025, 4, 2, 14, 26, 44, 691, DateTimeKind.Utc).AddTicks(4424),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "Shipper"
+                            Name = "Giao hàng"
                         });
                 });
 
@@ -784,6 +812,32 @@ namespace Infrastructure.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.WishlistItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WishlistItem", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.CartItem", b =>
                 {
                     b.HasOne("Domain.Entities.Product", "Product")
@@ -849,11 +903,14 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("Domain.Entities.Order", null)
+                    b.HasOne("Domain.Entities.Order", "Order")
                         .WithOne("Payment")
                         .HasForeignKey("Domain.Entities.Payment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Order_PaymentId");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Domain.Entities.Product", b =>
@@ -909,6 +966,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("Domain.Entities.WishlistItem", b =>
+                {
+                    b.HasOne("Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("WishlistItems")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -941,6 +1017,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("WishlistItems");
                 });
 #pragma warning restore 612, 618
         }

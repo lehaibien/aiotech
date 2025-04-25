@@ -1,6 +1,7 @@
 "use client";
 
 import ControlledComboBox from "@/components/core/ControlledComboBox";
+import { ControlledTextField } from "@/components/core/ControlledTextField";
 import RichTextEditor, {
   RichTextEditorRef,
 } from "@/components/core/RichTextEditor";
@@ -8,23 +9,19 @@ import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
+import { productRequestSchema } from "@/schemas/productSchema";
 import { ComboBoxItem } from "@/types";
-import { type ProductRequest, ProductRequestSchema } from "@/types/product";
+import { ProductRequest } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Grid2 as Grid, Paper, Typography } from "@mui/material";
+import { FormLabel, Grid, Stack, Typography } from "@mui/material";
 import { MuiChipsInput } from "mui-chips-input";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Control,
-  FieldValues,
-  TextFieldElement,
-  useForm,
-} from "react-hook-form-mui";
-import ImageUpload from "./ImageUpload";
+import { Control, FieldValues, useForm } from "react-hook-form";
+import { ImageUpload } from "./ImageUpload";
 import { FormActions } from "./ProductFormActions";
-import { SectionTitle } from "./ProductSectionTitle";
+import { ThumbnailUpload } from "./ThumbnailUpload";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
@@ -38,12 +35,12 @@ const featuredOptions = [
   { value: "false", text: "Không" },
 ];
 
-export function ProductUpsertForm({
+export const ProductUpsertForm = ({
   brands,
   categories,
   product,
   defaultImages = [],
-}: ProductUpsertFormProps) {
+}: ProductUpsertFormProps) => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const rteRef = useRef<RichTextEditorRef>(null);
@@ -51,37 +48,19 @@ export function ProductUpsertForm({
   const { control, handleSubmit } = useForm<ProductRequest>({
     defaultValues: {
       ...product,
-      discountPrice: product.discountPrice ?? undefined,
+      discountPrice: product.discountPrice ?? 0,
     },
-    resolver: zodResolver(ProductRequestSchema),
+    resolver: zodResolver(productRequestSchema),
   });
 
   const [chips, setChips] = useState<string[]>(product.tags ?? []);
+  const [thumbnail, setThumbnail] = useState<File | undefined>(undefined);
   const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChipChange = useCallback((newChips: string[]) => {
-    setChips(newChips);
+  const handleDeleteImage = useCallback((index: number) => {
+    setImages((prev) => prev.filter((_, idx) => idx !== index));
   }, []);
-
-  const handleImageUpload = useCallback((newImages: File[]) => {
-    setImages((prev) => [...prev, ...newImages]);
-  }, []);
-
-  const handleSubmitSuccess = useCallback(
-    (message: string) => {
-      enqueueSnackbar(message, { variant: "success" });
-      router.push("/dashboard/products");
-    },
-    [enqueueSnackbar, router]
-  );
-
-  const handleSubmitError = useCallback(
-    (message: string) => {
-      enqueueSnackbar(message, { variant: "error" });
-    },
-    [enqueueSnackbar]
-  );
 
   const onSubmit = async (data: ProductRequest) => {
     setIsLoading(true);
@@ -91,6 +70,7 @@ export function ProductUpsertForm({
         discountPrice: data.discountPrice || undefined,
         description: rteRef.current?.content ?? "",
         tags: chips,
+        thumbnail,
         images,
       };
 
@@ -99,18 +79,19 @@ export function ProductUpsertForm({
       const response = await action(API_URL.product, formData);
 
       if (response.success) {
-        handleSubmitSuccess(
+        const message =
           product.id === EMPTY_UUID
             ? "Thêm mới sản phẩm thành công"
-            : "Cập nhật sản phẩm thành công"
-        );
+            : "Cập nhật sản phẩm thành công";
+        enqueueSnackbar(message, { variant: "success" });
+        router.push("/dashboard/products");
       } else {
-        handleSubmitError(
-          response.message ?? "Đã xảy ra lỗi khi xử lý yêu cầu"
-        );
+        enqueueSnackbar(response.message ?? "Đã xảy ra lỗi khi xử lý yêu cầu", {
+          variant: "error",
+        });
       }
     } catch (error) {
-      handleSubmitError("Đã xảy ra lỗi khi xử lý yêu cầu");
+      enqueueSnackbar("Đã xảy ra lỗi khi xử lý yêu cầu", { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -121,22 +102,15 @@ export function ProductUpsertForm({
       if (urls.length == 0) return [];
 
       try {
-        // Replace docker internal host with localhost if needed
-        const imageUrls = urls.map((url) => {
-          return url.includes("host.docker.internal")
-            ? url.replace("host.docker.internal", "localhost")
-            : url;
-        });
-
         const responses = await Promise.all(
-          imageUrls.map(async (url) => {
+          urls.map(async (url) => {
             const response = await fetch(url, {
-              mode: "cors", // Enable CORS
+              mode: "cors",
             });
             if (!response.ok) throw new Error("Failed to fetch image");
 
             const blob = await response.blob();
-            return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+            return new File([blob], url.substring(url.lastIndexOf("/") + 1), { type: blob.type });
           })
         );
 
@@ -156,161 +130,161 @@ export function ProductUpsertForm({
   }, [defaultImages]);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      style={{ position: "relative" }}
-    >
-      <Grid container spacing={4}>
-        {/* Product Information Section */}
-        <Grid size={{ sm: 12, md: 8 }}>
-          <Paper elevation={1} sx={{ p: 2 }}>
-            <SectionTitle>Thông tin chung</SectionTitle>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Grid container spacing={2}>
+        <Grid size={{ sm: 12, lg: 9 }}>
+          <Typography variant="h5" gutterBottom>
+            Thông tin chung
+          </Typography>
 
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <TextFieldElement
-                  control={control}
-                  name="sku"
-                  label="Mã sản phẩm"
-                  required
-                  fullWidth
-                  size="small"
-                />
-              </Grid>
-              <Grid size={12}>
-                <TextFieldElement
-                  control={control}
-                  name="name"
-                  label="Tên sản phẩm"
-                  required
-                  fullWidth
-                  size="small"
-                />
-              </Grid>
-              <Grid size={6}>
-                <TextFieldElement
-                  control={control}
-                  name="price"
-                  label="Giá gốc"
-                  type="number"
-                  required
-                  fullWidth
-                  size="small"
-                />
-              </Grid>
-              <Grid size={6}>
-                <TextFieldElement
-                  control={control}
-                  name="discountPrice"
-                  label="Giá khuyến mãi"
-                  type="number"
-                  fullWidth
-                  size="small"
-                  InputProps={{
-                    inputProps: { min: 0, max: Number.MAX_SAFE_INTEGER },
-                  }}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    return value === "" ? null : Number(value);
-                  }}
-                />
-              </Grid>
-              <Grid size={6}>
-                <TextFieldElement
-                  control={control}
-                  name="stock"
-                  label="Số lượng tồn kho"
-                  type="number"
-                  required
-                  fullWidth
-                  size="small"
-                />
-              </Grid>
-
-              <Grid size={6}>
-                {/* <AutocompleteElement
-                  control={control}
-                  name="isFeatured"
-                  label="Nổi bật"
-                  options={featuredOptions}
-                  autocompleteProps={{
-                    disableClearable: true,
-                    getOptionLabel: (option) => option.text,
-                    size: "small",
-                  }}
-                  transform={{
-                    input: (value) => ({
-                      value: String(value),
-                      text: value ? "Có" : "Không",
-                    }),
-                    output: (_, value) => value?.value === "true",
-                  }}
-                /> */}
-                <ControlledComboBox
-                  control={control as unknown as Control<FieldValues>}
-                  name="isFeatured"
-                  label="Nổi bật"
-                  items={featuredOptions}
-                  required
-                />
-              </Grid>
-
-              <Grid size={6}>
-                <ControlledComboBox
-                  control={control as unknown as Control<FieldValues>}
-                  name="brandId"
-                  label="Thương hiệu"
-                  items={brands}
-                  required
-                />
-              </Grid>
-
-              <Grid size={6}>
-                <ControlledComboBox
-                  control={control as unknown as Control<FieldValues>}
-                  name="categoryId"
-                  label="Danh mục"
-                  items={categories}
-                  required
-                />
-              </Grid>
-
-              <Grid size={12}>
-                <MuiChipsInput
-                  fullWidth
-                  size="small"
-                  value={chips}
-                  onChange={handleChipChange}
-                  label="Thẻ"
-                  placeholder="Nhập và nhấn Enter để thêm thẻ"
-                />
-              </Grid>
-
-              <Grid size={12}>
-                <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
-                  Mô tả
-                </Typography>
-                <RichTextEditor
-                  ref={rteRef}
-                  defaultContent={product.description ?? ""}
-                />
-              </Grid>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <FormLabel htmlFor="sku" required>
+                Mã sản phẩm
+              </FormLabel>
+              <ControlledTextField
+                control={control}
+                name="sku"
+                required
+                fullWidth
+                size="small"
+              />
             </Grid>
-          </Paper>
+            <Grid size={6}>
+              <FormLabel htmlFor="name" required>
+                Tên sản phẩm
+              </FormLabel>
+              <ControlledTextField
+                control={control}
+                name="name"
+                required
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormLabel required>Giá nhập</FormLabel>
+              <ControlledTextField
+                control={control}
+                name="costPrice"
+                type="number"
+                required
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormLabel required>Giá gốc</FormLabel>
+              <ControlledTextField
+                control={control}
+                name="price"
+                type="number"
+                required
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormLabel>Giá khuyến mãi</FormLabel>
+              <ControlledTextField
+                control={control}
+                name="discountPrice"
+                type="number"
+                fullWidth
+                size="small"
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormLabel required>Số lượng tồn kho</FormLabel>
+              <ControlledTextField
+                control={control}
+                name="stock"
+                type="number"
+                required
+                fullWidth
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={6}>
+              <FormLabel required>Thương hiệu</FormLabel>
+              <ControlledComboBox
+                control={control as unknown as Control<FieldValues>}
+                name="brandId"
+                items={brands}
+                required
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={6}>
+              <FormLabel required>Danh mục</FormLabel>
+              <ControlledComboBox
+                control={control as unknown as Control<FieldValues>}
+                name="categoryId"
+                items={categories}
+                required
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={6}>
+              <FormLabel>Nổi bật</FormLabel>
+              <ControlledComboBox
+                control={control as unknown as Control<FieldValues>}
+                name="isFeatured"
+                items={featuredOptions}
+                required
+                size="small"
+              />
+            </Grid>
+
+            <Grid size={6}>
+              <FormLabel htmlFor="tags">Thẻ</FormLabel>
+              <MuiChipsInput
+                fullWidth
+                name="tags"
+                size="small"
+                value={chips}
+                onChange={setChips}
+                placeholder="Nhập và nhấn Enter để thêm thẻ"
+              />
+            </Grid>
+
+            <Grid size={12}>
+              <Typography variant="h5" gutterBottom>
+                Mô tả
+              </Typography>
+              <RichTextEditor
+                ref={rteRef}
+                defaultContent={product.description ?? ""}
+              />
+            </Grid>
+          </Grid>
         </Grid>
 
-        {/* Product Images Section */}
-        <Grid size={{ sm: 12, md: 4 }}>
-          <Paper elevation={1} sx={{ p: 2 }}>
-            <SectionTitle>Ảnh sản phẩm</SectionTitle>
-            <ImageUpload onUpload={handleImageUpload} images={images} />
-          </Paper>
+        <Grid size={{ sm: 12, lg: 3 }}>
+          <Stack spacing={2}>
+            <Typography variant="h5" gutterBottom>
+              Ảnh đại diện
+            </Typography>
+            <ThumbnailUpload image={thumbnail} onUpload={setThumbnail} />
+          </Stack>
+          <Stack spacing={2}>
+            <Typography variant="h5" gutterBottom>
+              Ảnh sản phẩm
+            </Typography>
+            <ImageUpload
+              images={images}
+              onUpload={setImages}
+              onDelete={handleDeleteImage}
+              onReorder={setImages}
+            />
+          </Stack>
         </Grid>
       </Grid>
 
-      {/* Form Actions */}
       <FormActions isLoading={isLoading} isNew={product.id === EMPTY_UUID} />
     </form>
   );
-}
+};

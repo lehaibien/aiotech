@@ -31,12 +31,16 @@ export function CancelButton({ dataGridRef }: CancelButtonProps) {
   const [reason, setReason] = useState("");
 
   const handleClickOpen = () => {
-    const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
-    if (rowSelection.length === 0) {
+    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
+    if(rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }
-    if (rowSelection.length > 1) {
+    if (rowSelection.size === 0) {
+      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
+      return;
+    }
+    if (rowSelection.size > 1) {
       enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, { variant: "error" });
       return;
     }
@@ -53,9 +57,9 @@ export function CancelButton({ dataGridRef }: CancelButtonProps) {
       enqueueSnackbar("Lý do không được để trống", { variant: "error" });
       return;
     }
-    const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
-    if (rowSelection.length > 0) {
-      const id = rowSelection[0];
+    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
+    if (rowSelection.size > 0) {
+      const id = rowSelection.values().next().value;
       const parsedId = parseUUID(id.toString());
       const request: OrderCancelRequest = {
         id: parsedId,

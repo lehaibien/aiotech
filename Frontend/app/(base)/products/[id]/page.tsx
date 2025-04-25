@@ -1,36 +1,36 @@
-import "server-only";
-
-import { API_URL } from "@/constant/apiUrl";
-import ImageGallery from "@/features/products/single/ImageGallery";
-import ProductInfo from "@/features/products/single/ProductInfo";
-import RelatedProducts from "@/features/products/single/RelatedProductSection";
-import ReviewSection from "@/features/products/single/ReviewSection";
-import { getByIdApi } from "@/lib/apiClient";
-import { parseUUID } from "@/lib/utils";
-import { ProductDetailResponse } from "@/types/product";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import HomeIcon from "@mui/icons-material/Home";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import { HtmlContent } from '@/components/core/HtmlContent';
+import { API_URL } from '@/constant/apiUrl';
+import ImageGallery from '@/features/products/single/ImageGallery';
+import ProductInfo from '@/features/products/single/ProductInfo';
+import { ProductNotFound } from '@/features/products/single/ProductNotFound';
+import RelatedProducts from '@/features/products/single/RelatedProductSection';
+import ReviewSection from '@/features/products/single/ReviewSection';
+import { getByIdApi } from '@/lib/apiClient';
+import { parseUUID } from '@/lib/utils';
+import { ProductDetailResponse } from '@/types/product';
 import {
   Box,
   Breadcrumbs,
-  Button,
   Container,
   Divider,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Typography,
-} from "@mui/material";
-import { Metadata } from "next";
-import Link from "next/link";
-import ProductNotFound from "./ProductNotFound";
+} from '@mui/material';
+import { Metadata } from 'next';
+import Link from 'next/link';
+
+type Params = Promise<{
+  id: string;
+}>;
 
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Params;
 }): Promise<Metadata> {
-  const parsedId = parseUUID(params.id);
+  const { id } = await params;
+  const parsedId = parseUUID(id);
   const response = await getByIdApi(API_URL.product, { id: parsedId });
   if (response.success) {
     const product = response.data as ProductDetailResponse;
@@ -45,7 +45,7 @@ export async function generateMetadata({
           url: url,
           width: 500,
           height: 500,
-          alt: product.name + " image" + (index + 1),
+          alt: product.name + ' image' + (index + 1),
         })),
       },
     };
@@ -53,84 +53,57 @@ export async function generateMetadata({
   return {};
 }
 
-export default async function ProductDetail({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ProductDetail({ params }: { params: Params }) {
+  const { id } = await params;
+  const parsedId = parseUUID(id);
   let product: ProductDetailResponse | null = null;
-  const parsedId = parseUUID(params.id);
   const response = await getByIdApi(API_URL.product, { id: parsedId });
   if (response.success) {
     product = response.data as ProductDetailResponse;
   }
   if (!product) {
     return (
-      <Container maxWidth="xl">
+      <Container maxWidth='xl'>
         <ProductNotFound />
       </Container>
     );
   }
   return (
-    <Container maxWidth="xl">
+    <>
       {/* Navigation and Breadcrumbs */}
-      <Box sx={{ mb: 3 }}>
-        <Button
-          component={Link}
-          href="/products"
-          startIcon={<ArrowBackIcon />}
-          sx={{ mb: 2 }}
-          variant="text"
-          color="primary"
-        >
-          Quay lại cửa hàng
-        </Button>
+      <Breadcrumbs
+        aria-label='breadcrumb'
+        sx={{ mb: 2 }}>
+        <Link
+          href='/'
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}>
+          Trang chủ
+        </Link>
+        <Link
+          href='/products'
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}>
+          Sản phẩm
+        </Link>
+        <Typography>{product.name}</Typography>
+      </Breadcrumbs>
 
-        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-          <Link
-            href="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
-            Trang chủ
-          </Link>
-          <Link
-            href="/products"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <ShoppingBagIcon sx={{ mr: 0.5 }} fontSize="small" />
-            Sản phẩm
-          </Link>
-          <Typography
-            color="text.primary"
-            sx={{ display: "flex", alignItems: "center" }}
-          >
-            {product.name}
-          </Typography>
-        </Breadcrumbs>
-      </Box>
-
-      {/* Product Information */}
-      <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 4, borderRadius: 2 }}>
-        <Grid container spacing={3}>
+      <Paper sx={{ p: 2 }}>
+        <Grid
+          container
+          spacing={3}>
           <Grid size={{ xs: 12, md: 5 }}>
             <Box
               sx={{
                 borderRadius: 1,
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              }}
-            >
+                overflow: 'hidden',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              }}>
               <ImageGallery images={product.imageUrls} />
             </Box>
           </Grid>
@@ -138,31 +111,22 @@ export default async function ProductDetail({
             <ProductInfo product={product} />
           </Grid>
         </Grid>
-      </Paper>
 
-      {/* Product Description */}
-      <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 4, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
-          Mô tả sản phẩm
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-        <Box
-          sx={{
-            "& img": { maxWidth: "100%", height: "auto" },
-            "& ul, & ol": { pl: 3 },
-            "& p": { mb: 1.5 },
-          }}
-        >
-          <div dangerouslySetInnerHTML={{ __html: product.description }} />
+        {/* Product Description */}
+        <Box sx={{ mt: 2 }}>
+          <Typography
+            variant='h5'
+            gutterBottom
+            sx={{ fontWeight: 'bold' }}>
+            Mô tả sản phẩm
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <HtmlContent content={product.description} />
         </Box>
-      </Paper>
-
-      {/* Reviews Section */}
-      <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
         <ReviewSection productId={product.id} />
       </Paper>
 
       <RelatedProducts productId={product.id} />
-    </Container>
+    </>
   );
 }

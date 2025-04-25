@@ -11,11 +11,12 @@ namespace WebApi.Controllers;
 public class RoleController : ControllerBase
 {
     private readonly IRoleService _service;
+
     public RoleController(IRoleService service)
     {
         _service = service;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
     {
@@ -28,10 +29,10 @@ public class RoleController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
-    
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -43,7 +44,7 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -58,10 +59,10 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
-    
+
     [HttpPut]
     public async Task<IActionResult> Update(UpdateRoleRequest request)
     {
@@ -73,10 +74,10 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -88,10 +89,10 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
-    
+
     [HttpDelete]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
@@ -103,10 +104,10 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
-    
+
     [HttpGet("combo-box")]
     public async Task<IActionResult> GetComboBox()
     {
@@ -118,7 +119,7 @@ public class RoleController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 }

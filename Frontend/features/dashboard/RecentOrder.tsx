@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import NoRowOverlay from "@/components/core/NoRowOverlay";
-import { formatDate, formatNumberWithSeperator } from "@/lib/utils";
-import { OrderResponse } from "@/types";
+import NoRowOverlay from '@/components/core/NoRowOverlay';
+import { formatDate, formatNumberWithSeperator } from '@/lib/utils';
+import { OrderResponse } from '@/types';
 import {
   Paper,
   Table,
@@ -10,34 +10,37 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
-} from "@mui/material";
-import { grey } from "@mui/material/colors";
-import { GridColDef } from "@mui/x-data-grid";
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { grey } from '@mui/material/colors';
+import { GridColDef } from '@mui/x-data-grid';
 
 const columns: GridColDef<OrderResponse>[] = [
   {
-    field: "trackingNumber",
-    headerName: "Mã đơn hàng",
+    field: 'trackingNumber',
+    headerName: 'Mã đơn hàng',
     width: 250,
   },
-  { field: "name", headerName: "Khách hàng", flex: 1, minWidth: 200 },
+  { field: 'name', headerName: 'Khách hàng', flex: 1, minWidth: 200 },
   {
-    field: "phoneNumber",
-    headerName: "Số điện thoại",
+    field: 'phoneNumber',
+    headerName: 'Số điện thoại',
     width: 180,
   },
   {
-    field: "createdDate",
-    headerName: "Ngày đặt hàng",
-    width: 180,
-    headerAlign: "center",
-    align: "center",
+    field: 'createdDate',
+    headerName: 'Ngày đặt hàng',
+    minWidth: 160,
     valueFormatter: (params) => formatDate(params),
   },
-  { field: "totalPrice", headerName: "Thành tiền", width: 160, type: "number",
-    align: "right",
-   },
+  {
+    field: 'totalPrice',
+    headerName: 'Thành tiền',
+    minWidth: 200,
+    type: 'number',
+    align: 'right',
+  },
 ];
 
 type RecentOrdersProps = {
@@ -50,14 +53,14 @@ export function RecentOrders({ data }: RecentOrdersProps) {
       component={Paper}
       elevation={0}
       sx={{
-        position: "relative",
+        position: 'relative',
         minHeight: 400,
-        "& .MuiTableCell-root": {
+        height: '100%',
+        '& .MuiTableCell-root': {
           px: { xs: 1, sm: 2 },
           py: 1.5,
         },
-      }}
-    >
+      }}>
       <Table>
         <TableHead sx={{ bgcolor: grey[50] }}>
           <TableRow>
@@ -67,12 +70,13 @@ export function RecentOrders({ data }: RecentOrdersProps) {
                 sx={{
                   width: column.width,
                   minWidth: column.minWidth,
-                  fontWeight: 600,
-                  color: "text.secondary",
                 }}
-                align={column.align}
-              >
-                {column.headerName}
+                align={column.align}>
+                <Typography
+                  variant='subtitle2'
+                  fontWeight={600}>
+                  {column.headerName}
+                </Typography>
               </TableCell>
             ))}
           </TableRow>
@@ -83,15 +87,16 @@ export function RecentOrders({ data }: RecentOrdersProps) {
             <TableRow
               key={row.trackingNumber}
               hover
-              sx={{ "&:last-child td": { borderBottom: 0 } }}
-            >
+              sx={{ '&:last-child td': { borderBottom: 0 } }}>
               <TableCell>{row.trackingNumber}</TableCell>
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.phoneNumber}</TableCell>
-              <TableCell align="center">
+              <TableCell align='center'>
                 {formatDate(row.createdDate)}
               </TableCell>
-              <TableCell align="right">{formatNumberWithSeperator(row.totalPrice)} đ</TableCell>
+              <TableCell align='right'>
+                {formatNumberWithSeperator(row.totalPrice)} đ
+              </TableCell>
             </TableRow>
           ))}
 

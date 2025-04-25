@@ -1,16 +1,17 @@
-import { Controller, useForm } from "react-hook-form";
+import { emailSchema } from "@/schemas/userSchema";
+import { EmailFormData } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormLabel,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormLabel,
+  TextField,
 } from "@mui/material";
-import { EmailFormData, emailSchema } from "@/types";
+import { Controller, useForm } from "react-hook-form";
 
 type EmailChangeDialogProps = {
   oldEmail?: string;

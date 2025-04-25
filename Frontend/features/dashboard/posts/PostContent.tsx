@@ -6,11 +6,11 @@ import { useRef } from "react";
 import { postGridColumns } from "./postGridColumns";
 import { PostToolbar } from "./PostToolbar";
 
-export function PostContent() {
+export const PostContent = () => {
   const dataGridRef = useRef<DataTableRef>(null);
   return (
     <>
-      <PostToolbar dataGridRef={dataGridRef}/>
+      <PostToolbar dataGridRef={dataGridRef} />
       <DataTable
         ref={dataGridRef}
         columns={postGridColumns}
@@ -20,4 +20,4 @@ export function PostContent() {
       />
     </>
   );
-}
+};

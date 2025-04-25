@@ -1,6 +1,6 @@
 import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { CategoryResponse } from "@/types";
-import { Grid2 as Grid, Stack } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import { CategoryCard } from "./CategoryCard";
 
 type FeaturedCategoriesProps = {

@@ -5,6 +5,7 @@ namespace Application.Users.Dtos;
 
 public class UserRequest
 {
+    public Guid Id { get; set; }
     [Required(AllowEmptyStrings = false, ErrorMessage = "Tên người dùng không được để trống")]
     public string? UserName { get; set; }
 
@@ -22,4 +23,5 @@ public class UserRequest
     public string? Password { get; set; }
     public Guid RoleId { get; set; }
     public IFormFile? Image { get; set; }
+    public bool IsImageEdited { get; set; }
 }

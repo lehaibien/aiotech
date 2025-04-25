@@ -12,14 +12,13 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Link,
   Stack,
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import "server-only";
 
 export default function Footer() {
   return (

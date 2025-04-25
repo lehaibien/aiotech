@@ -1,46 +1,46 @@
 import { API_URL } from "@/constant/apiUrl";
-import { EMPTY_UUID } from "@/constant/common";
 import OrderDetail from "@/features/dashboard/orders/OrderDetail";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
-import { OrderResponse } from "@/types";
+import { OrderResponse, UUID } from "@/types";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import Link from "next/link";
-import "server-only";
 
-export default async function Page({ params }: { params: { id: string } }) {
-  let order: OrderResponse | undefined = undefined;
-  const uuid = parseUUID(params.id);
-  if (uuid !== EMPTY_UUID) {
-    const response = await getByIdApi(API_URL.order, { id: uuid });
-    if (response.success) {
-      order = response.data as OrderResponse;
-    } else {
-      console.error(response.message);
-    }
+type DashboardOrderDetailParams = Promise<{
+  id: string;
+}>;
+
+async function getOrderById(id: UUID) {
+  const response = await getByIdApi(API_URL.order, { id });
+  if (response.success) {
+    return response.data as OrderResponse;
   }
+  console.error(response.message);
+  return undefined;
+}
+
+export default async function Page({
+  params,
+}: {
+  params: DashboardOrderDetailParams;
+}) {
+  const { id } = await params;
+  const uuid = parseUUID(id);
+  const order = await getOrderById(uuid);
   return (
     <>
-      <Box
+      <Button
+        variant="text"
+        startIcon={<ArrowBackIcon />}
+        LinkComponent={Link}
+        href="/dashboard/orders"
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          fontWeight: "400",
         }}
       >
-        <Button
-          variant="text"
-          startIcon={<ArrowBackIcon />}
-          LinkComponent={Link}
-          href="/dashboard/orders"
-          sx={{
-            fontWeight: "400",
-          }}
-        >
-          Quay lại
-        </Button>
-      </Box>
+        Quay lại
+      </Button>
       <OrderDetail order={order} />
     </>
   );

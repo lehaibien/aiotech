@@ -10,10 +10,10 @@ public interface ICategoryService
         CancellationToken cancellationToken = default
     );
     Task<Result<List<CategoryResponse>>> GetFeaturedAsync();
-    Task<Result<CategoryResponse>> GetById(Guid id);
-    Task<Result<CategoryResponse>> Create(CreateCategoryRequest request);
-    Task<Result<CategoryResponse>> Update(UpdateCategoryRequest request);
-    Task<Result<string>> Delete(Guid id);
-    Task<Result<string>> DeleteList(List<Guid> ids);
-    Task<Result<List<ComboBoxItem>>> GetComboBox();
+    Task<Result<CategoryResponse>> GetByIdAsync(Guid id);
+    Task<Result<CategoryResponse>> CreateAsync(CategoryRequest request);
+    Task<Result<CategoryResponse>> UpdateAsync(CategoryRequest request);
+    Task<Result<string>> DeleteAsync(Guid id);
+    Task<Result<string>> DeleteListAsync(List<Guid> ids);
+    Task<Result<List<ComboBoxItem>>> GetComboBoxAsync();
 }

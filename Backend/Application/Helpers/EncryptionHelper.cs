@@ -25,7 +25,7 @@ public class EncryptionHelper
         return Convert.ToBase64String(outputBytes);
     }
 
-    public static bool VerifyHashedPassword(string hashedPassword,  byte[] salt, string password)
+    public static bool VerifyHashedPassword(string hashedPassword, byte[] salt, string password)
     {
         ArgumentNullException.ThrowIfNull(hashedPassword);
         ArgumentNullException.ThrowIfNull(password);
@@ -35,7 +35,7 @@ public class EncryptionHelper
         const int SaltSize = 128 / 8; // 128 bits
         byte[] hashedBytes = Convert.FromBase64String(hashedPassword);
         // We know ahead of time the exact length of a valid hashed password payload.
-        if (hashedBytes.Length != 1 + SaltSize + Pbkdf2SubkeyLength)
+        if(hashedBytes.Length != 1 + SaltSize + Pbkdf2SubkeyLength)
         {
             return false; // bad size
         }
@@ -47,5 +47,20 @@ public class EncryptionHelper
         // Hash the incoming password and verify it
         byte[] actualSubkey = KeyDerivation.Pbkdf2(password, salt, Pbkdf2Prf, Pbkdf2IterCount, Pbkdf2SubkeyLength);
         return CryptographicOperations.FixedTimeEquals(actualSubkey, expectedSubkey);
+    }
+
+    public static string GenerateSecureToken(int length = 32)
+    {
+        // Define the length of the token in bytes (e.g., 32 bytes = 256 bits)
+        byte[] randomBytes = new byte[length];
+
+        // Use RandomNumberGenerator to generate random bytes
+        RandomNumberGenerator.Fill(randomBytes);
+
+        // Convert the random bytes to a Base64-encoded string for readability
+        string token = Convert.ToBase64String(randomBytes);
+
+        // Optionally, remove non-URL-safe characters (e.g., '+', '/', '=')
+        return token.Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 }

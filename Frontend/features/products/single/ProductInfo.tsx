@@ -1,7 +1,8 @@
-import { formatNumberWithSeperator } from "@/lib/utils";
-import { ProductDetailResponse } from "@/types/product";
-import { Box, Chip, Rating, Stack, Typography } from "@mui/material";
-import { AddToCartButton } from "./AddToCartButton";
+import { formatNumberWithSeperator } from '@/lib/utils';
+import { ProductDetailResponse } from '@/types/product';
+import { Box, Chip, Rating, Stack, Typography } from '@mui/material';
+import { AddToCartButton } from './AddToCartButton';
+import { AddToWishlist } from './AddToWishlist';
 
 interface ProductInfoProps {
   product: ProductDetailResponse;
@@ -10,46 +11,48 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
   return (
     <Stack spacing={1}>
-      <Typography variant="h4">{product.name}</Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: {
-            xs: "column",
-            md: "row",
-          },
-          alignItems: {
-            xs: "flex-start",
-            md: "center",
-          },
-          gap: {
-            xs: 2,
-            md: 4,
-          },
-        }}
-      >
-        <Typography variant="caption">Mã hàng: {product.sku}</Typography>
-        <Typography variant="caption" color="textSecondary">
+      <Typography variant='h4'>{product.name}</Typography>
+      <Stack
+        direction='row'
+        alignItems='center'
+        gap={2}>
+        <Typography variant='subtitle2'>Mã hàng: {product.sku}</Typography>
+        <Typography
+          variant='subtitle2'
+          color='textSecondary'>
           Thương hiệu: {product.brand}
         </Typography>
-      </Box>
+      </Stack>
 
-      <Box display="flex" alignItems="center">
-        <Rating value={product.rating} readOnly precision={0.5} />
-        <Typography variant="body2" ml={1}>
+      <Box
+        display='flex'
+        alignItems='center'>
+        <Rating
+          value={product.rating}
+          readOnly
+          precision={0.5}
+          size='large'
+        />
+        <Typography
+          variant='body2'
+          ml={1}>
           ({product.rating.toFixed(1)})
         </Typography>
       </Box>
       {product.discountPrice ? (
-        <Stack direction="row" gap={1} alignItems="center">
-          <Typography variant="h5" fontWeight="bold" color="error">
+        <Stack
+          direction='row'
+          gap={1}
+          alignItems='center'>
+          <Typography
+            variant='h3'
+            color='error'>
             {formatNumberWithSeperator(product.discountPrice)} VNĐ
           </Typography>
           <Typography
-            variant="body1"
-            color="textSecondary"
-            sx={{ textDecoration: "line-through" }}
-          >
+            variant='h6'
+            color='textSecondary'
+            sx={{ textDecoration: 'line-through' }}>
             {formatNumberWithSeperator(product.price)} VNĐ
           </Typography>
           <Chip
@@ -57,27 +60,35 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               ((product.price - product.discountPrice) / product.price) *
               100
             ).toFixed(2)}%`}
-            color="error"
-            size="small"
-            variant="outlined"
+            color='error'
+            size='small'
+            variant='outlined'
           />
         </Stack>
       ) : (
-        <Typography variant="h5" fontWeight="bold" color="error">
+        <Typography
+          variant='h3'
+          color='error'>
           {formatNumberWithSeperator(product.price)} VNĐ
         </Typography>
       )}
-      <Box display="flex" alignItems="center">
+      <Stack
+        direction='row'
+        gap={2}
+        alignItems='center'>
         <AddToCartButton
           productId={product.id}
           productName={product.name}
           productPrice={product.discountPrice ?? product.price}
           productImage={product.imageUrls[0]}
         />
-        <Typography variant="body2" ml={2}>
+        <AddToWishlist productId={product.id} />
+        <Typography
+          variant='body2'
+          ml={2}>
           {product.stock} trong kho
         </Typography>
-      </Box>
+      </Stack>
     </Stack>
   );
 }

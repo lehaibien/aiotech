@@ -29,7 +29,7 @@ export const API_URL = {
   productFiltered: "product/filtered",
   productRequest: "product/request",
   productTop: "product/top",
-  productFeatured: "product/featured",
+  productNewest: "product/newest",
   productSearch: "product/search",
   productRelated: "product/related",
 
@@ -71,4 +71,7 @@ export const API_URL = {
   dashboardTopProduct: "dashboard/top-product",
   dashboardSale: "dashboard/sale",
   dashboardStockAlert: "dashboard/stock-alert",
+
+  // wishlist
+  wishlist: "wishlist",
 };

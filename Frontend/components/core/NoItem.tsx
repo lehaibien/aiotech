@@ -1,39 +1,44 @@
-"use client";
+'use client';
 
-import { Box, Container, Typography } from "@mui/material";
-import { SvgIconComponent } from "@mui/icons-material";
+import { Box, Container, Typography } from '@mui/material';
+import { SvgIconComponent } from '@mui/icons-material';
 
 type NoItemProps = {
-  icon: SvgIconComponent;
   title?: string;
   description: string;
+  icon: SvgIconComponent;
 };
 
-export default function NoItem({
+export const NoItem = ({
+  title = 'Không có dữ liệu',
   description,
   icon: Icon,
-  title = "Không có dữ liệu",
-}: NoItemProps) {
+}: NoItemProps) => {
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth='sm'>
       <Box
         sx={{
-          minHeight: "60vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        <Icon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
-        <Typography variant="h4" component="h1" gutterBottom>
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+        }}>
+        <Icon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+        <Typography
+          variant='h4'
+          component='h1'
+          gutterBottom>
           {title}
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
+        <Typography
+          variant='subtitle1'
+          color='text.secondary'
+          sx={{ mb: 4 }}>
           {description}
         </Typography>
       </Box>
     </Container>
   );
-}
+};

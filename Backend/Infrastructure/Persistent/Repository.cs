@@ -48,24 +48,31 @@ public class Repository<T> : IRepository<T>
         return _dbSet.Find(id);
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet.FindAsync([id], cancellationToken);
     }
 
-    public virtual T? Find(Expression<Func<T, bool>> predicate)
+    public virtual T? Find(Expression<Func<T, bool>> predicate, bool asNoTracking = true)
     {
-        return _dbSet.AsNoTracking().FirstOrDefault(predicate);
+        if (asNoTracking)
+        {
+            return _dbSet.AsNoTracking().FirstOrDefault(predicate);
+        }
+        return _dbSet.FirstOrDefault(predicate);
     }
 
-    public async Task<T?> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<T?> FindAsync(
+        Expression<Func<T, bool>> predicate,
+        bool asNoTracking = true,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate);
-    }
-
-    public void AttachRange(IEnumerable<T> entities)
-    {
-        _dbSet.AttachRange(entities);
+        if (asNoTracking)
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken);
+        }
+        return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
     public virtual void Add(T entity)
@@ -98,6 +105,10 @@ public class Repository<T> : IRepository<T>
 
     public virtual void Delete(T entity)
     {
+        if (_dbContext.Entry(entity).State == EntityState.Detached)
+        {
+            _dbSet.Attach(entity);
+        }
         _dbSet.Remove(entity);
     }
 
@@ -111,9 +122,9 @@ public class Repository<T> : IRepository<T>
         return _dbSet.Count();
     }
 
-    public async Task<int> CountAsync()
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.CountAsync();
+        return await _dbSet.CountAsync(cancellationToken);
     }
 
     public virtual int Count(Expression<Func<T, bool>> predicate)
@@ -121,9 +132,12 @@ public class Repository<T> : IRepository<T>
         return _dbSet.Count(predicate);
     }
 
-    public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+    public async Task<int> CountAsync(
+        Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _dbSet.CountAsync(predicate);
+        return await _dbSet.CountAsync(predicate, cancellationToken);
     }
 
     public virtual bool Any()
@@ -131,9 +145,9 @@ public class Repository<T> : IRepository<T>
         return _dbSet.Any();
     }
 
-    public async Task<bool> AnyAsync()
+    public async Task<bool> AnyAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.AnyAsync();
+        return await _dbSet.AnyAsync(cancellationToken);
     }
 
     public virtual bool Any(Expression<Func<T, bool>> predicate)
@@ -141,12 +155,19 @@ public class Repository<T> : IRepository<T>
         return _dbSet.Any(predicate);
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    public async Task<bool> AnyAsync(
+        Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await _dbSet.AnyAsync(predicate);
+        return await _dbSet.AnyAsync(predicate, cancellationToken);
     }
 
-    public virtual IEnumerable<T> ExecuteStoredProcedure(string storedProcedureName, object model)
+    public virtual IEnumerable<T> ExecuteStoredProcedure<TModel>(
+        string storedProcedureName,
+        T model
+    )
+        where TModel : class
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
         {
@@ -169,10 +190,12 @@ public class Repository<T> : IRepository<T>
         return dataTable.ToList<T>();
     }
 
-    public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
+    public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync<TModel>(
         string storedProcedureName,
-        object model
+        T model,
+        CancellationToken cancellationToken = default
     )
+        where TModel : class
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
         {
@@ -184,12 +207,12 @@ public class Repository<T> : IRepository<T>
         {
             sqlParameters.Add(new SqlParameter(property.Name, property.GetValue(model)));
         }
-        using DbCommand command = _dbContext.Database.GetDbConnection().CreateCommand();
+        await using DbCommand command = _dbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = storedProcedureName;
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddRange(sqlParameters.ToArray());
         DataTable dataTable = new DataTable();
-        await using DbDataReader reader = await command.ExecuteReaderAsync();
+        await using DbDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
         dataTable.Load(reader);
         command.Parameters.Clear();
         return dataTable.ToList<T>();
@@ -197,7 +220,7 @@ public class Repository<T> : IRepository<T>
 
     public virtual IEnumerable<T> ExecuteStoredProcedure(
         string storedProcedureName,
-        params SqlParameter[]? parameters
+        SqlParameter[]? parameters
     )
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
@@ -207,7 +230,10 @@ public class Repository<T> : IRepository<T>
         using DbCommand command = _dbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = storedProcedureName;
         command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddRange(parameters);
+        if (parameters is not null)
+        {
+            command.Parameters.AddRange(parameters);
+        }
         DataTable dataTable = new DataTable();
         using DbDataReader reader = command.ExecuteReader();
         dataTable.Load(reader);
@@ -217,19 +243,23 @@ public class Repository<T> : IRepository<T>
 
     public async Task<IEnumerable<T>> ExecuteStoredProcedureAsync(
         string storedProcedureName,
-        params SqlParameter[]? parameters
+        SqlParameter[]? parameters,
+        CancellationToken cancellationToken = default
     )
     {
         if (_dbContext.Database.GetDbConnection().State == ConnectionState.Closed)
         {
             _dbContext.Database.OpenConnection();
         }
-        using DbCommand command = _dbContext.Database.GetDbConnection().CreateCommand();
+        await using DbCommand command = _dbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = storedProcedureName;
         command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddRange(parameters);
+        if (parameters is not null)
+        {
+            command.Parameters.AddRange(parameters);
+        }
         DataTable dataTable = new DataTable();
-        await using DbDataReader reader = await command.ExecuteReaderAsync();
+        await using DbDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
         dataTable.Load(reader);
         command.Parameters.Clear();
         return dataTable.ToList<T>();
@@ -240,9 +270,9 @@ public class Repository<T> : IRepository<T>
         _dbContext.SaveChanges();
     }
 
-    public virtual async Task SaveChangesAsync()
+    public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public virtual void Dispose()

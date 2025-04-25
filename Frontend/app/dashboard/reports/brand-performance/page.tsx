@@ -1,41 +1,25 @@
-import NavBreadcrumbs from "@/components/core/NavBreadcrumbs";
 import { API_URL } from "@/constant/apiUrl";
 import { getListApi } from "@/lib/apiClient";
-import {
-    BrandPerformanceReportRequest,
-    BrandPerformanceReportResponse,
-} from "@/types";
-import { Box, Card, CardContent, Typography } from "@mui/material";
 import dayjs from "@/lib/extended-dayjs";
-import utc from "dayjs/plugin/utc";
+import {
+  BrandPerformanceReportRequest,
+  BrandPerformanceReportResponse,
+} from "@/types";
+import { Box, Stack, Typography } from "@mui/material";
 import { BrandPerformanceChart } from "./BrandPerformanceChart";
 import { BrandPerformanceGrid } from "./BrandPerformanceGrid";
 
-dayjs.extend(utc);
-
-const breadcrums = [
-  {
-    label: "",
-    href: "dashboard",
-  },
-  {
-    label: "Báo cáo hiệu suất danh mục",
-    href: "sale",
-  },
-];
+type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
 export default async function BrandPerformancePage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | undefined };
+  searchParams: SearchParams;
 }) {
+  const { start_date, end_date } = await searchParams;
   let data: BrandPerformanceReportResponse[] = [];
-  const startDate = searchParams?.start_date
-    ? dayjs(searchParams?.start_date)
-    : dayjs().startOf("year");
-  const endDate = searchParams?.end_date
-    ? dayjs(searchParams?.end_date)
-    : dayjs().endOf("year");
+  const startDate = start_date ? dayjs(start_date) : dayjs().startOf("year");
+  const endDate = end_date ? dayjs(end_date) : dayjs().endOf("year");
   const request: BrandPerformanceReportRequest = {
     startDate: startDate.toJSON(),
     endDate: endDate.toJSON(),
@@ -44,45 +28,34 @@ export default async function BrandPerformancePage({
   if (response.success) {
     data = response.data as BrandPerformanceReportResponse[];
   } else {
-    console.error(
-      "Error fetching brand performance data:",
-      response.message
-    );
+    console.error("Error fetching brand performance data:", response.message);
   }
 
-  // Sort and get top 10 categories by revenue
   const top10Categories = data
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 10);
 
   return (
-    <Box>
-      <NavBreadcrumbs items={breadcrums} />
-      <Typography variant="h4" gutterBottom>
-        Báo cáo hiệu suất thương hiệu
-      </Typography>
+    <Stack spacing={2}>
+      <Typography variant="h5">Báo cáo hiệu suất thương hiệu</Typography>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Top 10 thương hiệu theo doanh thu
-          </Typography>
-          <Box sx={{ width: "100%", height: 400 }}>
-            <BrandPerformanceChart data={top10Categories} />
-          </Box>
-        </CardContent>
-      </Card>
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Top 10 thương hiệu theo doanh thu
+        </Typography>
+        <Box sx={{ width: "100%", height: 400 }}>
+          <BrandPerformanceChart data={top10Categories} />
+        </Box>
+      </Box>
 
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Chi tiết hiệu suất thương hiệu
-          </Typography>
-          <Box sx={{ height: 600, width: "100%" }}>
-            <BrandPerformanceGrid data={data} />
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Chi tiết hiệu suất thương hiệu
+        </Typography>
+        <Box sx={{ height: 600, width: "100%" }}>
+          <BrandPerformanceGrid data={data} />
+        </Box>
+      </Box>
+    </Stack>
   );
 }

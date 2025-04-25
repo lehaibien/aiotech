@@ -1,18 +1,26 @@
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Posts.Dtos;
 
-public class PostRequest
+public record PostRequest(
+    Guid Id,
+    string Title,
+    string Slug,
+    string Content,
+    IFormFile Image,
+    bool IsPublished,
+    List<string> Tags,
+    bool IsImageEdited
+);
+
+public class PostRequestValidator : AbstractValidator<PostRequest>
 {
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Tiêu đề không được để trống")]
-    public string Title { get; set; } = null!;
-
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Nội dung không được để trống")]
-    public string Content { get; set; } = null!;
-
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Ảnh không được để trống")]
-    public IFormFile Image { get; set; } = null!;
-    public bool IsPublished { get; set; } = true;
-    public List<string> Tags { get; set; } = [];
+    public PostRequestValidator()
+    {
+        RuleFor(x => x.Title).NotEmpty().WithMessage("Tiêu đề không được để trống");
+        RuleFor(x => x.Slug).NotEmpty().WithMessage("Slug không được để trống");
+        RuleFor(x => x.Content).NotEmpty().WithMessage("Nội dung không được để trống");
+        RuleFor(x => x.Image).NotEmpty().WithMessage("Ảnh không được để trống");
+    }
 }

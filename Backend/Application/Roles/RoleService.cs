@@ -1,6 +1,6 @@
 ﻿using System.Data;
+using Application.Helpers;
 using Application.Roles.Dtos;
-using AutoDependencyRegistration.Attributes;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -11,7 +11,6 @@ using Shared;
 
 namespace Application.Roles;
 
-[RegisterClassAsScoped]
 public class RoleService : IRoleService
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -31,23 +30,24 @@ public class RoleService : IRoleService
         {
             ParameterName = "@oTotalRow",
             SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output
+            Direction = ParameterDirection.Output,
         };
         var parameters = new SqlParameter[]
         {
             new("@iTextSearch", request.TextSearch),
             new("@iPageIndex", request.PageIndex),
             new("@iPageSize", request.PageSize),
-            totalRow
+            totalRow,
         };
-        var result = await _unitOfWork.GetRepository<RoleResponse>()
+        var result = await _unitOfWork
+            .GetRepository<RoleResponse>()
             .ExecuteStoredProcedureAsync("sp_Role_GetList", parameters);
         var response = new PaginatedList
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
             TotalCount = Convert.ToInt32(totalRow.Value),
-            Items = result
+            Items = result,
         };
         return Result<PaginatedList>.Success(response);
     }
@@ -66,7 +66,8 @@ public class RoleService : IRoleService
 
     public async Task<Result<RoleResponse>> Create(CreateRoleRequest request)
     {
-        var isExists = await _unitOfWork.GetRepository<Role>()
+        var isExists = await _unitOfWork
+            .GetRepository<Role>()
             .FindAsync(x => x.Name == request.Name);
         if (isExists != null)
         {
@@ -74,7 +75,7 @@ public class RoleService : IRoleService
         }
         var entity = _mapper.Map<Role>(request);
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Role>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<RoleResponse>(entity);
@@ -83,8 +84,9 @@ public class RoleService : IRoleService
 
     public async Task<Result<RoleResponse>> Update(UpdateRoleRequest request)
     {
-        var isExists = await _unitOfWork.GetRepository<Role>()
-            .AnyAsync(x => x.Name == request.Name && x.Id!= request.Id);
+        var isExists = await _unitOfWork
+            .GetRepository<Role>()
+            .AnyAsync(x => x.Name == request.Name && x.Id != request.Id);
         if (isExists)
         {
             return Result<RoleResponse>.Failure("Vai trò đã tồn tại");
@@ -96,7 +98,7 @@ public class RoleService : IRoleService
         }
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Role>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<RoleResponse>(entity);
@@ -111,13 +113,13 @@ public class RoleService : IRoleService
             return Result<string>.Failure("Vai trò không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Role>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
     }
-    
+
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
         foreach (var id in ids)
@@ -128,7 +130,7 @@ public class RoleService : IRoleService
                 return Result<string>.Failure("Vai trò không tồn tại");
             }
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Role>().Update(entity);
         }
@@ -138,12 +140,11 @@ public class RoleService : IRoleService
 
     public async Task<Result<List<ComboBoxItem>>> GetComboBox()
     {
-        var result = await _unitOfWork.GetRepository<Role>().GetAll()
-            .Select(x => new ComboBoxItem
-            {
-                Text = x.Name,
-                Value = x.Id.ToString(),
-            }).ToListAsync();
+        var result = await _unitOfWork
+            .GetRepository<Role>()
+            .GetAll()
+            .Select(x => new ComboBoxItem { Text = x.Name, Value = x.Id.ToString() })
+            .ToListAsync();
         return Result<List<ComboBoxItem>>.Success(result);
     }
 }

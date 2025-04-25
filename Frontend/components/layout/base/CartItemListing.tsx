@@ -1,89 +1,94 @@
-import { formatNumberWithSeperator } from '@/lib/utils';
-import { CartItemResponse } from '@/types';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, IconButton, List, ListItem, Typography, Stack, SxProps } from '@mui/material';
-import Image from 'next/image';
+'use client'
+
+import useCart from "@/hooks/useCart";
+import { formatNumberWithSeperator } from "@/lib/utils";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import {
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  Stack,
+  SxProps,
+  Typography,
+} from "@mui/material";
+import Image from "next/image";
 
 type CartItemListingProps = {
-  cartItems: CartItemResponse[];
-  onQuantityChange: (cartItem: CartItemResponse) => void;
-  onRemoveFromCart: (productId: string) => void;
   sx?: SxProps;
 };
 
-function CartItemListing({ cartItems, onQuantityChange, onRemoveFromCart, sx }: CartItemListingProps) {
+export const CartItemListing = ({ sx }: CartItemListingProps) => {
+  const { cartItems, addToCart, removeFromCart } = useCart();
   return (
     <List sx={{ ...sx, p: 0 }}>
       {cartItems.map((item) => (
         <ListItem
           key={item.productId}
           sx={{
-            px: 2,
-            py: 1.5,
-            display: 'flex',
+            display: "flex",
             gap: 2,
-            alignItems: 'center',
-            borderBottom: 1,
-            borderColor: 'divider',
-            '&:last-child': { borderBottom: 0 }
+            alignItems: "center",
           }}
         >
-          <Box sx={{ flexShrink: 0, position: 'relative', width: 64, height: 64 }}>
-            <Image
-              src={item.productImage || '/placeholder-product.png'}
-              alt={item.productName}
-              fill
-              style={{ objectFit: 'cover', borderRadius: 4 }}
-            />
-          </Box>
+          <Image
+            src={item.productImage || "/placeholder-product.png"}
+            alt={item.productName}
+            width={96}
+            height={96}
+          />
 
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="body2" fontWeight={500} noWrap>
-              {item.productName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+          <Box>
+            <Typography>{item.productName}</Typography>
+            <Typography variant="body2" color="textSecondary">
               {formatNumberWithSeperator(item.productPrice ?? 0)}₫
             </Typography>
           </Box>
 
-          <Stack alignItems="center" gap={0.5}>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Stack marginX="auto" alignItems="center">
+            <Stack direction="row" alignItems="center">
               <IconButton
                 size="small"
-                onClick={() => item.quantity > 1 && onQuantityChange({ ...item, quantity: item.quantity - 1 })}
+                onClick={() =>
+                  item.quantity > 1 &&
+                  addToCart({ ...item, quantity: item.quantity - 1 })
+                }
                 disabled={item.quantity <= 1}
-                sx={{ bgcolor: 'action.hover', borderRadius: 1 }}
+                sx={{ bgcolor: "action.hover", borderRadius: 1 }}
               >
                 <RemoveIcon fontSize="inherit" />
               </IconButton>
-              
-              <Typography variant="body2" sx={{ minWidth: 24, textAlign: 'center' }}>
+
+              <Typography
+                variant="body2"
+                sx={{ minWidth: 24, textAlign: "center" }}
+              >
                 {item.quantity}
               </Typography>
-              
+
               <IconButton
                 size="small"
-                onClick={() => onQuantityChange({ ...item, quantity: item.quantity + 1 })}
-                sx={{ bgcolor: 'action.hover', borderRadius: 1 }}
+                onClick={() =>
+                  addToCart({ ...item, quantity: item.quantity + 1 })
+                }
               >
                 <AddIcon fontSize="inherit" />
               </IconButton>
             </Stack>
-            
-            <Typography
-              variant="caption"
-              color="error.main"
-              onClick={() => onRemoveFromCart(item.productId)}
-              sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+
+            <Button
+              variant="text"
+              size="small"
+              color="error"
+              onClick={() => removeFromCart(item.productId)}
             >
               Xóa
-            </Typography>
+            </Button>
           </Stack>
         </ListItem>
       ))}
     </List>
   );
-}
-
-export default CartItemListing;
+};

@@ -4,7 +4,7 @@ import { CustomDataGridRef } from "@/components/core/CustomDataGrid";
 import { SearchToolBar } from "@/components/core/SearchToolBar";
 import { ERROR_MESSAGE } from "@/constant/message";
 import { AddRounded, DeleteRounded, EditRounded } from "@mui/icons-material";
-import { Button, Grid2 as Grid } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import React from "react";
@@ -26,18 +26,22 @@ export function DashboardToolbar({
     router.push("/dashboard/Dashboards/upsert");
   }
   function triggerEdit() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
-    if (rowSelection.length === 0) {
+    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
+    if(rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }
-    if (rowSelection.length > 1) {
+    if (rowSelection.size === 0) {
+      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
+      return;
+    }
+    if (rowSelection.size > 1) {
       enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, {
         variant: "error",
       });
       return;
     }
-    const selectedData = rowSelection[0];
+    const selectedData = rowSelection.values().next().value;
     if (selectedData) {
       dataGridRef.current?.clearSelection();
       router.push(`/dashboard/Dashboards/upsert?id=${selectedData}`);
@@ -45,12 +49,16 @@ export function DashboardToolbar({
   }
 
   function triggerDelete() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel ?? [];
-    if (rowSelection.length === 0) {
+    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
+    if(rowSelection?.size === undefined) {
       enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
       return;
     }
-    const selectedData = rowSelection[0];
+    if (rowSelection.size === 0) {
+      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
+      return;
+    }
+    const selectedData = rowSelection.values().next().value;
     if (selectedData) {
       enqueueSnackbar("Chức năng xóa chưa được triển khai", {
         variant: "error",

@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Application.Reports.Dtos;
-using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.Data.SqlClient;
@@ -9,7 +8,6 @@ using Shared;
 
 namespace Application.Reports;
 
-[RegisterClassAsScoped]
 public class ReportService : IReportService
 {
     private readonly IUnitOfWork _unitOfWork;

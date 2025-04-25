@@ -31,7 +31,7 @@ public class AuthController : ControllerBase
         }
 
         // HttpContext.Response.Cookies.Append("token", result.Data.AccessToken, _cookieOptions);
-        response.Data = result.Data;
+        response.Data = result.Value;
         _logger.LogInformation(
             "The user with username {UserName} is logged in at {Timestamp}.",
             request.UserName,
@@ -57,7 +57,7 @@ public class AuthController : ControllerBase
             request.Email,
             DateTime.UtcNow
         );
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 
@@ -144,7 +144,6 @@ public class AuthController : ControllerBase
             return BadRequest(response);
         }
 
-        response.Data = result.Data;
         _logger.LogInformation(
             "A user {UserName} has been created at {Timestamp}",
             request.UserName,
@@ -178,7 +177,7 @@ public class AuthController : ControllerBase
             response.Message = result.Message;
             return BadRequest(response);
         }
-        response.Data = result.Data;
+        response.Data = result.Value;
         return Ok(response);
     }
 

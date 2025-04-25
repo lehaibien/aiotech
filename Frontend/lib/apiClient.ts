@@ -30,7 +30,6 @@ async function fetchApi(
       },
       body: data instanceof FormData ? data : JSON.stringify(data),
     });
-
     return await handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -103,6 +102,10 @@ export async function putApi(action: string, request: unknown) {
 
 export async function deleteApi(action: string) {
   return fetchApi(buildUrl(action), "DELETE");
+}
+
+export async function deleteApiWithBody(action: string, request: object) {
+  return fetchApi(buildUrl(action), "DELETE", request, API_CONFIG.defaultHeaders);
 }
 
 export async function deleteApiQuery(action: string, request: object) {

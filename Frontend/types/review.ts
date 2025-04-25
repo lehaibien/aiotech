@@ -1,6 +1,7 @@
-import { UUID } from "crypto";
-import { BaseResponse, BaseGetListRequest } from "./base";
-import { z } from "zod";
+import { reviewRequestSchema } from '@/schemas/reviewSchema';
+import { UUID } from "@/types";
+import { z } from 'zod';
+import { BaseGetListRequest, BaseResponse } from './base';
 
 export type ReviewResponse = {
   id: UUID;
@@ -23,11 +24,4 @@ export type GetListReviewByProductIdRequest = {
   productId: UUID;
 } & BaseGetListRequest;
 
-export const ReviewRequestSchema = z.object({
-  productID: z.string().uuid(),
-  userId: z.string().uuid(),
-  rating: z.number().min(1).max(5),
-  comment: z.string().optional(),
-});
-
-export type ReviewRequest = z.infer<typeof ReviewRequestSchema>;
+export type ReviewRequest = z.infer<typeof reviewRequestSchema>;

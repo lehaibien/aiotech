@@ -1,14 +1,16 @@
+import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
 import { ArrowForward } from "@mui/icons-material";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 
-type BannerProps = {
+type HeroBannerProps = {
   title: string;
   description: string;
   imageUrl: string;
 };
 
-export function Banner({ title, description, imageUrl }: BannerProps) {
+export const HeroBanner = ({ title, description, imageUrl }: HeroBannerProps) => {
   return (
     <Box
       sx={{
@@ -22,7 +24,6 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
         overflow: "hidden",
       }}
     >
-      {/* Next.js Image component */}
       <Box
         sx={{
           position: "absolute",
@@ -30,13 +31,13 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
           left: 0,
           width: "100%",
           height: "100%",
-          zIndex: 1, // Ensure the image is behind the text
+          zIndex: 1,
         }}
       >
         <Image
           src={imageUrl || "/hero-banner.jpg"}
           alt="Banner Image"
-          width={1600}
+          width={1200}
           height={400}
           quality={100}
           priority
@@ -44,7 +45,8 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: "fill",
+            aspectRatio: IMAGE_ASPECT_RATIO.BANNER,
           }}
         />
         <Image
@@ -63,7 +65,6 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
         />
       </Box>
 
-      {/* Text and Button Overlay */}
       <Box
         sx={{
           position: "absolute",
@@ -73,31 +74,21 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-end", // Align text to the bottom
-          alignItems: "flex-start", // Align text to the left
+          justifyContent: "flex-end",
+          alignItems: "flex-start",
           p: 4,
           backgroundColor: "rgba(0,0,0,0.5)",
           color: "white",
-          zIndex: 2, // Ensure the text is above the image
+          zIndex: 2,
         }}
       >
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{
-            fontSize: "clamp(2rem, 10vw, 2.15rem)",
-            mb: 2,
-          }}
-        >
+        <Typography variant="h2" component="h1" gutterBottom>
           {title || "AioTech"}
         </Typography>
         <Typography
-          variant="h5"
+          variant="body1"
           gutterBottom
           sx={{
-            lineHeight: 1.5,
-            fontSize: "clamp(1.2rem, 10rem, 1.2rem)",
             display: {
               xs: "none",
               md: "block",
@@ -119,4 +110,4 @@ export function Banner({ title, description, imageUrl }: BannerProps) {
       </Box>
     </Box>
   );
-}
+};

@@ -1,4 +1,6 @@
-import { UUID } from "crypto";
+export type UUID = `${string}-${string}-${string}-${string}-${string}`;
+
+export type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
 export type BaseGetListRequest = {
   textSearch: string;
@@ -10,9 +12,9 @@ export type GetListRequest = {
   pageIndex: number;
   pageSize: number;
   sortColumn?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
   textSearch: string;
-}
+};
 
 export type GetByIdRequest = {
   id: UUID;
@@ -43,30 +45,9 @@ export type ComboBoxItem = {
   text: string;
 };
 
-export type AuthState = {
-  userId: UUID;
-  username: string;
-};
-
 export type NotificationItem = {
   id: UUID;
   message: string;
   isRead: boolean;
   createdDate: Date;
-};
-
-export type ComboBoxProps = {
-  name: string;
-  defaultValue: string | null;
-  onValueChange?: (value: string) => void;
-};
-
-export type SlugPageParams = {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-export type IdPageParams = {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
 };

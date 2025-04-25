@@ -2,21 +2,21 @@
 
 public sealed class Result<T> where T : class
 {
-    public T Data { get; set; }
+    public T Value { get; set; }
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     public string Message { get; set; }
 
-    private Result(bool success, T data, string message)
+    private Result(bool success, T value, string message)
     {
         IsSuccess = success;
-        Data = data;
+        Value = value;
         Message = message;
     }
 
-    public static Result<T> Success(T data)
+    public static Result<T> Success(T value)
     {
-        return new Result<T>(true, data, null!);
+        return new Result<T>(true, value, null!);
     }
 
     public static Result<T> Failure(string message)
@@ -27,9 +27,9 @@ public sealed class Result<T> where T : class
     {
         if (IsSuccess)
         {
-            return Data;
+            return Value;
         }
-        throw new Exception("Cannot get data from failed result");
+        throw new Exception("Cannot get value from failed result");
     }
 }
 

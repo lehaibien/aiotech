@@ -3,7 +3,7 @@ using Application.Users.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
-using WebApi.Model;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -19,143 +19,70 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
+    public async Task<IActionResult> GetListAsync([FromQuery] GetListRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.GetListAsync(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetByIdAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpGet("{id:guid}/profile")]
-    public async Task<IActionResult> GetUserProfileById(Guid id)
+    public async Task<IActionResult> GetUserProfileByIdAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetProfileById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.GetProfileByIdAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create([FromForm] CreateUserRequest request)
+    public async Task<IActionResult> CreateAsync([FromForm] UserRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Create(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.CreateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpPut]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update([FromForm] UpdateUserRequest request)
+    public async Task<IActionResult> UpdateAsync([FromForm] UserRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Update(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.UpdateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpPost("profile")]
-    public async Task<IActionResult> ChangeProfile([FromForm] UserProfileRequest request)
+    public async Task<IActionResult> ChangeProfileAsync([FromForm] UserProfileRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.UpdateProfile(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.UpdateProfileAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.Delete(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.DeleteAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpDelete]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeleteList(List<Guid> ids)
+    public async Task<IActionResult> DeleteListAsync(List<Guid> ids)
     {
-        var response = new ApiResponse();
-        var result = await _service.DeleteList(ids);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Data;
-        return Ok(response);
+        var result = await _service.DeleteListAsync(ids);
+        return this.FromResult(result);
     }
 
     [HttpPost("lock/{id:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> LockUser(Guid id)
+    public async Task<IActionResult> LockUserAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.LockUser(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        return Ok(response);
+        var result = await _service.LockUserAsync(id);
+        return this.FromResult(result);
     }
 }

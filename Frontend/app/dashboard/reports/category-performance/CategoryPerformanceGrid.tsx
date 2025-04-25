@@ -1,9 +1,10 @@
 "use client";
 
-import {DataGridPaginationPure} from "@/components/core/CustomDataGridPaginationPure";
+import { DataGridPaginationPure } from "@/components/core/CustomDataGridPaginationPure";
 import NoRowOverlay from "@/components/core/NoRowOverlay";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { CategoryPerformanceReportResponse } from "@/types";
+import { alpha } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 const columns: GridColDef<CategoryPerformanceReportResponse>[] = [
@@ -43,17 +44,16 @@ type CategoryPerformanceGridProps = {
   data: CategoryPerformanceReportResponse[];
 };
 
-export function CategoryPerformanceGrid({
+export const CategoryPerformanceGrid = ({
   data,
-}: CategoryPerformanceGridProps) {
+}: CategoryPerformanceGridProps) => {
   return (
     <DataGrid
       rows={data}
       columns={columns}
       getRowId={(row) => row.categoryId}
       disableRowSelectionOnClick
-      showCellVerticalBorder
-      showColumnVerticalBorder
+      disableColumnMenu
       pageSizeOptions={[10, 25, 50]}
       paginationMode="client"
       pagination={true}
@@ -70,6 +70,31 @@ export function CategoryPerformanceGrid({
         noRowsOverlay: NoRowOverlay,
         noResultsOverlay: NoRowOverlay,
       }}
+      showCellVerticalBorder
+      showColumnVerticalBorder
+      sx={(theme) => ({
+        "& .MuiDataGrid-columnHeader": {
+          backgroundColor: alpha(theme.palette.background.paper, 0.1),
+        },
+        "& .MuiDataGrid-cell:focus": {
+          outline: "none",
+        },
+        "& .MuiDataGrid-cell": {
+          display: "flex",
+          alignItems: "center",
+          px: 1,
+        },
+        "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: 1 },
+        "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+          py: 2,
+        },
+        "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+          py: 3,
+        },
+        "& .MuiDataGrid-selectedRowCount": {
+          display: "none",
+        },
+      })}
     />
   );
-}
+};

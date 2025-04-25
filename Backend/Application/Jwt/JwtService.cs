@@ -3,14 +3,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Jwt.Options;
-using AutoDependencyRegistration.Attributes;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Jwt;
 
-[RegisterClassAsSingleton]
 public class JwtService : IJwtService
 {
     private readonly JwtOption _options;
@@ -41,7 +39,7 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Name, user.UserName),
             new(JwtRegisteredClaimNames.Email, user.Email),
-            new(ClaimTypes.Role, user.Role.Name ?? string.Empty),
+            new(ClaimTypes.Role, user.Role.Code ?? string.Empty),
             new(ClaimTypes.Thumbprint, user.AvatarUrl ?? string.Empty),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };

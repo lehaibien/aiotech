@@ -1,4 +1,7 @@
+"use client";
+
 import Color from "@tiptap/extension-color";
+import Image from "@tiptap/extension-image";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Table from "@tiptap/extension-table";
@@ -6,8 +9,8 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
 import TextStyle from "@tiptap/extension-text-style";
+import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import {
   MenuButtonAddTable,
@@ -19,6 +22,7 @@ import {
   MenuButtonBold,
   MenuButtonBulletedList,
   MenuButtonEditLink,
+  MenuButtonImageUpload,
   MenuButtonItalic,
   MenuButtonOrderedList,
   MenuButtonRedo,
@@ -35,7 +39,13 @@ import {
   RichTextEditorRef as MuiRichTextEditorRef,
   TableBubbleMenu,
 } from "mui-tiptap";
-import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from "react";
+import {
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 
 type RichTextEditorProps = {
   defaultContent: string;
@@ -71,10 +81,27 @@ function RichTextEditor(
     TableRow,
     Color,
     TextStyle,
+    Image,
   ];
 
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const styleElement = document.createElement("style");
+      styleElement.innerHTML = fixListStyles;
+      document.head.appendChild(styleElement);
+      return () => {
+        document.head.removeChild(styleElement);
+      };
+    }
+  }, []);
+
+  const handleImageUpload = async (files: File[]) => {
+    console.log(files);
+    return [];
+  };
+
   return (
-    <div className="shadow-sm">
+    <div className="border">
       <MuiRichTextEditor
         ref={rteRef}
         extensions={extensions}
@@ -100,7 +127,7 @@ function RichTextEditor(
                   paragraph: "Văn bản",
                 }}
               />
-              <MenuDivider className="!mx-2 !h-6" />
+              <MenuDivider />
               <MenuButtonBold className="rounded p-1" tooltipLabel="Chữ đậm" />
               <MenuButtonItalic
                 className="rounded p-1"
@@ -138,7 +165,7 @@ function RichTextEditor(
                 className="rounded p-1"
                 tooltipLabel="Căn đều"
               />
-              <MenuDivider className="!mx-2 !h-6" />
+              <MenuDivider />
               <MenuButtonSuperscript
                 className="rounded p-1"
                 tooltipLabel="Chỉ số trên"
@@ -155,7 +182,7 @@ function RichTextEditor(
                 className="rounded p-1"
                 tooltipLabel="Câu trích dẫn"
               />
-              <MenuDivider className="!mx-2 !h-6" />
+              <MenuDivider />
               <MenuButtonOrderedList
                 className="rounded p-1"
                 tooltipLabel="Danh sách có thứ tự"
@@ -163,6 +190,12 @@ function RichTextEditor(
               <MenuButtonBulletedList
                 className="rounded p-1"
                 tooltipLabel="Danh sách không thứ tự"
+              />
+              <MenuDivider />
+              <MenuButtonImageUpload
+                className="rounded p-1"
+                tooltipLabel="Chèn hình ảnh"
+                onUploadFiles={handleImageUpload}
               />
               <MenuButtonEditLink
                 className="rounded p-1"
@@ -226,14 +259,13 @@ const fixListStyles = `
     outline: none;
   }
 
-  .ProseMirror h1 { font-size: 2rem; margin: 1rem 0; }
-  .ProseMirror h2 { font-size: 1.75rem; margin: 0.875rem 0; }
-  .ProseMirror h3 { font-size: 1.5rem; margin: 0.75rem 0; }
+  .ProseMirror h1 { font-size: 2.5rem; margin: 1rem 0; line-height: 1.2; }
+  .ProseMirror h2 { font-size: 2rem; margin: 0.875rem 0;  line-height: 1.25; }
+  .ProseMirror h3 { font-size: 1.75rem; margin: 0.75rem 0;  line-height: 1.3; }
+  .ProseMirror h4 { font-size: 1.5rem; margin: 0.625rem 0; line-height: 1.4; }
+  .ProseMirror h5 { font-size: 1.25rem; margin: 0.5rem 0;  line-height: 1.5; }
+  .ProseMirror h6 { font-size: 1.1rem; margin: 0.375rem 0; line-height: 1.6; }
+  .ProseMirror p { margin: 0.5rem 0; line-height: 1.5; }
 `;
-
-// Add the global styles in your component
-const styleElement = document.createElement("style");
-styleElement.innerHTML = fixListStyles;
-document.head.appendChild(styleElement);
 
 export default forwardRef(RichTextEditor);

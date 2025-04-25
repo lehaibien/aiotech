@@ -1,43 +1,44 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
+using Application.Abstractions;
+using Application.Helpers;
 using Application.Images;
 using Application.Products.Dtos;
-using AutoDependencyRegistration.Attributes;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace Application.Products;
 
-[RegisterClassAsScoped]
 public class ProductService : IProductService
 {
+    private const string FolderUpload = "images/products";
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
-    private const string FolderUpload = "products";
-    private readonly IDistributedCache _cache;
+    private readonly IStorageService _storageService;
+    private readonly ICacheService _cacheService;
+    private readonly ILogger<ProductService> _logger;
 
     public ProductService(
         IUnitOfWork unitOfWork,
-        IMapper mapper,
         IHttpContextAccessor contextAccessor,
         IImageService imageService,
-        IDistributedCache cache
+        IStorageService storageService,
+        ICacheService cacheService,
+        ILogger<ProductService> logger
     )
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _contextAccessor = contextAccessor;
         _imageService = imageService;
-        _cache = cache;
+        _storageService = storageService;
+        _cacheService = cacheService;
+        _logger = logger;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -75,21 +76,7 @@ public class ProductService : IProductService
         var result = await productQuery
             .Skip(request.PageIndex * request.PageSize)
             .Take(request.PageSize)
-            .Select(x => new ProductResponse
-            {
-                Id = x.Id,
-                Sku = x.Sku,
-                Name = x.Name,
-                Price = x.Price,
-                DiscountPrice = x.DiscountPrice,
-                Stock = x.Stock,
-                Brand = x.Brand.Name,
-                Category = x.Category.Name,
-                ImageUrls = x.ImageUrls,
-                CreatedDate = x.CreatedDate,
-                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
-                IsFeatured = x.IsFeatured,
-            })
+            .ProjectToProductResponse()
             .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
@@ -105,6 +92,25 @@ public class ProductService : IProductService
         GetListFilteredProductRequest request
     )
     {
+        var isUnfilteredFirstPage =
+            request.PageIndex == 0
+            && string.IsNullOrEmpty(request.TextSearch)
+            && request.MinPrice == 0
+            && double.IsInfinity(request.MaxPrice)
+            && string.IsNullOrEmpty(request.Categories)
+            && string.IsNullOrEmpty(request.Brands)
+            && request.Sort == ProductSort.Default;
+        if (isUnfilteredFirstPage)
+        {
+            var cachedResult = await _cacheService.GetAsync<PaginatedList>(
+                CacheKeys.FirstPageProducts
+            );
+            if (cachedResult != null)
+            {
+                return Result<PaginatedList>.Success(cachedResult);
+            }
+        }
+
         SqlParameter totalRow = new()
         {
             ParameterName = "@oTotalRow",
@@ -127,7 +133,7 @@ public class ProductService : IProductService
             totalRow,
         };
         var result = await _unitOfWork
-            .GetRepository<ProductResponse>()
+            .GetRepository<ProductListItemResponse>()
             .ExecuteStoredProcedureAsync(StoredProcedure.GetFilteredProduct, parameters);
         var response = new PaginatedList
         {
@@ -136,10 +142,21 @@ public class ProductService : IProductService
             TotalCount = Convert.ToInt32(totalRow.Value),
             Items = result,
         };
+
+        // Cache first page with default filters
+        if (isUnfilteredFirstPage)
+        {
+            await _cacheService.SetAsync(
+                CacheKeys.FirstPageProducts,
+                response,
+                TimeSpan.FromMinutes(30)
+            );
+        }
+
         return Result<PaginatedList>.Success(response);
     }
 
-    public async Task<Result<List<ProductResponse>>> Search(SearchProductRequest request)
+    public async Task<Result<List<ProductResponse>>> SearchAsync(SearchProductRequest request)
     {
         var result = await _unitOfWork
             .GetRepository<Product>()
@@ -149,178 +166,81 @@ public class ProductService : IProductService
                 && (request.Category == null || x.Category.Name == request.Category)
                 && x.Name.Contains(request.TextSearch)
             )
+            .ProjectToProductResponse()
             .Take(request.SearchLimit)
             .ToListAsync();
-        var response = _mapper.Map<List<ProductResponse>>(result);
-        return Result<List<ProductResponse>>.Success(response);
-    }
-
-    public async Task<Result<List<ProductResponse>>> GetTopProducts(int top = 12)
-    {
-        var productInCache = await _cache.GetStringAsync(CacheKeys.TopProducts);
-        if (productInCache is not null)
-        {
-            var res = JsonConvert.DeserializeObject<List<ProductResponse>>(productInCache);
-            return Result<List<ProductResponse>>.Success(res);
-        }
-        var result = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Stock >= 8)
-            .Select(x => new ProductResponse
-            {
-                Id = x.Id,
-                Sku = x.Sku,
-                Name = x.Name,
-                Price = x.Price,
-                DiscountPrice = x.DiscountPrice,
-                Stock = x.Stock,
-                Brand = x.Brand.Name,
-                Category = x.Category.Name,
-                ImageUrls = x.ImageUrls,
-                CreatedDate = x.CreatedDate,
-                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
-                IsFeatured = x.IsFeatured,
-            })
-            .OrderByDescending(p =>
-                _unitOfWork
-                    .GetRepository<OrderItem>()
-                    .GetAll()
-                    .Count(oi =>
-                        oi.ProductId == p.Id
-                        && !oi.Order.IsDeleted
-                        && oi.Order.Status != OrderStatus.Cancelled
-                    )
-            )
-            .ThenByDescending(x => x.IsFeatured)
-            .ThenByDescending(x => x.Rating)
-            .ThenByDescending(x => x.CreatedDate)
-            .Take(top)
-            .ToListAsync();
-        var json = JsonConvert.SerializeObject(result);
-        await _cache.SetStringAsync(CacheKeys.TopProducts, json);
         return Result<List<ProductResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ProductResponse>>> GetFeaturedProducts(int top = 12)
+    public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(int top = 12)
     {
-        var productInCache = await _cache.GetStringAsync(CacheKeys.FeaturedProducts);
+        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
+            CacheKeys.TopProducts
+        );
         if (productInCache is not null)
         {
-            var res = JsonConvert.DeserializeObject<List<ProductResponse>>(productInCache);
-            return Result<List<ProductResponse>>.Success(res);
+            return Result<List<ProductListItemResponse>>.Success(productInCache);
+        }
+        var orderItems = _unitOfWork
+            .GetRepository<OrderItem>()
+            .GetAll(oi => oi.Order.Status != OrderStatus.Cancelled && !oi.Order.IsDeleted);
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Stock >= 8)
+            .OrderByDescending(p =>
+                orderItems.Where(oi => oi.ProductId == p.Id).Sum(oi => oi.Quantity)
+            )
+            .ThenByDescending(x => x.IsFeatured)
+            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
+            .ThenByDescending(x => x.CreatedDate)
+            .ProjectToProductListItemResponse()
+            .Take(top)
+            .ToListAsync();
+        await _cacheService.SetAsync(CacheKeys.TopProducts, result, TimeSpan.FromMinutes(30));
+        return Result<List<ProductListItemResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(int top = 12)
+    {
+        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
+            CacheKeys.NewestProducts
+        );
+        if (productInCache is not null)
+        {
+            return Result<List<ProductListItemResponse>>.Success(productInCache);
         }
         var result = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => x.Stock >= 10)
-            .Select(x => new ProductResponse
-            {
-                Id = x.Id,
-                Sku = x.Sku,
-                Name = x.Name,
-                Price = x.Price,
-                DiscountPrice = x.DiscountPrice,
-                Stock = x.Stock,
-                Brand = x.Brand.Name,
-                Category = x.Category.Name,
-                ImageUrls = x.ImageUrls,
-                CreatedDate = x.CreatedDate,
-                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
-                IsFeatured = x.IsFeatured,
-            })
-            .Where(x => x.IsFeatured)
             .OrderByDescending(x => x.CreatedDate)
-            .ThenByDescending(x => x.Rating)
+            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
+            .ProjectToProductListItemResponse()
             .Take(top)
             .ToListAsync();
 
-        var json = JsonConvert.SerializeObject(result);
-        await _cache.SetStringAsync(CacheKeys.FeaturedProducts, json);
-        return Result<List<ProductResponse>>.Success(result);
+        await _cacheService.SetAsync(CacheKeys.NewestProducts, result, TimeSpan.FromMinutes(30));
+        return Result<List<ProductListItemResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ProductResponse>>> GetRelatedProducts(
+    public async Task<Result<List<ProductListItemResponse>>> GetRelatedProductsAsync(
         GetRelatedProductsRequest request
     )
     {
         var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(request.Id);
         if (entity is null)
         {
-            return Result<List<ProductResponse>>.Failure("Sản phẩm không tồn tại");
+            return Result<List<ProductListItemResponse>>.Failure("Sản phẩm không tồn tại");
         }
 
-        // Get all potential related products
-        var allRelatedProducts = await _unitOfWork
+        var result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll(x => x.Id != request.Id)
-            .Select(x => new ProductResponse
-            {
-                Id = x.Id,
-                Sku = x.Sku,
-                Name = x.Name,
-                Price = x.Price,
-                DiscountPrice = x.DiscountPrice,
-                Stock = x.Stock,
-                Brand = x.Brand.Name,
-                Category = x.Category.Name,
-                ImageUrls = x.ImageUrls,
-                CreatedDate = x.CreatedDate,
-                Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
-                IsFeatured = x.IsFeatured,
-                CategoryId = x.CategoryId,
-                BrandId = x.BrandId,
-            })
+            .GetAll(x => x.Id != request.Id && x.CategoryId == entity.CategoryId)
+            .ProjectToProductListItemResponse()
             .ToListAsync();
-
-        // Process in memory
-        var result = new List<ProductResponse>();
-
-        // First priority: same category
-        var sameCategoryProducts = allRelatedProducts
-            .Where(x => x.CategoryId == entity.CategoryId)
-            .OrderByDescending(x => x.Rating)
-            .ThenByDescending(x => x.CreatedDate)
-            .Take(request.Limit)
-            .ToList();
-
-        result.AddRange(sameCategoryProducts);
-
-        if (result.Count < request.Limit)
-        {
-            // Second priority: same brand, different category
-            var remainingCount = request.Limit - result.Count;
-            var sameBrandProducts = allRelatedProducts
-                .Where(x =>
-                    x.BrandId == entity.BrandId
-                    && x.CategoryId != entity.CategoryId
-                    && !result.Select(r => r.Id).Contains(x.Id)
-                )
-                .OrderByDescending(x => x.Rating)
-                .ThenByDescending(x => x.CreatedDate)
-                .Take(remainingCount)
-                .ToList();
-
-            result.AddRange(sameBrandProducts);
-        }
-
-        if (result.Count < request.Limit)
-        {
-            // Third priority: other products
-            var remainingCount = request.Limit - result.Count;
-            var otherProducts = allRelatedProducts
-                .Where(x => !result.Select(r => r.Id).Contains(x.Id))
-                .OrderByDescending(x => x.IsFeatured)
-                .ThenByDescending(x => x.Rating)
-                .ThenByDescending(x => x.CreatedDate)
-                .Take(remainingCount)
-                .ToList();
-
-            result.AddRange(otherProducts);
-        }
-
-        return Result<List<ProductResponse>>.Success(result);
+        return Result<List<ProductListItemResponse>>.Success(result);
     }
 
-    public async Task<Result<ProductDetailResponse>> GetById(Guid id)
+    public async Task<Result<ProductDetailResponse>> GetByIdAsync(Guid id)
     {
         var entity = await _unitOfWork
             .GetRepository<Product>()
@@ -350,7 +270,7 @@ public class ProductService : IProductService
         return Result<ProductDetailResponse>.Success(entity);
     }
 
-    public async Task<Result<ProductUpdateResponse>> GetRequestById(Guid id)
+    public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(Guid id)
     {
         var entity = await _unitOfWork
             .GetRepository<Product>()
@@ -360,42 +280,63 @@ public class ProductService : IProductService
         {
             return Result<ProductUpdateResponse>.Failure("Sản phẩm không tồn tại");
         }
-        var response = _mapper.Map<ProductUpdateResponse>(entity);
+        var response = entity.MapToProductUpdateResponse();
         return Result<ProductUpdateResponse>.Success(response);
     }
 
-    public async Task<Result<ProductResponse>> Create(CreateProductRequest request)
+    public async Task<Result<ProductResponse>> CreateAsync(ProductRequest request)
     {
+        _logger.LogInformation(
+            "Creating new product with SKU: {Sku}, Name: {Name}",
+            request.Sku,
+            request.Name
+        );
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .FindAsync(x => x.Name == request.Name && x.Sku == request.Sku);
         if (isExists != null)
         {
+            _logger.LogWarning(
+                "Product already exists with SKU: {Sku} and Name: {Name} when trying to create",
+                request.Sku,
+                request.Name
+            );
             return Result<ProductResponse>.Failure("Sản phẩm đã tồn tại");
         }
-        var entity = _mapper.Map<Product>(request);
+        var entity = request.MapToProduct();
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var uploadResult = await _imageService.UploadBulkAsync(
-            request.Images,
-            ImageType.ProductDetail,
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
+        #region Upload image
+        var thumbnailImage = await _imageService.OptimizeAsync(
+            request.Thumbnail,
+            ImageType.ProductThumbnail,
+            "thumbnail"
+        );
+        var images = await _imageService.OptimizeBulkAsync(request.Images, ImageType.ProductDetail);
+        var imageList = new List<IFormFile> { thumbnailImage.Value };
+        imageList.AddRange(images.Value);
+        var uploadResult = await _storageService.UploadBulkAsync(
+            imageList,
+            CommonConst.PublicBucket,
             Path.Combine(FolderUpload, entity.Sku)
         );
-        if (uploadResult.IsFailure)
-        {
-            return Result<ProductResponse>.Failure(uploadResult.Message);
-        }
-        entity.ImageUrls = uploadResult.Data;
+        var value = uploadResult.ToList();
+        #endregion
+        entity.ThumbnailUrl = value[0].Url;
+        entity.ImageUrls = value.Skip(1).Select(x => x.Url).ToList();
         _unitOfWork.GetRepository<Product>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        await _cache.RemoveAsync(CacheKeys.TopProducts);
-        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
-        var response = _mapper.Map<ProductResponse>(entity);
+        await _cacheService.RemoveAsync(CacheKeys.TopProducts);
+        await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
+        await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
+        var response = entity.MapToProductResponse();
+        _logger.LogInformation("Successfully created product with ID: {ProductId}", entity.Id);
         return Result<ProductResponse>.Success(response);
     }
 
-    public async Task<Result<ProductResponse>> Update(UpdateProductRequest request)
+    public async Task<Result<ProductResponse>> UpdateAsync(ProductRequest request)
     {
+        _logger.LogInformation("Updating product ID: {ProductId}", request.Id);
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .AnyAsync(x => x.Id != request.Id && x.Name == request.Name && x.Sku == request.Sku);
@@ -406,55 +347,71 @@ public class ProductService : IProductService
         var entity = await _unitOfWork.GetRepository<Product>().FindAsync(x => x.Id == request.Id);
         if (entity is null)
         {
+            _logger.LogWarning("Product not found for update with ID: {ProductId}", request.Id);
             return Result<ProductResponse>.Failure("Sản phẩm không tồn tại");
         }
-        _mapper.Map(request, entity);
+        entity = request.ApplyToProduct(entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var deleteResult = _imageService.DeleteBulkByUrl(entity.ImageUrls);
-        if (deleteResult.IsFailure)
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
+        #region Update image
+        if (request.IsImageEdited)
         {
-            return Result<ProductResponse>.Failure(deleteResult.Message);
-        }
-        if (request.Images.Count > 0)
-        {
-            var uploadResult = await _imageService.UploadBulkAsync(
+            var deleteUrls = new List<string> { entity.ThumbnailUrl };
+            deleteUrls.AddRange(entity.ImageUrls);
+            await _storageService.DeleteBulkFromUrlAsync(deleteUrls);
+            var thumbnailImage = await _imageService.OptimizeAsync(
+                request.Thumbnail,
+                ImageType.ProductThumbnail,
+                "thumbnail"
+            );
+            var images = await _imageService.OptimizeBulkAsync(
                 request.Images,
-                ImageType.ProductDetail,
+                ImageType.ProductDetail
+            );
+            var imageList = new List<IFormFile> { thumbnailImage.Value };
+            imageList.AddRange(images.Value);
+
+            var uploadResult = await _storageService.UploadBulkAsync(
+                imageList,
+                CommonConst.PublicBucket,
                 Path.Combine(FolderUpload, entity.Sku)
             );
-            if (uploadResult.IsFailure)
-            {
-                return Result<ProductResponse>.Failure(uploadResult.Message);
-            }
-            entity.ImageUrls = uploadResult.Data;
+            var value = uploadResult.ToList();
+            entity.ThumbnailUrl = value[0].Url;
+            entity.ImageUrls = value.Skip(1).Select(x => x.Url).ToList();
         }
+        #endregion
         _unitOfWork.GetRepository<Product>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        await _cache.RemoveAsync(CacheKeys.TopProducts);
-        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
-        var response = _mapper.Map<ProductResponse>(entity);
+        await _cacheService.RemoveAsync(CacheKeys.TopProducts);
+        await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
+        await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
+        var response = entity.MapToProductResponse();
+        _logger.LogInformation("Successfully updated product with ID: {ProductId}", request.Id);
         return Result<ProductResponse>.Success(response);
     }
 
-    public async Task<Result<string>> Delete(Guid id)
+    public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(id);
         if (entity is null)
         {
+            _logger.LogWarning("Product not found for deletion with ID: {ProductId}", id);
             return Result<string>.Failure("Sản phẩm không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Product>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        await _cache.RemoveAsync(CacheKeys.TopProducts);
-        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
+        await _cacheService.RemoveAsync(CacheKeys.TopProducts);
+        await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
+        await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
+        _logger.LogInformation("Successfully deleted product with ID: {ProductId}", id);
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<string>> DeleteList(List<Guid> ids)
+    public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
         foreach (var id in ids)
         {
@@ -464,13 +421,15 @@ public class ProductService : IProductService
                 return Result<string>.Failure("Sản phẩm không tồn tại");
             }
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Product>().Update(entity);
         }
         await _unitOfWork.SaveChangesAsync();
-        await _cache.RemoveAsync(CacheKeys.TopProducts);
-        await _cache.RemoveAsync(CacheKeys.FeaturedProducts);
+        await _cacheService.RemoveAsync(CacheKeys.TopProducts);
+        await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
+        await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
+        _logger.LogInformation("Successfully deleted {Count} products", ids.Count);
         return Result<string>.Success("Xóa thành công");
     }
 

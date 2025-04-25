@@ -1,15 +1,15 @@
 "use client";
 
 import { HighlightTypography } from "@/components/core/HighlightTypography";
-import { PostPreviewResponse } from "@/types/post";
-import { Box, Button, Theme, useMediaQuery } from "@mui/material";
+import { PostListItemResponse } from "@/types/post";
+import { Box, Button } from "@mui/material";
+import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import BlogPostItem from "./BlogPostItem";
-import Link from "next/link";
 
 const swiperBreakpoints = {
   320: {
@@ -27,14 +27,10 @@ const swiperBreakpoints = {
 };
 
 type LatestBlogProps = {
-  posts: PostPreviewResponse[];
+  posts: PostListItemResponse[];
 };
 
 export function LatestBlog({ posts }: LatestBlogProps) {
-  const isMobile = useMediaQuery((theme: Theme) =>
-    theme.breakpoints.down("sm")
-  );
-
   return (
     <Box
       sx={{
@@ -77,7 +73,6 @@ export function LatestBlog({ posts }: LatestBlogProps) {
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        navigation={!isMobile}
         pagination={{ clickable: true }}
         autoplay={{
           delay: 3000,
@@ -91,9 +86,9 @@ export function LatestBlog({ posts }: LatestBlogProps) {
         {posts.map((post) => (
           <SwiperSlide key={post.id}>
             <BlogPostItem
-              id={post.id}
+              slug={post.slug}
               title={post.title}
-              imageUrl={post.imageUrl}
+              imageUrl={post.thumbnailUrl}
               createdDate={post.createdDate}
             />
           </SwiperSlide>

@@ -1,29 +1,61 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Products.Dtos;
 
 public class ProductRequest
 {
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Mã sản phẩm không được để trống.")]
-    public string? Sku { get; set; }
-
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Tên sản phẩm không được để trống.")]
-    [MaxLength(100, ErrorMessage = "Tên sản phẩm không được vượt quá 100 ký tự.")]
+    public Guid Id { get; set; }
+    public string Sku { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
-
-    [Required(ErrorMessage = "Giá sản phẩm không được để trống.")]
-    [Range(0, double.MaxValue, ErrorMessage = "Giá sản phẩm không hợp lệ.")]
-    public double Price { get; set; }
-    public double? DiscountPrice { get; set; }
-
-    [Required(ErrorMessage = "Số lượng sản phẩm không được để trống.")]
-    [Range(0, int.MaxValue, ErrorMessage = "Số lượng sản phẩm không hợp lệ.")]
+    public decimal CostPrice { get; set; }
+    public decimal Price { get; set; }
+    public decimal? DiscountPrice { get; set; }
     public int Stock { get; set; }
     public Guid BrandId { get; set; }
     public Guid CategoryId { get; set; }
     public List<string> Tags { get; set; } = [];
+    public IFormFile Thumbnail { get; set; } = null!;
     public List<IFormFile> Images { get; set; } = [];
     public bool IsFeatured { get; set; }
+    public bool IsImageEdited { get; set; }
+}
+
+public class ProductRequestValidator : AbstractValidator<ProductRequest>
+{
+    public ProductRequestValidator()
+    {
+        RuleFor(x => x.Sku)
+            .NotEmpty()
+            .WithMessage("Mã sản phẩm không được để trống.")
+            .MaximumLength(20)
+            .WithMessage("Mã sản phẩm không được vượt quá 20 ký tự.");
+
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Tên sản phẩm không được để trống.");
+
+        RuleFor(x => x.CostPrice)
+            .NotEmpty()
+            .WithMessage("Giá nhập sản phẩm không được để trống.")
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Giá nhập sản phẩm không hợp lệ.");
+
+        RuleFor(x => x.Price)
+            .NotEmpty()
+            .WithMessage("Giá sản phẩm không được để trống.")
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Giá sản phẩm không hợp lệ.");
+
+        RuleFor(x => x.DiscountPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Giá khuyến mãi sản phẩm không hợp lệ.");
+
+        RuleFor(x => x.Stock)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Số lượng sản phẩm không hợp lệ.");
+
+        RuleFor(x => x.Thumbnail).NotNull().WithMessage("Ảnh sản phẩm không được để trống.");
+
+        RuleFor(x => x.Images).NotEmpty().WithMessage("Ảnh sản phẩm không được để trống.");
+    }
 }

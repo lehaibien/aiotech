@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-// export { auth as middleware } from "@/lib/auth";
 
 export default auth(async (req) => {
   const path = req.nextUrl.pathname;
@@ -13,13 +12,20 @@ export default auth(async (req) => {
   if (path.startsWith("/shipper") && !req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  if (path.startsWith("/dashboard") && req.auth?.user.role !== "Admin") {
+  if (path.startsWith("/dashboard") && req.auth?.user.role !== "admin") {
     return NextResponse.redirect(new URL("/no-access", req.url));
   }
-  if (path.startsWith("/shipper") && req.auth?.user.role !== "Shipper" && req.auth?.user.role!== "Admin") {
+  if (
+    path.startsWith("/shipper") &&
+    req.auth?.user.role !== "shipper" &&
+    req.auth?.user.role !== "admin"
+  ) {
     return NextResponse.redirect(new URL("/no-access", req.url));
   }
   if (path.startsWith("/profile") && !req.auth) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  if (path.startsWith("/checkout") && !req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
   NextResponse.next();
