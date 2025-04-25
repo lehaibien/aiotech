@@ -20,6 +20,7 @@ using Application.Roles;
 using Application.Users;
 using Application.Wishlist;
 using AutoMapper;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,10 +37,11 @@ public static class DependencyInjection
         services.AddHttpClient<MomoLibrary>();
         services.AddApplicationAutoMapper();
         services.AddApplicationServices();
+        services.AddValidators();
         return services;
     }
 
-    public static IServiceCollection AddApplicationOptions(
+    private static IServiceCollection AddApplicationOptions(
         this IServiceCollection services,
         IConfiguration configuration
     )
@@ -51,7 +53,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
+    private static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
     {
         var assembly = Assembly.GetAssembly(typeof(RoleProfile));
         var mapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(assembly));
@@ -60,11 +62,11 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddSingleton<IJwtService, JwtService>();
         services.AddSingleton<MomoLibrary>();
-        services.AddScoped<IStorageImageService, StorageImageService>();
+        services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IBrandService, BrandService>();
         services.AddScoped<ICartService, CartService>();
@@ -80,6 +82,12 @@ public static class DependencyInjection
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWishlistService, WishlistService>();
+        return services;
+    }
+
+    private static IServiceCollection AddValidators(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         return services;
     }
 }

@@ -30,6 +30,22 @@ export const productRequestSchema = z.object({
   brandId: z.string().uuid(),
   categoryId: z.string().uuid(),
   tags: z.array(z.string()).optional(),
+  thumbnail: z
+    .any()
+    .refine((value) => value instanceof File, {
+      message: "Ảnh không hợp lệ",
+    })
+    .refine((images) => images.size <= MAX_FILE_SIZE, {
+      message: `Dung lượng ảnh không được vượt quá ${
+        MAX_FILE_SIZE / 1024 / 1024
+      }MB`,
+    })
+    .refine((images) => ACCEPTED_IMAGE_TYPES.includes(images.type), {
+      message: `Định dạng ảnh không hợp lệ. Chỉ chấp nhận ${ACCEPTED_IMAGE_TYPES.join(
+        ", "
+      )}`,
+    })
+    .optional(),
   images: z.array(
     z
       .any()
@@ -51,4 +67,5 @@ export const productRequestSchema = z.object({
     (val) => (val === "true" || val === "false" ? val === "true" : val),
     z.boolean().optional()
   ),
+  isImageEdited: z.boolean().optional(),
 });

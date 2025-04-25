@@ -9,11 +9,34 @@ public interface IPostService
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<PaginatedList>> GetPostPreviewAsync(GetListRequest request);
-    Task<Result<List<PostResponse>>> GetRelatedPostAsync(Guid id);
-    Task<Result<PostResponse>> GetByIdAsync(Guid id);
-    Task<Result<PostResponse>> CreateAsync(CreatePostRequest request);
-    Task<Result<PostResponse>> UpdateAsync(UpdatePostRequest request);
-    Task<Result<string>> DeleteAsync(Guid id);
-    Task<Result<string>> DeleteListAsync(List<Guid> ids);
+    Task<Result<PaginatedList>> GetListItemAsync(
+        GetListRequest request,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<List<PostListItemResponse>>> GetRelatedPostAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<PostDetailResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Result<PostDetailResponse>> GetBySlugAsync(
+        string slug,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<PostResponse>> CreateAsync(
+        PostRequest request,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<PostResponse>> UpdateAsync(
+        PostRequest request,
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<string>> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<string>> DeleteListAsync(
+        List<Guid> ids,
+        CancellationToken cancellationToken = default
+    );
 }

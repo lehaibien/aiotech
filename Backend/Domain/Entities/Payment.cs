@@ -9,6 +9,8 @@ public class Payment
     public string Description { get; set; } = null!;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public PaymentProvider Provider { get; set; }
+
+    public Order Order { get; set; } = null!;
 }
 
 public enum PaymentProvider

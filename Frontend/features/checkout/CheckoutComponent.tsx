@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
-import { API_URL } from '@/constant/apiUrl';
-import { TAX_VALUE } from '@/constant/common';
-import { postApi } from '@/lib/apiClient';
-import { cartItemsAtom } from '@/lib/globalState';
-import { formatNumberWithSeperator, parseUUID } from '@/lib/utils';
-import {
-  CheckoutFormInput,
-  checkoutFormSchema,
-  CheckoutRequest,
-  PaymentMethods,
-} from '@/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
-import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import { API_URL } from "@/constant/apiUrl";
+import { TAX_VALUE } from "@/constant/common";
+import { postApi } from "@/lib/apiClient";
+import { cartItemsAtom } from "@/lib/globalState";
+import { formatNumberWithSeperator, parseUUID } from "@/lib/utils";
+import { checkoutFormSchema } from "@/schemas/orderSchema";
+import { CheckoutFormInput, CheckoutRequest, PaymentMethods } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import {
   Alert,
   alpha,
@@ -33,13 +29,13 @@ import {
   TextField,
   Typography,
   useTheme,
-} from '@mui/material';
-import { useAtom } from 'jotai';
-import { useSession } from 'next-auth/react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+} from "@mui/material";
+import { useAtom } from "jotai";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 type CheckoutComponentProps = {
   name: string;
@@ -59,7 +55,7 @@ export const CheckoutComponent = ({
   const [cartItems] = useAtom(cartItemsAtom);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(
-    isError ? 'Lỗi xảy ra khi thanh toán, vui lòng thử lại sau!' : null
+    isError ? "Lỗi xảy ra khi thanh toán, vui lòng thử lại sau!" : null
   );
 
   const cartTotal = useMemo(
@@ -89,7 +85,7 @@ export const CheckoutComponent = ({
       address: address,
       provider: PaymentMethods.VNPAY,
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<CheckoutFormInput> = async (data) => {
@@ -117,7 +113,7 @@ export const CheckoutComponent = ({
         if (orderData.provider === PaymentMethods.MOMO) {
           const response = await postApi(API_URL.createOrderUrl, orderData);
           if (!response.success) {
-            setError(response.message || 'Có lỗi xảy ra khi xử lý đơn hàng');
+            setError(response.message || "Có lỗi xảy ra khi xử lý đơn hàng");
             console.error(response.message);
           } else {
             router.push(response.data as string);
@@ -127,18 +123,18 @@ export const CheckoutComponent = ({
         if (orderData.provider === PaymentMethods.VNPAY) {
           const response = await postApi(API_URL.createOrderUrl, orderData);
           if (!response.success) {
-            setError(response.message || 'Có lỗi xảy ra khi xử lý đơn hàng');
+            setError(response.message || "Có lỗi xảy ra khi xử lý đơn hàng");
             console.error(response.message);
           } else {
             router.push(response.data as string);
           }
         }
       } else {
-        setError('Vui lòng đăng nhập để tiếp tục thanh toán');
+        setError("Vui lòng đăng nhập để tiếp tục thanh toán");
       }
     } catch (error) {
       setError(`Thanh toán thất bại: ${(error as Error).message}`);
-      console.error('Thanh toán thất bại: ', (error as Error).message);
+      console.error("Thanh toán thất bại: ", (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -147,97 +143,89 @@ export const CheckoutComponent = ({
   return (
     <Box>
       {error && (
-        <Alert
-          severity='error'
-          sx={{ mb: 3 }}
-          onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid
-          container
-          spacing={4}>
+        <Grid container spacing={4}>
           {/* Shipping Information */}
           <Grid size={{ xs: 12, md: 8 }}>
             <Paper
               elevation={2}
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
                 gap: 2,
                 mb: 2,
                 p: 3,
                 borderRadius: 2,
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
                   boxShadow: 6,
                 },
-              }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <LocalShippingOutlinedIcon
                   sx={{
                     color: theme.palette.primary.main,
                     fontSize: 28,
                   }}
                 />
-                <Typography
-                  variant='h5'
-                  fontWeight='500'>
+                <Typography variant="h5" fontWeight="500">
                   Thông tin giao hàng
                 </Typography>
               </Box>
 
-              <Grid
-                container
-                spacing={2}>
+              <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label='Họ và tên'
-                    {...register('name')}
+                    label="Họ và tên"
+                    {...register("name")}
                     error={!!errors.name}
                     helperText={errors.name?.message}
-                    variant='outlined'
+                    variant="outlined"
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     fullWidth
-                    label='Số điện thoại'
-                    {...register('phoneNumber')}
+                    label="Số điện thoại"
+                    {...register("phoneNumber")}
                     error={!!errors.phoneNumber}
                     helperText={errors.phoneNumber?.message}
-                    variant='outlined'
+                    variant="outlined"
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <TextField
                     fullWidth
-                    label='Địa chỉ'
-                    {...register('address')}
+                    label="Địa chỉ"
+                    {...register("address")}
                     error={!!errors.address}
                     helperText={errors.address?.message}
                     multiline
                     rows={3}
-                    variant='outlined'
+                    variant="outlined"
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <TextField
                     fullWidth
-                    label='Ghi chú (tùy chọn)'
-                    {...register('note')}
+                    label="Ghi chú (tùy chọn)"
+                    {...register("note")}
                     error={!!errors.note}
                     helperText={errors.note?.message}
                     multiline
                     rows={2}
-                    variant='outlined'
+                    variant="outlined"
                   />
                 </Grid>
               </Grid>
@@ -246,45 +234,46 @@ export const CheckoutComponent = ({
             <Paper
               elevation={2}
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
                 gap: 2,
                 p: 3,
                 borderRadius: 2,
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
                   boxShadow: 6,
                 },
-              }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <PaymentOutlinedIcon
                   sx={{
                     color: theme.palette.primary.main,
                     fontSize: 28,
                   }}
                 />
-                <Typography
-                  variant='h5'
-                  fontWeight='500'>
+                <Typography variant="h5" fontWeight="500">
                   Phương thức thanh toán
                 </Typography>
               </Box>
 
               <Controller
-                name='provider'
+                name="provider"
                 control={control}
                 render={({ field }) => (
                   <RadioGroup
                     {...field}
                     value={field.value?.toString()}
-                    onChange={(e) => field.onChange(Number(e.target.value))}>
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  >
                     <Box
                       sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
+                        display: "flex",
+                        flexDirection: { xs: "column", sm: "row" },
                         gap: 2,
-                      }}>
+                      }}
+                    >
                       <Paper
                         elevation={field.value === PaymentMethods.MOMO ? 3 : 1}
                         sx={{
@@ -298,28 +287,26 @@ export const CheckoutComponent = ({
                                   0.5
                                 )}`,
                           flex: 1,
-                          transition: 'all 0.2s ease',
-                          cursor: 'pointer',
-                          '&:hover': {
+                          transition: "all 0.2s ease",
+                          cursor: "pointer",
+                          "&:hover": {
                             borderColor: theme.palette.primary.light,
                           },
                         }}
-                        onClick={() => field.onChange(PaymentMethods.MOMO)}>
+                        onClick={() => field.onChange(PaymentMethods.MOMO)}
+                      >
                         <FormControlLabel
                           value={PaymentMethods.MOMO.toString()}
                           control={<Radio />}
                           label={
-                            <Box
-                              display='flex'
-                              alignItems='center'
-                              gap={1}>
+                            <Box display="flex" alignItems="center" gap={1}>
                               <Image
-                                src='/momo-icon.svg'
-                                alt='Momo'
+                                src="/momo-icon.svg"
+                                alt="Momo"
                                 width={32}
                                 height={32}
                               />
-                              <Typography fontWeight='500'>Ví Momo</Typography>
+                              <Typography fontWeight="500">Ví Momo</Typography>
                             </Box>
                           }
                           sx={{ m: 0 }}
@@ -339,28 +326,26 @@ export const CheckoutComponent = ({
                                   0.5
                                 )}`,
                           flex: 1,
-                          transition: 'all 0.2s ease',
-                          cursor: 'pointer',
-                          '&:hover': {
+                          transition: "all 0.2s ease",
+                          cursor: "pointer",
+                          "&:hover": {
                             borderColor: theme.palette.primary.light,
                           },
                         }}
-                        onClick={() => field.onChange(PaymentMethods.VNPAY)}>
+                        onClick={() => field.onChange(PaymentMethods.VNPAY)}
+                      >
                         <FormControlLabel
                           value={PaymentMethods.VNPAY.toString()}
                           control={<Radio />}
                           label={
-                            <Box
-                              display='flex'
-                              alignItems='center'
-                              gap={1}>
+                            <Box display="flex" alignItems="center" gap={1}>
                               <Image
-                                src='/vnpay-icon.svg'
-                                alt='VNPay'
+                                src="/vnpay-icon.svg"
+                                alt="VNPay"
                                 width={32}
                                 height={32}
                               />
-                              <Typography fontWeight='500'>VNPay</Typography>
+                              <Typography fontWeight="500">VNPay</Typography>
                             </Box>
                           }
                           sx={{ m: 0 }}
@@ -371,10 +356,7 @@ export const CheckoutComponent = ({
                 )}
               />
               {errors.provider && (
-                <Typography
-                  color='error'
-                  variant='body2'
-                  sx={{ mt: 1 }}>
+                <Typography color="error" variant="body2" sx={{ mt: 1 }}>
                   {errors.provider.message}
                 </Typography>
               )}
@@ -386,71 +368,68 @@ export const CheckoutComponent = ({
             <Paper
               elevation={2}
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
                 gap: 2,
                 p: 3,
                 borderRadius: 2,
-                position: 'sticky',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
+                position: "sticky",
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
                   boxShadow: 6,
                 },
-              }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <ShoppingBagOutlinedIcon
                   sx={{
                     color: theme.palette.primary.main,
                     fontSize: 28,
                   }}
                 />
-                <Typography
-                  variant='h5'
-                  fontWeight='500'>
+                <Typography variant="h5" fontWeight="500">
                   Tổng quan đơn hàng
                 </Typography>
               </Box>
 
-              <Box sx={{ overflowY: 'auto' }}>
+              <Box sx={{ overflowY: "auto" }}>
                 <Stack spacing={2}>
                   {cartItems.map((item) => (
                     <Card
                       key={item.productId}
                       elevation={0}
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
+                        display: "flex",
+                        alignItems: "center",
                         p: 1,
                         borderRadius: 2,
-                      }}>
+                      }}
+                    >
                       <Image
                         src={item.productImage}
                         alt={item.productName}
                         width={60}
                         height={60}
-                        style={{ borderRadius: 8, objectFit: 'cover' }}
+                        style={{ borderRadius: 8, objectFit: "cover" }}
                       />
                       <Box sx={{ ml: 2, flex: 1 }}>
-                        <Typography
-                          variant='body1'
-                          fontWeight='500'>
+                        <Typography variant="body1" fontWeight="500">
                           {item.productName}
                         </Typography>
                         <Box
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}>
-                          <Typography
-                            variant='body2'
-                            color='text.secondary'>
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
                             {formatNumberWithSeperator(item.productPrice)} đ
                           </Typography>
                           <Chip
                             label={`x${item.quantity}`}
-                            size='small'
+                            size="small"
                             sx={{
                               bgcolor: alpha(theme.palette.primary.main, 0.1),
                               color: theme.palette.primary.main,
@@ -466,56 +445,53 @@ export const CheckoutComponent = ({
               <Divider sx={{ mb: 2 }} />
 
               <Stack spacing={1}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography color='text.secondary'>Tạm tính:</Typography>
-                  <Typography fontWeight='500'>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography color="text.secondary">Tạm tính:</Typography>
+                  <Typography fontWeight="500">
                     {formatNumberWithSeperator(cartTotal)} đ
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography color='text.secondary'>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography color="text.secondary">
                     Thuế GTGT ({TAX_VALUE * 100}%):
                   </Typography>
-                  <Typography fontWeight='500'>
+                  <Typography fontWeight="500">
                     {formatNumberWithSeperator(
                       Number((cartTotal * TAX_VALUE).toFixed(2))
-                    )}{' '}
+                    )}{" "}
                     đ
                   </Typography>
                 </Box>
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
+                    display: "flex",
+                    justifyContent: "space-between",
                     mt: 1,
-                  }}>
-                  <Typography variant='h6'>Tổng cộng:</Typography>
-                  <Typography
-                    variant='h6'
-                    color='primary.main'>
+                  }}
+                >
+                  <Typography variant="h6">Tổng cộng:</Typography>
+                  <Typography variant="h6" color="primary.main">
                     {formatNumberWithSeperator(
                       Number((cartTotal * (1 + TAX_VALUE)).toFixed(2))
-                    )}{' '}
+                    )}{" "}
                     đ
                   </Typography>
                 </Box>
               </Stack>
 
               <Button
-                type='submit'
-                variant='contained'
-                color='primary'
+                type="submit"
+                variant="contained"
+                color="primary"
                 fullWidth
-                size='large'
-                data-umami-event='Thanh toán'
-                disabled={isSubmitting || !isValid}>
+                size="large"
+                data-umami-event="Thanh toán"
+                disabled={isSubmitting || !isValid}
+              >
                 {isSubmitting ? (
-                  <CircularProgress
-                    size={24}
-                    color='inherit'
-                  />
+                  <CircularProgress size={24} color="inherit" />
                 ) : (
-                  'Thanh toán'
+                  "Thanh toán"
                 )}
               </Button>
             </Paper>

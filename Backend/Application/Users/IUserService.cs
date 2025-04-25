@@ -9,14 +9,14 @@ public interface IUserService
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<UserResponse>> GetById(Guid id);
-    Task<Result<UserResponse>> GetByUsername(string username);
-    Task<Result<UserResponse>> GetByEmail(string email);
-    Task<Result<UserProfileResponse>> GetProfileById(Guid id);
-    Task<Result<UserResponse>> Create(CreateUserRequest request);
-    Task<Result<UserResponse>> Update(UpdateUserRequest request);
-    Task<Result<UserResponse>> UpdateProfile(UserProfileRequest request);
-    Task<Result<string>> Delete(Guid id);
-    Task<Result<string>> DeleteList(List<Guid> ids);
-    Task<Result> LockUser(Guid id);
+    Task<Result<UserResponse>> GetByIdAsync(Guid id);
+    Task<Result<UserResponse>> GetByUsernameAsync(string username);
+    Task<Result<UserResponse>> GetByEmailAsync(string email);
+    Task<Result<UserProfileResponse>> GetProfileByIdAsync(Guid id);
+    Task<Result<UserResponse>> CreateAsync(UserRequest request);
+    Task<Result<UserResponse>> UpdateAsync(UserRequest request);
+    Task<Result<UserResponse>> UpdateProfileAsync(UserProfileRequest request);
+    Task<Result> DeleteAsync(Guid id);
+    Task<Result> DeleteListAsync(List<Guid> ids);
+    Task<Result> LockUserAsync(Guid id);
 }

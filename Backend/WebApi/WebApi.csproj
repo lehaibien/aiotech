@@ -44,14 +44,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Data\brands.json" />
-      <None Include="Data\categories.json" />
-      <None Include="Data\products.json" />
-      <None Include="Data\reviews.json" />
-      <None Include="Data\users.json" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\images\brands\asus\asus-logo.jpg" />
       <_ContentIncludedByDefault Remove="wwwroot\images\products\test\firstimage.png" />
       <_ContentIncludedByDefault Remove="wwwroot\images\products\test\secondimage.png" />

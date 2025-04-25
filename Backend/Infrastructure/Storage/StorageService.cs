@@ -8,6 +8,7 @@ namespace Infrastructure.Storage;
 public class StorageService : IStorageService
 {
     private readonly IMinioClient _minioClient;
+    private const string DEFAULT_PATH = "http://localhost:9000";
 
     public StorageService(IMinioClient minioClient)
     {
@@ -18,27 +19,37 @@ public class StorageService : IStorageService
         string bucket,
         string objectName,
         int expirationInMinutes = 10,
+        string? folder = null,
         CancellationToken cancellationToken = default
     )
     {
+        if (!string.IsNullOrWhiteSpace(folder))
+        {
+            objectName = $"{folder}/{objectName}";
+        }
+
         var obj = new PresignedGetObjectArgs()
             .WithBucket(bucket)
             .WithObject(objectName)
             .WithExpiry(expirationInMinutes);
 
-        var url = await _minioClient.PresignedGetObjectAsync(obj);
-
-        return url;
+        return await _minioClient.PresignedGetObjectAsync(obj);
     }
 
     public async Task<StorageObjectInfo?> GetObjectInfoAsync(
         string bucket,
         string objectName,
+        string? folder = null,
         CancellationToken cancellationToken = default
     )
     {
         try
         {
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                objectName = $"{folder}/{objectName}";
+            }
+
             var obj = new StatObjectArgs().WithBucket(bucket).WithObject(objectName);
 
             var info = await _minioClient.StatObjectAsync(obj, cancellationToken);
@@ -47,9 +58,7 @@ public class StorageService : IStorageService
                 objectName,
                 info.ContentType,
                 info.Size,
-                info.ETag,
-                info.LastModified,
-                await GetPresignedUrlAsync(bucket, objectName, cancellationToken: cancellationToken)
+                $"{DEFAULT_PATH}/{bucket}/{objectName}"
             );
         }
         catch (Exception)
@@ -58,9 +67,55 @@ public class StorageService : IStorageService
         }
     }
 
+    public async Task<StorageObjectInfo> UploadAsync(
+        IFormFile file,
+        string bucket,
+        string? folder = null,
+        string? prefix = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            var objectName = string.IsNullOrWhiteSpace(prefix)
+                ? file.FileName
+                : $"{prefix}/{file.FileName}";
+            
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                objectName = $"{folder}/{objectName}";
+            }
+
+            var contentType = GetFileContentType(file);
+
+            var stream = file.OpenReadStream();
+
+            var putObjectArgs = new PutObjectArgs()
+                .WithBucket(bucket)
+                .WithObject(objectName)
+                .WithStreamData(stream)
+                .WithObjectSize(file.Length)
+                .WithContentType(contentType);
+
+            await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
+
+            return new StorageObjectInfo(
+                objectName,
+                contentType,
+                file.Length,
+                $"{DEFAULT_PATH}/{bucket}/{objectName}"
+            );
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to upload file: {ex.Message}", ex);
+        }
+    }
+
     public async Task<IEnumerable<StorageObjectInfo>> UploadBulkAsync(
         IEnumerable<IFormFile> files,
         string bucket,
+        string? folder = null,
         string? prefix = null,
         CancellationToken cancellationToken = default
     )
@@ -71,16 +126,12 @@ public class StorageService : IStorageService
 
             foreach (var file in files)
             {
-                var objectName = $"{prefix}/{file.FileName}";
-
-                var task = UploadAsync(file, bucket, objectName, cancellationToken);
+                var task = UploadAsync(file, bucket, folder, cancellationToken: cancellationToken);
 
                 tasks.Add(task);
             }
 
-            var results = await Task.WhenAll(tasks);
-
-            return results;
+            return await Task.WhenAll(tasks);
         }
         catch (Exception)
         {
@@ -88,45 +139,49 @@ public class StorageService : IStorageService
         }
     }
 
-    public async Task<StorageObjectInfo> UploadAsync(
-        IFormFile file,
-        string bucket,
-        string? prefix = null,
+    public async Task DeleteFromUrlAsync(string url, CancellationToken cancellationToken = default)
+    {
+        var uri = new Uri(url);
+        var bucket = uri.Segments[1].Trim('/');
+        var objectName = uri.Segments.Skip(2).Aggregate((a, b) => a + b);
+
+        await DeleteAsync(bucket, objectName, null, cancellationToken);
+    }
+
+    public async Task DeleteBulkFromUrlAsync(
+        IEnumerable<string> urls,
         CancellationToken cancellationToken = default
     )
     {
-        try
+        var tasks = new List<Task>();
+
+        foreach (var url in urls)
         {
-            var objectName = string.IsNullOrEmpty(prefix)
-                ? file.FileName
-                : $"{prefix}/{file.FileName}";
+            var uri = new Uri(url);
+            var bucket = uri.Segments[1].Trim('/');
+            var objectName = uri.Segments.Skip(2).Aggregate((a, b) => a + b);
 
-            var putObjectArgs = new PutObjectArgs()
-                .WithBucket(bucket)
-                .WithObject(objectName)
-                .WithStreamData(file.OpenReadStream())
-                .WithObjectSize(file.Length)
-                .WithContentType(file.ContentType);
+            var task = DeleteAsync(bucket, objectName, null, cancellationToken);
 
-            await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
-
-            return await GetObjectInfoAsync(bucket, objectName, cancellationToken)
-                ?? throw new Exception("Failed to get uploaded object info");
+            tasks.Add(task);
         }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to upload file: {ex.Message}", ex);
-        }
+        await Task.WhenAll(tasks);
     }
 
     public async Task<bool> ExistsAsync(
         string bucket,
         string objectName,
+        string? folder = null,
         CancellationToken cancellationToken = default
     )
     {
         try
         {
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                objectName = $"{folder}/{objectName}";
+            }
+
             var statObjectArgs = new StatObjectArgs().WithBucket(bucket).WithObject(objectName);
 
             await _minioClient.StatObjectAsync(statObjectArgs, cancellationToken);
@@ -141,11 +196,17 @@ public class StorageService : IStorageService
     public async Task DeleteAsync(
         string bucket,
         string objectName,
+        string? folder = null,
         CancellationToken cancellationToken = default
     )
     {
         try
         {
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                objectName = $"{folder}/{objectName}";
+            }
+
             var removeObjectArgs = new RemoveObjectArgs().WithBucket(bucket).WithObject(objectName);
 
             await _minioClient.RemoveObjectAsync(removeObjectArgs, cancellationToken);
@@ -159,11 +220,17 @@ public class StorageService : IStorageService
     public async Task DeleteBulkAsync(
         string bucket,
         IEnumerable<string> objectNames,
+        string? folder = null,
         CancellationToken cancellationToken = default
     )
     {
         try
         {
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                objectNames = objectNames.Select(x => $"{folder}/{x}");
+            }
+
             var removeObjectsArgs = new RemoveObjectsArgs()
                 .WithBucket(bucket)
                 .WithObjects(objectNames.ToList());
@@ -185,5 +252,17 @@ public class StorageService : IStorageService
         {
             throw new Exception($"Failed to delete objects: {ex.Message}", ex);
         }
+    }
+
+    private static string GetFileContentType(IFormFile file)
+    {
+        var fileExtension = Path.GetExtension(file.FileName);
+        return fileExtension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            _ => "application/octet-stream",
+        };
     }
 }

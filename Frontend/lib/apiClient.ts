@@ -30,7 +30,6 @@ async function fetchApi(
       },
       body: data instanceof FormData ? data : JSON.stringify(data),
     });
-
     return await handleResponse(response);
   } catch (error) {
     return handleError(error);

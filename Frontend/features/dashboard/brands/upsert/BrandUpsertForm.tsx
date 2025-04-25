@@ -25,6 +25,7 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [isImageChanged, setIsImageChanged] = useState(false);
 
   const { control, handleSubmit } = useForm<BrandRequest>({
     defaultValues: defaultValue,
@@ -35,33 +36,22 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
     const request: BrandRequest = {
       ...data,
       image: image,
+      isImageEdited: isImageChanged,
     };
     const formData = convertObjectToFormData(request);
     try {
-      if (data.id === EMPTY_UUID) {
-        const response = await postApi(API_URL.brand, formData);
-        if (response.success) {
-          enqueueSnackbar("Thêm mới thương hiệu thành công", {
-            variant: "success",
-          });
-          router.push("/dashboard/brands");
-        } else {
-          enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-            variant: "error",
-          });
-        }
+      const action = data.id === EMPTY_UUID ? postApi : putApi;
+      const method = data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật";
+      const response = await action(API_URL.brand, formData);
+      if (response.success) {
+        enqueueSnackbar(method + " thương hiệu thành công", {
+          variant: "success",
+        });
+        router.push("/dashboard/brands");
       } else {
-        const response = await putApi(API_URL.brand, formData);
-        if (response.success) {
-          enqueueSnackbar("Cập nhật thương hiệu thành công", {
-            variant: "success",
-          });
-          router.push("/dashboard/brands");
-        } else {
-          enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-            variant: "error",
-          });
-        }
+        enqueueSnackbar(method + " thương hiệu thất bại", {
+          variant: "error",
+        });
       }
     } catch (err) {
       enqueueSnackbar("Lỗi xảy ra: " + (err as Error).message, {
@@ -74,11 +64,7 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
     const getImage = async (url: string) => {
       if (!url) return undefined;
       try {
-        const imageUrl = url.includes("host.docker.internal")
-          ? url.replace("host.docker.internal", "localhost")
-          : url;
-
-        const response = await fetch(imageUrl, {
+        const response = await fetch(url, {
           mode: "cors",
         });
 
@@ -129,7 +115,13 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
         <Typography variant="h6" className="mb-4">
           Ảnh thương hiệu
         </Typography>
-        <ImageUpload image={image} onUpload={setImage} />
+        <ImageUpload
+          image={image}
+          onUpload={(img) => {
+            setIsImageChanged(true);
+            setImage(img);
+          }}
+        />
       </FormControl>
       <FormControl
         margin="normal"
@@ -144,7 +136,7 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
         <Button
           type="button"
           LinkComponent={Link}
-          href="/dashboard/categories"
+          href="/dashboard/brands"
           variant="contained"
           disabled={isLoading}
         >

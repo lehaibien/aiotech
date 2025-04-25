@@ -1,40 +1,43 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
+using Application.Abstractions;
 using Application.Categories.Dtos;
+using Application.Helpers;
 using Application.Images;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using Shared;
 
 namespace Application.Categories;
 
 public class CategoryService : ICategoryService
 {
-    private const string FolderUpload = "categories";
+    private const string FolderUpload = "images/categories";
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
-    private readonly IDistributedCache _cache;
+    private readonly IStorageService _storageService;
+    private readonly ICacheService _cacheService;
+    private readonly ILogger<CategoryService> _logger;
 
     public CategoryService(
         IUnitOfWork unitOfWork,
-        IMapper mapper,
         IHttpContextAccessor contextAccessor,
         IImageService imageService,
-        IDistributedCache cache
+        IStorageService storageService,
+        ICacheService cacheService,
+        ILogger<CategoryService> logger
     )
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _contextAccessor = contextAccessor;
         _imageService = imageService;
-        _cache = cache;
+        _storageService = storageService;
+        _cacheService = cacheService;
+        _logger = logger;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -71,16 +74,7 @@ public class CategoryService : ICategoryService
         var result = await categoryQuery
             .Skip(request.PageIndex * request.PageSize)
             .Take(request.PageSize)
-            .Select(x => new CategoryResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                ImageUrl = x.ImageUrl,
-                CreatedDate = x.CreatedDate,
-                CreatedBy = x.CreatedBy,
-                UpdatedDate = x.UpdatedDate,
-                UpdatedBy = x.UpdatedBy,
-            })
+            .ProjectToCategoryResponse()
             .ToListAsync(cancellationToken);
         var response = new PaginatedList
         {
@@ -94,148 +88,142 @@ public class CategoryService : ICategoryService
 
     public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync()
     {
-        var categoryInCache = await _cache.GetStringAsync(CacheKeys.FeaturedCategories);
-        if (categoryInCache is not null)
+        var cacheResult = await _cacheService.GetAsync<List<CategoryResponse>>(
+            CacheKeys.FeaturedCategories
+        );
+        if (cacheResult is not null)
         {
-            var res = JsonConvert.DeserializeObject<List<CategoryResponse>>(categoryInCache);
-            return Result<List<CategoryResponse>>.Success(res);
+            return Result<List<CategoryResponse>>.Success(cacheResult);
         }
         var result = await _unitOfWork
             .GetRepository<Category>()
-            .GetAll(x => x.IsDeleted == false)
-            .Select(x => new CategoryResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                ImageUrl = x.ImageUrl,
-                CreatedDate = x.CreatedDate,
-                CreatedBy = x.CreatedBy,
-                UpdatedDate = x.UpdatedDate,
-                UpdatedBy = x.UpdatedBy,
-            })
+            .GetAll()
+            .ProjectToCategoryResponse()
             .OrderByDescending(x => x.CreatedDate)
             .ToListAsync();
-        var json = JsonConvert.SerializeObject(result);
-        await _cache.SetStringAsync(CacheKeys.FeaturedCategories, json);
+        await _cacheService.SetAsync(CacheKeys.FeaturedCategories, result);
         return Result<List<CategoryResponse>>.Success(result);
     }
 
-    public async Task<Result<CategoryResponse>> GetById(Guid id)
+    public async Task<Result<CategoryResponse>> GetByIdAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
         if (entity is null)
         {
-            return Result<CategoryResponse>.Failure("Thể loại không tồn tại");
+            return Result<CategoryResponse>.Failure("Danh mục không tồn tại");
         }
 
-        var response = _mapper.Map<CategoryResponse>(entity);
+        var response = entity.MapToCategoryResponse();
         return Result<CategoryResponse>.Success(response);
     }
 
-    public async Task<Result<CategoryResponse>> Create(CreateCategoryRequest request)
+    public async Task<Result<CategoryResponse>> CreateAsync(CategoryRequest request)
     {
         var isExists = await _unitOfWork
             .GetRepository<Category>()
             .FindAsync(x => x.Name == request.Name);
         if (isExists != null)
         {
-            return Result<CategoryResponse>.Failure("Thể loại đã tồn tại");
+            return Result<CategoryResponse>.Failure("Danh mục đã tồn tại");
         }
 
-        var entity = _mapper.Map<Category>(request);
+        var entity = request.MapToCategory();
         entity.Id = Guid.NewGuid();
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        var uploadResult = await _imageService.UploadAsync(
-            request.Image,
-            ImageType.Branding,
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
+        var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Branding);
+        if (optimizedImage.IsFailure)
+        {
+            return Result<CategoryResponse>.Failure(optimizedImage.Message);
+        }
+        var uploadResult = await _storageService.UploadAsync(
+            optimizedImage.Value,
+            CommonConst.PublicBucket,
             Path.Combine(FolderUpload, entity.Id.ToString())
         );
-        if (uploadResult.IsFailure)
-        {
-            return Result<CategoryResponse>.Failure(uploadResult.Message);
-        }
 
-        entity.ImageUrl = uploadResult.Value;
+        entity.ImageUrl = uploadResult.Url;
         _unitOfWork.GetRepository<Category>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<CategoryResponse>(entity);
+        var response = entity.MapToCategoryResponse();
         return Result<CategoryResponse>.Success(response);
     }
 
-    public async Task<Result<CategoryResponse>> Update(UpdateCategoryRequest request)
+    public async Task<Result<CategoryResponse>> UpdateAsync(CategoryRequest request)
     {
+        if (request.Id == Guid.Empty)
+        {
+            return Result<CategoryResponse>.Failure("Danh mục không tồn tại");
+        }
         var isExists = await _unitOfWork
             .GetRepository<Category>()
             .AnyAsync(x => x.Name == request.Name && x.Id != request.Id);
         if (isExists)
         {
-            return Result<CategoryResponse>.Failure("Thể loại đã tồn tại");
+            return Result<CategoryResponse>.Failure("Danh mục đã tồn tại");
         }
 
         var entity = await _unitOfWork.GetRepository<Category>().FindAsync(x => x.Id == request.Id);
         if (entity is null)
         {
-            return Result<CategoryResponse>.Failure("Thể loại không tồn tại");
+            return Result<CategoryResponse>.Failure("Danh mục không tồn tại");
         }
 
-        _mapper.Map(request, entity);
+        entity = request.ApplyToCategory(entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
-        if (entity.ImageUrl is not null)
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
+        if(request.IsImageEdited)
         {
-            var deleteResult = _imageService.DeleteByUrl(entity.ImageUrl);
-            if (deleteResult.IsFailure)
+            if(!string.IsNullOrWhiteSpace(entity.ImageUrl))
             {
-                return Result<CategoryResponse>.Failure(deleteResult.Message);
+                await _storageService.DeleteFromUrlAsync(entity.ImageUrl);
             }
+            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Branding);
+            if (optimizedImage.IsFailure)
+            {
+                return Result<CategoryResponse>.Failure(optimizedImage.Message);
+            }
+            var uploadResult = await _storageService.UploadAsync(
+                optimizedImage.Value,
+                CommonConst.PublicBucket,
+                Path.Combine(FolderUpload, entity.Id.ToString())
+            );
+            entity.ImageUrl = uploadResult.Url;
         }
-
-        var uploadResult = await _imageService.UploadAsync(
-            request.Image,
-            ImageType.Branding,
-            Path.Combine(FolderUpload, entity.Id.ToString())
-        );
-        if (uploadResult.IsFailure)
-        {
-            return Result<CategoryResponse>.Failure(uploadResult.Message);
-        }
-
-        entity.ImageUrl = uploadResult.Value;
         _unitOfWork.GetRepository<Category>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<CategoryResponse>(entity);
+        var response = entity.MapToCategoryResponse();
         return Result<CategoryResponse>.Success(response);
     }
 
-    public async Task<Result<string>> Delete(Guid id)
+    public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
         if (entity is null)
         {
-            return Result<string>.Failure("Thể loại không tồn tại");
+            return Result<string>.Failure("Danh mục không tồn tại");
         }
 
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Category>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<string>> DeleteList(List<Guid> ids)
+    public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
         foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
             if (entity is null)
             {
-                return Result<string>.Failure("Thể loại không tồn tại");
+                return Result<string>.Failure("Danh mục không tồn tại");
             }
 
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Category>().Update(entity);
         }
@@ -244,7 +232,7 @@ public class CategoryService : ICategoryService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<List<ComboBoxItem>>> GetComboBox()
+    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync()
     {
         var result = await _unitOfWork
             .GetRepository<Category>()

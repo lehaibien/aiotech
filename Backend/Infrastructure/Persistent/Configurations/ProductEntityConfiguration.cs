@@ -35,6 +35,14 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.CategoryId).IsRequired();
         builder.Property(x => x.ThumbnailUrl).IsRequired();
         builder
+            .Property(x => x.Tags)
+            .IsUnicode(true)
+            .HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+            )
+            .Metadata.SetValueComparer(_urlComparer);
+        builder
             .Property(x => x.ImageUrls)
             .HasConversion(
                 v => string.Join(',', v),

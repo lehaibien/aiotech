@@ -1,13 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
+using Application.Abstractions;
 using Application.Authentication.Dtos;
 using Application.Helpers;
 using Application.Images;
 using Application.Jwt;
 using Application.Mail;
-using Application.Users;
-using Application.Users.Dtos;
 using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -20,12 +17,14 @@ namespace Application.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {
+    private const string FolderUpload = "images/users";
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IJwtService _jwtService;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
     private readonly IImageService _imageService;
+    private readonly IStorageService _storageService;
 
     public AuthenticationService(
         IJwtService jwtService,
@@ -33,7 +32,8 @@ public class AuthenticationService : IAuthenticationService
         IHttpContextAccessor contextAccessor,
         IMapper mapper,
         IEmailService emailService,
-        IImageService imageService
+        IImageService imageService,
+        IStorageService storageService
     )
     {
         _jwtService = jwtService;
@@ -42,6 +42,7 @@ public class AuthenticationService : IAuthenticationService
         _mapper = mapper;
         _emailService = emailService;
         _imageService = imageService;
+        _storageService = storageService;
     }
 
     public async Task<Result<TokenResult>> Login(AuthLoginRequest request)
@@ -51,15 +52,15 @@ public class AuthenticationService : IAuthenticationService
             .GetAll()
             .Include(r => r.Role)
             .FirstOrDefaultAsync(u => u.UserName == request.UserName);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<TokenResult>.Failure("Tài khoản hoặc mật khẩu không chính xác");
         }
-        if(entity.IsLocked)
+        if (entity.IsLocked)
         {
             return Result<TokenResult>.Failure("Tài khoản đã bị khóa");
         }
-        if(
+        if (
             !EncryptionHelper.VerifyHashedPassword(
                 entity.Password,
                 Convert.FromBase64String(entity.Salt),
@@ -83,7 +84,7 @@ public class AuthenticationService : IAuthenticationService
         var givenName = request.GivenName;
         var imageUrl = request.ImageUrl;
         var user = await _unitOfWork.GetRepository<User>().FindAsync(u => u.Email == email);
-        if(user is null)
+        if (user is null)
         {
             var role = await _unitOfWork
                 .GetRepository<Role>()
@@ -101,12 +102,6 @@ public class AuthenticationService : IAuthenticationService
                 Headers = new HeaderDictionary(),
                 ContentType = contentType,
             };
-            string? newImageUrl = null;
-            var uploadImageResult = await _imageService.UploadAsync(file, ImageType.Logo, "user");
-            if(uploadImageResult.IsSuccess)
-            {
-                newImageUrl = uploadImageResult.Value;
-            }
             user = new User
             {
                 Id = Guid.NewGuid(),
@@ -116,18 +111,22 @@ public class AuthenticationService : IAuthenticationService
                 GivenName = givenName,
                 Password = password,
                 Salt = Convert.ToBase64String(salt),
-                AvatarUrl = newImageUrl,
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = "system",
                 IsDeleted = false,
                 RoleId = role.Id,
             };
+            var uploadResult = await _storageService.UploadAsync(
+                file,
+                Path.Combine(FolderUpload, user.Id.ToString())
+            );
+            user.AvatarUrl = uploadResult.Url;
             _unitOfWork.GetRepository<User>().Add(user);
             await _unitOfWork.SaveChangesAsync();
         }
 
         var nRole = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Id == user.RoleId);
-        if(nRole != null)
+        if (nRole != null)
         {
             user.Role = nRole;
         }
@@ -142,15 +141,17 @@ public class AuthenticationService : IAuthenticationService
         var isExist = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(u => u.UserName == request.UserName);
-        if(isExist)
+        if (isExist)
             return Result.Failure("Tài khoản đã tồn tại");
         var isEmailExist = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(u => u.Email == request.Email);
-        if(isEmailExist)
+        if (isEmailExist)
             return Result.Failure("Địa chỉ email đã được sử dụng");
         var user = _mapper.Map<User>(request);
-        var role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Name == CommonConst.DefaultRole)!;
+        var role = await _unitOfWork
+            .GetRepository<Role>()
+            .FindAsync(r => r.Name == CommonConst.DefaultRole)!;
         user.RoleId = role.Id;
         user.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
         user.Salt = Convert.ToBase64String(salt);
@@ -178,7 +179,7 @@ public class AuthenticationService : IAuthenticationService
             .GetAll()
             .Include(x => x.Role)
             .FirstOrDefaultAsync(x => x.Id == userId);
-        if(user is null)
+        if (user is null)
         {
             return Result<TokenResult>.Failure("Người dùng không tồn tại");
         }
@@ -193,7 +194,7 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<Result> ChangePassword(ChangePasswordRequest request)
     {
-        if(
+        if (
             string.Equals(
                 request.OldPassword,
                 request.NewPassword,
@@ -204,11 +205,11 @@ public class AuthenticationService : IAuthenticationService
             return Result.Failure("Mật khẩu cũ và mật khẩu mới không giống nhau");
         }
         var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result.Failure("Tài khoản không tồn tại");
         }
-        if(
+        if (
             !EncryptionHelper.VerifyHashedPassword(
                 entity.Password,
                 Convert.FromBase64String(entity.Salt),
@@ -231,7 +232,7 @@ public class AuthenticationService : IAuthenticationService
     {
         // generate url for change email
         var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result.Failure("Tài khoản không tồn tại");
         }
@@ -258,16 +259,16 @@ public class AuthenticationService : IAuthenticationService
             .GetRepository<EmailChange>()
             .GetAll()
             .FirstOrDefaultAsync(x => x.Token == request.Token);
-        if(entity is null)
+        if (entity is null)
         {
             return Result.Failure("Đường dẫn không hợp lệ");
         }
-        if(entity.ExpiryDate < DateTime.UtcNow)
+        if (entity.ExpiryDate < DateTime.UtcNow)
         {
             return Result.Failure("Đường dẫn đã hết hạn");
         }
         var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(entity.UserId);
-        if(user is null)
+        if (user is null)
         {
             return Result.Failure("Tài khoản không tồn tại");
         }
@@ -280,7 +281,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<Result> ResetPassword(ResetPasswordRequest request)
     {
         var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Email == request.Email);
-        if(user is null)
+        if (user is null)
         {
             return Result.Failure("Email không tồn tại");
         }

@@ -13,7 +13,7 @@ import { productRequestSchema } from "@/schemas/productSchema";
 import { ComboBoxItem } from "@/types";
 import { ProductRequest } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormLabel, Grid, Typography } from "@mui/material";
+import { FormLabel, Grid, Stack, Typography } from "@mui/material";
 import { MuiChipsInput } from "mui-chips-input";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
@@ -21,6 +21,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Control, FieldValues, useForm } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
 import { FormActions } from "./ProductFormActions";
+import { ThumbnailUpload } from "./ThumbnailUpload";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
@@ -47,12 +48,13 @@ export const ProductUpsertForm = ({
   const { control, handleSubmit } = useForm<ProductRequest>({
     defaultValues: {
       ...product,
-      discountPrice: product.discountPrice ?? undefined,
+      discountPrice: product.discountPrice ?? 0,
     },
     resolver: zodResolver(productRequestSchema),
   });
 
   const [chips, setChips] = useState<string[]>(product.tags ?? []);
+  const [thumbnail, setThumbnail] = useState<File | undefined>(undefined);
   const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,6 +70,7 @@ export const ProductUpsertForm = ({
         discountPrice: data.discountPrice || undefined,
         description: rteRef.current?.content ?? "",
         tags: chips,
+        thumbnail,
         images,
       };
 
@@ -102,12 +105,12 @@ export const ProductUpsertForm = ({
         const responses = await Promise.all(
           urls.map(async (url) => {
             const response = await fetch(url, {
-              mode: "cors", // Enable CORS
+              mode: "cors",
             });
             if (!response.ok) throw new Error("Failed to fetch image");
 
             const blob = await response.blob();
-            return new File([blob], url.substring(url.lastIndexOf("/") + 1));
+            return new File([blob], url.substring(url.lastIndexOf("/") + 1), { type: blob.type });
           })
         );
 
@@ -189,13 +192,6 @@ export const ProductUpsertForm = ({
                 type="number"
                 fullWidth
                 size="small"
-                InputProps={{
-                  inputProps: { min: 0, max: Number.MAX_SAFE_INTEGER },
-                }}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  return value === "" ? null : Number(value);
-                }}
               />
             </Grid>
             <Grid size={6}>
@@ -243,7 +239,7 @@ export const ProductUpsertForm = ({
               />
             </Grid>
 
-            <Grid size={12}>
+            <Grid size={6}>
               <FormLabel htmlFor="tags">Thẻ</FormLabel>
               <MuiChipsInput
                 fullWidth
@@ -256,7 +252,7 @@ export const ProductUpsertForm = ({
             </Grid>
 
             <Grid size={12}>
-              <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
+              <Typography variant="h5" gutterBottom>
                 Mô tả
               </Typography>
               <RichTextEditor
@@ -268,15 +264,23 @@ export const ProductUpsertForm = ({
         </Grid>
 
         <Grid size={{ sm: 12, lg: 3 }}>
-          <Typography variant="h5" gutterBottom>
-            Ảnh sản phẩm
-          </Typography>
-          <ImageUpload
-            images={images}
-            onUpload={setImages}
-            onDelete={handleDeleteImage}
-            onReorder={setImages}
-          />
+          <Stack spacing={2}>
+            <Typography variant="h5" gutterBottom>
+              Ảnh đại diện
+            </Typography>
+            <ThumbnailUpload image={thumbnail} onUpload={setThumbnail} />
+          </Stack>
+          <Stack spacing={2}>
+            <Typography variant="h5" gutterBottom>
+              Ảnh sản phẩm
+            </Typography>
+            <ImageUpload
+              images={images}
+              onUpload={setImages}
+              onDelete={handleDeleteImage}
+              onReorder={setImages}
+            />
+          </Stack>
         </Grid>
       </Grid>
 

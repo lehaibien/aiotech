@@ -3,7 +3,7 @@ import { API_URL } from "@/constant/apiUrl";
 import BlogList from "@/features/blog/BlogList";
 import { getListApi } from "@/lib/apiClient";
 import { PaginatedList, SearchParams } from "@/types";
-import { PostPreviewResponse } from "@/types/post";
+import { PostListItemResponse } from "@/types/post";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
@@ -24,7 +24,7 @@ async function fetchBlogPosts(
   page: number = 1,
   pageSize: number = 10,
   search: string = ""
-): Promise<PaginatedList<PostPreviewResponse>> {
+): Promise<PaginatedList<PostListItemResponse>> {
   const response = await getListApi(API_URL.postPreview, {
     pageIndex: page - 1,
     pageSize,
@@ -40,7 +40,7 @@ async function fetchBlogPosts(
     };
   }
 
-  return response.data as PaginatedList<PostPreviewResponse>;
+  return response.data as PaginatedList<PostListItemResponse>;
 }
 
 export default async function BlogsPage({

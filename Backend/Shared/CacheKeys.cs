@@ -3,9 +3,10 @@ namespace Shared;
 public static class CacheKeys
 {
     // Products
-    public static string TopProducts = "TopProducts";
-    public static string FeaturedProducts = "FeaturedProducts";
+    public const string TopProducts = "TopProducts";
+    public const string NewestProducts = "NewestProducts";
+    public const string FirstPageProducts = "FirstPageProducts";
 
     // Categories
-    public static string FeaturedCategories = "FeaturedCategories";
+    public const string FeaturedCategories = "FeaturedCategories";
 }

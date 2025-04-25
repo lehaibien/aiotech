@@ -84,6 +84,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         <ControlledTextField
           id="password"
           name="password"
+          type="password"
           required
           fullWidth
           placeholder="Nhập mật khẩu"

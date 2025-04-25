@@ -8,7 +8,7 @@ import { getApi, getApiQuery, getListApi } from "@/lib/apiClient";
 import {
   CategoryResponse,
   PaginatedList,
-  PostPreviewResponse,
+  PostListItemResponse,
   ProductListItemResponse,
 } from "@/types";
 import { BannerConfiguration } from "@/types/sys-config";
@@ -31,7 +31,7 @@ export default async function Home() {
   let topProducts: ProductListItemResponse[] = [];
   let newestProducts: ProductListItemResponse[] = [];
   let featuredCategories: CategoryResponse[] = [];
-  let posts: PostPreviewResponse[] = [];
+  let posts: PostListItemResponse[] = [];
   const bannerPromise = getApi(API_URL.bannerConfig);
   const featuredCategoriesPromise = getListApi(API_URL.category, {
     pageIndex: 0,
@@ -93,7 +93,7 @@ export default async function Home() {
   }
 
   if (postsResponse.success) {
-    posts = (postsResponse.data as PaginatedList<PostPreviewResponse>).items;
+    posts = (postsResponse.data as PaginatedList<PostListItemResponse>).items;
   } else {
     console.error("Failed to load posts: ", postsResponse.message);
   }

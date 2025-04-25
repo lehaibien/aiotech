@@ -3,6 +3,7 @@ using Application.Brands.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
+using WebApi.Extensions;
 using WebApi.Model;
 
 namespace WebApi.Controllers;
@@ -23,124 +24,61 @@ public class BrandController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.GetListAsync(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var response = new ApiResponse();
         var result = await _service.GetById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create([FromForm] CreateBrandRequest request)
+    public async Task<IActionResult> Create([FromForm] BrandRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.Create(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
         _logger.LogInformation("A brand with name {Name} has been created", request.Name);
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPut]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update([FromForm] UpdateBrandRequest request)
+    [Authorize(Policy = "Admin")]
+    public async Task<IActionResult> Update([FromForm] BrandRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.Update(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
         _logger.LogInformation(
             "A brand with id {Id} and name {Name} has been updated",
             request.Id,
             request.Name
         );
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var response = new ApiResponse();
         var result = await _service.Delete(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
         _logger.LogInformation("A brand with Id {Id} has been deleted.", id);
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpDelete]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
-        var response = new ApiResponse();
         var result = await _service.DeleteList(ids);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
         _logger.LogInformation("A list of brand has been deleted. Ids: {Id}", ids);
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("combo-box")]
     public async Task<IActionResult> GetComboBox()
     {
-        var response = new ApiResponse();
         var result = await _service.GetComboBox();
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 }

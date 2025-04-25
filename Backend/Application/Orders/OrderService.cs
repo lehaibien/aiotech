@@ -234,7 +234,7 @@ public class OrderService : IOrderService
         }
 
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         // if (!string.IsNullOrWhiteSpace(request.CouponCode))
         // {
         //     var discount = await _discountService.GetDiscountByCode(request.CouponCode);
@@ -285,7 +285,7 @@ public class OrderService : IOrderService
         }
 
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Add(entity);
         _unitOfWork.GetRepository<OrderItem>().AddRange(items);
         await _unitOfWork.SaveChangesAsync();
@@ -304,7 +304,7 @@ public class OrderService : IOrderService
             return Result<OrderResponse>.Failure("Đơn hàng không tồn tại");
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<OrderResponse>(entity);
@@ -317,7 +317,7 @@ public class OrderService : IOrderService
         if(entity is null)
             return Result<string>.Failure("Đơn hàng không tồn tại");
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -332,7 +332,7 @@ public class OrderService : IOrderService
             if(entity is null)
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Order>().Update(entity);
         }
@@ -377,7 +377,7 @@ public class OrderService : IOrderService
         }
         entity.Status = request.Status;
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -397,7 +397,7 @@ public class OrderService : IOrderService
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             entity.Status = status;
             entity.UpdatedDate = DateTime.UtcNow;
-            entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             _unitOfWork.GetRepository<Order>().Update(entity);
         }
 
@@ -548,7 +548,7 @@ public class OrderService : IOrderService
         order.Status = OrderStatus.Cancelled;
         order.CancelReason = request.Reason;
         order.UpdatedDate = DateTime.UtcNow;
-        order.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        order.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -570,7 +570,7 @@ public class OrderService : IOrderService
         }
         order.Status = OrderStatus.Completed;
         order.UpdatedDate = DateTime.UtcNow;
-        order.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        order.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(

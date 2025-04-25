@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Application.Helpers;
 
@@ -65,5 +66,23 @@ public static class Utilities
             allowedExtensions,
             ext => ext.Equals(extension, StringComparison.InvariantCultureIgnoreCase)
         );
+    }
+
+    public static string GetUsernameFromContext(HttpContext context)
+    {
+        var username = context
+            .User.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Name)
+            ?.Value;
+        return username ?? string.Empty;
+    }
+
+    public static IEnumerable<string> ExtractUrlPath(string url)
+    {
+        var path = url.Split("/").AsEnumerable();
+        path = path.Skip(3); // skip scheme and host
+        for (int i = 0; i < path.Count(); i++)
+        {
+            yield return path.ElementAt(i);
+        }
     }
 }

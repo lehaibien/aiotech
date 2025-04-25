@@ -9,7 +9,7 @@ import { DashboardDeleteButton } from "../DashboardDeleteButton";
 import { DashboardSearchBar } from "../DashboardSearchBar";
 
 type ProductToolbarProps = {
-  dataGridRef: React.RefObject<DataTableRef>;
+  dataGridRef: React.RefObject<DataTableRef | null>;
 };
 
 export function ProductToolbar({ dataGridRef }: ProductToolbarProps) {

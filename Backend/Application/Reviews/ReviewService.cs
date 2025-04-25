@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
+using Application.Helpers;
 using Application.Reviews.Dtos;
 using AutoMapper;
 using Domain.Entities;
@@ -145,7 +146,7 @@ public class ReviewService : IReviewService
         }
         var entity = _mapper.Map<Review>(request);
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<ReviewResponse>(entity);
@@ -161,7 +162,7 @@ public class ReviewService : IReviewService
         }
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<ReviewResponse>(entity);
@@ -176,7 +177,7 @@ public class ReviewService : IReviewService
             return Result.Failure("Đánh giá không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -193,7 +194,7 @@ public class ReviewService : IReviewService
                 return Result<string>.Failure("Đánh giá không tồn tại");
             }
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Review>().Update(entity);
         }

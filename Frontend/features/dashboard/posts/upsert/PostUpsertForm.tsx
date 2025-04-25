@@ -40,12 +40,13 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const rteRef = useRef<RichTextEditorRef>(null);
-  const { control, handleSubmit } = useForm<PostRequest>({
+  const { control, getValues, setValue, handleSubmit } = useForm<PostRequest>({
     defaultValues: post,
     resolver: zodResolver(postRequestSchema),
   });
   const [chips, setChips] = useState<string[]>(post.tags);
   const [image, setImage] = useState<File>();
+  const [isImageChanged, setIsImageChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChipChange = (newChips: string[]) => {
@@ -56,6 +57,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
   };
 
   const handleImageUpload = (newImage: File) => {
+    setIsImageChanged(true);
     setImage(newImage);
   };
   const onSubmit = async (data: PostRequest) => {
@@ -65,30 +67,38 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
       content: rteRef.current?.content ?? "",
       image: image,
       tags: chips,
+      isImageEdited: isImageChanged,
     };
     const formData = convertObjectToFormData(request);
-    if (post.id === EMPTY_UUID) {
-      const response = await postApi(API_URL.post, formData);
-      if (response.success) {
-        enqueueSnackbar("Thêm mới bài viết thành công", {
-          variant: "success",
-        });
-        router.push("/dashboard/posts");
-      } else {
-        enqueueSnackbar(response.message, { variant: "error" });
-      }
+    const action = post.id === EMPTY_UUID ? postApi : putApi;
+    const method = postApi === postApi ? "Thêm mới" : "Cập nhật";
+    const response = await action(API_URL.post, formData);
+    console.log(response);
+    if (response.success) {
+      enqueueSnackbar(method + " bài viết thành công", {
+        variant: "success",
+      });
+      router.push("/dashboard/posts");
     } else {
-      const response = await putApi(API_URL.post, formData);
-      if (response.success) {
-        enqueueSnackbar("Cập nhật bài viết thành công", {
-          variant: "success",
-        });
-        router.push("/dashboard/posts");
-      } else {
-        enqueueSnackbar(response.message, { variant: "error" });
-      }
+      enqueueSnackbar("Lỗi xảy ra: " + response.message, {
+        variant: "error",
+      });
     }
     setIsLoading(false);
+  };
+
+  const handleGenerateSlug = () => {
+    const title = getValues("title");
+    if (!title) return;
+    // Remove special characters and replace spaces with hyphens
+    const slug = title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-");
+
+    // Remove consecutive hyphens
+    const completeSlug = slug.replace(/-{2,}/g, "-");
+    setValue("slug", completeSlug);
   };
 
   useEffect(() => {
@@ -129,6 +139,27 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
           <ControlledTextField
             control={control}
             name="title"
+            required
+            fullWidth
+            size="small"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 12 }}>
+          <FormLabel required htmlFor="slug">
+            Slug
+          </FormLabel>
+          <Button
+            variant="text"
+            color="primary"
+            size="small"
+            sx={{ ml: 1 }}
+            onClick={handleGenerateSlug}
+          >
+            Tạo slug
+          </Button>
+          <ControlledTextField
+            control={control}
+            name="slug"
             required
             fullWidth
             size="small"

@@ -1,7 +1,7 @@
 'use client';
 
 import { NoItem } from '@/components/core/NoItem';
-import { PostPreviewResponse } from '@/types/post';
+import { PostListItemResponse } from '@/types/post';
 import ArticleIcon from '@mui/icons-material/Article';
 import { Box, Grid, Pagination } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -9,7 +9,7 @@ import React, { useCallback } from 'react';
 import BlogPostItem from '../home/BlogPostItem';
 
 type BlogListProps = {
-  posts: PostPreviewResponse[];
+  posts: PostListItemResponse[];
   currentPage: number;
   totalPages: number;
 };
@@ -53,9 +53,9 @@ export default function BlogList({
             size={{ xs: 12, sm: 6 }}
             key={post.id}>
             <BlogPostItem
-              id={post.id}
+              slug={post.slug}
               title={post.title}
-              imageUrl={post.imageUrl}
+              imageUrl={post.thumbnailUrl}
               createdDate={post.createdDate}
               imgHeight={315}
             />

@@ -1,11 +1,12 @@
-import { postRequestSchema } from '@/schemas/postSchema';
+import { postRequestSchema } from "@/schemas/postSchema";
 import { UUID } from "@/types";
-import { z } from 'zod';
+import { z } from "zod";
 
-export type PostPreviewResponse = {
+export type PostListItemResponse = {
   id: UUID;
   title: string;
-  imageUrl: string;
+  slug: string;
+  thumbnailUrl: string;
   createdDate: Date;
 };
 

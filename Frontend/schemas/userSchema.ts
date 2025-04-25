@@ -104,6 +104,7 @@ export const profileSchema = z.object({
     .optional(),
   address: z.string().optional(),
   image: z.instanceof(File).optional(),
+  isImageEdited: z.boolean().optional(),
 });
 
 export const emailSchema = z.object({

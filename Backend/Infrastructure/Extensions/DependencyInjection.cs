@@ -1,5 +1,4 @@
 using Application.Abstractions;
-using Application.Files;
 using Application.Images;
 using Application.Mail;
 using Domain.UnitOfWork;
@@ -63,7 +62,6 @@ public static class DependencyInjection
         services.AddInfraMinio();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IFileService, FileService>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IStorageService, StorageService>();
         services.AddScoped<ICacheService, CacheService>();
@@ -74,8 +72,8 @@ public static class DependencyInjection
     {
         var url =
             Environment.GetEnvironmentVariable("ConnectionStrings__Minio") ?? "localhost:9000";
-        var accessKey = Environment.GetEnvironmentVariable("MINIO_ROOT_USER");
-        var secretKey = Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD");
+        var accessKey = Environment.GetEnvironmentVariable("MINIO_ROOT_USER") ?? "aiotech";
+        var secretKey = Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD") ?? "123456789";
         services.AddMinio(
             (config) =>
                 config

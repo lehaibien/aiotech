@@ -73,6 +73,7 @@ export const RegisterForm = () => {
         <ControlledTextField
           id="password"
           name="password"
+          type="password"
           required
           fullWidth
           placeholder="*********"

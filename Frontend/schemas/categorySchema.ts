@@ -1,16 +1,16 @@
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '@/constant/common';
-import { z } from 'zod';
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/constant/common";
+import { z } from "zod";
 
-export const CategoryRequestSchema = z.object({
+export const categoryRequestSchema = z.object({
   id: z.string().uuid().optional(),
   name: z
-    .string({ message: 'Tên thể loại không được để trống' })
-    .max(100, { message: 'Tên thể loại không được vượt quá 100 ký tự' })
+    .string({ message: "Tên thể loại không được để trống" })
+    .max(100, { message: "Tên thể loại không được vượt quá 100 ký tự" })
     .trim(),
   image: z
     .any()
     .refine((value) => value instanceof File, {
-      message: 'Ảnh không hợp lệ',
+      message: "Ảnh không hợp lệ",
     })
     .refine((images) => images.size <= MAX_FILE_SIZE, {
       message: `Dung lượng ảnh không được vượt quá ${
@@ -19,8 +19,9 @@ export const CategoryRequestSchema = z.object({
     })
     .refine((images) => ACCEPTED_IMAGE_TYPES.includes(images.type), {
       message: `Định dạng ảnh không hợp lệ. Chỉ chấp nhận ${ACCEPTED_IMAGE_TYPES.join(
-        ', '
+        ", "
       )}`,
     })
     .optional(),
+  isImageEdited: z.boolean().optional(),
 });

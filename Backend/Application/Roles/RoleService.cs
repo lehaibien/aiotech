@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Application.Helpers;
 using Application.Roles.Dtos;
 using AutoMapper;
 using Domain.Entities;
@@ -74,7 +75,7 @@ public class RoleService : IRoleService
         }
         var entity = _mapper.Map<Role>(request);
         entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Role>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<RoleResponse>(entity);
@@ -97,7 +98,7 @@ public class RoleService : IRoleService
         }
         _mapper.Map(request, entity);
         entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Role>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = _mapper.Map<RoleResponse>(entity);
@@ -112,7 +113,7 @@ public class RoleService : IRoleService
             return Result<string>.Failure("Vai trò không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
-        entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+        entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Role>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -129,7 +130,7 @@ public class RoleService : IRoleService
                 return Result<string>.Failure("Vai trò không tồn tại");
             }
             entity.DeletedDate = DateTime.UtcNow;
-            entity.DeletedBy = _contextAccessor.HttpContext.User.Identity.Name ?? "system";
+            entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Role>().Update(entity);
         }
