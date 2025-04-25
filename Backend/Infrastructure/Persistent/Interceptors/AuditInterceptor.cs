@@ -8,6 +8,12 @@ namespace Infrastructure.Persistent.Interceptors;
 
 public class AuditInterceptor(IHttpContextAccessor contextAccessor) : SaveChangesInterceptor
 {
+    /// <summary>
+    /// Sets audit fields on added and modified <see cref="BaseEntity"/> instances before saving changes to the database.
+    /// </summary>
+    /// <param name="eventData">The event data containing the current <see cref="DbContext"/> and change tracker.</param>
+    /// <param name="result">The interception result to be returned.</param>
+    /// <returns>The interception result, potentially modified.</returns>
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
         InterceptionResult<int> result
@@ -43,6 +49,13 @@ public class AuditInterceptor(IHttpContextAccessor contextAccessor) : SaveChange
         return base.SavingChanges(eventData, result);
     }
 
+    /// <summary>
+    /// Asynchronously sets audit fields on added and modified <see cref="BaseEntity"/> instances before saving changes to the database.
+    /// </summary>
+    /// <param name="eventData">The event data associated with the save operation.</param>
+    /// <param name="result">The interception result for the save operation.</param>
+    /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="ValueTask{InterceptionResult}"/> representing the asynchronous operation, with updated audit fields applied to relevant entities.</returns>
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,

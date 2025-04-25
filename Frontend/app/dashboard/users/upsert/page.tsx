@@ -7,6 +7,14 @@ import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, SearchParams, UserResponse } from "@/types";
 import { Stack, Typography } from "@mui/material";
 
+/**
+ * Renders the user upsert page, handling both user creation and update based on the provided search parameters.
+ *
+ * Fetches role options and user data (if an ID is provided), then displays a form for adding or updating a user account.
+ *
+ * @param searchParams - URL search parameters containing the user ID for editing, if applicable.
+ * @returns The user upsert page layout with the form and relevant data.
+ */
 export default async function Page({
   searchParams,
 }: {

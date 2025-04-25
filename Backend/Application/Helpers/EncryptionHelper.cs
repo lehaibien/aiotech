@@ -1,10 +1,16 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace Application.Helpers;
 
 public class EncryptionHelper
 {
+    /// <summary>
+    /// Hashes a password using PBKDF2 with a randomly generated salt and returns the Base64-encoded hash.
+    /// </summary>
+    /// <param name="password">The plaintext password to hash.</param>
+    /// <param name="salt">Outputs the randomly generated salt used in hashing.</param>
+    /// <returns>A Base64-encoded string containing the format marker, salt, and derived subkey.</returns>
     public static string HashPassword(string password, out byte[] salt)
     {
         var rng = RandomNumberGenerator.Create();
@@ -25,6 +31,13 @@ public class EncryptionHelper
         return Convert.ToBase64String(outputBytes);
     }
 
+    /// <summary>
+    /// Verifies whether a provided password matches a previously hashed password using the given salt.
+    /// </summary>
+    /// <param name="hashedPassword">The Base64-encoded hashed password to verify against.</param>
+    /// <param name="salt">The salt used during the original password hashing. This array will be overwritten.</param>
+    /// <param name="password">The plaintext password to verify.</param>
+    /// <returns>True if the password is valid; otherwise, false.</returns>
     public static bool VerifyHashedPassword(string hashedPassword, byte[] salt, string password)
     {
         ArgumentNullException.ThrowIfNull(hashedPassword);
@@ -49,6 +62,11 @@ public class EncryptionHelper
         return CryptographicOperations.FixedTimeEquals(actualSubkey, expectedSubkey);
     }
 
+    /// <summary>
+    /// Generates a cryptographically secure, URL-safe random token string of the specified byte length.
+    /// </summary>
+    /// <param name="length">The number of random bytes to generate for the token. Defaults to 32.</param>
+    /// <returns>A Base64-encoded, URL-safe token string.</returns>
     public static string GenerateSecureToken(int length = 32)
     {
         // Define the length of the token in bytes (e.g., 32 bytes = 256 bits)

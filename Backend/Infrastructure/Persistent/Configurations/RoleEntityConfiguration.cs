@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,6 +6,10 @@ namespace Infrastructure.Persistent.Configurations;
 
 public class RoleEntityConfiguration : IEntityTypeConfiguration<Role>
 {
+    /// <summary>
+    /// Configures the Role entity's schema, relationships, query filters, and seeds initial data for Entity Framework Core.
+    /// </summary>
+    /// <param name="builder">The builder used to configure the Role entity type.</param>
     public void Configure(EntityTypeBuilder<Role> builder)
     {
         builder.HasKey(x => x.Id);

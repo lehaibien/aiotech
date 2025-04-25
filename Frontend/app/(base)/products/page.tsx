@@ -46,6 +46,14 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Renders the main shop page with product listings, filters, and sorting options.
+ *
+ * Fetches and displays a paginated list of products based on query parameters for category, brand, price range, and sort order. Also loads available categories and brands for filtering. Includes breadcrumb navigation and a loading state for asynchronous data.
+ *
+ * @param searchParams - Optional promise resolving to query parameters for filtering and sorting products.
+ * @returns The shop page React component with product list, filters, and sorting controls.
+ */
 export default async function ShopPage({
   searchParams,
 }: {

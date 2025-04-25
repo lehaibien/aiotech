@@ -18,6 +18,11 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Authenticates a user with provided credentials and returns login response data on success.
+    /// </summary>
+    /// <param name="request">The login credentials and related information.</param>
+    /// <returns>An HTTP 200 response with login data if authentication succeeds; otherwise, HTTP 400 with an error message.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login(AuthLoginRequest request)
     {
@@ -40,6 +45,11 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Authenticates a user using OAuth credentials and returns the authentication result.
+    /// </summary>
+    /// <param name="request">The OAuth login request containing provider and user information.</param>
+    /// <returns>An HTTP 200 response with authentication data on success, or HTTP 400 with an error message on failure.</returns>
     [HttpPost("social-login")]
     public async Task<IActionResult> SocialLogin(OAuthLoginRequest request)
     {
@@ -130,7 +140,11 @@ public class AuthController : ControllerBase
     //         }
     //         response.Data = result.Data;
     //         return Ok(response);
-    //     }
+    /// <summary>
+    /// Handles user registration by creating a new account with the provided registration details.
+    /// </summary>
+    /// <param name="request">The registration information for the new user.</param>
+    /// <returns>An HTTP 200 response on success, or 400 with an error message if registration fails.</returns>
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(AuthRegisterRequest request)
@@ -166,6 +180,11 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Handles refresh token requests and returns a new authentication token if the provided refresh token is valid.
+    /// </summary>
+    /// <param name="request">The refresh token request containing the necessary token information.</param>
+    /// <returns>An HTTP 200 response with the refreshed token data on success, or HTTP 400 with an error message on failure.</returns>
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {

@@ -1,6 +1,11 @@
 import { WishlistGrid } from '@/features/wishlist/WishlistGrid';
 import { Divider, Stack, Typography } from '@mui/material';
 
+/**
+ * Renders the wishlist page with a heading, description, and a grid of favorite items.
+ *
+ * Displays a styled layout containing the wishlist title, explanatory text, a divider, and the user's wishlist items.
+ */
 export default function Page() {
   return (
     <Stack spacing={1}>

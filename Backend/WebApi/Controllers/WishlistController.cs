@@ -10,11 +10,19 @@ namespace WebApi.Controllers;
 public class WishlistController : ControllerBase
 {
     private readonly IWishlistService _wishlistService;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WishlistController"/> with the specified wishlist service.
+    /// </summary>
     public WishlistController(IWishlistService wishlistService)
     {
         _wishlistService = wishlistService;
     }
 
+    /// <summary>
+    /// Retrieves the wishlist items for the specified user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user whose wishlist is to be retrieved.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the wishlist items on success, or an error message on failure.</returns>
     [HttpGet("{userId:guid}")]
     public async Task<IActionResult> GetWishlistItems(Guid userId)
     {
@@ -31,6 +39,11 @@ public class WishlistController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Adds an item to the user's wishlist.
+    /// </summary>
+    /// <param name="request">The wishlist item details to add.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the result of the add operation.</returns>
     [HttpPost]
     public async Task<IActionResult> AddToWishlist([FromBody] WishlistItemRequest request)
     {
@@ -47,6 +60,11 @@ public class WishlistController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Removes a specified item from the user's wishlist.
+    /// </summary>
+    /// <param name="request">The wishlist item to remove.</param>
+    /// <returns>An IActionResult indicating success or failure of the removal operation.</returns>
     [HttpDelete]
     public async Task<IActionResult> RemoveFromWishlist([FromBody] WishlistItemRequest request)
     {
@@ -62,6 +80,11 @@ public class WishlistController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Removes all items from the wishlist for the specified user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user whose wishlist will be cleared.</param>
+    /// <returns>An HTTP response indicating the success or failure of the operation.</returns>
     [HttpDelete("{userId:guid}/clear")]
     public async Task<IActionResult> ClearWishlist(Guid userId)
     {

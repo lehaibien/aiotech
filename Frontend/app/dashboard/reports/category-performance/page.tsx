@@ -11,6 +11,13 @@ import { Dayjs } from "dayjs";
 import { CategoryPerformanceChart } from "./CategoryPerformanceChart";
 import { CategoryPerformanceGrid } from "./CategoryPerformanceGrid";
 
+/**
+ * Retrieves category performance data for a specified date range.
+ *
+ * @param startDate - The start date of the reporting period.
+ * @param endDate - The end date of the reporting period.
+ * @returns An array of category performance report responses, or an empty array if the fetch fails.
+ */
 async function fetchCategoryPerformanceData(startDate: Dayjs, endDate: Dayjs) {
   const request: CategoryPerformanceReportRequest = {
     startDate: startDate.toISOString(),
@@ -28,6 +35,11 @@ async function fetchCategoryPerformanceData(startDate: Dayjs, endDate: Dayjs) {
   }
 }
 
+/**
+ * Displays the category performance report page with charts and detailed data for a specified date range.
+ *
+ * Extracts the start and end dates from {@link searchParams}, defaults to the current year if not provided, fetches category performance data, and renders the top 10 categories by revenue along with a detailed grid.
+ */
 export default async function CategoryPerformancePage({
   searchParams,
 }: {

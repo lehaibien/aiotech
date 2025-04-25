@@ -21,6 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Renders the home page of the AioTech e-commerce site with dynamic content.
+ *
+ * Fetches banner configuration, featured categories, top products, newest products, and latest blog posts from APIs, and displays them using corresponding UI components.
+ *
+ * @returns The JSX layout for the home page populated with fetched data.
+ *
+ * @remark If any API request fails, the affected section will display with default or empty data, and an error will be logged to the console.
+ */
 export default async function Home() {
   let bannerConfig: BannerConfiguration = {
     title: "AioTech",

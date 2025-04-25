@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Handles GET requests for the order callback, validating query parameters and redirecting to the appropriate frontend checkout page.
+ *
+ * Redirects to the checkout page with an error flag if no query parameters are present or if an error occurs during processing. On successful order callback, redirects to the checkout confirmation page.
+ */
 export async function GET(request: NextRequest) {
   let url = process.env.NEXT_PUBLIC_FRONTEND_URL;
   if(!url?.endsWith('/')) {

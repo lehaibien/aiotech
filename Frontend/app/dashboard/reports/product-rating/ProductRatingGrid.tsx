@@ -47,6 +47,13 @@ type ProductRatingGridProps = {
   data: ProductRatingReportResponse[];
 };
 
+/**
+ * Displays a data grid of product rating information with sortable columns and custom styling.
+ *
+ * Renders product names, average ratings (with star icons), review counts, and sentiment percentages in a paginated, sortable grid.
+ *
+ * @param data - Array of product rating report objects to display in the grid.
+ */
 export function ProductRatingGrid({ data }: ProductRatingGridProps) {
   return (
     <DataGrid

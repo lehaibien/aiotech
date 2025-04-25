@@ -5,6 +5,15 @@ import { Stack, Typography } from "@mui/material";
 import { BannerConfigForm } from "./BannerConfigForm";
 import { EmailConfigForm } from "./EmailConfigForm";
 
+/**
+ * Displays the system configuration page with forms for editing banner and email settings.
+ *
+ * Fetches banner and email configuration data from the API and renders corresponding forms with the retrieved or default values.
+ *
+ * @returns A React element containing the configuration forms.
+ *
+ * @remark If configuration data cannot be fetched, the forms are rendered with default empty values.
+ */
 export default async function ConfigurationPage() {
   let banner: BannerConfiguration = {
     title: "",

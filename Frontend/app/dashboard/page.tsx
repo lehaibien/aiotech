@@ -28,6 +28,11 @@ type KPI = {
   };
 };
 
+/**
+ * Renders the dashboard overview page with KPIs, sales charts, top products, recent orders, and stock alerts.
+ *
+ * Fetches all dashboard data concurrently and displays it in a responsive layout using Material-UI components.
+ */
 export default async function Page() {
   let kpi: KPI[] = [];
   let saleData: DashboardSale[] = [];

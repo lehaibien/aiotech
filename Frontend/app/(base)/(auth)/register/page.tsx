@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "Đăng ký",
 };
 
+/**
+ * Renders the registration page with a heading and registration form.
+ *
+ * Displays a centered layout containing a "Đăng ký" heading and the {@link RegisterForm} component.
+ */
 export default function Page() {
   return (
     <Stack width={{ xs: "100%", md: "400px" }} margin="auto" gap={2}>

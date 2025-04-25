@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Helpers;
@@ -20,6 +20,9 @@ public class UserService : IUserService
     private readonly IImageService _imageService;
     private readonly IStorageService _storageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserService"/> class with required dependencies for user management, HTTP context access, image processing, and storage operations.
+    /// </summary>
     public UserService(
         IUnitOfWork unitOfWork,
         IHttpContextAccessor contextAccessor,
@@ -33,6 +36,12 @@ public class UserService : IUserService
         _storageService = storageService;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of users filtered by search text and sorted by the specified column and order.
+    /// </summary>
+    /// <param name="request">Pagination, filtering, and sorting criteria for the user list.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of user responses matching the criteria.</returns>
     public async Task<Result<PaginatedList>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
@@ -72,6 +81,11 @@ public class UserService : IUserService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <returns>A result containing the user information if found; otherwise, a failure result.</returns>
     public async Task<Result<UserResponse>> GetByIdAsync(Guid id)
     {
         var entity = await _unitOfWork
@@ -86,6 +100,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(entity);
     }
 
+    /// <summary>
+    /// Retrieves a user by username and returns the user details if found.
+    /// </summary>
+    /// <param name="username">The username to search for.</param>
+    /// <returns>A result containing the user details if found; otherwise, a failure result.</returns>
     public async Task<Result<UserResponse>> GetByUsernameAsync(string username)
     {
         var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.UserName == username);
@@ -97,6 +116,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves a user by email address and returns the user information if found.
+    /// </summary>
+    /// <param name="email">The email address of the user to retrieve.</param>
+    /// <returns>A result containing the user response if found; otherwise, a failure result.</returns>
     public async Task<Result<UserResponse>> GetByEmailAsync(string email)
     {
         var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Email == email);
@@ -108,6 +132,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves the profile details of a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <returns>A result containing the user's profile information if found; otherwise, a failure result.</returns>
     public async Task<Result<UserProfileResponse>> GetProfileByIdAsync(Guid id)
     {
         var userProfile = await _unitOfWork
@@ -130,6 +159,11 @@ public class UserService : IUserService
         return Result<UserProfileResponse>.Success(userProfile);
     }
 
+    /// <summary>
+    /// Creates a new user with the provided information, including optional avatar image processing and role assignment.
+    /// </summary>
+    /// <param name="request">The user data to create, including credentials and optional avatar image.</param>
+    /// <returns>A result containing the created user's details, or a failure result if the username or email already exists or image processing fails.</returns>
     public async Task<Result<UserResponse>> CreateAsync(UserRequest request)
     {
         var userExists = await _unitOfWork
@@ -166,6 +200,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing user's information, including profile details, password, and avatar image if edited.
+    /// </summary>
+    /// <param name="request">The user data to update, including optional image and password changes.</param>
+    /// <returns>A result containing the updated user response if successful; otherwise, a failure result with an error message.</returns>
     public async Task<Result<UserResponse>> UpdateAsync(UserRequest request)
     {
         if (request.Id == Guid.Empty)
@@ -222,6 +261,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates a user's profile information and avatar image.
+    /// </summary>
+    /// <param name="request">Profile update data, including optional new avatar image.</param>
+    /// <returns>A result containing the updated user information, or a failure if the user does not exist or image processing fails.</returns>
     public async Task<Result<UserResponse>> UpdateProfileAsync(UserProfileRequest request)
     {
         var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(request.Id);
@@ -261,6 +305,11 @@ public class UserService : IUserService
         return Result<UserResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks a user as deleted by setting deletion metadata and soft delete flag.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to delete.</param>
+    /// <returns>A result indicating whether the operation was successful or failed if the user does not exist.</returns>
     public async Task<Result> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);
@@ -276,6 +325,11 @@ public class UserService : IUserService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Marks multiple users as deleted based on the provided list of user IDs.
+    /// </summary>
+    /// <param name="ids">A list of user IDs to be marked as deleted.</param>
+    /// <returns>A result indicating success, or failure if no matching users are found.</returns>
     public async Task<Result> DeleteListAsync(List<Guid> ids)
     {
         var entities = await _unitOfWork
@@ -298,6 +352,11 @@ public class UserService : IUserService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Locks a user account by setting its locked status to true.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to lock.</param>
+    /// <returns>A result indicating whether the operation was successful or failed if the user does not exist.</returns>
     public async Task<Result> LockUserAsync(Guid id)
     {
         var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);

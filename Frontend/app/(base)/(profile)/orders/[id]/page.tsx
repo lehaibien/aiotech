@@ -14,6 +14,12 @@ type OrderDetailParams = Promise<{
   id: string;
 }>;
 
+/**
+ * Fetches order details for the specified UUID.
+ *
+ * @param id - The UUID of the order to retrieve.
+ * @returns The order details as an {@link OrderResponse}, or `undefined` if the fetch fails.
+ */
 async function getOrderDetail(id: UUID) {
   const response = await getByIdApi(API_URL.order, { id });
   if (response.success) {
@@ -23,6 +29,12 @@ async function getOrderDetail(id: UUID) {
   return undefined;
 }
 
+/**
+ * Server component that displays the details and actions for a specific order.
+ *
+ * @param params - A promise resolving to an object containing the order ID as a string.
+ * @returns The order detail page UI for the specified order.
+ */
 export default async function OrderDetailPage({
   params,
 }: {

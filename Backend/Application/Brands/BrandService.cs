@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Brands.Dtos;
@@ -22,6 +22,9 @@ public class BrandService : IBrandService
     private readonly IStorageService _storageService;
     private readonly ILogger<BrandService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BrandService"/> class with required dependencies for brand management, image processing, storage, and logging.
+    /// </summary>
     public BrandService(
         IUnitOfWork unitOfWork,
         IHttpContextAccessor contextAccessor,
@@ -37,6 +40,12 @@ public class BrandService : IBrandService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieves a paginated and optionally filtered list of brands, supporting text search and sorting.
+    /// </summary>
+    /// <param name="request">Pagination, filtering, and sorting options for the brand list.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of brands matching the specified criteria.</returns>
     public async Task<Result<PaginatedList>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
@@ -83,6 +92,11 @@ public class BrandService : IBrandService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves a brand by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the brand.</param>
+    /// <returns>A result containing the brand details if found; otherwise, a failure result.</returns>
     public async Task<Result<BrandResponse>> GetById(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
@@ -95,6 +109,11 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Creates a new brand with the provided details, including image optimization and upload.
+    /// </summary>
+    /// <param name="request">The brand information and image to create.</param>
+    /// <returns>A result containing the created brand's details, or a failure message if creation is unsuccessful.</returns>
     public async Task<Result<BrandResponse>> Create(BrandRequest request)
     {
         var isExists = await _unitOfWork
@@ -126,6 +145,11 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing brand with new information and optionally replaces its image.
+    /// </summary>
+    /// <param name="request">The updated brand data, including image if it has been edited.</param>
+    /// <returns>A result containing the updated brand response, or a failure message if the update is unsuccessful.</returns>
     public async Task<Result<BrandResponse>> Update(BrandRequest request)
     {
         if (request.Id == Guid.Empty)
@@ -174,6 +198,11 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks a brand as deleted by its ID, setting deletion metadata and saving changes.
+    /// </summary>
+    /// <param name="id">The unique identifier of the brand to delete.</param>
+    /// <returns>A result indicating success or failure with an appropriate message.</returns>
     public async Task<Result<string>> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
@@ -189,6 +218,11 @@ public class BrandService : IBrandService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Marks multiple brands as deleted by their IDs.
+    /// </summary>
+    /// <param name="ids">List of brand IDs to delete.</param>
+    /// <returns>A result indicating success or failure with a message.</returns>
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
         foreach (var id in ids)

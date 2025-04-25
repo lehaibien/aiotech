@@ -13,6 +13,16 @@ type InventoryStatusReportFilterProps = {
   defaultCategoryId?: UUID;
 };
 
+/**
+ * Renders filter controls for the inventory status report, allowing users to filter by brand and category.
+ *
+ * Displays two autocomplete dropdowns for selecting a brand and a category, and a button to apply the selected filters. When the filter is applied, the component updates the URL query parameters and navigates to the inventory status report page with the selected filters.
+ *
+ * @param brandList - List of available brands to filter by.
+ * @param categoryList - List of available categories to filter by.
+ * @param defaultBrandId - Optional UUID of the initially selected brand.
+ * @param defaultCategoryId - Optional UUID of the initially selected category.
+ */
 export default function InventoryStatusReportFilter({
   brandList,
   categoryList,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -8,7 +8,9 @@ namespace Infrastructure.Migrations
     /// <inheritdoc />
     public partial class AddCodeToRole : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Applies schema changes to add a "Code" column to the "Role" table and a "CostPrice" column to the "Product" table, and updates seed data for specific roles.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -49,7 +51,9 @@ namespace Infrastructure.Migrations
                 values: new object[] { "shipper", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Giao hàng" });
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Reverts the schema and data changes made by the migration, removing the "Code" column from the "Role" table and the "CostPrice" column from the "Product" table, and restoring original "CreatedDate" and "Name" values for specific roles.
+        /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

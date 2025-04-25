@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,6 +6,10 @@ namespace Infrastructure.Persistent.Configurations;
 
 public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 {
+    /// <summary>
+    /// Configures the schema, relationships, and constraints for the <see cref="Order"/> entity in Entity Framework Core.
+    /// </summary>
+    /// <param name="builder">The builder used to configure the <see cref="Order"/> entity.</param>
     public void Configure(EntityTypeBuilder<Order> builder)
     {
         builder.HasKey(x => x.Id).HasName("PK_OrderId");

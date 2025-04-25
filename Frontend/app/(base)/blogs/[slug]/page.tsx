@@ -15,6 +15,12 @@ import Image from "next/image";
 
 type Params = Promise<{ slug: string }>;
 
+/**
+ * Retrieves a blog post by its slug from the API.
+ *
+ * @param slug - The unique slug identifier for the blog post.
+ * @returns The post data if found; otherwise, undefined if the API call fails or the post does not exist.
+ */
 async function getPostBySlug(slug: string) {
   const response = await getApi(API_URL.post + `/slug/${slug}`);
   if (response.success) {
@@ -23,6 +29,12 @@ async function getPostBySlug(slug: string) {
   return undefined;
 }
 
+/**
+ * Retrieves related blog posts for a given post ID.
+ *
+ * @param id - The unique identifier of the blog post to find related posts for.
+ * @returns An array of related post items, or an empty array if none are found or the API call fails.
+ */
 async function getRelatedPosts(id: UUID) {
   const response = await getApi(API_URL.postRelated(id));
   if (response.success) {
@@ -31,6 +43,15 @@ async function getRelatedPosts(id: UUID) {
   return [];
 }
 
+/**
+ * Renders a blog post page with its content, metadata, and related posts.
+ *
+ * Fetches the blog post by slug and displays its details, including title, image, formatted creation date, and content. If the post is not found or unpublished, shows a fallback message. Also displays a table of contents and a grid of related posts if available.
+ *
+ * @param params - An object containing a promise that resolves to the route parameters, including the blog post slug.
+ *
+ * @returns The blog post page UI, or a fallback UI if the post is not found or unpublished.
+ */
 export default async function Page({ params }: { params: Params }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);

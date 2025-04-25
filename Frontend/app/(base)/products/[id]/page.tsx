@@ -24,6 +24,14 @@ type Params = Promise<{
   id: string;
 }>;
 
+/**
+ * Generates SEO metadata for a product detail page based on the provided product ID.
+ *
+ * If the product is found, returns metadata including title, description, keywords, and Open Graph information with product images. Returns an empty object if the product is not found.
+ *
+ * @param params - A promise resolving to an object containing the product ID.
+ * @returns Metadata for the product detail page, or an empty object if the product does not exist.
+ */
 export async function generateMetadata({
   params,
 }: {
@@ -53,6 +61,14 @@ export async function generateMetadata({
   return {};
 }
 
+/**
+ * Displays detailed information for a specific product, including images, description, reviews, and related products.
+ *
+ * Renders a product detail page based on the provided product ID. If the product is not found, shows a not-found message.
+ *
+ * @param params - A promise resolving to an object containing the product ID.
+ * @returns The product detail page UI, or a not-found message if the product does not exist.
+ */
 export default async function ProductDetail({ params }: { params: Params }) {
   const { id } = await params;
   const parsedId = parseUUID(id);

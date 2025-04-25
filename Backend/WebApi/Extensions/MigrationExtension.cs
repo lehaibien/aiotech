@@ -5,6 +5,10 @@ namespace WebApi.Extensions;
 
 public static class MigrationExtension
 {
+    /// <summary>
+    /// Applies any pending database migrations automatically when running in a development environment.
+    /// </summary>
+    /// <returns>The original <see cref="WebApplication"/> instance for fluent configuration.</returns>
     public static WebApplication AddMigration(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())

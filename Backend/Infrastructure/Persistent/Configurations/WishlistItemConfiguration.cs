@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 internal sealed class WishlistItemConfiguration : IEntityTypeConfiguration<WishlistItem>
 {
+    /// <summary>
+    /// Configures the entity mapping for the <c>WishlistItem</c> entity, including table name, primary key, required properties, default values, and relationships.
+    /// </summary>
     public void Configure(EntityTypeBuilder<WishlistItem> builder)
     {
         builder.ToTable("WishlistItem");

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +12,10 @@ namespace WebApi.Extensions;
 
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Registers a global exception handler and adds problem details support to the service collection.
+    /// </summary>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     public static IServiceCollection ConfigureExceptionHandler(this IServiceCollection services)
     {
         services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -31,7 +35,10 @@ public static class DependencyInjection
     /// and credentials, while allowing any origin.
     /// </remarks>
 
-    /*******  6a1cdf82-875f-485b-b651-e1f2a80a0ac4  *******/
+    /// <summary>
+    /// Configures a CORS policy that allows any origin, method, header, and credentials.
+    /// </summary>
+    /// <returns>The updated service collection with the CORS policy applied.</returns>
     public static IServiceCollection ConfigureCors(
         this IServiceCollection services,
         IConfiguration configuration
@@ -53,6 +60,11 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Configures JWT Bearer authentication using settings from the application configuration.
+    /// </summary>
+    /// <param name="configuration">Application configuration containing JWT settings such as key, issuer, and audience.</param>
+    /// <returns>The updated service collection with authentication configured.</returns>
     public static IServiceCollection ConfigureAuthentication(
         this IServiceCollection services,
         IConfiguration configuration
@@ -82,6 +94,10 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Adds authorization policies for "Admin", "Shipper", and "AdminOrShipper" roles to the service collection.
+    /// </summary>
+    /// <returns>The updated <see cref="IServiceCollection"/> with configured authorization policies.</returns>
     public static IServiceCollection ConfigureAuthorization(this IServiceCollection services)
     {
         services
@@ -92,6 +108,12 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Configures Serilog as the logging provider using settings from the specified configuration, enriching logs with correlation ID, log context, machine name, and exception details.
+    /// </summary>
+    /// <param name="loggingBuilder">The logging builder to configure.</param>
+    /// <param name="configuration">The application configuration containing Serilog settings.</param>
+    /// <returns>The updated logging builder with Serilog configured.</returns>
     public static ILoggingBuilder ConfigureLogger(
         this ILoggingBuilder loggingBuilder,
         IConfiguration configuration

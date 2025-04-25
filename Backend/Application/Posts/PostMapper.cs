@@ -5,6 +5,10 @@ namespace Application.Posts;
 
 public static class PostMapper
 {
+    /// <summary>
+    /// Maps a <see cref="Post"/> entity to a <see cref="PostResponse"/> DTO.
+    /// </summary>
+    /// <returns>A <see cref="PostResponse"/> containing the post's details.</returns>
     public static PostResponse MapToPostResponse(this Post post)
     {
         return new PostResponse
@@ -20,6 +24,10 @@ public static class PostMapper
         };
     }
 
+    /// <summary>
+    /// Maps a <see cref="Post"/> entity to a <see cref="PostListItemResponse"/> DTO.
+    /// </summary>
+    /// <returns>A <see cref="PostListItemResponse"/> containing summary information about the post.</returns>
     public static PostListItemResponse MapToPostListItemResponse(this Post post)
     {
         return new PostListItemResponse(
@@ -31,6 +39,10 @@ public static class PostMapper
         );
     }
 
+    /// <summary>
+    /// Maps a <see cref="Post"/> entity to a <see cref="PostDetailResponse"/> DTO.
+    /// </summary>
+    /// <returns>A <see cref="PostDetailResponse"/> containing detailed information about the post.</returns>
     public static PostDetailResponse MapToPostDetailResponse(this Post post)
     {
         return new PostDetailResponse(
@@ -43,7 +55,10 @@ public static class PostMapper
         );
     }
 
-    // Request
+    /// <summary>
+    /// Creates a new <see cref="Post"/> entity from the provided <see cref="PostRequest"/>.
+    /// </summary>
+    /// <returns>A <see cref="Post"/> initialized with values from the request.</returns>
 
     public static Post MapToPost(this PostRequest request)
     {
@@ -57,6 +72,12 @@ public static class PostMapper
         };
     }
 
+    /// <summary>
+    /// Updates an existing <see cref="Post"/> entity with values from a <see cref="PostRequest"/>.
+    /// </summary>
+    /// <param name="request">The request containing updated post data.</param>
+    /// <param name="post">The post entity to update.</param>
+    /// <returns>The updated <see cref="Post"/> entity.</returns>
     public static Post ApplyToPost(this PostRequest request, Post post)
     {
         post.Title = request.Title;
@@ -68,7 +89,10 @@ public static class PostMapper
         return post;
     }
 
-    // Projection
+    /// <summary>
+    /// Projects a queryable collection of Post entities to PostListItemResponse DTOs.
+    /// </summary>
+    /// <returns>An IQueryable of PostListItemResponse representing the projected posts.</returns>
     public static IQueryable<PostListItemResponse> ProjectToPostListItemResponse(
         this IQueryable<Post> query
     )
@@ -82,6 +106,12 @@ public static class PostMapper
         ));
     }
 
+    /// <summary>
+    /// Projects a queryable collection of <see cref="Post"/> entities to a queryable collection of <see cref="PostDetailResponse"/> DTOs.
+    /// </summary>
+    /// <returns>
+    /// An <see cref="IQueryable{PostDetailResponse}"/> representing the projected post details.
+    /// </returns>
     public static IQueryable<PostDetailResponse> ProjectToPostDetailResponse(
         this IQueryable<Post> query
     )

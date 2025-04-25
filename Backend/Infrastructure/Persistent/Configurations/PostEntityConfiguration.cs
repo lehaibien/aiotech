@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,6 +13,9 @@ public class PostEntityConfiguration : IEntityTypeConfiguration<Post>
         c => c.ToList()
     );
 
+    /// <summary>
+    /// Configures the entity model for the <c>Post</c> class, including property mappings, value conversions, constraints, indexes, and query filters for use with Entity Framework Core.
+    /// </summary>
     public void Configure(EntityTypeBuilder<Post> builder)
     {
         builder.HasKey(x => x.Id).HasName("PK_PostId");

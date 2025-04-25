@@ -16,6 +16,10 @@ public class ConfigurationController : ControllerBase
         _service = service;
     }
 
+    /// <summary>
+    /// Retrieves the current banner configuration settings.
+    /// </summary>
+    /// <returns>An HTTP 200 response with the banner configuration data if successful; otherwise, an HTTP 400 response with an error message.</returns>
     [HttpGet("banner")]
     public async Task<IActionResult> GetBannerConfiguration()
     {
@@ -32,6 +36,11 @@ public class ConfigurationController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Updates the banner configuration with the provided settings.
+    /// </summary>
+    /// <param name="request">The new banner configuration to apply.</param>
+    /// <returns>An HTTP 200 response with the updated configuration on success, or HTTP 400 with an error message on failure.</returns>
     [HttpPost("banner")]
     public async Task<IActionResult> SetBannerConfiguration([FromBody] BannerConfiguration request)
     {
@@ -48,6 +57,10 @@ public class ConfigurationController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Retrieves the current email configuration settings.
+    /// </summary>
+    /// <returns>An HTTP response containing the email configuration data if successful; otherwise, a bad request with an error message.</returns>
     [HttpGet("email")]
     public async Task<IActionResult> GetEmailConfiguration()
     {
@@ -64,6 +77,11 @@ public class ConfigurationController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Updates the email configuration settings.
+    /// </summary>
+    /// <param name="request">The new email configuration to apply.</param>
+    /// <returns>An HTTP response containing the updated configuration if successful, or an error message if the update fails.</returns>
     [HttpPost("email")]
     public async Task<IActionResult> SetEmailConfiguration([FromBody] EmailConfiguration request)
     {

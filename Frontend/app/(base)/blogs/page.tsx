@@ -20,6 +20,14 @@ export const metadata: Metadata = {
   keywords: ["blog", "công nghệ", "tech", "tin tức", "AioTech"],
 };
 
+/**
+ * Retrieves a paginated list of blog post previews matching the specified search criteria.
+ *
+ * @param page - The page number to retrieve, starting from 1.
+ * @param pageSize - The number of posts per page.
+ * @param search - Optional search term to filter blog posts by title or content.
+ * @returns A paginated list of blog post items. If the API request fails, returns an empty list with zero total count.
+ */
 async function fetchBlogPosts(
   page: number = 1,
   pageSize: number = 10,
@@ -43,6 +51,13 @@ async function fetchBlogPosts(
   return response.data as PaginatedList<PostListItemResponse>;
 }
 
+/**
+ * Renders the blog listing page with search and pagination functionality.
+ *
+ * Displays a searchable and paginated list of technology blog posts, including a header, search form, and the list of posts.
+ *
+ * @param searchParams - Query parameters for pagination and search filtering.
+ */
 export default async function BlogsPage({
   searchParams,
 }: {

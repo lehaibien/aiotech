@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using Application.Helpers;
@@ -51,6 +51,12 @@ public class OrderService : IOrderService
         // _discountService = discountService;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of orders filtered by status, customer ID, and text search, with optional sorting.
+    /// </summary>
+    /// <param name="request">The filter, search, and pagination criteria for retrieving orders.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of order responses matching the specified criteria.</returns>
     public async Task<Result<PaginatedList>> GetListAsync(
         OrderGetListRequest request,
         CancellationToken cancellationToken = default
@@ -115,6 +121,11 @@ public class OrderService : IOrderService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves an order by its ID, including its order items, and returns it as an <see cref="OrderResponse"/>.
+    /// </summary>
+    /// <param name="id">The unique identifier of the order to retrieve.</param>
+    /// <returns>A result containing the order details if found; otherwise, a failure result if the order does not exist.</returns>
     public async Task<Result<OrderResponse>> GetById(Guid id)
     {
         var entity = await _unitOfWork
@@ -205,6 +216,11 @@ public class OrderService : IOrderService
         return Result<List<OrderResponse>>.Success(entities);
     }
 
+    /// <summary>
+    /// Creates a new order from the checkout request, validates product stock, saves the order, and generates a payment URL for the selected provider.
+    /// </summary>
+    /// <param name="request">The order checkout request containing order items and payment provider information.</param>
+    /// <returns>A result containing the generated payment URL if successful; otherwise, a failure message.</returns>
     public async Task<Result<string>> CreateUrl(OrderCheckoutRequest request)
     {
         var productIds = request.OrderItems.Select(x => x.ProductId);
@@ -271,6 +287,11 @@ public class OrderService : IOrderService
         return Result<string>.Success(url);
     }
 
+    /// <summary>
+    /// Creates a new order with associated order items and returns the created order details.
+    /// </summary>
+    /// <param name="request">The order data to create, including order items.</param>
+    /// <returns>The created order and its items wrapped in a <see cref="Result{OrderResponse}"/>.</returns>
     public async Task<Result<OrderResponse>> Create(OrderRequest request)
     {
         var entity = _mapper.Map<Order>(request);
@@ -294,6 +315,11 @@ public class OrderService : IOrderService
         return Result<OrderResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing order with new information provided in the request.
+    /// </summary>
+    /// <param name="request">The updated order data.</param>
+    /// <returns>A result containing the updated order response, or a failure if the order does not exist or a duplicate is detected.</returns>
     public async Task<Result<OrderResponse>> Update(OrderRequest request)
     {
         var isExists = await _unitOfWork.GetRepository<Order>().AnyAsync(x => x.Id != request.Id);
@@ -311,6 +337,11 @@ public class OrderService : IOrderService
         return Result<OrderResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks an order as deleted by its ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the order to delete.</param>
+    /// <returns>A result containing a success or failure message.</returns>
     public async Task<Result<string>> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
@@ -324,6 +355,11 @@ public class OrderService : IOrderService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Marks multiple orders as deleted by their IDs.
+    /// </summary>
+    /// <param name="ids">A list of order IDs to delete.</param>
+    /// <returns>A result indicating success or failure with a message.</returns>
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
         foreach(var id in ids)
@@ -341,6 +377,11 @@ public class OrderService : IOrderService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Changes the status of an order, enforcing role-based permissions and updating delivery date as needed.
+    /// </summary>
+    /// <param name="request">The status update request containing the order ID and new status.</param>
+    /// <returns>A result indicating success or failure, with error messages for unauthorized actions or invalid order states.</returns>
     public async Task<Result> ChangeStatus(OrderUpdateStatusRequest request)
     {
         var role = _contextAccessor
@@ -388,6 +429,12 @@ public class OrderService : IOrderService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Updates the status of multiple orders by their IDs.
+    /// </summary>
+    /// <param name="ids">List of order IDs to update.</param>
+    /// <param name="status">The new status to set for each order.</param>
+    /// <returns>A result containing a success message if all updates succeed, or a failure message if any order is not found.</returns>
     public async Task<Result<string>> ChangeStatusList(List<Guid> ids, OrderStatus status)
     {
         foreach(var id in ids)
@@ -405,6 +452,11 @@ public class OrderService : IOrderService
         return Result<string>.Success("Cập nhật trạng thái thành công");
     }
 
+    /// <summary>
+    /// Generates a PDF receipt for the specified order.
+    /// </summary>
+    /// <param name="id">The unique identifier of the order.</param>
+    /// <returns>A result containing the PDF bytes of the order receipt, or a failure if the order does not exist.</returns>
     public async Task<Result<byte[]>> PrintReceipt(Guid id)
     {
         var entity = await _unitOfWork
@@ -420,6 +472,11 @@ public class OrderService : IOrderService
         return Result<byte[]>.Success(pdfBytes);
     }
 
+    /// <summary>
+    /// Processes payment callback data from VnPay or Momo, updates order and payment status, adjusts inventory, clears the user's cart, sends confirmation email and notification, and handles failed payments by deleting the order.
+    /// </summary>
+    /// <param name="queryCollection">The query parameters received from the payment provider callback.</param>
+    /// <returns>A <see cref="Result"/> indicating success or failure of the payment processing and order update.</returns>
     public async Task<Result> HandleCallbackPayment(IQueryCollection queryCollection)
     {
         queryCollection.TryGetValue("partnerCode", out var partnerCode);
@@ -526,6 +583,11 @@ public class OrderService : IOrderService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Cancels an order if it is in a cancellable state and not already cancelled.
+    /// </summary>
+    /// <param name="request">The cancellation request containing the order ID and cancellation reason.</param>
+    /// <returns>A result indicating success or failure of the cancellation operation.</returns>
     public async Task<Result> Cancel(OrderCancelRequest request)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
@@ -557,6 +619,11 @@ public class OrderService : IOrderService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Confirms receipt of an order by updating its status to Completed if it has been delivered.
+    /// </summary>
+    /// <param name="id">The unique identifier of the order to confirm.</param>
+    /// <returns>A result indicating success or failure of the confirmation operation.</returns>
     public async Task<Result> Confirm(Guid id)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
@@ -579,6 +646,10 @@ public class OrderService : IOrderService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Generates a unique tracking number using the prefix "AIO", the current UTC timestamp, and a random three-digit number.
+    /// </summary>
+    /// <returns>A unique tracking number string.</returns>
     private string GenerateTrackingNumber()
     {
         var random = new Random();

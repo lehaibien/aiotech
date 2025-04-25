@@ -5,6 +5,11 @@ namespace Application.Users;
 
 public static class UserMapper
 {
+    /// <summary>
+    /// Projects a sequence of <see cref="User"/> entities to <see cref="UserResponse"/> DTOs, including role name.
+    /// </summary>
+    /// <param name="source">The queryable collection of <see cref="User"/> entities to project.</param>
+    /// <returns>An <see cref="IQueryable{UserResponse}"/> representing the mapped user responses.</returns>
     public static IQueryable<UserResponse> ProjectToUserResponse(this IQueryable<User> source)
     {
         return source.Select(x => new UserResponse
@@ -26,6 +31,11 @@ public static class UserMapper
         });
     }
 
+    /// <summary>
+    /// Maps a <see cref="User"/> entity to a <see cref="UserResponse"/> DTO by copying user properties.
+    /// </summary>
+    /// <param name="source">The <see cref="User"/> entity to map.</param>
+    /// <returns>A <see cref="UserResponse"/> containing the mapped user data.</returns>
     public static UserResponse MapToUserResponse(this User source)
     {
         return new UserResponse
@@ -46,6 +56,11 @@ public static class UserMapper
         };
     }
 
+    /// <summary>
+    /// Creates a new <see cref="User"/> entity from the provided <see cref="UserRequest"/> by mapping user details and role ID.
+    /// </summary>
+    /// <param name="source">The user request containing data to populate the new user entity.</param>
+    /// <returns>A new <see cref="User"/> entity with properties set from the request.</returns>
     public static User MapToUser(this UserRequest source)
     {
         return new User
@@ -59,6 +74,12 @@ public static class UserMapper
         };
     }
 
+    /// <summary>
+    /// Updates an existing <see cref="User"/> entity with non-null or non-default values from a <see cref="UserRequest"/>.
+    /// </summary>
+    /// <param name="source">The <see cref="UserRequest"/> containing updated user information.</param>
+    /// <param name="user">The <see cref="User"/> entity to update.</param>
+    /// <returns>The updated <see cref="User"/> entity.</returns>
     public static User ApplyToUser(this UserRequest source, User user)
     {
         user.UserName = source.UserName ?? user.UserName;

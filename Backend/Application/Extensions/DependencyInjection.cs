@@ -28,6 +28,11 @@ namespace Application.Extensions;
 
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Registers application options, services, AutoMapper profiles, HTTP clients, and validators with the service collection.
+    /// </summary>
+    /// <param name="configuration">The application configuration used for binding options.</param>
+    /// <returns>The updated service collection with all application dependencies registered.</returns>
     public static IServiceCollection AddApplication(
         this IServiceCollection services,
         IConfiguration configuration
@@ -41,6 +46,11 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Binds configuration sections to strongly typed application option classes for dependency injection.
+    /// </summary>
+    /// <param name="configuration">The application's configuration source.</param>
+    /// <returns>The updated service collection.</returns>
     private static IServiceCollection AddApplicationOptions(
         this IServiceCollection services,
         IConfiguration configuration
@@ -53,6 +63,10 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Registers AutoMapper with profiles from the assembly containing <c>RoleProfile</c> as a singleton service.
+    /// </summary>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     private static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
     {
         var assembly = Assembly.GetAssembly(typeof(RoleProfile));
@@ -62,6 +76,10 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Registers application service interfaces and their implementations with appropriate lifetimes in the dependency injection container.
+    /// </summary>
+    /// <returns>The updated <see cref="IServiceCollection"/> with application services registered.</returns>
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddSingleton<IJwtService, JwtService>();
@@ -85,6 +103,10 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Registers all FluentValidation validators from the executing assembly.
+    /// </summary>
+    /// <returns>The updated service collection.</returns>
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

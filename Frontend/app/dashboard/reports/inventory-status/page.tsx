@@ -6,6 +6,14 @@ import { Stack, Typography } from "@mui/material";
 import InventoryStatusReportFilter from "./InventoryStatusReportFilter";
 import InventoryStatusReportGrid from "./InventoryStatusReportGrid";
 
+/**
+ * Renders the inventory status report page with filters and data grid based on selected brand and category.
+ *
+ * Fetches available brands and categories for filtering, parses default selections from {@link searchParams}, and displays the inventory status report UI.
+ *
+ * @param searchParams - URL search parameters containing optional `brand_id` and `category_id` values.
+ * @returns The inventory status report page as a React element.
+ */
 export default async function OutOfStockReportPage({
   searchParams,
 }: {

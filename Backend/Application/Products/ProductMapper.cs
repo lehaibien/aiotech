@@ -6,6 +6,11 @@ namespace Application.Products;
 
 public static class ProductMapper
 {
+    /// <summary>
+    /// Maps a <see cref="Product"/> entity to a <see cref="ProductResponse"/> DTO, including calculated average rating and related brand and category information.
+    /// </summary>
+    /// <param name="product">The product entity to map.</param>
+    /// <returns>A <see cref="ProductResponse"/> containing the mapped product data.</returns>
     public static ProductResponse MapToProductResponse(this Product product)
     {
         return new ProductResponse()
@@ -27,6 +32,10 @@ public static class ProductMapper
         };
     }
 
+    /// <summary>
+    /// Maps a <see cref="Product"/> entity to a <see cref="ProductListItemResponse"/> DTO for use in product list displays.
+    /// </summary>
+    /// <returns>A <see cref="ProductListItemResponse"/> containing summary information, including average rating and tags.</returns>
     public static ProductListItemResponse MapToProductListItemResponse(this Product product)
     {
         return new ProductListItemResponse(
@@ -42,6 +51,11 @@ public static class ProductMapper
         );
     }
 
+    /// <summary>
+    /// Maps a <see cref="Product"/> entity to a <see cref="ProductDetailResponse"/> DTO, including detailed product information and average rating.
+    /// </summary>
+    /// <param name="product">The product entity to map.</param>
+    /// <returns>A <see cref="ProductDetailResponse"/> containing detailed product data, including brand and category names, description, image URLs, tags, and the average rating calculated from reviews.</returns>
     public static ProductDetailResponse MapToProductDetailResponse(this Product product)
     {
         return new ProductDetailResponse
@@ -61,6 +75,11 @@ public static class ProductMapper
         };
     }
 
+    /// <summary>
+    /// Maps a <see cref="Product"/> entity to a <see cref="ProductUpdateResponse"/> DTO for update operations.
+    /// </summary>
+    /// <param name="product">The product entity to map.</param>
+    /// <returns>A <see cref="ProductUpdateResponse"/> containing the product's updateable fields.</returns>
     public static ProductUpdateResponse MapToProductUpdateResponse(this Product product)
     {
         return new ProductUpdateResponse
@@ -80,7 +99,10 @@ public static class ProductMapper
         };
     }
 
-    // Request
+    /// <summary>
+    /// Creates a new <see cref="Product"/> entity from the values in a <see cref="ProductRequest"/>.
+    /// </summary>
+    /// <returns>A new <see cref="Product"/> populated with the request's data.</returns>
     public static Product MapToProduct(this ProductRequest request)
     {
         return new Product
@@ -98,6 +120,12 @@ public static class ProductMapper
         };
     }
 
+    /// <summary>
+    /// Updates an existing Product entity with values from a ProductRequest.
+    /// </summary>
+    /// <param name="request">The ProductRequest containing updated product data.</param>
+    /// <param name="product">The Product entity to update.</param>
+    /// <returns>The updated Product entity.</returns>
     public static Product ApplyToProduct(this ProductRequest request, Product product)
     {
         product.Sku = request.Sku;
@@ -114,7 +142,9 @@ public static class ProductMapper
         return product;
     }
 
-    // Projection
+    /// <summary>
+    /// Projects an <see cref="IQueryable{Product}"/> to an <see cref="IQueryable{ProductResponse}"/>, mapping each product entity to a response DTO with relevant properties and computed average rating.
+    /// </summary>
     public static IQueryable<ProductResponse> ProjectToProductResponse(
         this IQueryable<Product> query
     )
@@ -138,6 +168,11 @@ public static class ProductMapper
         });
     }
 
+    /// <summary>
+    /// Projects a queryable collection of products to a queryable collection of product list item response DTOs.
+    /// </summary>
+    /// <param name="query">The queryable collection of <see cref="Product"/> entities.</param>
+    /// <returns>A queryable collection of <see cref="ProductListItemResponse"/> DTOs with mapped properties and computed average ratings.</returns>
     public static IQueryable<ProductListItemResponse> ProjectToProductListItemResponse(
         this IQueryable<Product> query
     )

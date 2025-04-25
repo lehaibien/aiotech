@@ -7,6 +7,14 @@ import { parseUUID } from "@/lib/utils";
 import { BrandResponse, SearchParams, UUID } from "@/types";
 import { Stack, Typography } from "@mui/material";
 
+/**
+ * Retrieves brand data by its UUID, returning a default empty brand object if the fetch fails.
+ *
+ * @param id - The UUID of the brand to retrieve.
+ * @returns The brand data as a {@link BrandResponse}, or a default empty brand object if not found.
+ *
+ * @remark If the API call fails, an error is logged and a default brand object with empty fields is returned.
+ */
 async function getBrandById(id: UUID) {
   const response = await getByIdApi(API_URL.brand, { id });
   if (response.success) {
@@ -22,6 +30,12 @@ async function getBrandById(id: UUID) {
   };
 }
 
+/**
+ * Renders the brand upsert page, displaying a form for creating or updating a brand based on the provided search parameters.
+ *
+ * @param searchParams - Query parameters containing the brand ID to edit, or empty for creating a new brand.
+ * @returns The JSX layout for the brand upsert form with appropriate heading and default values.
+ */
 export default async function Page({
   searchParams,
 }: {

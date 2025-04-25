@@ -10,6 +10,10 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+    /// <summary>
+    /// Retrieves aggregated dashboard metrics for the current and previous month, including revenue, order count, average order value, and new user count, along with their percentage changes.
+    /// </summary>
+    /// <returns>A <see cref="Result{DashboardCard}"/> containing the dashboard metrics for the current and previous month.</returns>
     public async Task<Result<DashboardCard>> GetDashboardCardAsync()
     {
         var now = DateTime.UtcNow;
@@ -134,6 +138,10 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
         return Result<DashboardCard>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves the top 8 products with the highest sales count from completed orders.
+    /// </summary>
+    /// <returns>A result containing a list of top-selling products with their details and sales count.</returns>
     public async Task<Result<List<DashboardTopProduct>>> GetDashboardTopProductAsync()
     {
         IQueryable<OrderItem> order = _unitOfWork.GetRepository<OrderItem>().GetAll();
@@ -160,6 +168,10 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
         return Result<List<DashboardTopProduct>>.Success(result);
     }
 
+    /// <summary>
+    /// Generates a monthly sales report for the current year, returning total revenue for each month.
+    /// </summary>
+    /// <returns>A result containing a list of <see cref="DashboardSale"/> objects, each representing a month's revenue.</returns>
     public async Task<Result<List<DashboardSale>>> GetDashboardSaleAsync()
     {
         DateTime now = DateTime.UtcNow;
@@ -203,6 +215,11 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
         return Result<List<DashboardSale>>.Success(report);
     }
 
+    /// <summary>
+    /// Retrieves a list of products with stock less than or equal to the specified threshold.
+    /// </summary>
+    /// <param name="stockThreshold">The maximum stock quantity to trigger an alert. Defaults to 5.</param>
+    /// <returns>A result containing a list of products with low stock for dashboard alerts.</returns>
     public async Task<Result<List<DashboardStockAlert>>> GetDashboardStockAlertAsync(
         int stockThreshold = 5
     )

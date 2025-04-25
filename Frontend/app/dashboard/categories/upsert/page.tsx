@@ -7,6 +7,14 @@ import { Card, Typography } from "@mui/material";
 import dayjs from "@/lib/extended-dayjs";
 import { CategoryUpsertForm } from "@/features/dashboard/categories/upsert/CategoryUpsertForm";
 
+/**
+ * Renders a page for creating or updating a category based on the provided query parameters.
+ *
+ * If an `id` is present in {@link searchParams}, fetches the corresponding category data for editing; otherwise, initializes a new category for creation.
+ *
+ * @param searchParams - Optional query parameters, where `id` specifies the category to update.
+ * @returns A React component displaying the category upsert form.
+ */
 export default async function CategoryUpsertPage({
   searchParams,
 }: {

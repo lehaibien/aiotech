@@ -17,6 +17,11 @@ public class ReviewController : ControllerBase
         _service = service;
     }
 
+    /// <summary>
+    /// Retrieves a list of reviews based on the specified query parameters.
+    /// </summary>
+    /// <param name="request">The query parameters for filtering and paging the review list.</param>
+    /// <returns>An HTTP response containing the list of reviews or an error message.</returns>
     [HttpGet]
     public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
     {
@@ -33,6 +38,11 @@ public class ReviewController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Retrieves a list of reviews for a specified product.
+    /// </summary>
+    /// <param name="request">The request containing the product ID and optional filtering parameters.</param>
+    /// <returns>An API response containing the list of reviews or an error message.</returns>
     [HttpGet("product")]
     public async Task<IActionResult> GetByProductId(
         [FromQuery] GetListReviewByProductIdRequest request
@@ -51,6 +61,11 @@ public class ReviewController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Retrieves a review by its unique identifier.
+    /// </summary>
+    /// <param name="id">The GUID of the review to retrieve.</param>
+    /// <returns>An HTTP 200 response with the review data if found; otherwise, an HTTP 400 response with an error message.</returns>
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -66,6 +81,11 @@ public class ReviewController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Creates a new review using the provided request data.
+    /// </summary>
+    /// <param name="request">The details of the review to create.</param>
+    /// <returns>An API response containing the created review data on success, or an error message on failure.</returns>
     [HttpPost]
     public async Task<IActionResult> Create(CreateReviewRequest request)
     {
@@ -81,6 +101,11 @@ public class ReviewController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Updates an existing review with the provided information.
+    /// </summary>
+    /// <param name="request">The update details for the review.</param>
+    /// <returns>An HTTP response containing the updated review data if successful, or an error message if the update fails.</returns>
     [HttpPut]
     public async Task<IActionResult> Update(UpdateReviewRequest request)
     {
@@ -110,6 +135,11 @@ public class ReviewController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Deletes multiple reviews identified by their GUIDs.
+    /// </summary>
+    /// <param name="ids">A list of GUIDs representing the reviews to delete.</param>
+    /// <returns>An HTTP response indicating the result of the deletion operation.</returns>
     [HttpDelete]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {

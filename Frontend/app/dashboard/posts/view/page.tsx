@@ -7,6 +7,12 @@ import { Stack, Typography } from "@mui/material";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+/**
+ * Retrieves a post by its unique identifier.
+ *
+ * @param id - The UUID of the post to fetch.
+ * @returns The post data if found; otherwise, null.
+ */
 async function getPostById(id: UUID) {
   const response = await getByIdApi(API_URL.post, { id });
   if (response.success) {
@@ -15,6 +21,11 @@ async function getPostById(id: UUID) {
   return null;
 }
 
+/**
+ * Displays a preview page for a post specified by its ID in the search parameters.
+ *
+ * If the post does not exist or the ID is invalid, triggers a 404 Not Found response.
+ */
 export default async function PostPreviewPage({
   searchParams,
 }: {

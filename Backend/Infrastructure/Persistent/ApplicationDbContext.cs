@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistent;
@@ -19,7 +19,11 @@ public class ApplicationDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<WishlistItem> WishlistItems { get; set; }
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationDbContext"/> class using the specified options.
+        /// </summary>
+        /// <param name="options">The options to be used by the database context.</param>
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

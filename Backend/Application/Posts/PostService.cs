@@ -22,6 +22,9 @@ public class PostService : IPostService
     private readonly IImageService _imageService;
     private readonly IStorageService _storageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PostService"/> class with required dependencies for data access, HTTP context, image processing, and storage.
+    /// </summary>
     public PostService(
         IUnitOfWork unitOfWork,
         IHttpContextAccessor contextAccessor,
@@ -35,6 +38,12 @@ public class PostService : IPostService
         _storageService = storageService;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of blog posts with optional text search and sorting.
+    /// </summary>
+    /// <param name="request">Pagination, search, and sorting parameters for the post list.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of post list items.</returns>
     public async Task<Result<PaginatedList>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
@@ -81,6 +90,12 @@ public class PostService : IPostService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of published post summaries filtered by title.
+    /// </summary>
+    /// <param name="request">Pagination and search criteria for retrieving posts.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of post list item responses.</returns>
     public async Task<Result<PaginatedList>> GetListItemAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
@@ -106,6 +121,12 @@ public class PostService : IPostService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves up to five published posts, excluding the specified post, ordered by most recent creation date.
+    /// </summary>
+    /// <param name="id">The ID of the post to exclude from the results.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a list of related post list item responses.</returns>
     public async Task<Result<List<PostListItemResponse>>> GetRelatedPostAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -121,6 +142,12 @@ public class PostService : IPostService
         return Result<List<PostListItemResponse>>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves detailed information for a post by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the post.</param>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <returns>A result containing the post details if found; otherwise, a failure result.</returns>
     public async Task<Result<PostDetailResponse>> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -139,6 +166,12 @@ public class PostService : IPostService
         return Result<PostDetailResponse>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves detailed information for a post identified by its slug.
+    /// </summary>
+    /// <param name="slug">The unique slug of the post.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing the post details if found; otherwise, a failure result.</returns>
     public async Task<Result<PostDetailResponse>> GetBySlugAsync(
         string slug,
         CancellationToken cancellationToken = default
@@ -156,6 +189,12 @@ public class PostService : IPostService
         return Result<PostDetailResponse>.Success(result);
     }
 
+    /// <summary>
+    /// Creates a new blog post with image optimization and storage, ensuring the title is unique.
+    /// </summary>
+    /// <param name="request">The post data to create.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing the created post response if successful; otherwise, a failure message.</returns>
     public async Task<Result<PostResponse>> CreateAsync(
         PostRequest request,
         CancellationToken cancellationToken = default
@@ -207,6 +246,12 @@ public class PostService : IPostService
         return Result<PostResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing blog post with new data, including optional image replacement and metadata updates.
+    /// </summary>
+    /// <param name="request">The post data to update, including content and image information.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing the updated post response if successful, or a failure message if the update could not be completed.</returns>
     public async Task<Result<PostResponse>> UpdateAsync(
         PostRequest request,
         CancellationToken cancellationToken = default
@@ -276,6 +321,12 @@ public class PostService : IPostService
         return Result<PostResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks a post as deleted by its ID, setting deletion metadata and flag.
+    /// </summary>
+    /// <param name="id">The unique identifier of the post to delete.</param>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <returns>A result indicating success or failure with a message.</returns>
     public async Task<Result<string>> DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -295,6 +346,11 @@ public class PostService : IPostService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Marks multiple posts as deleted by setting deletion metadata and flag for each specified post ID.
+    /// </summary>
+    /// <param name="ids">List of post IDs to be marked as deleted.</param>
+    /// <returns>A result indicating success with a confirmation message.</returns>
     public async Task<Result<string>> DeleteListAsync(
         List<Guid> ids,
         CancellationToken cancellationToken = default

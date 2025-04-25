@@ -17,6 +17,11 @@ namespace Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    /// <summary>
+    /// Registers and configures infrastructure services, including database context, Redis cache, Minio client, and core application services, into the dependency injection container.
+    /// </summary>
+    /// <param name="configuration">Application configuration used for retrieving connection strings and settings.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/> with infrastructure services registered.</returns>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration
@@ -68,6 +73,10 @@ public static class DependencyInjection
         return services;
     }
 
+    /// <summary>
+    /// Configures and registers the Minio client service using endpoint and credentials from environment variables or default values.
+    /// </summary>
+    /// <returns>The updated <see cref="IServiceCollection"/> with Minio client services registered.</returns>
     private static IServiceCollection AddInfraMinio(this IServiceCollection services)
     {
         var url =

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +7,9 @@ namespace Infrastructure.Migrations
     /// <inheritdoc />
     public partial class AddThumbnailAndSlugToPost : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Applies the migration by adding "Slug" and "ThumbnailUrl" columns to the "Post" table and updating the foreign key constraint on the "Payment" table.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -38,7 +40,9 @@ namespace Infrastructure.Migrations
                 onDelete: ReferentialAction.Cascade);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Reverts the migration by removing the "Slug" and "ThumbnailUrl" columns from the "Post" table, restoring the original foreign key constraint on the "Payment" table, and dropping the new foreign key.
+        /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(

@@ -18,6 +18,11 @@ const tabs = [
   },
 ];
 
+/**
+ * Renders a tabbed navigation layout for the profile section, displaying the active tab based on the current route and rendering nested content below.
+ *
+ * @param children - The content to display below the tab navigation.
+ */
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();

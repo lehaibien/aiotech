@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,6 +13,10 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<Product>
         c => c.ToList()
     );
 
+    /// <summary>
+    /// Configures the Entity Framework Core mapping for the <see cref="Product"/> entity, including property constraints, value conversions, relationships, indexes, and query filters.
+    /// </summary>
+    /// <param name="builder">The builder used to configure the <see cref="Product"/> entity type.</param>
     public void Configure(EntityTypeBuilder<Product> builder)
     {
         builder.HasKey(x => x.Id).HasName("PK_ProductId");

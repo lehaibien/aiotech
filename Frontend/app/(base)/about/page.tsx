@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     'Giới thiệu về công ty chuyên cung cấp linh kiện điện tử, PC, Laptop và phụ kiện gaming chất lượng cao',
 };
 
+/**
+ * Renders the company introduction page for AioTech, showcasing company values, services, and a technology blog.
+ *
+ * Displays an overview of AioTech's mission, commitment to quality, customer service, and core values, along with a link to the technology blog and information for various customer segments.
+ */
 export default function AboutPage() {
   return (
     <Box

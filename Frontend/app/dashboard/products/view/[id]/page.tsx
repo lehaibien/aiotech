@@ -8,6 +8,14 @@ type ProductViewParams = Promise<{
   id: string;
 }>;
 
+/**
+ * Renders the product detail view for a given product ID.
+ *
+ * Awaits the provided parameters to extract the product ID, fetches product details from the API, and displays the product view. If the product ID is missing or the product cannot be found, displays a "Product not found" message.
+ *
+ * @param params - A promise resolving to an object containing the product ID.
+ * @returns The product detail view component or a "Product not found" message.
+ */
 export default async function ProductViewPage({
   params,
 }: {

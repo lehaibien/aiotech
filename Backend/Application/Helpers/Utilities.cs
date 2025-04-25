@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -59,6 +59,12 @@ public static class Utilities
         };
     }
 
+    /// <summary>
+    /// Determines whether the specified file extension is included in the list of allowed extensions.
+    /// </summary>
+    /// <param name="extension">The file extension to check, with or without a leading dot.</param>
+    /// <param name="allowedExtensions">An array of allowed file extensions.</param>
+    /// <returns>True if the extension is allowed; otherwise, false.</returns>
     public static bool IsAllowedExtension(string extension, string[] allowedExtensions)
     {
         extension = extension.ToLowerInvariant();
@@ -68,6 +74,11 @@ public static class Utilities
         );
     }
 
+    /// <summary>
+    /// Retrieves the username from the JWT claims in the provided HTTP context.
+    /// </summary>
+    /// <param name="context">The HTTP context containing the user principal.</param>
+    /// <returns>The username from the JWT "name" claim, or an empty string if not found.</returns>
     public static string GetUsernameFromContext(HttpContext context)
     {
         var username = context
@@ -76,6 +87,11 @@ public static class Utilities
         return username ?? string.Empty;
     }
 
+    /// <summary>
+    /// Returns the path segments of a URL, excluding the scheme and host.
+    /// </summary>
+    /// <param name="url">The full URL string to extract path segments from.</param>
+    /// <returns>An enumerable sequence of path segments as strings.</returns>
     public static IEnumerable<string> ExtractUrlPath(string url)
     {
         var path = url.Split("/").AsEnumerable();

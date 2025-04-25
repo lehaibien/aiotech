@@ -11,6 +11,12 @@ type DashboardOrderDetailParams = Promise<{
   id: string;
 }>;
 
+/**
+ * Retrieves order details by UUID from the order API.
+ *
+ * @param id - The UUID of the order to fetch.
+ * @returns The order data if found; otherwise, undefined.
+ */
 async function getOrderById(id: UUID) {
   const response = await getByIdApi(API_URL.order, { id });
   if (response.success) {
@@ -20,6 +26,13 @@ async function getOrderById(id: UUID) {
   return undefined;
 }
 
+/**
+ * Displays the order detail page for a specific order in the dashboard.
+ *
+ * Fetches the order data using the provided order ID and renders a back button along with the order details.
+ *
+ * @param params - An object containing a promise that resolves to the order ID parameter.
+ */
 export default async function Page({
   params,
 }: {

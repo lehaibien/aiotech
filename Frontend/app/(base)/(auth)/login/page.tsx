@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   title: "Đăng nhập",
 };
 
+/**
+ * Renders the login page with form and social authentication options.
+ *
+ * Displays a login form, a registration link, and social login buttons, using the `redirect` query parameter to determine the post-login destination.
+ *
+ * @param searchParams - Query parameters from the URL, including an optional `redirect` path.
+ */
 export default async function Page({
   searchParams,
 }: {

@@ -11,6 +11,14 @@ import {
 } from "@/types";
 import { Divider, Stack, Typography } from "@mui/material";
 
+/**
+ * Displays a page for creating a new product or updating an existing product based on the provided search parameters.
+ *
+ * Fetches product details, brand options, and category options as needed, and renders the product upsert form with the appropriate default values.
+ *
+ * @param searchParams - Query parameters containing the product ID to edit, if any.
+ * @returns A React component for the product upsert page.
+ */
 export default async function ProductUpsertPage({
   searchParams,
 }: {

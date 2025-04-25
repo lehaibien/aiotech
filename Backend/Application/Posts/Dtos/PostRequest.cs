@@ -16,6 +16,9 @@ public record PostRequest(
 
 public class PostRequestValidator : AbstractValidator<PostRequest>
 {
+    /// <summary>
+    /// Initializes validation rules for <see cref="PostRequest"/>, requiring that Title, Slug, Content, and Image are not empty.
+    /// </summary>
     public PostRequestValidator()
     {
         RuleFor(x => x.Title).NotEmpty().WithMessage("Tiêu đề không được để trống");

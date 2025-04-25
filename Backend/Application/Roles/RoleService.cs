@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Application.Helpers;
 using Application.Roles.Dtos;
 using AutoMapper;
@@ -24,6 +24,11 @@ public class RoleService : IRoleService
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of roles based on search criteria.
+    /// </summary>
+    /// <param name="request">The pagination and search parameters.</param>
+    /// <returns>A result containing the paginated list of roles.</returns>
     public async Task<Result<PaginatedList>> GetList(GetListRequest request)
     {
         SqlParameter totalRow = new()
@@ -64,6 +69,11 @@ public class RoleService : IRoleService
         return Result<RoleResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Creates a new role if a role with the same name does not already exist.
+    /// </summary>
+    /// <param name="request">The details of the role to create.</param>
+    /// <returns>A result containing the created role information, or a failure if the role name already exists.</returns>
     public async Task<Result<RoleResponse>> Create(CreateRoleRequest request)
     {
         var isExists = await _unitOfWork
@@ -82,6 +92,11 @@ public class RoleService : IRoleService
         return Result<RoleResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing role with new information.
+    /// </summary>
+    /// <param name="request">The update request containing the role ID and updated fields.</param>
+    /// <returns>A result containing the updated role data if successful, or a failure message if the role does not exist or the name is already in use.</returns>
     public async Task<Result<RoleResponse>> Update(UpdateRoleRequest request)
     {
         var isExists = await _unitOfWork
@@ -105,6 +120,11 @@ public class RoleService : IRoleService
         return Result<RoleResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks a role as deleted by its ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the role to delete.</param>
+    /// <returns>A result indicating success or failure with a corresponding message.</returns>
     public async Task<Result<string>> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Role>().GetByIdAsync(id);
@@ -120,6 +140,11 @@ public class RoleService : IRoleService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Marks multiple roles as deleted by their IDs.
+    /// </summary>
+    /// <param name="ids">A list of role IDs to delete.</param>
+    /// <returns>A result indicating success or failure of the deletion operation.</returns>
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
         foreach (var id in ids)
@@ -138,6 +163,10 @@ public class RoleService : IRoleService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Retrieves all roles as a list of combo box items with role names and IDs.
+    /// </summary>
+    /// <returns>A result containing a list of combo box items representing roles.</returns>
     public async Task<Result<List<ComboBoxItem>>> GetComboBox()
     {
         var result = await _unitOfWork

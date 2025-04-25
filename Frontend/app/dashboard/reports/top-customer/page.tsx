@@ -11,6 +11,12 @@ import {
 } from "@/types";
 import { Stack, Typography } from "@mui/material";
 
+/**
+ * Retrieves top customer report data based on the specified request parameters.
+ *
+ * @param request - The parameters defining the date range and count for the report.
+ * @returns An array of {@link TopCustomerReportResponse} objects, or an empty array if the API request fails.
+ */
 async function getTopCustomerData(request: TopCustomerReportRequest) {
   const response = await getApiQuery(API_URL.topCustomerReport, request);
   if (!response.success) {
@@ -19,6 +25,14 @@ async function getTopCustomerData(request: TopCustomerReportRequest) {
   return response.data as TopCustomerReportResponse[];
 }
 
+/**
+ * Displays the top customer report page with filters, chart, and grid based on provided search parameters.
+ *
+ * Parses date and count parameters from {@link searchParams}, fetches top customer data for the specified range and count, and renders the report layout.
+ *
+ * @param searchParams - Query parameters specifying the date range and number of customers to include in the report.
+ * @returns The JSX layout for the top customer report page.
+ */
 export default async function Page({
   searchParams,
 }: {

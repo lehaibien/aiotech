@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -8,7 +8,9 @@ namespace Infrastructure.Migrations
     /// <inheritdoc />
     public partial class AddWishlist : Migration
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Applies schema changes to add the wishlist feature, including creating the WishlistItem table with foreign key constraints, updating role seed data timestamps, and modifying indexes on the Product and Post tables.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
@@ -87,7 +89,9 @@ namespace Infrastructure.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Reverts the migration by removing the WishlistItem table, restoring original indexes on the Product and Post tables, and resetting Role seed data timestamps.
+        /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

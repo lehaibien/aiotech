@@ -15,6 +15,13 @@ export const metadata: Metadata = {
   applicationName: 'AioTech',
 };
 
+/**
+ * Provides the main application layout with a header, footer, and a centered content area.
+ *
+ * Renders the {@link Header} and {@link Footer} components around the main content, which is displayed inside a Material-UI {@link Container} with maximum width and vertical padding.
+ *
+ * @param children - The page content to display within the layout.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{

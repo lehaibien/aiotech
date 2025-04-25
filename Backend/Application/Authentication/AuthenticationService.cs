@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using Application.Abstractions;
 using Application.Authentication.Dtos;
 using Application.Helpers;
@@ -26,6 +26,9 @@ public class AuthenticationService : IAuthenticationService
     private readonly IImageService _imageService;
     private readonly IStorageService _storageService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthenticationService"/> class with required dependencies.
+    /// </summary>
     public AuthenticationService(
         IJwtService jwtService,
         IUnitOfWork unitOfWork,
@@ -45,6 +48,11 @@ public class AuthenticationService : IAuthenticationService
         _storageService = storageService;
     }
 
+    /// <summary>
+    /// Authenticates a user with the provided credentials and returns JWT access and refresh tokens on success.
+    /// </summary>
+    /// <param name="request">The login request containing username and password.</param>
+    /// <returns>A result containing JWT tokens if authentication succeeds; otherwise, a failure result with an error message.</returns>
     public async Task<Result<TokenResult>> Login(AuthLoginRequest request)
     {
         var entity = await _unitOfWork
@@ -77,6 +85,11 @@ public class AuthenticationService : IAuthenticationService
         return Result<TokenResult>.Success(response);
     }
 
+    /// <summary>
+    /// Authenticates a user via social login, creating a new user account with a default role and avatar if one does not exist, and returns JWT access and refresh tokens.
+    /// </summary>
+    /// <param name="request">The OAuth login request containing user profile information.</param>
+    /// <returns>A result containing the generated access and refresh tokens.</returns>
     public async Task<Result<TokenResult>> SocialLogin(OAuthLoginRequest request)
     {
         var email = request.Email;
@@ -136,6 +149,11 @@ public class AuthenticationService : IAuthenticationService
         return Result<TokenResult>.Success(response);
     }
 
+    /// <summary>
+    /// Registers a new user account with the provided information if the username and email are not already in use.
+    /// </summary>
+    /// <param name="request">The registration details including username, email, and password.</param>
+    /// <returns>A result indicating success or failure of the registration process.</returns>
     public async Task<Result> Register(AuthRegisterRequest request)
     {
         var isExist = await _unitOfWork
@@ -162,6 +180,9 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Placeholder for confirming a user's email address. Not yet implemented.
+    /// </summary>
     public async Task<Result> ConfirmEmail(ConfirmEmailRequest request)
     {
         return null;
@@ -192,6 +213,11 @@ public class AuthenticationService : IAuthenticationService
         return Result<TokenResult>.Success(new TokenResult(accessToken, refreshToken));
     }
 
+    /// <summary>
+    /// Changes a user's password after verifying the old password and ensuring the new password is different.
+    /// </summary>
+    /// <param name="request">Contains the user ID, old password, and new password.</param>
+    /// <returns>A result indicating success or failure of the password change operation.</returns>
     public async Task<Result> ChangePassword(ChangePasswordRequest request)
     {
         if (
@@ -228,6 +254,11 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Initiates an email change request for a user by generating a confirmation token and storing the request.
+    /// </summary>
+    /// <param name="request">The email change request containing the user ID and new email address.</param>
+    /// <returns>A result indicating whether the email change request was successfully created.</returns>
     public async Task<Result> ChangeEmail(ChangeEmailRequest request)
     {
         // generate url for change email
@@ -253,6 +284,11 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Confirms a user's email change request using a provided token and updates the user's email address if valid.
+    /// </summary>
+    /// <param name="request">The email change confirmation request containing the token.</param>
+    /// <returns>A result indicating success or failure of the email change confirmation.</returns>
     public async Task<Result> ConfirmChangeEmail(ConfirmChangeEmailRequest request)
     {
         var entity = await _unitOfWork
@@ -278,6 +314,11 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Initiates a password reset process for the user with the specified email address.
+    /// </summary>
+    /// <param name="request">The password reset request containing the user's email.</param>
+    /// <returns>A result indicating whether the password reset initiation was successful.</returns>
     public async Task<Result> ResetPassword(ResetPasswordRequest request)
     {
         var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Email == request.Email);
@@ -289,6 +330,11 @@ public class AuthenticationService : IAuthenticationService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Constructs a URL by appending the provided token as a query parameter to the current HTTP request URL.
+    /// </summary>
+    /// <param name="token">The token to include in the URL as a query parameter.</param>
+    /// <returns>The constructed URL containing the token.</returns>
     private string GenerateUrl(string token)
     {
         var url = _contextAccessor.HttpContext?.Request.GetDisplayUrl();

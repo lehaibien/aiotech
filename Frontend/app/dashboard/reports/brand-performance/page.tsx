@@ -11,6 +11,17 @@ import { BrandPerformanceGrid } from "./BrandPerformanceGrid";
 
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
+/**
+ * Displays the brand performance report page with charts and detailed data.
+ *
+ * Fetches brand performance data for a specified date range, then renders a chart of the top 10 brands by revenue and a detailed grid of all brand performance metrics.
+ *
+ * @param searchParams - A promise resolving to an object containing optional `start_date` and `end_date` parameters in string format.
+ *
+ * @returns A React server component rendering the brand performance report.
+ *
+ * @remark If no date range is provided, the report defaults to the current calendar year.
+ */
 export default async function BrandPerformancePage({
   searchParams,
 }: {

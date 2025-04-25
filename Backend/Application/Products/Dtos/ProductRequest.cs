@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Products.Dtos;
@@ -24,6 +24,9 @@ public class ProductRequest
 
 public class ProductRequestValidator : AbstractValidator<ProductRequest>
 {
+    /// <summary>
+    /// Defines validation rules for the <see cref="ProductRequest"/> data transfer object using FluentValidation.
+    /// </summary>
     public ProductRequestValidator()
     {
         RuleFor(x => x.Sku)

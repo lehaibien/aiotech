@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using Application.Helpers;
 using Application.Reviews.Dtos;
@@ -117,6 +117,11 @@ public class ReviewService : IReviewService
         return Result<ReviewResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Creates a new review for a product if the user has purchased the product and has not already reviewed it.
+    /// </summary>
+    /// <param name="request">The review creation request containing product and user information.</param>
+    /// <returns>A result containing the created review if successful; otherwise, a failure result with an error message.</returns>
     public async Task<Result<ReviewResponse>> Create(CreateReviewRequest request)
     {
         var isCommented = await _unitOfWork
@@ -153,6 +158,11 @@ public class ReviewService : IReviewService
         return Result<ReviewResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing review with new information provided in the request.
+    /// </summary>
+    /// <param name="request">The update request containing the review ID and updated fields.</param>
+    /// <returns>A result containing the updated review if successful, or a failure message if the review does not exist.</returns>
     public async Task<Result<ReviewResponse>> Update(UpdateReviewRequest request)
     {
         var entity = await _unitOfWork.GetRepository<Review>().FindAsync(x => x.Id == request.Id);
@@ -169,6 +179,11 @@ public class ReviewService : IReviewService
         return Result<ReviewResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Soft deletes a review by its ID, marking it as deleted and recording deletion metadata.
+    /// </summary>
+    /// <param name="id">The unique identifier of the review to delete.</param>
+    /// <returns>A result indicating success or failure if the review does not exist.</returns>
     public async Task<Result> Delete(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
@@ -184,6 +199,11 @@ public class ReviewService : IReviewService
         return Result.Success();
     }
 
+    /// <summary>
+    /// Soft deletes multiple reviews by their IDs, marking them as deleted and recording deletion metadata.
+    /// </summary>
+    /// <param name="ids">List of review IDs to delete.</param>
+    /// <returns>A result containing the number of successfully deleted reviews as a string, or a failure if any review is not found.</returns>
     public async Task<Result<string>> DeleteList(List<Guid> ids)
     {
         foreach (var id in ids)

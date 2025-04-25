@@ -6,6 +6,12 @@ import dayjs from '@/lib/extended-dayjs';
 import { SaleReportRequest, SaleReportResponse, SearchParams } from '@/types';
 import { Box, Stack, Typography } from '@mui/material';
 
+/**
+ * Fetches sales report data from the API based on the provided request parameters.
+ *
+ * @param request - The sales report request parameters.
+ * @returns An array of sales report responses, or an empty array if the API call fails.
+ */
 async function getSaleData(request: SaleReportRequest) {
   const response = await getApiQuery(API_URL.saleReport, request);
   if (response.success) {
@@ -16,6 +22,14 @@ async function getSaleData(request: SaleReportRequest) {
   }
 }
 
+/**
+ * Server component that displays a sales report page with filters and aggregated sales statistics.
+ *
+ * Renders a sales report based on optional date range parameters, including total revenue, order counts, and a chart of sales data.
+ *
+ * @param searchParams - Optional search parameters containing `start_date` and `end_date` to filter the report.
+ * @returns A React element displaying the sales report, filter controls, and summary statistics.
+ */
 export default async function Page({
   searchParams,
 }: {

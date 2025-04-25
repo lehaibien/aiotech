@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -32,6 +32,11 @@ public class JwtService : IJwtService
         };
     }
 
+    /// <summary>
+    /// Generates a JWT access token for the specified user, embedding user identity and role claims.
+    /// </summary>
+    /// <param name="user">The user for whom the token is generated.</param>
+    /// <returns>A signed JWT string containing user claims.</returns>
     public string GenerateToken(User user)
     {
         var claims = new List<Claim>

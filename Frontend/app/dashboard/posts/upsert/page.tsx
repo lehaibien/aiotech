@@ -7,6 +7,14 @@ import { parseUUID } from "@/lib/utils";
 import { PostResponse, SearchParams } from "@/types";
 import { Stack, Typography } from "@mui/material";
 
+/**
+ * Renders the post creation or update page based on the provided search parameters.
+ *
+ * Displays a form for creating a new post or updating an existing one, depending on whether a valid post ID is present in {@link searchParams}.
+ *
+ * @param searchParams - Query parameters containing the post ID to edit, if any.
+ * @returns A React component for the post upsert page.
+ */
 export default async function UpsertPage({
   searchParams,
 }: {

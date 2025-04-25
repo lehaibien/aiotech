@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Helpers;
@@ -24,6 +24,9 @@ public class ProductService : IProductService
     private readonly ICacheService _cacheService;
     private readonly ILogger<ProductService> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProductService"/> class with required dependencies for product management, caching, image processing, storage, and logging.
+    /// </summary>
     public ProductService(
         IUnitOfWork unitOfWork,
         IHttpContextAccessor contextAccessor,
@@ -41,6 +44,12 @@ public class ProductService : IProductService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of products with optional text search and sorting.
+    /// </summary>
+    /// <param name="request">Pagination, search, and sorting parameters for the product list.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing a paginated list of product responses.</returns>
     public async Task<Result<PaginatedList>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
@@ -88,6 +97,11 @@ public class ProductService : IProductService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Retrieves a paginated and filtered list of products using a stored procedure, supporting text search, price range, categories, brands, sorting, and pagination. Caches the first page of unfiltered results for 30 minutes.
+    /// </summary>
+    /// <param name="request">Filtering and pagination criteria for the product list.</param>
+    /// <returns>A result containing the paginated list of filtered products.</returns>
     public async Task<Result<PaginatedList>> GetListFilteredAsync(
         GetListFilteredProductRequest request
     )
@@ -156,6 +170,11 @@ public class ProductService : IProductService
         return Result<PaginatedList>.Success(response);
     }
 
+    /// <summary>
+    /// Searches for products by category and name, returning a limited list of matching products.
+    /// </summary>
+    /// <param name="request">Search criteria including optional category, text search, and result limit.</param>
+    /// <returns>A result containing a list of products matching the search criteria.</returns>
     public async Task<Result<List<ProductResponse>>> SearchAsync(SearchProductRequest request)
     {
         var result = await _unitOfWork
@@ -172,6 +191,11 @@ public class ProductService : IProductService
         return Result<List<ProductResponse>>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves the top products based on total quantity sold, featured status, average review rating, and creation date, including only products with stock of at least 8.
+    /// </summary>
+    /// <param name="top">The maximum number of top products to return. Defaults to 12.</param>
+    /// <returns>A result containing a list of top product list item responses.</returns>
     public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(int top = 12)
     {
         var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
@@ -200,6 +224,11 @@ public class ProductService : IProductService
         return Result<List<ProductListItemResponse>>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves the newest products with stock of at least 10, ordered by creation date and average review rating.
+    /// </summary>
+    /// <param name="top">The maximum number of products to return. Defaults to 12.</param>
+    /// <returns>A result containing a list of the newest product list item responses.</returns>
     public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(int top = 12)
     {
         var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
@@ -222,6 +251,11 @@ public class ProductService : IProductService
         return Result<List<ProductListItemResponse>>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves products in the same category as the specified product, excluding the product itself.
+    /// </summary>
+    /// <param name="request">The request containing the product ID to find related products for.</param>
+    /// <returns>A result containing a list of related product list item responses, or a failure if the product does not exist.</returns>
     public async Task<Result<List<ProductListItemResponse>>> GetRelatedProductsAsync(
         GetRelatedProductsRequest request
     )
@@ -240,6 +274,11 @@ public class ProductService : IProductService
         return Result<List<ProductListItemResponse>>.Success(result);
     }
 
+    /// <summary>
+    /// Retrieves detailed information for a product by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the product.</param>
+    /// <returns>A result containing the product details if found; otherwise, a failure result.</returns>
     public async Task<Result<ProductDetailResponse>> GetByIdAsync(Guid id)
     {
         var entity = await _unitOfWork
@@ -270,6 +309,11 @@ public class ProductService : IProductService
         return Result<ProductDetailResponse>.Success(entity);
     }
 
+    /// <summary>
+    /// Retrieves a product by its ID and maps it to an update response model.
+    /// </summary>
+    /// <param name="id">The unique identifier of the product.</param>
+    /// <returns>A result containing the product update response if found; otherwise, a failure result.</returns>
     public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(Guid id)
     {
         var entity = await _unitOfWork
@@ -284,6 +328,11 @@ public class ProductService : IProductService
         return Result<ProductUpdateResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Creates a new product, including image optimization and upload, and returns the created product response.
+    /// </summary>
+    /// <param name="request">The product data to create.</param>
+    /// <returns>A result containing the created product response, or a failure if a product with the same SKU and name already exists.</returns>
     public async Task<Result<ProductResponse>> CreateAsync(ProductRequest request)
     {
         _logger.LogInformation(
@@ -334,6 +383,11 @@ public class ProductService : IProductService
         return Result<ProductResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Updates an existing product with new details and images, handling duplicate checks and cache invalidation.
+    /// </summary>
+    /// <param name="request">The product data to update, including optional image changes.</param>
+    /// <returns>A result containing the updated product response, or a failure message if the product does not exist or duplicates are found.</returns>
     public async Task<Result<ProductResponse>> UpdateAsync(ProductRequest request)
     {
         _logger.LogInformation("Updating product ID: {ProductId}", request.Id);
@@ -391,6 +445,11 @@ public class ProductService : IProductService
         return Result<ProductResponse>.Success(response);
     }
 
+    /// <summary>
+    /// Marks a product as deleted by its ID and updates deletion metadata.
+    /// </summary>
+    /// <param name="id">The unique identifier of the product to delete.</param>
+    /// <returns>A result indicating success or failure with a corresponding message.</returns>
     public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(id);
@@ -411,6 +470,11 @@ public class ProductService : IProductService
         return Result<string>.Success("Xóa thành công");
     }
 
+    /// <summary>
+    /// Marks multiple products as deleted by their IDs and updates relevant caches.
+    /// </summary>
+    /// <param name="ids">List of product IDs to delete.</param>
+    /// <returns>A result indicating success or failure with a message.</returns>
     public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
         foreach (var id in ids)

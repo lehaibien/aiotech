@@ -5,6 +5,11 @@ import { Box, Stack, Typography } from "@mui/material";
 import { ProductRatingGrid } from "./ProductRatingGrid";
 import { RatingDistributionChart } from "./RatingDistributionChart";
 
+/**
+ * Retrieves product rating report data from the API.
+ *
+ * @returns An array of product rating report responses, or an empty array if the fetch fails.
+ */
 async function fetchProductRatingData() {
   const response = await getApi(API_URL.productRatingReport);
   if (response.success) {
@@ -15,6 +20,11 @@ async function fetchProductRatingData() {
   }
 }
 
+/**
+ * Server component that displays product rating statistics and details.
+ *
+ * Fetches product rating data, aggregates rating distributions, and renders a chart and grid summarizing product ratings.
+ */
 export default async function ProductRatingPage() {
   const data = await fetchProductRatingData();
   const chartData = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
