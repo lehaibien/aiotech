@@ -11,23 +11,23 @@ using WebApi.Middleware;
 QuestPDF.Settings.License = LicenseType.Community;
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddControllers()
+builder
+    .Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
     });
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var configuration = builder.Configuration;
-builder.Services
-    .AddHttpContextAccessor()
+builder
+    .Services.AddHttpContextAccessor()
     .AddInfrastructure(configuration)
     .AddApplication(configuration)
     .ConfigureExceptionHandler()
-    .ConfigureCors(configuration)
+    .ConfigureCors()
     .ConfigureAuthentication(configuration)
     .ConfigureAuthorization();
 
@@ -80,13 +80,13 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-if(app.Environment.IsProduction())
+if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler();
 }

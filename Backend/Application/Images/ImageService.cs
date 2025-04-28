@@ -189,13 +189,18 @@ public class ImageService : IImageService
             },
             ImageType.BlogThumbnail => new ResizeOptions
             {
-                Size = new Size(450, 300),
+                Size = new Size(600, 400),
                 Mode = ResizeMode.Max,
             },
             ImageType.Blog => new ResizeOptions
             {
                 Size = new Size(1200, 630),
                 Mode = ResizeMode.Max,
+            },
+            ImageType.Avatar => new ResizeOptions
+            {
+                Size = new Size(100, 100),
+                Mode = ResizeMode.Crop,
             },
             ImageType.Logo => null,
             _ => null,

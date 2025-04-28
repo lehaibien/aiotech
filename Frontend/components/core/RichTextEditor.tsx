@@ -103,6 +103,7 @@ function RichTextEditor(
   return (
     <div className="border">
       <MuiRichTextEditor
+        immediatelyRender={false}
         ref={rteRef}
         extensions={extensions}
         content={defaultContent}

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using WebApi.Extensions;
-using WebApi.Model;
 
 namespace WebApi.Controllers;
 
@@ -36,7 +35,7 @@ public class BrandController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Create([FromForm] BrandRequest request)
     {
         var result = await _service.Create(request);

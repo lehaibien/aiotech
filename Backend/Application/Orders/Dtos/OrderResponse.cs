@@ -11,8 +11,8 @@ public class OrderResponse : BaseResponse
     public string? PhoneNumber { get; set; }
     public string PaymentProvider { get; set; } = Domain.Entities.PaymentProvider.Cod.ToString();
     public string Address { get; set; } = null!;
-    public double Tax { get; set; }
-    public double TotalPrice { get; set; }
+    public decimal Tax { get; set; }
+    public decimal TotalPrice { get; set; }
     public string Status { get; set; } = OrderStatus.Pending.ToString();
     public DateTime? DeliveryDate { get; set; }
     public string? Note { get; set; }

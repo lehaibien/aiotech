@@ -27,7 +27,6 @@ export type ProductListItemResponse = {
   brand: string;
   rating: number;
   thumbnailUrl: string;
-  tags: string[];
 };
 
 export type ProductDetailResponse = {
@@ -58,6 +57,7 @@ export type ProductUpdateResponse = {
   stock: number;
   brandId: UUID;
   categoryId: UUID;
+  thumbnailUrl: string;
   tags: string[];
   imageUrls: string[];
   isFeatured?: boolean;

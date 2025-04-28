@@ -1,13 +1,14 @@
 ﻿using System.Data;
 using System.Linq.Expressions;
+using System.Threading.Channels;
 using Application.Abstractions;
+using Application.Channels;
 using Application.Helpers;
 using Application.Images;
 using Application.Products.Dtos;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shared;
@@ -23,6 +24,7 @@ public class ProductService : IProductService
     private readonly IStorageService _storageService;
     private readonly ICacheService _cacheService;
     private readonly ILogger<ProductService> _logger;
+    private readonly Channel<ESProductSync> _channel;
 
     public ProductService(
         IUnitOfWork unitOfWork,
@@ -30,7 +32,8 @@ public class ProductService : IProductService
         IImageService imageService,
         IStorageService storageService,
         ICacheService cacheService,
-        ILogger<ProductService> logger
+        ILogger<ProductService> logger,
+        Channel<ESProductSync> channel
     )
     {
         _unitOfWork = unitOfWork;
@@ -39,6 +42,7 @@ public class ProductService : IProductService
         _storageService = storageService;
         _cacheService = cacheService;
         _logger = logger;
+        _channel = channel;
     }
 
     public async Task<Result<PaginatedList>> GetListAsync(
@@ -88,7 +92,7 @@ public class ProductService : IProductService
         return Result<PaginatedList>.Success(response);
     }
 
-    public async Task<Result<PaginatedList>> GetListFilteredAsync(
+    public async Task<Result<PaginatedList<ProductListItemResponse>>> GetListFilteredAsync(
         GetListFilteredProductRequest request
     )
     {
@@ -96,54 +100,52 @@ public class ProductService : IProductService
             request.PageIndex == 0
             && string.IsNullOrEmpty(request.TextSearch)
             && request.MinPrice == 0
-            && double.IsInfinity(request.MaxPrice)
+            && request.MaxPrice == 900000000
             && string.IsNullOrEmpty(request.Categories)
             && string.IsNullOrEmpty(request.Brands)
             && request.Sort == ProductSort.Default;
         if (isUnfilteredFirstPage)
         {
-            var cachedResult = await _cacheService.GetAsync<PaginatedList>(
+            var cachedResult = await _cacheService.GetAsync<PaginatedList<ProductListItemResponse>>(
                 CacheKeys.FirstPageProducts
             );
             if (cachedResult != null)
             {
-                return Result<PaginatedList>.Success(cachedResult);
+                return Result<PaginatedList<ProductListItemResponse>>.Success(cachedResult);
             }
         }
 
-        SqlParameter totalRow = new()
-        {
-            ParameterName = "@oTotalRow",
-            SqlDbType = SqlDbType.BigInt,
-            Direction = ParameterDirection.Output,
-        };
-        var parameters = new SqlParameter[]
-        {
-            new("@iTextSearch", request.TextSearch),
-            new("@iMinPrice", request.MinPrice),
-            new(
-                "@iMaxPrice",
-                double.IsInfinity(request.MaxPrice) ? double.MaxValue : request.MaxPrice
-            ),
-            new("@iCategories", string.Join(',', request.Categories?.Split(',') ?? [])),
-            new("@iBrands", string.Join(',', request.Brands?.Split(',') ?? [])),
-            new("@iSort", request.Sort),
-            new("@iPageIndex", request.PageIndex),
-            new("@iPageSize", request.PageSize),
-            totalRow,
-        };
-        var result = await _unitOfWork
-            .GetRepository<ProductListItemResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetFilteredProduct, parameters);
-        var response = new PaginatedList
+        var query = _unitOfWork
+            .GetRepository<Product>()
+            .GetAll()
+            .Where(x =>
+                (string.IsNullOrEmpty(request.Brands) || x.Brand.Name.Contains(request.Brands))
+                && (
+                    string.IsNullOrEmpty(request.Categories)
+                    || x.Category.Name.Contains(request.Categories)
+                )
+                && x.Price >= request.MinPrice
+                && x.Price <= request.MaxPrice
+                && x.Name.Contains(request.TextSearch)
+            );
+
+        query = ApplyFilterSort(query, request.Sort);
+
+        var totalRow = await query.CountAsync();
+
+        var result = await query
+            .Skip(request.PageIndex * request.PageSize)
+            .Take(request.PageSize)
+            .ProjectToProductListItemResponse()
+            .ToListAsync();
+        var response = new PaginatedList<ProductListItemResponse>
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
-            TotalCount = Convert.ToInt32(totalRow.Value),
+            TotalCount = totalRow,
             Items = result,
         };
 
-        // Cache first page with default filters
         if (isUnfilteredFirstPage)
         {
             await _cacheService.SetAsync(
@@ -153,7 +155,7 @@ public class ProductService : IProductService
             );
         }
 
-        return Result<PaginatedList>.Success(response);
+        return Result<PaginatedList<ProductListItemResponse>>.Success(response);
     }
 
     public async Task<Result<List<ProductResponse>>> SearchAsync(SearchProductRequest request)
@@ -304,8 +306,6 @@ public class ProductService : IProductService
             return Result<ProductResponse>.Failure("Sản phẩm đã tồn tại");
         }
         var entity = request.MapToProduct();
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         #region Upload image
         var thumbnailImage = await _imageService.OptimizeAsync(
             request.Thumbnail,
@@ -330,6 +330,22 @@ public class ProductService : IProductService
         await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
         await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
         var response = entity.MapToProductResponse();
+        _channel.Writer.TryWrite(
+            new ESProductSync(
+                entity.Id,
+                entity.Sku,
+                entity.Name,
+                entity.Description,
+                entity.Stock,
+                entity.Brand.Name,
+                entity.Category.Name,
+                entity.Reviews.Count > 0 ? entity.Reviews.Average(r => r.Rating) : 0,
+                entity.Price,
+                entity.DiscountPrice,
+                entity.ThumbnailUrl,
+                entity.Tags
+            )
+        );
         _logger.LogInformation("Successfully created product with ID: {ProductId}", entity.Id);
         return Result<ProductResponse>.Success(response);
     }
@@ -351,8 +367,6 @@ public class ProductService : IProductService
             return Result<ProductResponse>.Failure("Sản phẩm không tồn tại");
         }
         entity = request.ApplyToProduct(entity);
-        entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         #region Update image
         if (request.IsImageEdited)
         {
@@ -386,9 +400,31 @@ public class ProductService : IProductService
         await _cacheService.RemoveAsync(CacheKeys.TopProducts);
         await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
         await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
-        var response = entity.MapToProductResponse();
+        var updatedEntity = await _unitOfWork.GetRepository<Product>()
+            .GetAll(x => x.Id == request.Id)
+            .Include(x => x.Brand)
+            .Include(x => x.Category)
+            .Include(x => x.Reviews)
+            .FirstOrDefaultAsync();
+        _channel.Writer.TryWrite(
+            new ESProductSync(
+                updatedEntity.Id,
+                updatedEntity.Sku,
+                updatedEntity.Name,
+                updatedEntity.Description,
+                updatedEntity.Stock,
+                updatedEntity.Brand.Name,
+                updatedEntity.Category.Name,
+                updatedEntity.Reviews.Count > 0 ? updatedEntity.Reviews.Average(r => r.Rating) : 0,
+                updatedEntity.Price,
+                updatedEntity.DiscountPrice,
+                updatedEntity.ThumbnailUrl,
+                updatedEntity.Tags
+            )
+        );
+        var response = updatedEntity!.MapToProductResponse();
         _logger.LogInformation("Successfully updated product with ID: {ProductId}", request.Id);
-        return Result<ProductResponse>.Success(response);
+        return Result<ProductResponse>.Success(response!);
     }
 
     public async Task<Result<string>> DeleteAsync(Guid id)
@@ -444,6 +480,19 @@ public class ProductService : IProductService
             "stock" => x => x.Stock,
             "createdDate" => x => x.CreatedDate,
             _ => null,
+        };
+    }
+
+    private static IQueryable<Product> ApplyFilterSort(IQueryable<Product> query, ProductSort sort)
+    {
+        return sort switch
+        {
+            ProductSort.Default => query,
+            ProductSort.PriceAsc => query.OrderBy(x => x.Price),
+            ProductSort.PriceDesc => query.OrderByDescending(x => x.Price),
+            ProductSort.Newest => query.OrderByDescending(x => x.CreatedDate),
+            ProductSort.Oldest => query.OrderBy(x => x.CreatedDate),
+            _ => query,
         };
     }
 }

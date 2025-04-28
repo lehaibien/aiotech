@@ -9,7 +9,6 @@ async function getUserProfile(id: string) {
   if (response.success) {
     return response.data as UserProfileResponse;
   } else {
-    console.log(response.message);
     return {
       familyName: "",
       givenName: "",

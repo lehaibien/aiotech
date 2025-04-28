@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Exceptions;
 using Shared;
-using StackExchange.Redis;
 using WebApi.ExceptionHandler;
 
 namespace WebApi.Extensions;
@@ -19,23 +18,7 @@ public static class DependencyInjection
         return services;
     }
 
-    /*************  ✨ Windsurf Command ⭐  *************/
-    /// <summary>
-    /// Configures CORS (Cross-Origin Resource Sharing) for the application.
-    /// </summary>
-    /// <param name="services">The IServiceCollection to add services to.</param>
-    /// <param name="configuration">The application configuration settings.</param>
-    /// <returns>The updated IServiceCollection.</returns>
-    /// <remarks>
-    /// This method sets up a CORS policy that allows any method, any header,
-    /// and credentials, while allowing any origin.
-    /// </remarks>
-
-    /*******  6a1cdf82-875f-485b-b651-e1f2a80a0ac4  *******/
-    public static IServiceCollection ConfigureCors(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection ConfigureCors(this IServiceCollection services)
     {
         var cors = new EnableCorsAttribute(CommonConst.CorsPolicy);
         services.AddCors(options =>

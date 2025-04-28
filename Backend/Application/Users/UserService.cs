@@ -148,14 +148,15 @@ public class UserService : IUserService
         user.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         if (request.Image is not null)
         {
-            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Logo);
+            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
             if (optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
-                Path.Combine(FolderUpload, user.Id.ToString())
+                CommonConst.PublicBucket,
+                Path.Combine(FolderUpload, user.UserName)
             );
             user.AvatarUrl = uploadResult.Url;
         }
@@ -205,14 +206,15 @@ public class UserService : IUserService
             {
                 await _storageService.DeleteFromUrlAsync(entity.AvatarUrl);
             }
-            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Logo);
+            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
             if (optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
-                Path.Combine(FolderUpload, entity.Id.ToString())
+                CommonConst.PublicBucket,
+                Path.Combine(FolderUpload, entity.UserName)
             );
             entity.AvatarUrl = uploadResult.Url;
         }
@@ -244,14 +246,15 @@ public class UserService : IUserService
             {
                 await _storageService.DeleteFromUrlAsync(user.AvatarUrl);
             }
-            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Logo);
+            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
             if (optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
-                Path.Combine(FolderUpload, user.Id.ToString())
+                CommonConst.PublicBucket,
+                Path.Combine(FolderUpload, user.UserName)
             );
             user.AvatarUrl = uploadResult.Url;
         }

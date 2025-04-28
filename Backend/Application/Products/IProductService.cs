@@ -9,7 +9,7 @@ public interface IProductService
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<PaginatedList>> GetListFilteredAsync(GetListFilteredProductRequest request);
+    Task<Result<PaginatedList<ProductListItemResponse>>> GetListFilteredAsync(GetListFilteredProductRequest request);
     Task<Result<List<ProductResponse>>> SearchAsync(SearchProductRequest request);
     Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(int top = 12);
     Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(int top = 12);

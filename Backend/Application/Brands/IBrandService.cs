@@ -5,7 +5,7 @@ namespace Application.Brands;
 
 public interface IBrandService
 {
-    Task<Result<PaginatedList>> GetListAsync(
+    Task<Result<PaginatedList<BrandResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     );

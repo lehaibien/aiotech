@@ -17,18 +17,21 @@ public class WishlistService : IWishlistService
 
     public async Task<Result<List<WishlistItemDto>>> GetWishlistAsync(Guid userId)
     {
-        var response = await _unitOfWork.GetRepository<WishlistItem>()
+        var response = await _unitOfWork
+            .GetRepository<WishlistItem>()
             .GetAll(x => x.UserId == userId)
             .ProjectToDto()
             .ToListAsync();
         return Result<List<WishlistItemDto>>.Success(response);
     }
+
     public async Task<Result<WishlistItemDto>> AddItemToWishlistAsync(WishlistItemRequest request)
     {
-        var existingItem = await _unitOfWork.GetRepository<WishlistItem>()
+        var existingItem = await _unitOfWork
+            .GetRepository<WishlistItem>()
             .GetAll(x => x.UserId == request.UserId && x.ProductId == request.ProductId)
             .FirstOrDefaultAsync();
-        if(existingItem is not null)
+        if (existingItem is not null)
         {
             return Result<WishlistItemDto>.Failure("Sản phẩm đã có trong danh sách yêu thích");
         }
@@ -37,26 +40,31 @@ public class WishlistService : IWishlistService
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             ProductId = request.ProductId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
         _unitOfWork.GetRepository<WishlistItem>().Add(wishlistItem);
         await _unitOfWork.SaveChangesAsync();
-        var entity = await _unitOfWork.GetRepository<WishlistItem>()
+        var entity = await _unitOfWork
+            .GetRepository<WishlistItem>()
             .GetAll(x => x.Id == wishlistItem.Id)
             .ProjectToDto()
             .FirstOrDefaultAsync();
-        if(entity == null)
+        if (entity == null)
         {
-            return Result<WishlistItemDto>.Failure("Thêm sản phẩm vào danh sách yêu thích không thành công");
+            return Result<WishlistItemDto>.Failure(
+                "Thêm sản phẩm vào danh sách yêu thích không thành công"
+            );
         }
         return Result<WishlistItemDto>.Success(entity);
     }
+
     public async Task<Result> RemoveItemFromWishlistAsync(WishlistItemRequest request)
     {
-        var wishlistItem = _unitOfWork.GetRepository<WishlistItem>()
+        var wishlistItem = _unitOfWork
+            .GetRepository<WishlistItem>()
             .GetAll(x => x.UserId == request.UserId && x.ProductId == request.ProductId)
             .FirstOrDefault();
-        if(wishlistItem is null)
+        if (wishlistItem is null)
         {
             return Result.Failure("Sản phẩm không có trong danh sách yêu thích");
         }
@@ -64,9 +72,11 @@ public class WishlistService : IWishlistService
         await _unitOfWork.SaveChangesAsync();
         return Result.Success();
     }
+
     public async Task<Result> ClearWishlistAsync(Guid userId)
     {
-        var wishlistItems = _unitOfWork.GetRepository<WishlistItem>()
+        var wishlistItems = _unitOfWork
+            .GetRepository<WishlistItem>()
             .GetAll(x => x.UserId == userId);
         _unitOfWork.GetRepository<WishlistItem>().DeleteRange(wishlistItems);
         await _unitOfWork.SaveChangesAsync();

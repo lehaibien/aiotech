@@ -2,6 +2,8 @@ using Application.Abstractions;
 using Application.Images;
 using Application.Mail;
 using Domain.UnitOfWork;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Infrastructure.Caching;
 using Infrastructure.Mail;
 using Infrastructure.Persistent;
@@ -18,6 +20,23 @@ namespace Infrastructure.Extensions;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        services.AddInfraDatabase(configuration);
+        services.AddInfraRedis(configuration);
+        services.AddInfraMinio();
+        services.AddInfraElasticsearch();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IStorageService, StorageService>();
+        services.AddScoped<ICacheService, CacheService>();
+        return services;
+    }
+
+    private static IServiceCollection AddInfraDatabase(
         this IServiceCollection services,
         IConfiguration configuration
     )
@@ -48,6 +67,15 @@ public static class DependencyInjection
                     .LogTo(Console.WriteLine);
             }
         );
+
+        return services;
+    }
+
+    private static IServiceCollection AddInfraRedis(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration =
@@ -59,12 +87,6 @@ public static class DependencyInjection
                 EndPoints = { options.Configuration },
             };
         });
-        services.AddInfraMinio();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IImageService, ImageService>();
-        services.AddScoped<IStorageService, StorageService>();
-        services.AddScoped<ICacheService, CacheService>();
         return services;
     }
 
@@ -83,6 +105,15 @@ public static class DependencyInjection
                     .Build()
         );
 
+        return services;
+    }
+
+    private static IServiceCollection AddInfraElasticsearch(this IServiceCollection services)
+    {
+        var settings = new ElasticsearchClientSettings(new Uri("http://localhost:9200/"))
+            .Authentication(new BasicAuthentication("elastic", "123456"))
+            .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+        services.AddSingleton(new ElasticsearchClient(settings));
         return services;
     }
 }

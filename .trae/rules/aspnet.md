@@ -1,4 +1,3 @@
-
   # .NET Development Rules
 
   You are a senior Software Architect and an expert in C#, ASP.NET Core and Entity Framework Core.

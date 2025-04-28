@@ -35,7 +35,7 @@ export default function FilterDrawer({
   defaultCategories = [],
 }: FilterDrawerProps) {
   const theme = useTheme();
-  const defaultMaxPrice = 200000000;
+  const defaultMaxPrice = 900000000;
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<string[]>(defaultCategories);
   const [brand, setBrand] = useState<string[]>(defaultBrands);

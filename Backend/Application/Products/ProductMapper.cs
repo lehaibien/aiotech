@@ -37,8 +37,7 @@ public static class ProductMapper
             product.Stock,
             product.Brand.Name,
             product.Reviews.Count > 0 ? product.Reviews.Average(r => r.Rating) : 0,
-            product.ThumbnailUrl,
-            product.Tags
+            product.ThumbnailUrl
         );
     }
 
@@ -68,13 +67,15 @@ public static class ProductMapper
             Id = product.Id,
             Sku = product.Sku,
             Name = product.Name,
+            Description = product.Description,
+            CostPrice = product.CostPrice,
             Price = product.Price,
             DiscountPrice = product.DiscountPrice,
             Stock = product.Stock,
             BrandId = product.BrandId,
             CategoryId = product.CategoryId,
+            ThumbnailUrl = product.ThumbnailUrl,
             IsFeatured = product.IsFeatured,
-            Description = product.Description,
             ImageUrls = product.ImageUrls,
             Tags = product.Tags,
         };
@@ -89,6 +90,7 @@ public static class ProductMapper
             Name = request.Name,
             CostPrice = request.CostPrice,
             Price = request.Price,
+            Description = request.Description,
             DiscountPrice = request.DiscountPrice,
             Stock = request.Stock,
             BrandId = request.BrandId,
@@ -102,6 +104,7 @@ public static class ProductMapper
     {
         product.Sku = request.Sku;
         product.Name = request.Name;
+        product.Description = request.Description;
         product.CostPrice = request.CostPrice;
         product.Price = request.Price;
         product.DiscountPrice = request.DiscountPrice;
@@ -150,8 +153,7 @@ public static class ProductMapper
             product.Stock,
             product.Brand.Name,
             product.Reviews.Count > 0 ? product.Reviews.Average(r => r.Rating) : 0,
-            product.ThumbnailUrl,
-            product.Tags
+            product.ThumbnailUrl
         ));
     }
 }

@@ -8,6 +8,5 @@ public record ProductListItemResponse(
     int Stock,
     string Brand,
     double Rating,
-    string ThumbnailUrl,
-    IList<string> Tags
+    string ThumbnailUrl
 );

@@ -37,7 +37,7 @@ public class BrandService : IBrandService
         _logger = logger;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(
+    public async Task<Result<PaginatedList<BrandResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
@@ -73,14 +73,14 @@ public class BrandService : IBrandService
             .Take(request.PageSize)
             .ProjectToBrandResponse()
             .ToListAsync(cancellationToken);
-        var response = new PaginatedList
+        var response = new PaginatedList<BrandResponse>
         {
             PageIndex = request.PageIndex,
             PageSize = request.PageSize,
             TotalCount = totalRow,
             Items = result,
         };
-        return Result<PaginatedList>.Success(response);
+        return Result<PaginatedList<BrandResponse>>.Success(response);
     }
 
     public async Task<Result<BrandResponse>> GetById(Guid id)
@@ -107,8 +107,6 @@ public class BrandService : IBrandService
         // var entity = _mapper.Map<Brand>(request);
         var entity = request.MapToBrand();
         entity.Id = Guid.NewGuid();
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Branding);
         if (optimizedImage.IsFailure)
         {
@@ -145,11 +143,9 @@ public class BrandService : IBrandService
             return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
         }
         entity = request.ApplyToBrand(entity);
-        entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         if (request.IsImageEdited)
         {
-            if(!string.IsNullOrWhiteSpace(entity.ImageUrl))
+            if (!string.IsNullOrWhiteSpace(entity.ImageUrl))
             {
                 await _storageService.DeleteFromUrlAsync(entity.ImageUrl);
             }

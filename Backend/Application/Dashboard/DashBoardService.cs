@@ -193,8 +193,8 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
             List<Order> completedOrders = monthlyOrders
                 .Where(o => o.Status == OrderStatus.Completed)
                 .ToList();
-            double totalRevenue = completedOrders.Sum(o => o.TotalPrice);
-            double averageOrderValue =
+            decimal totalRevenue = completedOrders.Sum(o => o.TotalPrice);
+            decimal averageOrderValue =
                 completedOrders.Count != 0 ? completedOrders.Average(o => o.TotalPrice) : 0;
 
             return new DashboardSale { Date = month, Revenue = totalRevenue };

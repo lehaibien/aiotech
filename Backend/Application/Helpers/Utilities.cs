@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -8,25 +10,7 @@ public static class Utilities
 {
     public static string GetBaseUri(HttpRequest request)
     {
-        var baseUri = $"{request.Scheme}://{request.Host}";
-        return baseUri;
-    }
-
-    public static string ConvertImageUrlToBase64(string imageUrl)
-    {
-        try
-        {
-            var image = System.IO.File.OpenRead(imageUrl);
-            var bytes = new byte[image.Length];
-            var _ = image.Read(bytes, 0, (int)image.Length);
-            var base64 = "data:image/png;base64," + Convert.ToBase64String(bytes);
-            image.Close();
-            return base64;
-        }
-        catch (Exception)
-        {
-            return string.Empty;
-        }
+        return $"{request.Scheme}://{request.Host}";
     }
 
     public static string GetContentType(string fileName)
@@ -84,5 +68,23 @@ public static class Utilities
         {
             yield return path.ElementAt(i);
         }
+    }
+
+    public static string GetRandomAlphanumeric(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var result = new StringBuilder();
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            byte[] uintBuffer = new byte[sizeof(uint)];
+
+            while (result.Length < length)
+            {
+                rng.GetBytes(uintBuffer);
+                uint num = BitConverter.ToUInt32(uintBuffer, 0);
+                result.Append(chars[(int)(num % (uint)chars.Length)]);
+            }
+        }
+        return result.ToString();
     }
 }
