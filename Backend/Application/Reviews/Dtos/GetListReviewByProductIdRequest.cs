@@ -1,4 +1,4 @@
-using Shared;
+using Application.Shared;
 
 namespace Application.Reviews.Dtos;
 

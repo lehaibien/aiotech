@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using Newtonsoft.Json;
-using Shared;
+using Application.Shared;
 
 namespace Infrastructure.Mail;
 

@@ -1,4 +1,4 @@
-﻿namespace Shared;
+﻿namespace Application.Shared;
 
 public class GetListRequest
 {

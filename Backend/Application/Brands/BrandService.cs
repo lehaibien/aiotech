@@ -9,7 +9,7 @@ using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shared;
+using Application.Shared;
 
 namespace Application.Brands;
 
@@ -67,25 +67,14 @@ public class BrandService : IBrandService
                 brandQuery = brandQuery.OrderBy(sortCol);
             }
         }
-        var totalRow = await brandQuery.CountAsync(cancellationToken);
-        var result = await brandQuery
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ProjectToBrandResponse()
-            .ToListAsync(cancellationToken);
-        var response = new PaginatedList<BrandResponse>
-        {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = totalRow,
-            Items = result,
-        };
-        return Result<PaginatedList<BrandResponse>>.Success(response);
+        var dtoQuery = brandQuery.ProjectToBrandResponse();
+        var result = await PaginatedList<BrandResponse>.CreateAsync(dtoQuery, request.PageIndex, request.PageSize, cancellationToken);
+        return Result<PaginatedList<BrandResponse>>.Success(result);
     }
 
-    public async Task<Result<BrandResponse>> GetById(Guid id)
+    public async Task<Result<BrandResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
+        var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id, cancellationToken);
         if (entity is null)
         {
             return Result<BrandResponse>.Failure("Thương hiệu không tồn tại");
@@ -95,7 +84,7 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
-    public async Task<Result<BrandResponse>> Create(BrandRequest request)
+    public async Task<Result<BrandResponse>> CreateAsync(BrandRequest request)
     {
         var isExists = await _unitOfWork
             .GetRepository<Brand>()
@@ -104,7 +93,6 @@ public class BrandService : IBrandService
         {
             return Result<BrandResponse>.Failure("Thương hiệu đã tồn tại");
         }
-        // var entity = _mapper.Map<Brand>(request);
         var entity = request.MapToBrand();
         entity.Id = Guid.NewGuid();
         var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Branding);
@@ -124,7 +112,7 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
-    public async Task<Result<BrandResponse>> Update(BrandRequest request)
+    public async Task<Result<BrandResponse>> UpdateAsync(BrandRequest request)
     {
         if (request.Id == Guid.Empty)
         {
@@ -170,7 +158,7 @@ public class BrandService : IBrandService
         return Result<BrandResponse>.Success(response);
     }
 
-    public async Task<Result<string>> Delete(Guid id)
+    public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
         if (entity is null)
@@ -185,7 +173,7 @@ public class BrandService : IBrandService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<string>> DeleteList(List<Guid> ids)
+    public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
         foreach (var id in ids)
         {
@@ -203,13 +191,13 @@ public class BrandService : IBrandService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<List<ComboBoxItem>>> GetComboBox()
+    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(CancellationToken cancellationToken = default)
     {
         var result = await _unitOfWork
             .GetRepository<Brand>()
             .GetAll()
             .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         return Result<List<ComboBoxItem>>.Success(result);
     }
 

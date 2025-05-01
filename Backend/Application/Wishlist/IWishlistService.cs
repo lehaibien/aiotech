@@ -1,5 +1,5 @@
 using Application.Wishlist.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Wishlist;
 public interface IWishlistService

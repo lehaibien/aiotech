@@ -1,45 +1,41 @@
-﻿using System.Data;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Application.Helpers;
 using Application.Reviews.Dtos;
-using AutoMapper;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Shared;
 
 namespace Application.Reviews;
 
 public class ReviewService : IReviewService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ReviewService(
         IUnitOfWork unitOfWork,
-        IMapper mapper,
         IHttpContextAccessor contextAccessor
     )
     {
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _contextAccessor = contextAccessor;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(
+    public async Task<Result<PaginatedList<ReviewResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
     {
         var query = _unitOfWork.GetRepository<Review>().GetAll();
-        if (!string.IsNullOrEmpty(request.TextSearch))
+        if(!string.IsNullOrEmpty(request.TextSearch))
         {
             query = query.Where(x => x.User.UserName.Contains(request.TextSearch));
         }
+
         var sortCol = GetSortExpression(request.SortColumn);
-        if (sortCol is null)
+        if(sortCol is null)
         {
             query = query
                 .OrderByDescending(x => x.UpdatedDate)
@@ -47,7 +43,7 @@ public class ReviewService : IReviewService
         }
         else
         {
-            if (request.SortOrder?.ToLower() == "desc")
+            if(request.SortOrder?.ToLower() == "desc")
             {
                 query = query.OrderByDescending(sortCol);
             }
@@ -56,68 +52,47 @@ public class ReviewService : IReviewService
                 query = query.OrderBy(sortCol);
             }
         }
-        var totalRow = await query.CountAsync(cancellationToken);
-        var result = await query
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .Select(x => new ReviewResponse
-            {
-                Id = x.Id,
-                UserName = x.User.UserName,
-                ProductName = x.Product.Name,
-                Rating = x.Rating,
-                Comment = x.Comment,
-                CreatedDate = x.CreatedDate,
-                UpdatedDate = x.UpdatedDate,
-            })
-            .ToListAsync(cancellationToken);
-        var response = new PaginatedList
-        {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = totalRow,
-            Items = result,
-        };
-        return Result<PaginatedList>.Success(response);
+
+        var dtoQuery = query.ProjectToReviewResponse();
+        var result = await PaginatedList<ReviewResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
+        return Result<PaginatedList<ReviewResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ReviewProductResponse>>> GetByProductId(
-        GetListReviewByProductIdRequest request
+    public async Task<Result<List<ReviewProductResponse>>> GetByProductIdAsync(
+        GetListReviewByProductIdRequest request,
+        CancellationToken cancellationToken = default
     )
     {
         var result = await _unitOfWork
             .GetRepository<Review>()
             .GetAll(x => x.ProductId == request.ProductId)
             .Include(x => x.User)
-            .Select(x => new ReviewProductResponse
-            {
-                Id = x.Id,
-                UserName = x.User.UserName,
-                UserImageUrl = x.User.AvatarUrl,
-                Rating = x.Rating,
-                Comment = x.Comment,
-                CreatedDate = x.CreatedDate,
-            })
+            .ProjectToReviewProductResponse()
             .OrderByDescending(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name)
             .Skip(request.PageSize * request.PageIndex)
             .Take(request.PageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         return Result<List<ReviewProductResponse>>.Success(result);
     }
 
-    public async Task<Result<ReviewResponse>> GetById(Guid id)
+    public async Task<Result<ReviewResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
-        if (entity is null)
+        var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id, cancellationToken);
+        if(entity is null)
         {
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
 
-        var response = _mapper.Map<ReviewResponse>(entity);
+        var response = entity.MapToReviewResponse();
         return Result<ReviewResponse>.Success(response);
     }
 
-    public async Task<Result<ReviewResponse>> Create(CreateReviewRequest request)
+    public async Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request)
     {
         var isCommented = await _unitOfWork
             .GetRepository<Review>()
@@ -127,10 +102,11 @@ public class ReviewService : IReviewService
                 && x.IsDeleted == false
             )
             .FirstOrDefaultAsync();
-        if (isCommented != null)
+        if(isCommented != null)
         {
             return Result<ReviewResponse>.Failure("Bạn đã đánh giá sản phẩm này rồi");
         }
+
         var hasBought = await _unitOfWork
             .GetRepository<Order>()
             .GetAll(x =>
@@ -140,42 +116,50 @@ public class ReviewService : IReviewService
                 && x.OrderItems.Any(y => y.ProductId == request.ProductId)
             )
             .AnyAsync();
-        if (!hasBought)
+        if(!hasBought)
         {
             return Result<ReviewResponse>.Failure("Bạn chưa mua sản phẩm này");
         }
-        var entity = _mapper.Map<Review>(request);
+
+        var entity = request.MapToReview();
         entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<ReviewResponse>(entity);
+        var response = entity.MapToReviewResponse();
         return Result<ReviewResponse>.Success(response);
     }
 
-    public async Task<Result<ReviewResponse>> Update(UpdateReviewRequest request)
+    public async Task<Result<ReviewResponse>> UpdateAsync(ReviewRequest request)
     {
-        var entity = await _unitOfWork.GetRepository<Review>().FindAsync(x => x.Id == request.Id);
-        if (entity is null)
+        if(request.Id == Guid.Empty)
         {
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
-        _mapper.Map(request, entity);
+
+        var entity = await _unitOfWork.GetRepository<Review>().FindAsync(x => x.Id == request.Id);
+        if(entity is null)
+        {
+            return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
+        }
+
+        entity = request.ApplyToReview(entity);
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = _mapper.Map<ReviewResponse>(entity);
+        var response = entity.MapToReviewResponse();
         return Result<ReviewResponse>.Success(response);
     }
 
-    public async Task<Result> Delete(Guid id)
+    public async Task<Result> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result.Failure("Đánh giá không tồn tại");
         }
+
         entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
@@ -184,22 +168,24 @@ public class ReviewService : IReviewService
         return Result.Success();
     }
 
-    public async Task<Result<string>> DeleteList(List<Guid> ids)
+    public async Task<Result> DeleteListAsync(List<Guid> ids)
     {
-        foreach (var id in ids)
+        foreach(var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
-            if (entity is null)
+            if(entity is null)
             {
-                return Result<string>.Failure("Đánh giá không tồn tại");
+                return Result.Failure("Đánh giá không tồn tại");
             }
+
             entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             entity.IsDeleted = true;
             _unitOfWork.GetRepository<Review>().Update(entity);
         }
+
         await _unitOfWork.SaveChangesAsync();
-        return Result<string>.Success(ids.Count.ToString());
+        return Result.Success();
     }
 
     private static Expression<Func<Review, object>>? GetSortExpression(string? orderBy)
@@ -208,7 +194,7 @@ public class ReviewService : IReviewService
         {
             "rating" => x => x.Rating,
             "createdDate" => x => x.CreatedDate,
-            _ => x => x.CreatedDate,
+            _ => x => x.CreatedDate
         };
     }
 }

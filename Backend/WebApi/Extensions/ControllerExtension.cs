@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Model;
 
 namespace WebApi.Extensions;

@@ -1,4 +1,3 @@
-using Application.Posts.Dtos;
 using Application.Products.Dtos;
 using Domain.Entities;
 
@@ -8,7 +7,7 @@ public static class ProductMapper
 {
     public static ProductResponse MapToProductResponse(this Product product)
     {
-        return new ProductResponse()
+        return new ProductResponse
         {
             Id = product.Id,
             Sku = product.Sku,
@@ -23,7 +22,7 @@ public static class ProductMapper
             BrandId = product.BrandId,
             ImageUrls = product.ImageUrls,
             IsFeatured = product.IsFeatured,
-            CreatedDate = product.CreatedDate,
+            CreatedDate = product.CreatedDate
         };
     }
 
@@ -56,7 +55,7 @@ public static class ProductMapper
             Description = product.Description,
             ImageUrls = product.ImageUrls,
             Rating = product.Reviews.Count > 0 ? product.Reviews.Average(r => r.Rating) : 0,
-            Tags = product.Tags,
+            Tags = product.Tags
         };
     }
 
@@ -77,7 +76,7 @@ public static class ProductMapper
             ThumbnailUrl = product.ThumbnailUrl,
             IsFeatured = product.IsFeatured,
             ImageUrls = product.ImageUrls,
-            Tags = product.Tags,
+            Tags = product.Tags
         };
     }
 
@@ -96,7 +95,7 @@ public static class ProductMapper
             BrandId = request.BrandId,
             CategoryId = request.CategoryId,
             IsFeatured = request.IsFeatured,
-            Tags = request.Tags,
+            Tags = request.Tags
         };
     }
 
@@ -122,7 +121,7 @@ public static class ProductMapper
         this IQueryable<Product> query
     )
     {
-        return query.Select(product => new ProductResponse()
+        return query.Select(product => new ProductResponse
         {
             Id = product.Id,
             Sku = product.Sku,
@@ -137,7 +136,7 @@ public static class ProductMapper
             BrandId = product.BrandId,
             ImageUrls = product.ImageUrls,
             IsFeatured = product.IsFeatured,
-            CreatedDate = product.CreatedDate,
+            CreatedDate = product.CreatedDate
         });
     }
 
@@ -155,5 +154,27 @@ public static class ProductMapper
             product.Reviews.Count > 0 ? product.Reviews.Average(r => r.Rating) : 0,
             product.ThumbnailUrl
         ));
+    }
+
+    public static IQueryable<ProductDetailResponse> ProjectToProductDetailResponse(
+        this IQueryable<Product> query
+    )
+    {
+        return query.Select(x => new ProductDetailResponse
+        {
+            Id = x.Id,
+            Sku = x.Sku,
+            Name = x.Name,
+            Brand = x.Brand != null ? x.Brand.Name : "",
+            Category = x.Category != null ? x.Category.Name : "",
+            Rating = x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0,
+            ImageUrls = x.ImageUrls,
+            Price = x.Price,
+            DiscountPrice = x.DiscountPrice,
+            Stock = x.Stock,
+            Description = x.Description,
+            IsFeatured = x.IsFeatured,
+            Tags = x.Tags
+        });
     }
 }

@@ -7,17 +7,16 @@ public static class PostMapper
 {
     public static PostResponse MapToPostResponse(this Post post)
     {
-        return new PostResponse
-        {
-            Id = post.Id,
-            Title = post.Title,
-            Content = post.Content,
-            ImageUrl = post.ImageUrl,
-            IsPublished = post.IsPublished,
-            Tags = post.Tags,
-            CreatedDate = post.CreatedDate,
-            UpdatedDate = post.UpdatedDate,
-        };
+        return new PostResponse(
+            post.Id,
+            post.Title,
+            post.Content,
+            post.ImageUrl,
+            post.IsPublished,
+            post.Tags,
+            post.CreatedDate,
+            post.UpdatedDate
+        );
     }
 
     public static PostListItemResponse MapToPostListItemResponse(this Post post)
@@ -53,7 +52,7 @@ public static class PostMapper
             Slug = request.Slug,
             Content = request.Content,
             IsPublished = request.IsPublished,
-            Tags = request.Tags,
+            Tags = request.Tags
         };
     }
 
@@ -64,11 +63,24 @@ public static class PostMapper
         post.Content = request.Content;
         post.IsPublished = request.IsPublished;
         post.Tags = request.Tags;
-
         return post;
     }
 
     // Projection
+    public static IQueryable<PostResponse> ProjectToPostResponse(this IQueryable<Post> query)
+    {
+        return query.Select(p => new PostResponse(
+            p.Id,
+            p.Title,
+            p.Content,
+            p.ImageUrl,
+            p.IsPublished,
+            p.Tags,
+            p.CreatedDate,
+            p.UpdatedDate
+        ));
+    }
+
     public static IQueryable<PostListItemResponse> ProjectToPostListItemResponse(
         this IQueryable<Post> query
     )

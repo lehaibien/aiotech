@@ -1,22 +1,25 @@
 using Application.Posts.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Posts;
 
 public interface IPostService
 {
-    Task<Result<PaginatedList>> GetListAsync(
+    Task<Result<PaginatedList<PostResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<PaginatedList>> GetListItemAsync(
+
+    Task<Result<PaginatedList<PostListItemResponse>>> GetListItemAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
+
     Task<Result<List<PostListItemResponse>>> GetRelatedPostAsync(
         Guid id,
         CancellationToken cancellationToken = default
     );
+
     Task<Result<PostDetailResponse>> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default
@@ -26,17 +29,18 @@ public interface IPostService
         string slug,
         CancellationToken cancellationToken = default
     );
+
     Task<Result<PostResponse>> CreateAsync(
-        PostRequest request,
-        CancellationToken cancellationToken = default
+        PostRequest request
     );
+
     Task<Result<PostResponse>> UpdateAsync(
-        PostRequest request,
-        CancellationToken cancellationToken = default
+        PostRequest request
     );
-    Task<Result<string>> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<Result<string>> DeleteAsync(Guid id);
+
     Task<Result<string>> DeleteListAsync(
-        List<Guid> ids,
-        CancellationToken cancellationToken = default
+        List<Guid> ids
     );
 }

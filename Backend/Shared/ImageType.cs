@@ -1,4 +1,4 @@
-namespace Shared;
+namespace Application.Shared;
 
 /// <summary>
 /// Defines the different types of images used in the application and their dimensions/processing rules

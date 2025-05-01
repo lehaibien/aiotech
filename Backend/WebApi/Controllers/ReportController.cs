@@ -70,7 +70,7 @@ public class ReportController : ControllerBase
     )
     {
         var response = new ApiResponse();
-        var result = await _service.GetOutOfStockReportAsync(request);
+        var result = await _service.GetInventoryStatusReportAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

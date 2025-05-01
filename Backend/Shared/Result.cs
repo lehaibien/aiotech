@@ -1,4 +1,4 @@
-﻿namespace Shared;
+﻿namespace Application.Shared;
 
 public sealed class Result<T> where T : class
 {

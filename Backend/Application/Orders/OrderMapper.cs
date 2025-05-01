@@ -1,5 +1,6 @@
 using Application.Orders.Dtos;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Orders;
 
@@ -54,7 +55,7 @@ public static class OrderMapper
                     Id = y.Id,
                     ProductId = y.ProductId,
                     ProductName = y.Product.Name,
-                    Price = (double)y.Product.Price,
+                    Price = y.Product.Price,
                     Quantity = y.Quantity,
                 })
                 .ToList(),
@@ -76,6 +77,7 @@ public static class OrderMapper
             Address = request.Address,
             Status = OrderStatus.Pending,
             Note = request.Note,
+            OrderItems = request.OrderItems.ConvertAll(x => x.MapToOrderItem()),
         };
     }
 
@@ -104,6 +106,19 @@ public static class OrderMapper
             ProductId = request.ProductId,
             Quantity = request.Quantity,
         };
+    }
+    
+    public static Order ApplyToOrder(this OrderRequest request, Order order)
+    {
+        order.Name = request.Name;
+        order.PhoneNumber = request.PhoneNumber;
+        order.Address = request.Address;
+        order.Tax = request.Tax;
+        order.TotalPrice = request.TotalPrice;
+        order.Status = OrderStatus.Pending;
+        order.Note = request.Note;
+        order.DeliveryDate = request.DeliveryDate;
+        return order;
     }
 
     // Projection
@@ -158,10 +173,36 @@ public static class OrderMapper
                     Id = item.Id,
                     ProductId = item.ProductId,
                     ProductName = item.Product.Name,
-                    Price = (double)item.Product.Price,
+                    Price = item.Product.Price,
                     Quantity = item.Quantity,
                 })
                 .ToList(),
         });
+    }
+    
+    public static IQueryable<OrderDetailResponse> ProjectToOrderDetailResponse(this IQueryable<Order> query)
+    {
+        return query.Select(ord => new OrderDetailResponse(
+            ord.Id,
+            ord.TrackingNumber,
+            ord.Name,
+            ord.PhoneNumber,
+            ord.Address,
+            ord.Tax,
+            ord.TotalPrice,
+            ord.Status.ToString(),
+            ord.DeliveryDate,
+            ord.Payment.Provider.ToString(),
+            ord.Note,
+            ord.CreatedDate,
+            ord.OrderItems.Select(item => new OrderItemResponse
+            {
+                Id = item.Id,
+                ProductId = item.ProductId,
+                ProductName = item.Product.Name,
+                Price = item.Product.Price,
+                Quantity = item.Quantity,
+            })
+        ));
     }
 }

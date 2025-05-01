@@ -1,7 +1,7 @@
 using Application.Posts;
 using Application.Posts.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Extensions;
 
 namespace WebApi.Controllers;

@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+using Application.Shared;
 
 namespace Application.Discounts;
 
@@ -14,7 +14,7 @@ public class DiscountService : IDiscountService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Discount>> GetDiscountByCode(string couponCode)
+    public async Task<Result<Discount>> GetDiscountByCodeAsync(string couponCode)
     {
         var discount = await _unitOfWork
             .GetRepository<Discount>()
@@ -27,7 +27,7 @@ public class DiscountService : IDiscountService
         return Result<Discount>.Success(discount);
     }
 
-    public async Task<Result> IsDiscountValid(string couponCode)
+    public async Task<Result> IsDiscountValidAsync(string couponCode)
     {
         var discount = await _unitOfWork
             .GetRepository<Discount>()
@@ -44,7 +44,7 @@ public class DiscountService : IDiscountService
         return Result.Success();
     }
 
-    public async Task<Result> ApplyDiscount(string couponCode)
+    public async Task<Result> ApplyDiscountAsync(string couponCode)
     {
         var discount = await _unitOfWork
             .GetRepository<Discount>()

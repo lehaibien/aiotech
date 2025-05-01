@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Exceptions;
-using Shared;
+using Application.Shared;
 using WebApi.ExceptionHandler;
 
 namespace WebApi.Extensions;
