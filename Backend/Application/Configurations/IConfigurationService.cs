@@ -5,10 +5,16 @@ namespace Application.Configurations;
 
 public interface IConfigurationService
 {
-    Task<Result<BannerConfiguration>> GetBannerConfigurationAsync(CancellationToken cancellationToken = default);
-    Task<Result<EmailConfiguration>> GetEmailConfiguration(CancellationToken cancellationToken = default);
-    Task<Result<BannerConfiguration>> SetBannerConfiguration(
+    Task<Result<BannerConfiguration>> GetBannerConfigurationAsync(
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<EmailConfiguration>> GetEmailConfigurationAsync(
+        CancellationToken cancellationToken = default
+    );
+    Task<Result<BannerConfiguration>> SetBannerConfigurationAsync(
         BannerConfiguration bannerConfiguration
     );
-    Task<Result<EmailConfiguration>> SetEmailConfiguration(EmailConfiguration emailConfiguration);
+    Task<Result<EmailConfiguration>> SetEmailConfigurationAsync(
+        EmailConfiguration emailConfiguration
+    );
 }

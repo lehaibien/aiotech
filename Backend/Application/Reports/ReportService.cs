@@ -26,12 +26,12 @@ public class ReportService : IReportService
             .GetAll(o =>
                 o.CreatedDate >= request.StartDate
                 && o.CreatedDate <= request.EndDate
-                && o.IsDeleted == false
+                && !o.IsDeleted
             )
             .ToListAsync(cancellationToken);
 
         var allMonths = new List<DateTime>();
-        for(var month = request.StartDate; month <= request.EndDate; month = month.AddMonths(1))
+        for (var month = request.StartDate; month <= request.EndDate; month = month.AddMonths(1))
         {
             allMonths.Add(new DateTime(month.Year, month.Month, 1));
         }
@@ -42,9 +42,7 @@ public class ReportService : IReportService
 
         var report = allMonths.ConvertAll(month =>
         {
-            var monthlyOrders = groupedOrders.TryGetValue(month, out var value)
-                ? value
-                : [];
+            var monthlyOrders = groupedOrders.TryGetValue(month, out var value) ? value : [];
 
             var completedOrders = monthlyOrders
                 .Where(o => o.Status == OrderStatus.Completed)
@@ -73,10 +71,12 @@ public class ReportService : IReportService
     {
         var parameters = new SqlParameter[]
         {
-            new("@iStartDate", request.StartDate), new("@iEndDate", request.EndDate), new(
+            new("@iStartDate", request.StartDate),
+            new("@iEndDate", request.EndDate),
+            new(
                 "@iCustomerUsername",
                 request.CustomerUsername is null ? DBNull.Value : request.CustomerUsername
-            )
+            ),
         };
         var reports = await _unitOfWork
             .GetRepository<OrderReportResponse>()
@@ -85,7 +85,9 @@ public class ReportService : IReportService
         return Result<List<OrderReportResponse>>.Success(reports.ToList());
     }
 
-    public async Task<Result<PaginatedList<InventoryStatusReportResponse>>> GetInventoryStatusReportAsync(
+    public async Task<
+        Result<PaginatedList<InventoryStatusReportResponse>>
+    > GetInventoryStatusReportAsync(
         InventoryStatusReportRequest request,
         CancellationToken cancellationToken = default
     )
@@ -97,7 +99,8 @@ public class ReportService : IReportService
                 (request.BrandId == null || x.BrandId == request.BrandId)
                 && (request.CategoryId == null || x.CategoryId == request.CategoryId)
             );
-        var dtoQuery = query.Select(p => new InventoryStatusReportResponse(
+        var dtoQuery = query
+            .Select(p => new InventoryStatusReportResponse(
                 p.Id,
                 p.Sku,
                 p.Name,
@@ -105,7 +108,9 @@ public class ReportService : IReportService
                 p.Category.Name,
                 p.Brand.Name,
                 p.ImageUrls,
-                p.Stock <= 0 ? "Out of Stock" : p.Stock <= lowStockThreshold ? "Low Stock" : "In Stock",
+                p.Stock <= 0 ? "Out of Stock"
+                    : p.Stock <= lowStockThreshold ? "Low Stock"
+                    : "In Stock",
                 p.Stock <= lowStockThreshold
             ))
             .OrderBy(p => p.CurrentStock);
@@ -126,31 +131,44 @@ public class ReportService : IReportService
     {
         var parameters = new SqlParameter[]
         {
-            new("@iStartDate", request.StartDate), new("@iEndDate", request.EndDate)
+            new("@iStartDate", request.StartDate),
+            new("@iEndDate", request.EndDate),
         };
         var reports = await _unitOfWork
             .GetRepository<BrandPerformanceReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetBrandPerformanceReport, parameters, cancellationToken);
+            .ExecuteStoredProcedureAsync(
+                StoredProcedure.GetBrandPerformanceReport,
+                parameters,
+                cancellationToken
+            );
         return Result<List<BrandPerformanceReportResponse>>.Success(reports.ToList());
     }
 
     public async Task<
         Result<List<CategoryPerformanceReportResponse>>
-    > GetCategoryPerformanceReportAsync(CategoryPerformanceReportRequest request,
-        CancellationToken cancellationToken = default)
+    > GetCategoryPerformanceReportAsync(
+        CategoryPerformanceReportRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         var parameters = new SqlParameter[]
         {
-            new("@iStartDate", request.StartDate), new("@iEndDate", request.EndDate)
+            new("@iStartDate", request.StartDate),
+            new("@iEndDate", request.EndDate),
         };
         var reports = await _unitOfWork
             .GetRepository<CategoryPerformanceReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetCategoryPerformanceReport, parameters, cancellationToken);
+            .ExecuteStoredProcedureAsync(
+                StoredProcedure.GetCategoryPerformanceReport,
+                parameters,
+                cancellationToken
+            );
         return Result<List<CategoryPerformanceReportResponse>>.Success(reports.ToList());
     }
 
     public async Task<Result<List<ProductRatingReportResponse>>> GetProductRatingReportAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var reports = await _unitOfWork
             .GetRepository<Product>()
@@ -166,10 +184,10 @@ public class ReportService : IReportService
                     { 2, p.Reviews.Count(r => r.Rating == 2) },
                     { 3, p.Reviews.Count(r => r.Rating == 3) },
                     { 4, p.Reviews.Count(r => r.Rating == 4) },
-                    { 5, p.Reviews.Count(r => r.Rating == 5) }
+                    { 5, p.Reviews.Count(r => r.Rating == 5) },
                 },
-                Convert.ToDouble(p.Reviews.Count(r => r.Rating >= 4) / p.Reviews.Count * 100),
-                Convert.ToDouble(p.Reviews.Count(r => r.Rating <= 2) / p.Reviews.Count * 100)
+                Convert.ToDouble(p.Reviews.Count(r => r.Rating >= 4) / p.Reviews.Count) * 100,
+                Convert.ToDouble(p.Reviews.Count(r => r.Rating <= 2) / p.Reviews.Count) * 100
             ))
             .OrderByDescending(p => p.AverageRating)
             .ToListAsync(cancellationToken);
@@ -183,11 +201,17 @@ public class ReportService : IReportService
     {
         var parameters = new SqlParameter[]
         {
-            new("@iStartDate", request.StartDate), new("@iEndDate", request.EndDate), new("@iCount", request.Count)
+            new("@iStartDate", request.StartDate),
+            new("@iEndDate", request.EndDate),
+            new("@iCount", request.Count),
         };
         var result = await _unitOfWork
             .GetRepository<TopCustomerReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetTopCustomerReport, parameters, cancellationToken);
+            .ExecuteStoredProcedureAsync(
+                StoredProcedure.GetTopCustomerReport,
+                parameters,
+                cancellationToken
+            );
         return Result<List<TopCustomerReportResponse>>.Success(result.ToList());
     }
 
@@ -204,16 +228,18 @@ public class ReportService : IReportService
                 && oi.Order.Status == OrderStatus.Completed
             )
             .GroupBy(oi => oi.ProductId);
-        var dtoQuery = query.Select(g => new TopSellingProductResponse(
-            g.Key,
-            g.First().Product.Sku,
-            g.First().Product.Name,
-            g.Sum(oi => oi.Quantity),
-            g.Sum(oi => oi.Price * oi.Quantity),
-            g.First().Product.Reviews.Any()
-                ? g.First().Product.Reviews.Average(r => r.Rating)
-                : 0
-        )).OrderByDescending(p => p.TotalQuantitySold);
+        var dtoQuery = query
+            .Select(g => new TopSellingProductResponse(
+                g.Key,
+                g.First().Product.Sku,
+                g.First().Product.Name,
+                g.Sum(oi => oi.Quantity),
+                g.Sum(oi => oi.Price * oi.Quantity),
+                g.First().Product.Reviews.Any()
+                    ? g.First().Product.Reviews.Average(r => r.Rating)
+                    : 0
+            ))
+            .OrderByDescending(p => p.TotalQuantitySold);
         var result = await PaginatedList<TopSellingProductResponse>.CreateAsync(
             dtoQuery,
             request.PageIndex,

@@ -36,7 +36,7 @@ public class ConfigurationController : ControllerBase
     public async Task<IActionResult> SetBannerConfiguration([FromBody] BannerConfiguration request)
     {
         var response = new ApiResponse();
-        var result = await _service.SetBannerConfiguration(request);
+        var result = await _service.SetBannerConfigurationAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -52,7 +52,7 @@ public class ConfigurationController : ControllerBase
     public async Task<IActionResult> GetEmailConfiguration()
     {
         var response = new ApiResponse();
-        var result = await _service.GetEmailConfiguration();
+        var result = await _service.GetEmailConfigurationAsync();
         if (result.IsFailure)
         {
             response.Success = false;
@@ -68,7 +68,7 @@ public class ConfigurationController : ControllerBase
     public async Task<IActionResult> SetEmailConfiguration([FromBody] EmailConfiguration request)
     {
         var response = new ApiResponse();
-        var result = await _service.SetEmailConfiguration(request);
+        var result = await _service.SetEmailConfigurationAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

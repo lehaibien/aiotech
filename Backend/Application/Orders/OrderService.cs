@@ -33,7 +33,7 @@ public class OrderService : IOrderService
         IEmailService emailService,
         IHubContext<NotificationHub, INotificationClient> notificationHubContext,
         MomoLibrary momoLibrary
-        // IDiscountService discountService
+    // IDiscountService discountService
     )
     {
         _unitOfWork = unitOfWork;
@@ -51,17 +51,17 @@ public class OrderService : IOrderService
     )
     {
         var orderQuery = _unitOfWork.GetRepository<Order>().GetAll();
-        if(request.Statuses.Count > 0)
+        if (request.Statuses.Count > 0)
         {
             orderQuery = orderQuery.Where(x => request.Statuses.Contains(x.Status));
         }
 
-        if(request.CustomerId.HasValue && request.CustomerId != Guid.Empty)
+        if (request.CustomerId.HasValue && request.CustomerId != Guid.Empty)
         {
             orderQuery = orderQuery.Where(x => x.CustomerId == request.CustomerId);
         }
 
-        if(!string.IsNullOrEmpty(request.TextSearch))
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
             orderQuery = orderQuery.Where(x =>
                 x.Name.ToLower().Contains(request.TextSearch.ToLower())
@@ -70,7 +70,7 @@ public class OrderService : IOrderService
             );
         }
 
-        if(request.SortOrder?.ToLower() == "desc")
+        if (request.SortOrder?.ToLower() == "desc")
         {
             orderQuery = orderQuery.OrderByDescending(GetSortExpression(request.SortColumn));
         }
@@ -89,8 +89,10 @@ public class OrderService : IOrderService
         return Result<PaginatedList<OrderResponse>>.Success(result);
     }
 
-    public async Task<Result<List<OrderResponse>>> GetByUsernameAsync(string username,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<List<OrderResponse>>> GetByUsernameAsync(
+        string username,
+        CancellationToken cancellationToken = default
+    )
     {
         var entities = await _unitOfWork
             .GetRepository<Order>()
@@ -100,8 +102,10 @@ public class OrderService : IOrderService
         return Result<List<OrderResponse>>.Success(entities);
     }
 
-    public async Task<Result<List<OrderResponse>>> GetRecentOrdersAsync(int count,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<List<OrderResponse>>> GetRecentOrdersAsync(
+        int count,
+        CancellationToken cancellationToken = default
+    )
     {
         var entities = await _unitOfWork
             .GetRepository<Order>()
@@ -113,14 +117,17 @@ public class OrderService : IOrderService
         return Result<List<OrderResponse>>.Success(entities);
     }
 
-    public async Task<Result<OrderDetailResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<OrderDetailResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork
             .GetRepository<Order>()
             .GetAll(x => x.Id == id)
             .ProjectToOrderDetailResponse()
             .FirstOrDefaultAsync(cancellationToken);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<OrderDetailResponse>.Failure("Đơn hàng không tồn tại");
         }
@@ -135,12 +142,12 @@ public class OrderService : IOrderService
             .GetRepository<Product>()
             .GetAll(x => productIds.Contains(x.Id))
             .ToList();
-        foreach(var product in products)
+        foreach (var product in products)
         {
             var productId = product.Id;
             var quantity =
                 request.OrderItems.FirstOrDefault(x => x.ProductId == productId)?.Quantity ?? 0;
-            if(product.Stock < quantity)
+            if (product.Stock < quantity)
             {
                 return Result<string>.Failure("Sản phẩm đã hết hàng");
             }
@@ -149,13 +156,11 @@ public class OrderService : IOrderService
         var entity = request.MapToOrder();
         entity.TrackingNumber = GenerateTrackingNumber();
         entity.Status = OrderStatus.Pending;
-        foreach(var item in entity.OrderItems)
+        foreach (var item in entity.OrderItems)
         {
             item.OrderId = entity.Id;
         }
 
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         // if (!string.IsNullOrWhiteSpace(request.CouponCode))
         // {
         //     var discount = await _discountService.GetDiscountByCode(request.CouponCode);
@@ -187,7 +192,7 @@ public class OrderService : IOrderService
                 _contextAccessor.HttpContext
             ),
             PaymentProvider.Momo => await _momoLibrary.CreatePaymentUrlAsync(entity),
-            _ => ""
+            _ => "",
         };
         return Result<string>.Success(url);
     }
@@ -198,13 +203,11 @@ public class OrderService : IOrderService
         entity.TrackingNumber = GenerateTrackingNumber();
         entity.Status = OrderStatus.Pending;
         var items = request.OrderItems.ConvertAll(x => x.MapToOrderItem());
-        foreach(var item in items)
+        foreach (var item in items)
         {
             item.OrderId = entity.Id;
         }
 
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Add(entity);
         _unitOfWork.GetRepository<OrderItem>().AddRange(items);
         await _unitOfWork.SaveChangesAsync();
@@ -214,21 +217,13 @@ public class OrderService : IOrderService
 
     public async Task<Result<OrderResponse>> UpdateAsync(OrderRequest request)
     {
-        var isExists = await _unitOfWork.GetRepository<Order>().AnyAsync(x => x.Id != request.Id);
-        if(isExists)
-        {
-            return Result<OrderResponse>.Failure("Đơn hàng đã tồn tại");
-        }
-
         var entity = await _unitOfWork.GetRepository<Order>().FindAsync(x => x.Id == request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<OrderResponse>.Failure("Đơn hàng không tồn tại");
         }
 
         entity = request.ApplyToOrder(entity);
-        entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToOrderResponse();
@@ -238,7 +233,7 @@ public class OrderService : IOrderService
     public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<string>.Failure("Đơn hàng không tồn tại");
         }
@@ -253,10 +248,10 @@ public class OrderService : IOrderService
 
     public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
-        foreach(var id in ids)
+        foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-            if(entity is null)
+            if (entity is null)
             {
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             }
@@ -274,22 +269,22 @@ public class OrderService : IOrderService
     public async Task<Result> ChangeStatusAsync(OrderUpdateStatusRequest request)
     {
         var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
 
-        if(entity.Status == OrderStatus.Cancelled)
+        if (entity.Status == OrderStatus.Cancelled)
         {
             return Result.Failure("Đơn hàng đã bị hủy");
         }
 
-        if(request.Status == OrderStatus.Delivered)
+        if (request.Status == OrderStatus.Delivered)
         {
             entity.DeliveryDate = DateTime.UtcNow;
         }
 
-        if(
+        if (
             entity.Status == OrderStatus.Delivered
             && request.Status != OrderStatus.Delivered
             && entity.Status != OrderStatus.Completed
@@ -299,8 +294,6 @@ public class OrderService : IOrderService
         }
 
         entity.Status = request.Status;
-        entity.UpdatedDate = DateTime.UtcNow;
-        entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -313,17 +306,15 @@ public class OrderService : IOrderService
 
     public async Task<Result<string>> ChangeStatusListAsync(List<Guid> ids, OrderStatus status)
     {
-        foreach(var id in ids)
+        foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-            if(entity is null)
+            if (entity is null)
             {
                 return Result<string>.Failure("Đơn hàng không tồn tại");
             }
 
             entity.Status = status;
-            entity.UpdatedDate = DateTime.UtcNow;
-            entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
             _unitOfWork.GetRepository<Order>().Update(entity);
         }
 
@@ -339,7 +330,7 @@ public class OrderService : IOrderService
             .Include(o => o.OrderItems)
             .ThenInclude(i => i.Product)
             .FirstOrDefaultAsync(o => o.Id == id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<byte[]>.Failure("Đơn hàng không tồn tại");
         }
@@ -356,21 +347,21 @@ public class OrderService : IOrderService
         var paymentResponse = new PaymentResponse();
         try
         {
-            if(!string.IsNullOrWhiteSpace(bankCode))
+            if (!string.IsNullOrWhiteSpace(bankCode))
             {
                 var pay = new VnPayLibrary();
                 paymentResponse = pay.GetFullResponseData(queryCollection, _option.HashSecret);
             }
-            else if(!string.IsNullOrEmpty(partnerCode))
+            else if (!string.IsNullOrWhiteSpace(partnerCode))
             {
                 paymentResponse = await _momoLibrary.PaymentExecuteAsync(queryCollection);
             }
 
             var orderId = Guid.Parse(paymentResponse.OrderId);
-            if(!paymentResponse.Success)
+            if (!paymentResponse.Success)
             {
                 var deleteOrder = await _unitOfWork.GetRepository<Order>().GetByIdAsync(orderId);
-                if(deleteOrder is not null)
+                if (deleteOrder is not null)
                 {
                     _unitOfWork.GetRepository<Order>().Delete(deleteOrder);
                     await _unitOfWork.SaveChangesAsync();
@@ -386,7 +377,7 @@ public class OrderService : IOrderService
                 Provider = PaymentProvider.VnPay,
                 Amount = Convert.ToDouble(paymentResponse.Amount),
                 Description = paymentResponse.OrderDescription,
-                CreatedDate = paymentResponse.PayDate
+                CreatedDate = paymentResponse.PayDate,
             };
 
             var order = await _unitOfWork
@@ -395,7 +386,7 @@ public class OrderService : IOrderService
                 .Include(x => x.OrderItems)
                 .ThenInclude(x => x.Product)
                 .FirstOrDefaultAsync(x => x.Id == orderId);
-            if(order is not null)
+            if (order is not null)
             {
                 order.Status = OrderStatus.Paid;
                 var cartItems = await _unitOfWork
@@ -407,7 +398,7 @@ public class OrderService : IOrderService
                     .GetRepository<Product>()
                     .GetAll(x => cartItems.Select(x => x.ProductId).Contains(x.Id))
                     .ToListAsync();
-                foreach(var product in products)
+                foreach (var product in products)
                 {
                     var item = cartItems.FirstOrDefault(x => x.ProductId == product.Id)!;
                     product.Stock -= item.Quantity;
@@ -436,9 +427,9 @@ public class OrderService : IOrderService
                             {
                                 { "name", x.Product.Name },
                                 { "quantity", x.Quantity.ToString() },
-                                { "price", x.Product.Price.ToString("N0") + " đ" }
+                                { "price", x.Product.Price.ToString("N0") + " đ" },
                             })
-                        }
+                        },
                     }
                 );
                 await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -461,30 +452,28 @@ public class OrderService : IOrderService
     public async Task<Result> CancelAsync(OrderCancelRequest request)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(request.Id);
-        if(order is null)
+        if (order is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
 
-        if(
+        if (
             order.Status
             is not OrderStatus.Pending
-            and not OrderStatus.Paid
-            and not OrderStatus.Processing
+                and not OrderStatus.Paid
+                and not OrderStatus.Processing
         )
         {
             return Result.Failure("Không thể hủy đơn hàng");
         }
 
-        if(order.Status == OrderStatus.Cancelled)
+        if (order.Status == OrderStatus.Cancelled)
         {
             return Result.Failure("Đơn hàng đã được hủy");
         }
 
         order.Status = OrderStatus.Cancelled;
         order.CancelReason = request.Reason;
-        order.UpdatedDate = DateTime.UtcNow;
-        order.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -496,19 +485,17 @@ public class OrderService : IOrderService
     public async Task<Result> ConfirmAsync(Guid id)
     {
         var order = await _unitOfWork.GetRepository<Order>().GetByIdAsync(id);
-        if(order is null)
+        if (order is null)
         {
             return Result.Failure("Đơn hàng không tồn tại");
         }
 
-        if(order.Status != OrderStatus.Delivered)
+        if (order.Status != OrderStatus.Delivered)
         {
             return Result.Failure("Không thể xác nhận đơn hàng");
         }
 
         order.Status = OrderStatus.Completed;
-        order.UpdatedDate = DateTime.UtcNow;
-        order.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Order>().Update(order);
         await _unitOfWork.SaveChangesAsync();
         await _notificationHubContext.Clients.All.ReceiveNotification(
@@ -524,7 +511,7 @@ public class OrderService : IOrderService
             "name" => x => x.Name,
             "trackingnumber" => x => x.TrackingNumber,
             "phonenumber" => x => x.PhoneNumber,
-            _ => x => x.Id
+            _ => x => x.Id,
         };
     }
 

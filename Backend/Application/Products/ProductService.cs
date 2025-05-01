@@ -50,7 +50,7 @@ public class ProductService : IProductService
     )
     {
         var productQuery = _unitOfWork.GetRepository<Product>().GetAll();
-        if(!string.IsNullOrEmpty(request.TextSearch))
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
             productQuery = productQuery.Where(x =>
                 x.Sku.ToLower().Contains(request.TextSearch.ToLower())
@@ -59,7 +59,7 @@ public class ProductService : IProductService
         }
 
         var sortCol = GetSortExpression(request.SortColumn);
-        if(sortCol is null)
+        if (sortCol is null)
         {
             productQuery = productQuery
                 .OrderByDescending(x => x.UpdatedDate)
@@ -67,7 +67,7 @@ public class ProductService : IProductService
         }
         else
         {
-            if(request.SortOrder?.ToLower() == "desc")
+            if (request.SortOrder?.ToLower() == "desc")
             {
                 productQuery = productQuery.OrderByDescending(sortCol);
             }
@@ -97,7 +97,7 @@ public class ProductService : IProductService
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .FindAsync(x => x.Name == request.Name && x.Sku == request.Sku);
-        if(isExists != null)
+        if (isExists != null)
         {
             _logger.LogWarning(
                 "Product already exists with SKU: {Sku} and Name: {Name} when trying to create",
@@ -162,13 +162,13 @@ public class ProductService : IProductService
         var isExists = await _unitOfWork
             .GetRepository<Product>()
             .AnyAsync(x => x.Id != request.Id && x.Name == request.Name && x.Sku == request.Sku);
-        if(isExists)
+        if (isExists)
         {
             return Result<ProductResponse>.Failure("Sản phẩm đã tồn tại");
         }
 
         var entity = await _unitOfWork.GetRepository<Product>().FindAsync(x => x.Id == request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             _logger.LogWarning("Product not found for update with ID: {ProductId}", request.Id);
             return Result<ProductResponse>.Failure("Sản phẩm không tồn tại");
@@ -178,7 +178,7 @@ public class ProductService : IProductService
 
         #region Update image
 
-        if(request.IsImageEdited)
+        if (request.IsImageEdited)
         {
             var deleteUrls = new List<string> { entity.ThumbnailUrl };
             deleteUrls.AddRange(entity.ImageUrls);
@@ -212,7 +212,8 @@ public class ProductService : IProductService
         await _cacheService.RemoveAsync(CacheKeys.TopProducts);
         await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
         await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
-        var updatedEntity = await _unitOfWork.GetRepository<Product>()
+        var updatedEntity = await _unitOfWork
+            .GetRepository<Product>()
             .GetAll(x => x.Id == request.Id)
             .Include(x => x.Brand)
             .Include(x => x.Category)
@@ -242,7 +243,7 @@ public class ProductService : IProductService
     public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(id);
-        if(entity is null)
+        if (entity is null)
         {
             _logger.LogWarning("Product not found for deletion with ID: {ProductId}", id);
             return Result<string>.Failure("Sản phẩm không tồn tại");
@@ -262,10 +263,10 @@ public class ProductService : IProductService
 
     public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
-        foreach(var id in ids)
+        foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(id);
-            if(entity is null)
+            if (entity is null)
             {
                 return Result<string>.Failure("Sản phẩm không tồn tại");
             }
@@ -297,12 +298,12 @@ public class ProductService : IProductService
             && string.IsNullOrEmpty(request.Categories)
             && string.IsNullOrEmpty(request.Brands)
             && request.Sort == ProductSort.Default;
-        if(isUnfilteredFirstPage)
+        if (isUnfilteredFirstPage)
         {
             var cachedResult = await _cacheService.GetAsync<PaginatedList<ProductListItemResponse>>(
                 CacheKeys.FirstPageProducts
             );
-            if(cachedResult != null)
+            if (cachedResult != null)
             {
                 return Result<PaginatedList<ProductListItemResponse>>.Success(cachedResult);
             }
@@ -310,8 +311,7 @@ public class ProductService : IProductService
 
         var query = _unitOfWork
             .GetRepository<Product>()
-            .GetAll()
-            .Where(x =>
+            .GetAll(x =>
                 (string.IsNullOrEmpty(request.Brands) || x.Brand.Name.Contains(request.Brands))
                 && (
                     string.IsNullOrEmpty(request.Categories)
@@ -330,7 +330,7 @@ public class ProductService : IProductService
             request.PageSize,
             cancellationToken
         );
-        if(isUnfilteredFirstPage)
+        if (isUnfilteredFirstPage)
         {
             await _cacheService.SetAsync(
                 CacheKeys.FirstPageProducts,
@@ -342,28 +342,33 @@ public class ProductService : IProductService
         return Result<PaginatedList<ProductListItemResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ProductResponse>>> SearchAsync(SearchProductRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<List<ProductResponse>>> SearchAsync(
+        SearchProductRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x =>
                 !x.IsDeleted
                 && (request.Category == null || x.Category.Name == request.Category)
-                && x.Name.Contains(request.TextSearch))
+                && x.Name.Contains(request.TextSearch)
+            )
             .ProjectToProductResponse()
             .Take(request.SearchLimit)
             .ToListAsync(cancellationToken);
         return Result<List<ProductResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(int top = 12,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(
+        int top = 12,
+        CancellationToken cancellationToken = default
+    )
     {
         var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
             CacheKeys.TopProducts
         );
-        if(productInCache is not null)
+        if (productInCache is not null)
         {
             return Result<List<ProductListItemResponse>>.Success(productInCache);
         }
@@ -387,13 +392,15 @@ public class ProductService : IProductService
         return Result<List<ProductListItemResponse>>.Success(result);
     }
 
-    public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(int top = 12,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(
+        int top = 12,
+        CancellationToken cancellationToken = default
+    )
     {
         var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
             CacheKeys.NewestProducts
         );
-        if(productInCache is not null)
+        if (productInCache is not null)
         {
             return Result<List<ProductListItemResponse>>.Success(productInCache);
         }
@@ -416,8 +423,10 @@ public class ProductService : IProductService
         CancellationToken cancellationToken = default
     )
     {
-        var entity = await _unitOfWork.GetRepository<Product>().GetByIdAsync(request.Id, cancellationToken);
-        if(entity is null)
+        var entity = await _unitOfWork
+            .GetRepository<Product>()
+            .GetByIdAsync(request.Id, cancellationToken);
+        if (entity is null)
         {
             return Result<List<ProductListItemResponse>>.Failure("Sản phẩm không tồn tại");
         }
@@ -430,15 +439,17 @@ public class ProductService : IProductService
         return Result<List<ProductListItemResponse>>.Success(result);
     }
 
-    public async Task<Result<ProductDetailResponse>> GetByIdAsync(Guid id,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<ProductDetailResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => x.Id == id)
             .ProjectToProductDetailResponse()
             .FirstOrDefaultAsync(cancellationToken);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<ProductDetailResponse>.Failure("Sản phẩm không tồn tại");
         }
@@ -446,14 +457,16 @@ public class ProductService : IProductService
         return Result<ProductDetailResponse>.Success(entity);
     }
 
-    public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(Guid id,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => x.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<ProductUpdateResponse>.Failure("Sản phẩm không tồn tại");
         }
@@ -472,7 +485,7 @@ public class ProductService : IProductService
             "discountPrice" => x => x.DiscountPrice,
             "stock" => x => x.Stock,
             "createdDate" => x => x.CreatedDate,
-            _ => null
+            _ => null,
         };
     }
 
@@ -485,7 +498,7 @@ public class ProductService : IProductService
             ProductSort.PriceDesc => query.OrderByDescending(x => x.Price),
             ProductSort.Newest => query.OrderByDescending(x => x.CreatedDate),
             ProductSort.Oldest => query.OrderBy(x => x.CreatedDate),
-            _ => query
+            _ => query,
         };
     }
 }

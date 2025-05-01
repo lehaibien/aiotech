@@ -1,11 +1,11 @@
 using Application.Abstractions;
 using Application.Configurations.Dtos;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using Application.Shared;
 
 namespace Application.Configurations;
 
@@ -20,10 +20,15 @@ public class ConfigurationService : IConfigurationService
         _cacheService = cacheService;
     }
 
-    public async Task<Result<BannerConfiguration>> GetBannerConfigurationAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<BannerConfiguration>> GetBannerConfigurationAsync(
+        CancellationToken cancellationToken = default
+    )
     {
-        var cacheData = await _cacheService.GetAsync<BannerConfiguration>(CacheKeys.BannerConfiguration);
-        if (cacheData is not null) {
+        var cacheData = await _cacheService.GetAsync<BannerConfiguration>(
+            CacheKeys.BannerConfiguration
+        );
+        if (cacheData is not null)
+        {
             return Result<BannerConfiguration>.Success(cacheData);
         }
         var config = await _unitOfWork
@@ -38,7 +43,7 @@ public class ConfigurationService : IConfigurationService
         return Result<BannerConfiguration>.Success(bannerConfig);
     }
 
-    public async Task<Result<BannerConfiguration>> SetBannerConfiguration(
+    public async Task<Result<BannerConfiguration>> SetBannerConfigurationAsync(
         BannerConfiguration bannerConfiguration
     )
     {
@@ -66,10 +71,15 @@ public class ConfigurationService : IConfigurationService
         return Result<BannerConfiguration>.Success(data);
     }
 
-    public async Task<Result<EmailConfiguration>> GetEmailConfiguration(CancellationToken cancellationToken = default)
+    public async Task<Result<EmailConfiguration>> GetEmailConfigurationAsync(
+        CancellationToken cancellationToken = default
+    )
     {
-        var cacheData = await _cacheService.GetAsync<EmailConfiguration>(CacheKeys.EmailConfiguration);
-        if (cacheData is not null) {
+        var cacheData = await _cacheService.GetAsync<EmailConfiguration>(
+            CacheKeys.EmailConfiguration
+        );
+        if (cacheData is not null)
+        {
             return Result<EmailConfiguration>.Success(cacheData);
         }
         var config = await _unitOfWork
@@ -84,7 +94,7 @@ public class ConfigurationService : IConfigurationService
         return Result<EmailConfiguration>.Success(emailConfig);
     }
 
-    public async Task<Result<EmailConfiguration>> SetEmailConfiguration(
+    public async Task<Result<EmailConfiguration>> SetEmailConfigurationAsync(
         EmailConfiguration emailConfiguration
     )
     {

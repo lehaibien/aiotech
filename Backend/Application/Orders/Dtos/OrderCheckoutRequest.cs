@@ -9,7 +9,7 @@ public class OrderCheckoutRequest
     public Guid CustomerId { get; set; }
     public decimal Tax { get; set; }
 
-    [Range(0, double.MaxValue, ErrorMessage = "Thành tiền phải lớn hơn hoặc bằng 0")]
+    [Range(0, (double)decimal.MaxValue, ErrorMessage = "Thành tiền phải lớn hơn hoặc bằng 0")]
     public decimal TotalPrice { get; set; }
 
     public OrderStatus? Status { get; set; } = OrderStatus.Pending;
