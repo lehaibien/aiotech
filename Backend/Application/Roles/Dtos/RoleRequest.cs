@@ -1,9 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
 
 namespace Application.Roles.Dtos;
 
-public class RoleRequest
+public record RoleRequest(
+    Guid Id,
+    string Code,
+    string Name
+);
+
+public class RoleRequestValidator : AbstractValidator<RoleRequest>
 {
-    [Required(AllowEmptyStrings = false, ErrorMessage = "Tên vai trò không được để trống")]
-    public string? Name { get; set; }
+    public RoleRequestValidator()
+    {
+        RuleFor(x => x.Code).NotEmpty().WithMessage("Mã vai trò không được để trống");
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Tên vai trò không được để trống");
+    }
 }

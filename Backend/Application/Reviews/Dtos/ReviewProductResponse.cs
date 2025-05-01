@@ -1,11 +1,10 @@
 namespace Application.Reviews.Dtos;
 
-public class ReviewProductResponse
-{
-    public Guid Id { get; set; }
-    public string? UserImageUrl { get; set; }
-    public string UserName { get; set; } = string.Empty;
-    public string Comment { get; set; } = string.Empty;
-    public int Rating { get; set; } = 0;
-    public DateTime CreatedDate { get; set; }
-}
+public record ReviewProductResponse(
+    Guid Id,
+    string? UserImageUrl,
+    string UserName,
+    string Comment,
+    int Rating,
+    DateTime CreatedDate
+);

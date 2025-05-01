@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Shared;
+using Application.Shared;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
@@ -9,8 +9,6 @@ namespace Application.Images;
 
 public class ImageService : IImageService
 {
-    private const string ImageFolder = "images";
-    private const string BucketName = "aiotech";
     private readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
     private readonly string[] AllowedMimeTypes =
     [
@@ -189,13 +187,18 @@ public class ImageService : IImageService
             },
             ImageType.BlogThumbnail => new ResizeOptions
             {
-                Size = new Size(450, 300),
+                Size = new Size(600, 400),
                 Mode = ResizeMode.Max,
             },
             ImageType.Blog => new ResizeOptions
             {
                 Size = new Size(1200, 630),
                 Mode = ResizeMode.Max,
+            },
+            ImageType.Avatar => new ResizeOptions
+            {
+                Size = new Size(100, 100),
+                Mode = ResizeMode.Crop,
             },
             ImageType.Logo => null,
             _ => null,

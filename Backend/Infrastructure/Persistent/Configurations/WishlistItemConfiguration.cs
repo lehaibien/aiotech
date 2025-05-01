@@ -14,11 +14,13 @@ internal sealed class WishlistItemConfiguration : IEntityTypeConfiguration<Wishl
         builder.Property(wi => wi.UserId).IsRequired();
         builder.Property(wi => wi.ProductId).IsRequired();
         builder.Property(wi => wi.CreatedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
-        builder.HasOne(wi => wi.User)
+        builder
+            .HasOne(wi => wi.User)
             .WithMany(u => u.WishlistItems)
             .HasForeignKey(wi => wi.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.HasOne(wi => wi.Product)
+        builder
+            .HasOne(wi => wi.Product)
             .WithMany()
             .HasForeignKey(wi => wi.ProductId)
             .OnDelete(DeleteBehavior.Cascade);

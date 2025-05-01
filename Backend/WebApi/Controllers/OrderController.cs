@@ -38,7 +38,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var response = new ApiResponse();
-        var result = await _service.GetById(id);
+        var result = await _service.GetByIdAsync(id);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -53,7 +53,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetByUsername(string username)
     {
         var response = new ApiResponse();
-        var result = await _service.GetByUsername(username);
+        var result = await _service.GetByUsernameAsync(username);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -68,7 +68,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetRecentOrders([FromQuery] int count = 10)
     {
         var response = new ApiResponse();
-        var result = await _service.GetRecentOrders(count);
+        var result = await _service.GetRecentOrdersAsync(count);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -84,7 +84,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> CreateUrl(OrderCheckoutRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.CreateUrl(request);
+        var result = await _service.CreateUrlAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -99,7 +99,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Create(OrderRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.Create(request);
+        var result = await _service.CreateAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -114,7 +114,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Update(OrderRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.Update(request);
+        var result = await _service.UpdateAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -129,7 +129,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> UpdateStatus([FromBody] OrderUpdateStatusRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.ChangeStatus(request);
+        var result = await _service.ChangeStatusAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -144,7 +144,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = new ApiResponse();
-        var result = await _service.Delete(id);
+        var result = await _service.DeleteAsync(id);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -159,7 +159,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
         var response = new ApiResponse();
-        var result = await _service.DeleteList(ids);
+        var result = await _service.DeleteListAsync(ids);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -174,7 +174,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Print(Guid id)
     {
         var response = new ApiResponse();
-        var result = await _service.PrintReceipt(id);
+        var result = await _service.PrintReceiptAsync(id);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -190,7 +190,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Callback()
     {
         var response = new ApiResponse();
-        var result = await _service.HandleCallbackPayment(Request.Query);
+        var result = await _service.HandleCallbackPaymentAsync(Request.Query);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -205,7 +205,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Confirm(Guid id)
     {
         var response = new ApiResponse();
-        var result = await _service.Confirm(id);
+        var result = await _service.ConfirmAsync(id);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -220,7 +220,7 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> Cancel([FromBody] OrderCancelRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.Cancel(request);
+        var result = await _service.CancelAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

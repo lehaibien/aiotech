@@ -5,13 +5,12 @@ using Application.Helpers;
 using Application.Images;
 using Application.Jwt;
 using Application.Mail;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+using Application.Shared;
 
 namespace Application.Authentication;
 
@@ -20,7 +19,6 @@ public class AuthenticationService : IAuthenticationService
     private const string FolderUpload = "images/users";
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IJwtService _jwtService;
-    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
     private readonly IImageService _imageService;
@@ -30,7 +28,6 @@ public class AuthenticationService : IAuthenticationService
         IJwtService jwtService,
         IUnitOfWork unitOfWork,
         IHttpContextAccessor contextAccessor,
-        IMapper mapper,
         IEmailService emailService,
         IImageService imageService,
         IStorageService storageService
@@ -39,7 +36,6 @@ public class AuthenticationService : IAuthenticationService
         _jwtService = jwtService;
         _unitOfWork = unitOfWork;
         _contextAccessor = contextAccessor;
-        _mapper = mapper;
         _emailService = emailService;
         _imageService = imageService;
         _storageService = storageService;
@@ -148,7 +144,14 @@ public class AuthenticationService : IAuthenticationService
             .AnyAsync(u => u.Email == request.Email);
         if (isEmailExist)
             return Result.Failure("Địa chỉ email đã được sử dụng");
-        var user = _mapper.Map<User>(request);
+        var user = new User
+        {
+            UserName = request.UserName,
+            FamilyName = request.FamilyName,
+            GivenName = request.GivenName,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+        };
         var role = await _unitOfWork
             .GetRepository<Role>()
             .FindAsync(r => r.Name == CommonConst.DefaultRole)!;

@@ -18,11 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper" Version="13.0.1" />
+      <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.17.4" />
       <PackageReference Include="FluentValidation" Version="11.11.0" />
       <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.13" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.15" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="QuestPDF" Version="2024.12.3" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />

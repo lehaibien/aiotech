@@ -22,7 +22,7 @@ public static class UserMapper
             UpdatedBy = x.UpdatedBy,
             IsLocked = x.IsLocked,
             IsDeleted = x.IsDeleted,
-            Role = x.Role.Name,
+            Role = x.Role.Name
         });
     }
 
@@ -42,7 +42,7 @@ public static class UserMapper
             UpdatedDate = source.UpdatedDate,
             UpdatedBy = source.UpdatedBy,
             IsLocked = source.IsLocked,
-            IsDeleted = source.IsDeleted,
+            IsDeleted = source.IsDeleted
         };
     }
 
@@ -55,7 +55,7 @@ public static class UserMapper
             FamilyName = source.FamilyName,
             Email = source.Email,
             PhoneNumber = source.PhoneNumber,
-            RoleId = source.RoleId,
+            RoleId = source.RoleId
         };
     }
 

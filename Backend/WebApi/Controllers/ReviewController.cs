@@ -1,8 +1,8 @@
 using Application.Reviews;
 using Application.Reviews.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
-using WebApi.Model;
+using Application.Shared;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -18,19 +18,10 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] GetListRequest request)
+    public async Task<IActionResult> GetListAsync([FromQuery] GetListRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.GetListAsync(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpGet("product")]
@@ -38,90 +29,42 @@ public class ReviewController : ControllerBase
         [FromQuery] GetListReviewByProductIdRequest request
     )
     {
-        var response = new ApiResponse();
-        var result = await _service.GetByProductId(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-
-        response.Data = result.Value;
-        return Ok(response);
+        var result = await _service.GetByProductIdAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.GetById(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Value;
-        return Ok(response);
+        var result = await _service.GetByIdAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateReviewRequest request)
+    public async Task<IActionResult> CreateAsync(ReviewRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Create(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Value;
-        return Ok(response);
+        var result = await _service.CreateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update(UpdateReviewRequest request)
+    public async Task<IActionResult> UpdateAsync(ReviewRequest request)
     {
-        var response = new ApiResponse();
-        var result = await _service.Update(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Value;
-        return Ok(response);
+        var result = await _service.UpdateAsync(request);
+        return this.FromResult(result);
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
-        var response = new ApiResponse();
-        var result = await _service.Delete(id);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        return Ok(response);
+        var result = await _service.DeleteAsync(id);
+        return this.FromResult(result);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteList(List<Guid> ids)
+    public async Task<IActionResult> DeleteListAsync(List<Guid> ids)
     {
-        var response = new ApiResponse();
-        var result = await _service.DeleteList(ids);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Value;
-        return Ok(response);
+        var result = await _service.DeleteListAsync(ids);
+        return this.FromResult(result);
     }
 }

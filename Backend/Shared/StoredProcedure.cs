@@ -1,4 +1,4 @@
-﻿namespace Shared;
+﻿namespace Application.Shared;
 
 public static class StoredProcedure
 {
@@ -12,6 +12,7 @@ public static class StoredProcedure
     public const string GetListOrder = Prefix + "Order_GetList";
     public const string GetListReview = Prefix + "Review_GetList";
     public const string GetListPost = Prefix + "Post_GetList";
+    public const string GetListRole = Prefix + "Role_GetList";
     public const string GetSaleReport = Prefix + "SaleReport_Get";
     public const string GetOrderReport = Prefix + "OrderReport_Get";
     public const string GetLowRatingProductReport = Prefix + "LowRatingProductReport_Get";

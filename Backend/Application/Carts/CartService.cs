@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+using Application.Shared;
 
 namespace Application.Carts;
 
@@ -15,24 +15,17 @@ public class CartService : ICartService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<List<CartItemResponse>>> GetCartByUserId(Guid userId)
+    public async Task<Result<List<CartItemResponse>>> GetCartByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var cart = await _unitOfWork
             .GetRepository<CartItem>()
             .GetAll(x => x.UserId == userId)
-            .Select(x => new CartItemResponse
-            {
-                ProductId = x.ProductId,
-                ProductName = x.Product.Name,
-                ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
-                Quantity = x.Quantity,
-            })
-            .ToListAsync();
+            .ProjectToCartItemResponse()
+            .ToListAsync(cancellationToken);
         return Result<List<CartItemResponse>>.Success(cart);
     }
 
-    public async Task<Result<List<CartItemResponse>>> AddToCart(CartRequest request)
+    public async Task<Result<List<CartItemResponse>>> AddToCartAsync(CartRequest request)
     {
         var cart = await _unitOfWork
             .GetRepository<CartItem>()
@@ -60,20 +53,13 @@ public class CartService : ICartService
             .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId)
             .Include(x => x.Product)
-            .Select(x => new CartItemResponse
-            {
-                ProductId = x.ProductId,
-                ProductName = x.Product.Name,
-                ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
-                Quantity = x.Quantity,
-            })
+            .ProjectToCartItemResponse()
             .ToListAsync();
 
         return Result<List<CartItemResponse>>.Success(cartList);
     }
 
-    public async Task<Result<List<CartItemResponse>>> RemoveFromCart(CartRemoveItemRequest request)
+    public async Task<Result<List<CartItemResponse>>> RemoveFromCartAsync(CartRemoveItemRequest request)
     {
         var cart = await _unitOfWork
             .GetRepository<CartItem>()
@@ -91,14 +77,7 @@ public class CartService : ICartService
             .GetRepository<CartItem>()
             .GetAll(x => x.UserId == request.UserId)
             .Include(x => x.Product)
-            .Select(x => new CartItemResponse
-            {
-                ProductId = x.ProductId,
-                ProductName = x.Product.Name,
-                ProductImage = x.Product.ImageUrls[0],
-                ProductPrice = x.Product.DiscountPrice ?? x.Product.Price,
-                Quantity = x.Quantity,
-            })
+            .ProjectToCartItemResponse()
             .ToListAsync();
         return Result<List<CartItemResponse>>.Success(cartList);
     }

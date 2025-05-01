@@ -1,5 +1,6 @@
 "use client";
 
+import { ControlledTextField } from "@/components/core/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { TAX_VALUE } from "@/constant/common";
 import { postApi } from "@/lib/apiClient";
@@ -13,7 +14,6 @@ import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import {
   Alert,
-  alpha,
   Box,
   Button,
   Card,
@@ -21,12 +21,12 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
+  FormLabel,
   Grid,
   Paper,
   Radio,
   RadioGroup,
   Stack,
-  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -73,9 +73,8 @@ export const CheckoutComponent = ({
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
 
   const {
-    register,
-    handleSubmit,
     control,
+    handleSubmit,
     formState: { errors, isValid },
   } = useForm<CheckoutFormInput>({
     resolver: zodResolver(checkoutFormSchema),
@@ -85,7 +84,6 @@ export const CheckoutComponent = ({
       address: address,
       provider: PaymentMethods.VNPAY,
     },
-    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<CheckoutFormInput> = async (data) => {
@@ -149,25 +147,9 @@ export const CheckoutComponent = ({
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={4}>
-          {/* Shipping Information */}
+        <Grid container spacing={4} component={Paper}>
           <Grid size={{ xs: 12, md: 8 }}>
-            <Paper
-              elevation={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                gap: 2,
-                mb: 2,
-                p: 3,
-                borderRadius: 2,
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
+            <Stack spacing={2} padding={2}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <LocalShippingOutlinedIcon
                   sx={{
@@ -175,77 +157,65 @@ export const CheckoutComponent = ({
                     fontSize: 28,
                   }}
                 />
-                <Typography variant="h5" fontWeight="500">
-                  Thông tin giao hàng
-                </Typography>
+                <Typography variant="h5">Thông tin giao hàng</Typography>
               </Box>
 
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Họ và tên"
-                    {...register("name")}
-                    error={!!errors.name}
-                    helperText={errors.name?.message}
-                    variant="outlined"
-                    sx={{ mb: 2 }}
-                  />
+                  <Stack>
+                    <FormLabel htmlFor="name" required>
+                      Họ và tên
+                    </FormLabel>
+                    <ControlledTextField
+                      control={control}
+                      name="name"
+                      variant="outlined"
+                      size="small"
+                    />
+                  </Stack>
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Số điện thoại"
-                    {...register("phoneNumber")}
-                    error={!!errors.phoneNumber}
-                    helperText={errors.phoneNumber?.message}
-                    variant="outlined"
-                    sx={{ mb: 2 }}
-                  />
+                  <Stack>
+                    <FormLabel htmlFor="phoneNumber" required>
+                      Số điện thoại
+                    </FormLabel>
+                    <ControlledTextField
+                      control={control}
+                      name="phoneNumber"
+                      variant="outlined"
+                      size="small"
+                    />
+                  </Stack>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <TextField
-                    fullWidth
-                    label="Địa chỉ"
-                    {...register("address")}
-                    error={!!errors.address}
-                    helperText={errors.address?.message}
-                    multiline
-                    rows={3}
-                    variant="outlined"
-                    sx={{ mb: 2 }}
-                  />
+                  <Stack>
+                    <FormLabel htmlFor="address" required>
+                      Địa chỉ
+                    </FormLabel>
+                    <ControlledTextField
+                      control={control}
+                      name="address"
+                      variant="outlined"
+                      multiline
+                      rows={2}
+                      size="small"
+                    />
+                  </Stack>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <TextField
-                    fullWidth
-                    label="Ghi chú (tùy chọn)"
-                    {...register("note")}
-                    error={!!errors.note}
-                    helperText={errors.note?.message}
-                    multiline
-                    rows={2}
-                    variant="outlined"
-                  />
+                  <Stack>
+                    <FormLabel htmlFor="note">Ghi chú (tùy chọn)</FormLabel>
+                    <ControlledTextField
+                      control={control}
+                      name="note"
+                      variant="outlined"
+                      multiline
+                      rows={2}
+                      size="small"
+                    />
+                  </Stack>
                 </Grid>
               </Grid>
-            </Paper>
-
-            <Paper
-              elevation={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                gap: 2,
-                p: 3,
-                borderRadius: 2,
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <PaymentOutlinedIcon
                   sx={{
@@ -253,9 +223,7 @@ export const CheckoutComponent = ({
                     fontSize: 28,
                   }}
                 />
-                <Typography variant="h5" fontWeight="500">
-                  Phương thức thanh toán
-                </Typography>
+                <Typography variant="h5">Phương thức thanh toán</Typography>
               </Box>
 
               <Controller
@@ -274,27 +242,7 @@ export const CheckoutComponent = ({
                         gap: 2,
                       }}
                     >
-                      <Paper
-                        elevation={field.value === PaymentMethods.MOMO ? 3 : 1}
-                        sx={{
-                          p: 2,
-                          borderRadius: 2,
-                          border:
-                            field.value === PaymentMethods.MOMO
-                              ? `2px solid ${theme.palette.primary.main}`
-                              : `1px solid ${alpha(
-                                  theme.palette.divider,
-                                  0.5
-                                )}`,
-                          flex: 1,
-                          transition: "all 0.2s ease",
-                          cursor: "pointer",
-                          "&:hover": {
-                            borderColor: theme.palette.primary.light,
-                          },
-                        }}
-                        onClick={() => field.onChange(PaymentMethods.MOMO)}
-                      >
+                      <Box onClick={() => field.onChange(PaymentMethods.MOMO)}>
                         <FormControlLabel
                           value={PaymentMethods.MOMO.toString()}
                           control={<Radio />}
@@ -306,34 +254,13 @@ export const CheckoutComponent = ({
                                 width={32}
                                 height={32}
                               />
-                              <Typography fontWeight="500">Ví Momo</Typography>
+                              <Typography>Ví Momo</Typography>
                             </Box>
                           }
-                          sx={{ m: 0 }}
                         />
-                      </Paper>
+                      </Box>
 
-                      <Paper
-                        elevation={field.value === PaymentMethods.VNPAY ? 3 : 1}
-                        sx={{
-                          p: 2,
-                          borderRadius: 2,
-                          border:
-                            field.value === PaymentMethods.VNPAY
-                              ? `2px solid ${theme.palette.primary.main}`
-                              : `1px solid ${alpha(
-                                  theme.palette.divider,
-                                  0.5
-                                )}`,
-                          flex: 1,
-                          transition: "all 0.2s ease",
-                          cursor: "pointer",
-                          "&:hover": {
-                            borderColor: theme.palette.primary.light,
-                          },
-                        }}
-                        onClick={() => field.onChange(PaymentMethods.VNPAY)}
-                      >
+                      <Box onClick={() => field.onChange(PaymentMethods.VNPAY)}>
                         <FormControlLabel
                           value={PaymentMethods.VNPAY.toString()}
                           control={<Radio />}
@@ -345,12 +272,11 @@ export const CheckoutComponent = ({
                                 width={32}
                                 height={32}
                               />
-                              <Typography fontWeight="500">VNPay</Typography>
+                              <Typography>VNPay</Typography>
                             </Box>
                           }
-                          sx={{ m: 0 }}
                         />
-                      </Paper>
+                      </Box>
                     </Box>
                   </RadioGroup>
                 )}
@@ -360,27 +286,11 @@ export const CheckoutComponent = ({
                   {errors.provider.message}
                 </Typography>
               )}
-            </Paper>
+            </Stack>
           </Grid>
 
-          {/* Order Summary */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Paper
-              elevation={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                gap: 2,
-                p: 3,
-                borderRadius: 2,
-                position: "sticky",
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  boxShadow: 6,
-                },
-              }}
-            >
+            <Stack spacing={2} padding={2}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <ShoppingBagOutlinedIcon
                   sx={{
@@ -388,9 +298,7 @@ export const CheckoutComponent = ({
                     fontSize: 28,
                   }}
                 />
-                <Typography variant="h5" fontWeight="500">
-                  Tổng quan đơn hàng
-                </Typography>
+                <Typography variant="h5">Tổng quan đơn hàng</Typography>
               </Box>
 
               <Box sx={{ overflowY: "auto" }}>
@@ -398,12 +306,11 @@ export const CheckoutComponent = ({
                   {cartItems.map((item) => (
                     <Card
                       key={item.productId}
-                      elevation={0}
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        p: 1,
                         borderRadius: 2,
+                        gap: 2,
                       }}
                     >
                       <Image
@@ -413,8 +320,8 @@ export const CheckoutComponent = ({
                         height={60}
                         style={{ borderRadius: 8, objectFit: "cover" }}
                       />
-                      <Box sx={{ ml: 2, flex: 1 }}>
-                        <Typography variant="body1" fontWeight="500">
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body1">
                           {item.productName}
                         </Typography>
                         <Box
@@ -424,16 +331,13 @@ export const CheckoutComponent = ({
                             alignItems: "center",
                           }}
                         >
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2">
                             {formatNumberWithSeperator(item.productPrice)} đ
                           </Typography>
                           <Chip
                             label={`x${item.quantity}`}
                             size="small"
-                            sx={{
-                              bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              color: theme.palette.primary.main,
-                            }}
+                            color="primary"
                           />
                         </Box>
                       </Box>
@@ -442,20 +346,20 @@ export const CheckoutComponent = ({
                 </Stack>
               </Box>
 
-              <Divider sx={{ mb: 2 }} />
+              <Divider />
 
               <Stack spacing={1}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography color="text.secondary">Tạm tính:</Typography>
-                  <Typography fontWeight="500">
+                  <Typography>Tạm tính:</Typography>
+                  <Typography>
                     {formatNumberWithSeperator(cartTotal)} đ
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography color="text.secondary">
+                  <Typography color="textSecondary">
                     Thuế GTGT ({TAX_VALUE * 100}%):
                   </Typography>
-                  <Typography fontWeight="500">
+                  <Typography>
                     {formatNumberWithSeperator(
                       Number((cartTotal * TAX_VALUE).toFixed(2))
                     )}{" "}
@@ -466,11 +370,10 @@ export const CheckoutComponent = ({
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    mt: 1,
                   }}
                 >
                   <Typography variant="h6">Tổng cộng:</Typography>
-                  <Typography variant="h6" color="primary.main">
+                  <Typography variant="h6" color="error">
                     {formatNumberWithSeperator(
                       Number((cartTotal * (1 + TAX_VALUE)).toFixed(2))
                     )}{" "}
@@ -494,7 +397,7 @@ export const CheckoutComponent = ({
                   "Thanh toán"
                 )}
               </Button>
-            </Paper>
+            </Stack>
           </Grid>
         </Grid>
       </form>

@@ -7,11 +7,14 @@ namespace Application.Orders;
 
 public class OrderReceiptDocument : IDocument
 {
-    private readonly Order _order;
     private const string PrimaryColor = "#2d3748";
     private const string SecondaryColor = "#4a5568";
+    private readonly Order _order;
 
-    public OrderReceiptDocument(Order order) => _order = order;
+    public OrderReceiptDocument(Order order)
+    {
+        _order = order;
+    }
 
     public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -39,7 +42,7 @@ public class OrderReceiptDocument : IDocument
         });
     }
 
-    void ComposeHeader(IContainer container)
+    private void ComposeHeader(IContainer container)
     {
         container.Column(column =>
         {
@@ -77,7 +80,7 @@ public class OrderReceiptDocument : IDocument
         });
     }
 
-    void ComposeContent(IContainer container)
+    private void ComposeContent(IContainer container)
     {
         container.Column(column =>
         {
@@ -153,7 +156,7 @@ public class OrderReceiptDocument : IDocument
         });
     }
 
-    void TableComponent(IContainer container)
+    private void TableComponent(IContainer container)
     {
         container.Table(table =>
         {
@@ -177,12 +180,14 @@ public class OrderReceiptDocument : IDocument
                 header.Cell().Element(HeaderCellStyle).AlignRight().Text("Đơn giá");
                 header.Cell().Element(HeaderCellStyle).AlignRight().Text("Thành tiền");
 
-                static IContainer HeaderCellStyle(IContainer container) =>
-                    container.BorderBottom(1).BorderColor(Colors.Grey.Darken1).PaddingVertical(5);
+                static IContainer HeaderCellStyle(IContainer container)
+                {
+                    return container.BorderBottom(1).BorderColor(Colors.Grey.Darken1).PaddingVertical(5);
+                }
             });
 
             // Table Rows
-            foreach (var (item, index) in _order.OrderItems.Select((x, i) => (x, i)))
+            foreach(var (item, index) in _order.OrderItems.Select((x, i) => (x, i)))
             {
                 table.Cell().Element(CellStyle).Text($"{index + 1}");
                 table.Cell().Element(CellStyle).Text(item.Product?.Sku ?? "N/A");
@@ -196,8 +201,10 @@ public class OrderReceiptDocument : IDocument
                     .Text((item.Quantity * item.Price).ToString("N0") + " đ");
             }
 
-            static IContainer CellStyle(IContainer container) =>
-                container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(8);
+            static IContainer CellStyle(IContainer container)
+            {
+                return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(8);
+            }
         });
     }
 }

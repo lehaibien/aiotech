@@ -1,9 +1,9 @@
-﻿using Shared;
+﻿namespace Application.Roles.Dtos;
 
-namespace Application.Roles.Dtos;
-
-public class RoleResponse : BaseResponse
-{
-    public Guid Id { get; set; }
-    public string? Name { get; set; } = string.Empty;
-}
+public record RoleResponse(
+    Guid Id,
+    string Code,
+    string Name,
+    DateTime CreatedDate,
+    DateTime? UpdatedDate
+);

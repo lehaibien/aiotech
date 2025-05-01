@@ -1,15 +1,13 @@
-using System.Data;
 using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Helpers;
 using Application.Images;
 using Application.Posts.Dtos;
-using AutoMapper;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+using Application.Shared;
 
 namespace Application.Posts;
 
@@ -35,7 +33,7 @@ public class PostService : IPostService
         _storageService = storageService;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(
+    public async Task<Result<PaginatedList<PostResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
@@ -65,23 +63,17 @@ public class PostService : IPostService
                 postQuery = postQuery.OrderBy(sortCol);
             }
         }
-        var totalRow = await postQuery.CountAsync(cancellationToken);
-        var result = await postQuery
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ProjectToPostListItemResponse()
-            .ToListAsync(cancellationToken);
-        var response = new PaginatedList
-        {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = totalRow,
-            Items = result,
-        };
-        return Result<PaginatedList>.Success(response);
+        var dtoQuery = postQuery.ProjectToPostResponse();
+        var result = await PaginatedList<PostResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
+        return Result<PaginatedList<PostResponse>>.Success(result);
     }
 
-    public async Task<Result<PaginatedList>> GetListItemAsync(
+    public async Task<Result<PaginatedList<PostListItemResponse>>> GetListItemAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
@@ -89,21 +81,23 @@ public class PostService : IPostService
         var query = _unitOfWork
             .GetRepository<Post>()
             .GetAll(x => x.IsPublished && x.Title.Contains(request.TextSearch));
-        var entities = await query
-            .OrderByDescending(x => x.CreatedDate)
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ProjectToPostListItemResponse()
-            .ToListAsync(cancellationToken);
-        var count = await query.CountAsync(cancellationToken);
-        var response = new PaginatedList
+        
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = count,
-            Items = entities,
-        };
-        return Result<PaginatedList>.Success(response);
+            query = query.Where(x =>
+                x.Title.ToLower().Contains(request.TextSearch.ToLower())
+            );
+        }
+
+        var dtoQuery = query.ProjectToPostListItemResponse()
+            .OrderByDescending(x => x.CreatedDate);
+        var result = await PaginatedList<PostListItemResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
+        return Result<PaginatedList<PostListItemResponse>>.Success(result);
     }
 
     public async Task<Result<List<PostListItemResponse>>> GetRelatedPostAsync(
@@ -116,7 +110,7 @@ public class PostService : IPostService
             .GetAll(x => x.IsPublished && x.Id != id)
             .OrderByDescending(x => x.CreatedDate)
             .ProjectToPostListItemResponse()
-            .Take(5)
+            .Take(6)
             .ToListAsync(cancellationToken);
         return Result<List<PostListItemResponse>>.Success(result);
     }
@@ -157,13 +151,12 @@ public class PostService : IPostService
     }
 
     public async Task<Result<PostResponse>> CreateAsync(
-        PostRequest request,
-        CancellationToken cancellationToken = default
+        PostRequest request
     )
     {
         var isExists = await _unitOfWork
             .GetRepository<Post>()
-            .FindAsync(x => x.Title == request.Title, false, cancellationToken);
+            .FindAsync(x => x.Title == request.Title, false);
         if (isExists != null)
         {
             return Result<PostResponse>.Failure("Bài viết đã tồn tại");
@@ -175,14 +168,12 @@ public class PostService : IPostService
         entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         var optimizedImage = await _imageService.OptimizeAsync(
             request.Image,
-            ImageType.Blog,
-            cancellationToken: cancellationToken
+            ImageType.Blog
         );
         var thumbnailImage = await _imageService.OptimizeAsync(
             request.Image,
             ImageType.BlogThumbnail,
-            ThumbnailPrefix,
-            cancellationToken
+            ThumbnailPrefix
         );
         if (optimizedImage.IsFailure)
         {
@@ -195,21 +186,19 @@ public class PostService : IPostService
         var uploadResult = await _storageService.UploadBulkAsync(
             [thumbnailImage.Value, optimizedImage.Value],
             CommonConst.PublicBucket,
-            Path.Combine(FolderUpload, entity.Id.ToString()),
-            cancellationToken: cancellationToken
+            Path.Combine(FolderUpload, entity.Id.ToString())
         );
         var value = uploadResult.ToList();
         entity.ThumbnailUrl = value[0].Url;
         entity.ImageUrl = value[1].Url;
         _unitOfWork.GetRepository<Post>().Add(entity);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToPostResponse();
         return Result<PostResponse>.Success(response);
     }
 
     public async Task<Result<PostResponse>> UpdateAsync(
-        PostRequest request,
-        CancellationToken cancellationToken = default
+        PostRequest request
     )
     {
         if (request.Id == Guid.Empty)
@@ -218,7 +207,7 @@ public class PostService : IPostService
         }
         var isExists = await _unitOfWork
             .GetRepository<Post>()
-            .AnyAsync(x => x.Title == request.Title && x.Id != request.Id, cancellationToken);
+            .AnyAsync(x => x.Title == request.Title && x.Id != request.Id);
         if (isExists)
         {
             return Result<PostResponse>.Failure("Bài viết đã tồn tại");
@@ -226,7 +215,7 @@ public class PostService : IPostService
 
         var entity = await _unitOfWork
             .GetRepository<Post>()
-            .FindAsync(x => x.Id == request.Id, false, cancellationToken);
+            .FindAsync(x => x.Id == request.Id, false);
         if (entity is null)
         {
             return Result<PostResponse>.Failure("Bài viết không tồn tại");
@@ -237,13 +226,13 @@ public class PostService : IPostService
         entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         if (request.IsImageEdited)
         {
-            await _storageService.DeleteFromUrlAsync(entity.ImageUrl, cancellationToken);
-            await _storageService.DeleteFromUrlAsync(entity.ThumbnailUrl, cancellationToken);
+            await _storageService.DeleteFromUrlAsync(entity.ImageUrl);
+            await _storageService.DeleteFromUrlAsync(entity.ThumbnailUrl);
             var thumbnailImage = await _imageService.OptimizeAsync(
                 request.Image,
                 ImageType.BlogThumbnail,
-                ThumbnailPrefix,
-                cancellationToken
+                ThumbnailPrefix
+              
             );
             if (thumbnailImage.IsFailure)
             {
@@ -252,8 +241,7 @@ public class PostService : IPostService
 
             var optimizedImage = await _imageService.OptimizeAsync(
                 request.Image,
-                ImageType.Blog,
-                cancellationToken: cancellationToken
+                ImageType.Blog
             );
             if (optimizedImage.IsFailure)
             {
@@ -263,25 +251,23 @@ public class PostService : IPostService
             var uploadResult = await _storageService.UploadBulkAsync(
                 [thumbnailImage.Value, optimizedImage.Value],
                 CommonConst.PublicBucket,
-                Path.Combine(FolderUpload, entity.Id.ToString()),
-                cancellationToken: cancellationToken
+                Path.Combine(FolderUpload, entity.Id.ToString())
             );
             var value = uploadResult.ToList();
             entity.ThumbnailUrl = value[0].Url;
             entity.ImageUrl = value[1].Url;
         }
         _unitOfWork.GetRepository<Post>().Update(entity);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToPostResponse();
         return Result<PostResponse>.Success(response);
     }
 
     public async Task<Result<string>> DeleteAsync(
-        Guid id,
-        CancellationToken cancellationToken = default
+        Guid id
     )
     {
-        var entity = await _unitOfWork.GetRepository<Post>().GetByIdAsync(id, cancellationToken);
+        var entity = await _unitOfWork.GetRepository<Post>().GetByIdAsync(id);
         if (entity is null)
         {
             return Result<string>.Failure("Bài viết không tồn tại");
@@ -291,14 +277,12 @@ public class PostService : IPostService
         entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Post>().Update(entity);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
     }
 
     public async Task<Result<string>> DeleteListAsync(
-        List<Guid> ids,
-        CancellationToken cancellationToken = default
-    )
+        List<Guid> ids)
     {
         var entites = _unitOfWork.GetRepository<Post>().GetAll(x => ids.Contains(x.Id));
         await entites.ForEachAsync(
@@ -308,11 +292,10 @@ public class PostService : IPostService
                 x.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
                 x.IsDeleted = true;
                 _unitOfWork.GetRepository<Post>().Update(x);
-            },
-            cancellationToken: cancellationToken
+            }
         );
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");
     }
 

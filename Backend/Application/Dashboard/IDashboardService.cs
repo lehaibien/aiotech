@@ -1,5 +1,5 @@
 using Application.Dashboard.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Dashboard;
 

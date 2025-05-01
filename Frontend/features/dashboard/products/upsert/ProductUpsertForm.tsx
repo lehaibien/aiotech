@@ -27,6 +27,7 @@ type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
   categories: ComboBoxItem[];
   defaultImages?: string[];
+  defaultThumbnail?: string;
   product: ProductRequest;
 };
 
@@ -40,6 +41,7 @@ export const ProductUpsertForm = ({
   categories,
   product,
   defaultImages = [],
+  defaultThumbnail,
 }: ProductUpsertFormProps) => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
@@ -110,7 +112,9 @@ export const ProductUpsertForm = ({
             if (!response.ok) throw new Error("Failed to fetch image");
 
             const blob = await response.blob();
-            return new File([blob], url.substring(url.lastIndexOf("/") + 1), { type: blob.type });
+            return new File([blob], url.substring(url.lastIndexOf("/") + 1), {
+              type: blob.type,
+            });
           })
         );
 
@@ -127,7 +131,11 @@ export const ProductUpsertForm = ({
     getImages(defaultImages)
       .then(setImages)
       .catch((err) => console.error("Image processing error:", err));
-  }, [defaultImages]);
+
+    getImages([defaultThumbnail ?? ""])
+      .then((files) => setThumbnail(files[0]))
+      .catch((err) => console.error("Image processing error:", err));
+  }, [defaultImages, defaultThumbnail]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>

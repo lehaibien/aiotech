@@ -1,8 +1,8 @@
 using Application.Dashboard.Dtos;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Shared;
 
 namespace Application.Dashboard;
 
@@ -25,27 +25,27 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
                 CurrentRevenue = g.Where(o =>
                         o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
                     )
-                    .Sum(o => Convert.ToDouble(o.TotalPrice)),
+                    .Sum(o => o.TotalPrice),
                 PreviousRevenue = g.Where(o =>
                         o.DeliveryDate >= previousMonthStart && o.DeliveryDate <= previousMonthEnd
                     )
-                    .Sum(o => Convert.ToDouble(o.TotalPrice)),
+                    .Sum(o => o.TotalPrice),
             })
             .Select(r => new RevenueCard
             {
                 Revenue = r.CurrentRevenue,
-                RevenueDiff =
+                RevenueDiff = (double?)(
                     r.PreviousRevenue == 0
                         ? (r.CurrentRevenue == 0 ? 0 : 100)
-                        : (r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue * 100,
+                        : (r.CurrentRevenue - r.PreviousRevenue) / r.PreviousRevenue * 100
+                ),
             })
             .OrderByDescending(r => r.Revenue)
             .FirstOrDefaultAsync();
         OrderCard? order =
             await _unitOfWork
                 .GetRepository<Order>()
-                .GetAll()
-                .Where(o => o.Status == OrderStatus.Completed)
+                .GetAll(o => o.Status == OrderStatus.Completed)
                 .GroupBy(_ => 1)
                 .Select(x => new
                 {
@@ -70,36 +70,35 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
         AverageOrderValueCard? averageOrderValue =
             await _unitOfWork
                 .GetRepository<Order>()
-                .GetAll()
-                .Where(o => o.Status == OrderStatus.Completed)
+                .GetAll(o => o.Status == OrderStatus.Completed)
                 .GroupBy(_ => 1)
                 .Select(x => new
                 {
                     CurrentAverage = x.Where(o =>
                             o.DeliveryDate >= currentMonthStart && o.DeliveryDate <= now
                         )
-                        .Average(o => Convert.ToDouble(o.TotalPrice)),
+                        .Average(o => o.TotalPrice),
                     PreviousAverage = x.Where(o =>
                             o.DeliveryDate >= previousMonthStart
                             && o.DeliveryDate <= previousMonthEnd
                         )
-                        .Average(o => Convert.ToDouble(o.TotalPrice)),
+                        .Average(o => o.TotalPrice),
                 })
                 .Select(x => new AverageOrderValueCard
                 {
                     AverageOrderValue = x.CurrentAverage,
-                    AverageOrderValueDiff =
+                    AverageOrderValueDiff = (double?)(
                         x.PreviousAverage == null || x.PreviousAverage == 0
                             ? (x.CurrentAverage == null || x.CurrentAverage == 0 ? 0 : 100)
-                            : (x.CurrentAverage - x.PreviousAverage) * 100 / x.PreviousAverage,
+                            : (x.CurrentAverage - x.PreviousAverage) * 100 / x.PreviousAverage
+                    ),
                 })
                 .OrderByDescending(r => r.AverageOrderValue)
                 .FirstOrDefaultAsync()
             ?? new AverageOrderValueCard { AverageOrderValue = 0, AverageOrderValueDiff = 0 };
         NewUserCard? newUser = await _unitOfWork
             .GetRepository<User>()
-            .GetAll()
-            .Where(u => u.CreatedDate >= currentMonthStart && u.CreatedDate <= now)
+            .GetAll(u => u.CreatedDate >= currentMonthStart && u.CreatedDate <= now)
             .GroupBy(_ => 1)
             .Select(x => new
             {
@@ -120,7 +119,7 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
             })
             .OrderByDescending(r => r.NewUser)
             .FirstOrDefaultAsync();
-        DashboardCard result = new()
+        var result = new DashboardCard
         {
             Revenue = revenue?.Revenue ?? 0,
             RevenueDiff = revenue?.RevenueDiff ?? 0,
@@ -136,17 +135,14 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
 
     public async Task<Result<List<DashboardTopProduct>>> GetDashboardTopProductAsync()
     {
-        IQueryable<OrderItem> order = _unitOfWork.GetRepository<OrderItem>().GetAll();
+        IQueryable<OrderItem> order = _unitOfWork
+            .GetRepository<OrderItem>()
+            .GetAll(oi =>
+                oi.Order != null && oi.Order.Status == OrderStatus.Completed && !oi.Order.IsDeleted
+            );
         List<DashboardTopProduct> result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll(x =>
-                order.Any(oi =>
-                    oi.ProductId == x.Id
-                    && oi.Order != null
-                    && !oi.Order.IsDeleted
-                    && oi.Order.Status == OrderStatus.Completed
-                )
-            )
+            .GetAll(x => order.Any(oi => oi.ProductId == x.Id))
             .Select(x => new DashboardTopProduct
             {
                 Id = x.Id,
@@ -167,8 +163,7 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
         DateTime lastMonthEnd = new(now.Year, 12, 31);
         List<Order> orders = await _unitOfWork
             .GetRepository<Order>()
-            .GetAll()
-            .Where(o => o.CreatedDate >= firstMonthStart && o.CreatedDate <= lastMonthEnd)
+            .GetAll(o => o.CreatedDate >= firstMonthStart && o.CreatedDate <= lastMonthEnd)
             .ToListAsync();
 
         List<DateTime> allMonths = Enumerable
@@ -176,25 +171,21 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
             .Select(firstMonthStart.AddMonths)
             .ToList();
 
-        // Group orders by month
         Dictionary<DateTime, List<Order>> groupedOrders = orders
             .GroupBy(o => new DateTime(o.CreatedDate.Year, o.CreatedDate.Month, 1)) // Group by the first day of the month
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        // Build the report for each month
         List<DashboardSale> report = allMonths.ConvertAll(month =>
         {
-            // Get orders for the current month, or an empty list if no orders exist
             List<Order> monthlyOrders = groupedOrders.TryGetValue(month, out List<Order>? value)
                 ? value
                 : [];
 
-            // Calculate metrics
             List<Order> completedOrders = monthlyOrders
                 .Where(o => o.Status == OrderStatus.Completed)
                 .ToList();
-            double totalRevenue = completedOrders.Sum(o => o.TotalPrice);
-            double averageOrderValue =
+            decimal totalRevenue = completedOrders.Sum(o => o.TotalPrice);
+            decimal averageOrderValue =
                 completedOrders.Count != 0 ? completedOrders.Average(o => o.TotalPrice) : 0;
 
             return new DashboardSale { Date = month, Revenue = totalRevenue };
@@ -209,8 +200,7 @@ public class DashboardService(IUnitOfWork unitOfWork) : IDashboardService
     {
         List<DashboardStockAlert> result = await _unitOfWork
             .GetRepository<Product>()
-            .GetAll()
-            .Where(p => p.Stock <= stockThreshold)
+            .GetAll(p => p.Stock <= stockThreshold)
             .Select(p => new DashboardStockAlert
             {
                 ProductId = p.Id,

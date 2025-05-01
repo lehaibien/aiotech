@@ -36,6 +36,7 @@ export default async function ProductUpsertPage({
   let brandCombobox: ComboBoxItem[] = [];
   let categoryCombobox: ComboBoxItem[] = [];
   let imageUrls: string[] = [];
+  let thumbnailUrl: string | undefined = undefined;
   if (parsedId !== EMPTY_UUID) {
     const response = await getByIdApi(API_URL.productRequest, { id: parsedId });
     if (response.success) {
@@ -56,6 +57,7 @@ export default async function ProductUpsertPage({
         images: [],
       };
       imageUrls = data.imageUrls;
+      thumbnailUrl = data.thumbnailUrl;
     }
   }
   const [brandComboboxResponse, categoryComboboxResponse] = await Promise.all([
@@ -73,6 +75,7 @@ export default async function ProductUpsertPage({
       <Divider sx={{ my: 1 }} />
       <ProductUpsertForm
         defaultImages={imageUrls}
+        defaultThumbnail={thumbnailUrl}
         brands={brandCombobox}
         categories={categoryCombobox}
         product={product}

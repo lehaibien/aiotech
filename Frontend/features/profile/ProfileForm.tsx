@@ -30,6 +30,7 @@ export const ProfileForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [avatarPreview, setAvatarPreview] = useState<string>();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [isImageChanged, setIsImageChanged] = useState(false);
 
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
 
@@ -50,6 +51,7 @@ export const ProfileForm = () => {
     if (file) {
       setValue("image", file);
       setAvatarPreview(URL.createObjectURL(file));
+      setIsImageChanged(true);
     }
   };
 
@@ -58,9 +60,9 @@ export const ProfileForm = () => {
     const extendedData = {
       ...data,
       id: parsedId,
+      isImageEdited: isImageChanged,
     };
     const formData = convertObjectToFormData(extendedData);
-    // TODO: Send formData to api
     postApi(API_URL.userProfile, formData).then((response) => {
       if (response.success) {
         enqueueSnackbar("Cập nhật tài khoản thành công", {
@@ -167,7 +169,7 @@ export const ProfileForm = () => {
           />
         </Grid>
         <Grid size={12}>
-          <FormLabel htmlFor="address" required>
+          <FormLabel htmlFor="address">
             Địa chỉ
           </FormLabel>
           <ControlledTextField

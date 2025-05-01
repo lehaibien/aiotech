@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Shared;
+﻿using Application.Shared;
+using Domain.Entities;
 
 namespace Application.Orders.Dtos;
 

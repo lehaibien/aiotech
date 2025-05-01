@@ -1,5 +1,5 @@
 ﻿using Application.Reports.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Reports;
 
@@ -9,20 +9,34 @@ public interface IReportService
         SaleReportRequest request,
         CancellationToken cancellationToken = default
     );
+
     Task<Result<List<OrderReportResponse>>> GetOrderReportsAsync(
         OrderReportRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<PaginatedList>> GetOutOfStockReportAsync(InventoryStatusReportRequest request);
+
+    Task<Result<PaginatedList<InventoryStatusReportResponse>>> GetInventoryStatusReportAsync(InventoryStatusReportRequest request,
+        CancellationToken cancellationToken = default
+    );
+
     Task<Result<List<BrandPerformanceReportResponse>>> GetBrandPerformanceReportAsync(
-        BrandPerformanceReportRequest request
+        BrandPerformanceReportRequest request,
+        CancellationToken cancellationToken = default
     );
+
     Task<Result<List<CategoryPerformanceReportResponse>>> GetCategoryPerformanceReportAsync(
-        CategoryPerformanceReportRequest request
+        CategoryPerformanceReportRequest request,
+        CancellationToken cancellationToken = default
     );
-    Task<Result<List<ProductRatingResponse>>> GetProductRatingReportAsync();
+
+    Task<Result<List<ProductRatingReportResponse>>>
+        GetProductRatingReportAsync(CancellationToken cancellationToken = default);
+
     Task<Result<List<TopCustomerReportResponse>>> GetTopCustomerReportAsync(
-        GetTopCustomerReportRequest request
+        GetTopCustomerReportRequest request,
+        CancellationToken cancellationToken = default
     );
-    Task<Result<PaginatedList>> GetTopSellingProductsAsync(TopSellingProductRequest request);
+
+    Task<Result<PaginatedList<TopSellingProductResponse>>> GetTopSellingProductsAsync(TopSellingProductRequest request,
+        CancellationToken cancellationToken = default);
 }

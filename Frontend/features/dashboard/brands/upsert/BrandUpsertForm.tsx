@@ -49,7 +49,7 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
         });
         router.push("/dashboard/brands");
       } else {
-        enqueueSnackbar(method + " thương hiệu thất bại", {
+        enqueueSnackbar(method + " thương hiệu thất bại: " + response.message, {
           variant: "error",
         });
       }

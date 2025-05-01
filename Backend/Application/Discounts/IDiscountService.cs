@@ -1,11 +1,11 @@
 using Domain.Entities;
-using Shared;
+using Application.Shared;
 
 namespace Application.Discounts;
 
 public interface IDiscountService
 {
-    Task<Result<Discount>> GetDiscountByCode(string couponCode);
-    Task<Result> IsDiscountValid(string couponCode);
-    Task<Result> ApplyDiscount(string couponCode);
+    Task<Result<Discount>> GetDiscountByCodeAsync(string couponCode);
+    Task<Result> IsDiscountValidAsync(string couponCode);
+    Task<Result> ApplyDiscountAsync(string couponCode);
 }

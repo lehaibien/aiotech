@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { NoItem } from '@/components/core/NoItem';
-import { ProductCard } from '@/components/core/ProductCard';
-import { ProductListItemResponse } from '@/types';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import { Box, Grid, Pagination } from '@mui/material';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { NoItem } from "@/components/core/NoItem";
+import { ProductCard } from "@/components/core/ProductCard";
+import { ProductListItemResponse } from "@/types";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import { Box, Grid, Pagination } from "@mui/material";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 type ShopListProps = {
   items: ProductListItemResponse[];
@@ -21,26 +21,23 @@ export default function ShopList({
 }: ShopListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const handlePageChange = useCallback(
     (event: React.ChangeEvent<unknown>, value: number) => {
       const params = new URLSearchParams(searchParams);
-      params.set('page', value.toString());
+      params.set("page", value.toString());
       router.push(`?${params.toString()}`);
     },
     [router, searchParams]
   );
   const message =
     searchParams.size > 0
-      ? 'Vui lòng thử lại sau hoặc lọc danh sách theo điều kiện khác.'
-      : 'Chúng tôi xin lỗi quý khách, quý khách vui lòng thử lại sau';
+      ? "Vui lòng thử lại sau hoặc lọc danh sách theo điều kiện khác."
+      : "Chúng tôi xin lỗi quý khách, quý khách vui lòng thử lại sau";
   if (items.length === 0) {
     return (
-      <Grid
-        container
-        spacing={2}>
+      <Grid container spacing={2}>
         <NoItem
-          title={'Không có sản phẩm nào'}
+          title={"Không có sản phẩm nào"}
           description={message}
           icon={ShoppingBagIcon}
         />
@@ -50,30 +47,24 @@ export default function ShopList({
 
   return (
     <>
-      <Grid
-        container
-        spacing={2}>
+      <Grid container spacing={2}>
         {items.map((product) => (
-          <Grid
-            size={{ xs: 12, md: 6, lg: 3 }}
-            key={product.id}>
+          <Grid key={product.id} size={{ xs: 12, md: 6, lg: 3 }}>
             <ProductCard product={product} />
           </Grid>
         ))}
       </Grid>
-      <Box
-        mt={2}
-        justifyContent='center'>
+      <Box mt={2} justifyContent="center">
         <Pagination
           count={totalPage}
           page={currentPage}
-          variant='text'
-          shape='rounded'
+          variant="text"
+          shape="rounded"
           onChange={handlePageChange}
-          color='primary'
+          color="primary"
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
+            display: "flex",
+            justifyContent: "center",
           }}
         />
       </Box>

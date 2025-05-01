@@ -73,7 +73,6 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
     const action = post.id === EMPTY_UUID ? postApi : putApi;
     const method = postApi === postApi ? "Thêm mới" : "Cập nhật";
     const response = await action(API_URL.post, formData);
-    console.log(response);
     if (response.success) {
       enqueueSnackbar(method + " bài viết thành công", {
         variant: "success",

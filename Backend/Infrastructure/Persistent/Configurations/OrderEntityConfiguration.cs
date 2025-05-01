@@ -8,10 +8,13 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
+        builder.ToTable("Order");
         builder.HasKey(x => x.Id).HasName("PK_OrderId");
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.CustomerId).IsRequired();
-        builder.Property(x => x.TrackingNumber).IsUnicode(false).IsRequired();
+        builder.Property(x => x.PhoneNumber).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.Name).HasMaxLength(255).IsRequired();
+        builder.Property(x => x.TrackingNumber).IsUnicode(false).HasMaxLength(16).IsRequired();
         builder.Property(x => x.Tax).HasPrecision(18, 2).IsRequired();
         builder.Property(x => x.TotalPrice).HasPrecision(18, 2).IsRequired();
         builder
@@ -27,6 +30,7 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
             .HasPrincipalKey(x => x.Id)
             .HasConstraintName("FK_Order_CustomerId")
             .OnDelete(DeleteBehavior.NoAction);
+
         builder
             .HasMany(x => x.OrderItems)
             .WithOne(x => x.Order)
@@ -41,8 +45,6 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
             .HasConstraintName("FK_Order_PaymentId")
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => x.CustomerId);
         builder.HasIndex(x => x.TrackingNumber).IsUnique();
-        builder.ToTable("Order");
     }
 }

@@ -1,3 +1,4 @@
+using Application.Helpers;
 using Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -29,15 +30,17 @@ public class AuditInterceptor(IHttpContextAccessor contextAccessor) : SaveChange
         foreach (EntityEntry<BaseEntity> entryAdd in entriesAdd)
         {
             entryAdd.Entity.CreatedDate = DateTime.UtcNow;
-            entryAdd.Entity.CreatedBy =
-                contextAccessor.HttpContext.User.Identity.Name ?? "anonymous";
+            entryAdd.Entity.CreatedBy = Utilities.GetUsernameFromContext(
+                contextAccessor.HttpContext
+            );
         }
 
         foreach (EntityEntry<BaseEntity> entryUpdate in entriesUpdate)
         {
             entryUpdate.Entity.UpdatedDate = DateTime.UtcNow;
-            entryUpdate.Entity.UpdatedBy =
-                contextAccessor.HttpContext.User.Identity.Name ?? "anonymous";
+            entryUpdate.Entity.UpdatedBy = Utilities.GetUsernameFromContext(
+                contextAccessor.HttpContext
+            );
         }
 
         return base.SavingChanges(eventData, result);
@@ -65,15 +68,17 @@ public class AuditInterceptor(IHttpContextAccessor contextAccessor) : SaveChange
         foreach (EntityEntry<BaseEntity> entryAdd in entriesAdd)
         {
             entryAdd.Entity.CreatedDate = DateTime.UtcNow;
-            entryAdd.Entity.CreatedBy =
-                contextAccessor?.HttpContext?.User?.Identity?.Name ?? "anonymous";
+            entryAdd.Entity.CreatedBy = Utilities.GetUsernameFromContext(
+                contextAccessor.HttpContext
+            );
         }
 
         foreach (EntityEntry<BaseEntity> entryUpdate in entriesUpdate)
         {
             entryUpdate.Entity.UpdatedDate = DateTime.UtcNow;
-            entryUpdate.Entity.UpdatedBy =
-                contextAccessor.HttpContext.User.Identity.Name ?? "anonymous";
+            entryUpdate.Entity.UpdatedBy = Utilities.GetUsernameFromContext(
+                contextAccessor.HttpContext
+            );
         }
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);

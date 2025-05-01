@@ -1,5 +1,5 @@
 ﻿using Application.Authentication.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Authentication;
 

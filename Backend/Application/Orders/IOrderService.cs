@@ -1,29 +1,35 @@
 ﻿using Application.Orders.Dtos;
+using Application.Shared;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
-using Shared;
 
 namespace Application.Orders;
 
 public interface IOrderService
 {
-    Task<Result<PaginatedList>> GetListAsync(
+    Task<Result<PaginatedList<OrderResponse>>> GetListAsync(
         OrderGetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<OrderResponse>> GetById(Guid id);
-    Task<Result<List<OrderResponse>>> GetByUsername(string username);
-    Task<Result<List<OrderResponse>>> GetRecentOrders(int count);
-    Task<Result<string>> CreateUrl(OrderCheckoutRequest request);
-    Task<Result<OrderResponse>> Create(OrderRequest request);
 
-    Task<Result<OrderResponse>> Update(OrderRequest request);
-    Task<Result<string>> Delete(Guid id);
-    Task<Result<string>> DeleteList(List<Guid> ids);
-    Task<Result> ChangeStatus(OrderUpdateStatusRequest request);
-    Task<Result<string>> ChangeStatusList(List<Guid> ids, OrderStatus status);
-    Task<Result<byte[]>> PrintReceipt(Guid id);
-    Task<Result> HandleCallbackPayment(IQueryCollection queryCollection);
-    Task<Result> Confirm(Guid id);
-    Task<Result> Cancel(OrderCancelRequest request);
+    Task<Result<OrderDetailResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<Result<List<OrderResponse>>> GetByUsernameAsync(string username,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<List<OrderResponse>>> GetRecentOrdersAsync(int count,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<string>> CreateUrlAsync(OrderCheckoutRequest request);
+    Task<Result<OrderResponse>> CreateAsync(OrderRequest request);
+
+    Task<Result<OrderResponse>> UpdateAsync(OrderRequest request);
+    Task<Result<string>> DeleteAsync(Guid id);
+    Task<Result<string>> DeleteListAsync(List<Guid> ids);
+    Task<Result> ChangeStatusAsync(OrderUpdateStatusRequest request);
+    Task<Result<string>> ChangeStatusListAsync(List<Guid> ids, OrderStatus status);
+    Task<Result<byte[]>> PrintReceiptAsync(Guid id);
+    Task<Result> HandleCallbackPaymentAsync(IQueryCollection queryCollection);
+    Task<Result> ConfirmAsync(Guid id);
+    Task<Result> CancelAsync(OrderCancelRequest request);
 }

@@ -4,6 +4,7 @@ namespace Application.Reviews.Dtos;
 
 public class ReviewRequest
 {
+    public Guid Id { get; set; }
     public Guid ProductId { get; set; }
     public Guid UserId { get; set; }
 
