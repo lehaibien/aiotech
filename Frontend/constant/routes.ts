@@ -12,30 +12,22 @@ import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import SensorDoorOutlinedIcon from '@mui/icons-material/SensorDoorOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
-import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 export const baseNavItems: NavItem[] = [
   {
     title: 'Cửa hàng',
-    icon: StoreOutlinedIcon,
     href: '/products',
   },
   {
     title: 'Tin tức',
-    icon: BookOutlinedIcon,
     href: '/blogs',
   },
   {
     title: 'Liên hệ',
-    icon: ContactsOutlinedIcon,
     href: '/contact',
   },
   {
     title: 'Giới thiệu',
-    icon: InfoOutlinedIcon,
     href: '/about',
   },
 ];

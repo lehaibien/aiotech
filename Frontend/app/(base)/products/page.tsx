@@ -1,6 +1,6 @@
 import { API_URL } from "@/constant/apiUrl";
-import FilterDrawer from "@/features/products/FilterDrawer";
-import ShopList from "@/features/products/ShopList";
+import { FilterDrawer } from "@/features/products/FilterDrawer";
+import { ShopList } from "@/features/products/ShopList";
 import { ShopSort } from "@/features/products/ShopSort";
 import { getApi, getListApi } from "@/lib/apiClient";
 import {
@@ -8,17 +8,11 @@ import {
   GetListFilteredProductRequest,
   PaginatedList,
   ProductListItemResponse,
-  ProductSort
+  ProductSort,
 } from "@/types";
-import {
-  Box,
-  Breadcrumbs,
-  CircularProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Group, Stack, Title } from "@mantine/core";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
@@ -120,69 +114,46 @@ export default async function ShopPage({
     brands = brandResponse.data as ComboBoxItem[];
   }
   return (
-    <Stack gap={1}>
-      {/* Breadcrumbs Navigation */}
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link
-          href="/"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-          }}
-        >
-          Trang chủ
-        </Link>
-        <Typography>Sản phẩm</Typography>
-      </Breadcrumbs>
+    <Stack gap={2}>
+      <Title order={1}>Cửa hàng</Title>
+      <Stack gap={3}>
+        <Group gap={2} justify="space-between">
+          <FilterDrawer
+            brands={brands}
+            categories={categories}
+            defaultBrands={brand?.split(",")}
+            defaultCategories={category?.split(",")}
+          />
+          <ShopSort defaultSort={sort ?? "default"} />
+        </Group>
 
-      <Box>
-        <Typography variant="h5" component="h1" gutterBottom>
-          Danh sách sản phẩm
-        </Typography>
-
-        <Stack spacing={3}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
+        <Box sx={{ position: "relative", minHeight: "200px" }}>
+          <Suspense
+            key={"Products page"}
+            fallback={
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "300px",
+                }}
+              >
+                <CircularProgress size={60} thickness={4} />
+                <Typography variant="body1" sx={{ ml: 2 }}>
+                  Đang tải sản phẩm...
+                </Typography>
+              </Box>
+            }
           >
-            <FilterDrawer
-              brands={brands}
-              categories={categories}
-              defaultBrands={brand?.split(",")}
-              defaultCategories={category?.split(",")}
+            <ShopList
+              items={dataList.items}
+              currentPage={page}
+              totalPage={Math.ceil(dataList.totalCount / pageSize)}
             />
-            <ShopSort defaultSort={sort ?? "default"} />
-          </Stack>
-
-          <Box sx={{ position: "relative", minHeight: "200px" }}>
-            <Suspense
-              key={"Products page"}
-              fallback={
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "300px",
-                  }}
-                >
-                  <CircularProgress size={60} thickness={4} />
-                  <Typography variant="body1" sx={{ ml: 2 }}>
-                    Đang tải sản phẩm...
-                  </Typography>
-                </Box>
-              }
-            >
-              <ShopList
-                items={dataList.items}
-                currentPage={page}
-                totalPage={Math.ceil(dataList.totalCount / pageSize)}
-              />
-            </Suspense>
-          </Box>
-        </Stack>
-      </Box>
+          </Suspense>
+        </Box>
+      </Stack>
     </Stack>
   );
 }

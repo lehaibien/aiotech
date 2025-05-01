@@ -1,12 +1,13 @@
 import {
-  Box,
   Button,
+  Group,
   Rating,
   Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { useState } from 'react';
+  Text,
+  Textarea,
+  Title
+} from "@mantine/core";
+import { useState } from "react";
 
 type NewReview = {
   rating: number;
@@ -22,52 +23,41 @@ export const WriteReviewSection = ({
 }: WriteReviewSectionProps) => {
   const [newReview, setNewReview] = useState<NewReview>({
     rating: 0,
-    comment: '',
+    comment: "",
   });
   const handleSubmit = () => {
-    if (newReview.rating === 0 || newReview.comment === '') {
+    if (newReview.rating === 0 || newReview.comment === "") {
       return;
     }
     handleSubmitReview(newReview);
   };
   return (
-    <Stack spacing={2}>
-      <Typography
-        variant='h6'
-        gutterBottom>
-        Viết đánh giá của bạn
-      </Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Stack gap={8}>
+      <Title order={6}>Viết đánh giá của bạn</Title>
+      <Group gap={4}>
         <Rating
           value={newReview.rating}
-          onChange={(_, value) =>
-            setNewReview({ ...newReview, rating: value || 0 })
+          onChange={(value) =>
+            setNewReview({ ...newReview, rating: value })
           }
-          size='large'
+          size="lg"
         />
-        <Typography
-          variant='body2'
-          color='text.secondary'>
-          {newReview.rating > 0 ? `${newReview.rating}/5 sao` : 'Chọn đánh giá'}
-        </Typography>
-      </Box>
-      <TextField
-        fullWidth
-        multiline
+        <Text size="md" c="gray">
+          {newReview.rating > 0 ? `${newReview.rating}/5 sao` : "Chọn đánh giá"}
+        </Text>
+      </Group>
+      <Textarea
+        placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
         rows={4}
-        placeholder='Chia sẻ trải nghiệm của bạn về sản phẩm này...'
         value={newReview.comment}
         onChange={(e) =>
           setNewReview({ ...newReview, comment: e.target.value })
         }
       />
-      <Button
-        variant='contained'
-        color='primary'
-        sx={{
-          width: 'fit-content',
-        }}
-        onClick={handleSubmit}>
+      <Button w={{
+        base: '100%',
+        md: '30%'
+      }} variant="filled" onClick={handleSubmit}>
         Gửi đánh giá
       </Button>
     </Stack>

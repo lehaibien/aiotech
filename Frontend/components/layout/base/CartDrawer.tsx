@@ -6,34 +6,21 @@ import { getByIdApi } from "@/lib/apiClient";
 import { cartItemsAtom } from "@/lib/globalState";
 import { formatNumberWithSeperator, parseUUID } from "@/lib/utils";
 import { CartItemResponse } from "@/types";
-import CloseIcon from "@mui/icons-material/Close";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import {
-  Badge,
-  Box,
-  Button,
-  Drawer,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { ActionIcon, Badge, Button, Drawer, Stack } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useSetAtom } from "jotai";
+import { ShoppingBag } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { CartItemListing } from "./CartItemListing";
 
-export function CartDrawer() {
+export const CartDrawer = () => {
   const { data: session } = useSession();
   const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
   const setCartItems = useSetAtom(cartItemsAtom);
   const { cartItems } = useCart();
-  const [open, setOpen] = useState(false);
-  const onOpen = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
+  const [opened, { open, close }] = useDisclosure(false);
   useEffect(() => {
     if (!userId) return;
     const parsedUserId = parseUUID(userId);
@@ -45,67 +32,58 @@ export function CartDrawer() {
   }, [setCartItems, userId]);
   return (
     <>
-      <IconButton color="inherit" onClick={onOpen} sx={{ p: 1 }}>
-        <Badge badgeContent={cartItems.length} color="error">
-          <ShoppingBagOutlinedIcon fontSize="small" />
-        </Badge>
-      </IconButton>
+      <ActionIcon
+        aria-label="Danh sách yêu thích"
+        variant="transparent"
+        color="dark"
+        pos="relative"
+        w={40}
+        h={40}
+        onClick={open}
+      >
+        <ShoppingBag size={20} />
+        {cartItems.length > 0 && (
+          <Badge pos="absolute" top={0} right={0} circle>
+            {cartItems.length}
+          </Badge>
+        )}
+      </ActionIcon>
 
       <Drawer
-        anchor="right"
-        open={open}
-        onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: { xs: "100%", sm: 420, lg: 520 },
-            display: "flex",
-            flexDirection: "column",
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
+        opened={opened}
+        onClose={close}
+        position="right"
+        title="Giỏ hàng"
+        withCloseButton
+        size='lg'
+        styles={{
+          body: {
+            height: "calc(100% - 60px)",
           },
         }}
       >
-        <Box
-          sx={{
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6" component="h2">
-            Giỏ hàng
-          </Typography>
-          <IconButton onClick={onClose} edge="end" size="small">
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <CartItemListing sx={{ flex: 1, overflow: "auto" }} />
-
-        <Button
-          LinkComponent={Link}
-          href="/checkout"
-          variant="contained"
-          color="primary"
-          size="medium"
-          fullWidth
-          disabled={cartItems.length === 0}
-          onClick={onClose}
-          sx={{
-            borderRadius: 0,
-          }}
-        >
-          Thanh toán ngay (
-          {formatNumberWithSeperator(
-            cartItems.reduce(
-              (acc, cur) => acc + (cur.productPrice ?? 0) * cur.quantity,
-              0
-            )
-          )}{" "}
-          ₫)
-        </Button>
+        <Stack h="100%" justify="space-between">
+          <CartItemListing />
+          <Button
+            component={Link}
+            href="/checkout"
+            variant="filled"
+            size="sm"
+            fullWidth
+            disabled={cartItems.length === 0}
+            onClick={close}
+          >
+            Thanh toán ngay (
+            {formatNumberWithSeperator(
+              cartItems.reduce(
+                (acc, cur) => acc + (cur.productPrice ?? 0) * cur.quantity,
+                0
+              )
+            )}{" "}
+            ₫)
+          </Button>
+        </Stack>
       </Drawer>
     </>
   );
-}
+};

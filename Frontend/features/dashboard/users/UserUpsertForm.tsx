@@ -1,7 +1,7 @@
 'use client';
 
-import ControlledComboBox from '@/components/core/ControlledComboBox';
-import { ControlledTextField } from '@/components/core/ControlledTextField';
+import ControlledComboBox from '@/components/form/ControlledComboBox';
+import { ControlledTextInput } from '@/components/form/ControlledTextField';
 import { API_URL } from '@/constant/apiUrl';
 import { EMPTY_UUID } from '@/constant/common';
 import { postApi, putApi } from '@/lib/apiClient';
@@ -95,7 +95,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
             required>
             Tên tài khoản
           </FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             required
             control={control}
             name='userName'
@@ -109,7 +109,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
             required>
             Email
           </FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             required
             control={control}
             name='email'
@@ -130,7 +130,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
             required>
             Họ
           </FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             required
             control={control}
             name='familyName'
@@ -143,7 +143,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
             required>
             Tên
           </FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             required
             control={control}
             name='givenName'
@@ -159,7 +159,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
         }}>
         <FormControl fullWidth>
           <FormLabel htmlFor='phoneNumber'>Số điện thoại</FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             control={control}
             name='phoneNumber'
             size='small'
@@ -184,7 +184,7 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
       </Box>
       <FormControl fullWidth>
         <FormLabel htmlFor='password'>Password</FormLabel>
-        <ControlledTextField
+        <ControlledTextInput
           control={control}
           name='password'
           size='small'

@@ -1,45 +1,44 @@
-'use client';
+"use client";
 
-import FilterDropdown from '@/components/core/FilterDropDown';
-import { formatNumberWithSeperator } from '@/lib/utils';
-import { ComboBoxItem } from '@/types';
-import CloseIcon from '@mui/icons-material/Close';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import TuneIcon from '@mui/icons-material/Tune';
+import FilterDropdown from "@/components/core/FilterDropDown";
+import { ComboBoxItem } from "@/types";
 import {
-  Box,
   Button,
   Drawer,
-  IconButton,
+  Flex,
+  Group,
+  NumberInput,
   Paper,
-  Slider,
+  RangeSlider,
   Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+  Text,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import TuneIcon from "@mui/icons-material/Tune";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
-interface FilterDrawerProps {
+type FilterDrawerProps = {
   brands: ComboBoxItem[];
   categories: ComboBoxItem[];
   defaultBrands?: string[];
   defaultCategories?: string[];
-}
+};
 
-export default function FilterDrawer({
+export const FilterDrawer = ({
   brands,
   categories,
   defaultBrands = [],
   defaultCategories = [],
-}: FilterDrawerProps) {
-  const theme = useTheme();
+}: FilterDrawerProps) => {
   const defaultMaxPrice = 900000000;
-  const [open, setOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const [category, setCategory] = useState<string[]>(defaultCategories);
   const [brand, setBrand] = useState<string[]>(defaultBrands);
-  const [priceRange, setPriceRange] = useState<number[]>([0, defaultMaxPrice]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    0,
+    defaultMaxPrice,
+  ]);
 
   const categoryValues = useMemo(
     () =>
@@ -65,10 +64,6 @@ export default function FilterDrawer({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-
   const handleCategoryChange = (values: string[]) => {
     const selectedCategories = categories
       .filter((x) => values.includes(x.value))
@@ -87,196 +82,131 @@ export default function FilterDrawer({
     setCategory([]);
     setBrand([]);
     setPriceRange([0, defaultMaxPrice]);
-    router.push('/products');
+    close();
+    router.push("/products");
   };
 
   const handleSubmit = () => {
     const params = new URLSearchParams(searchParams);
-    params.delete('category');
-    params.delete('brand');
-    params.delete('minPrice');
-    params.delete('maxPrice');
-    params.delete('page');
+    params.delete("category");
+    params.delete("brand");
+    params.delete("minPrice");
+    params.delete("maxPrice");
+    params.delete("page");
     if (category.length > 0) {
-      params.set('category', flatCategory.join(','));
+      params.set("category", flatCategory.join(","));
     }
     if (brand.length > 0) {
-      params.set('brand', flatBrand.join(','));
+      params.set("brand", flatBrand.join(","));
     }
     if (priceRange[0] > 0 || priceRange[1] < defaultMaxPrice) {
-      params.set('minPrice', priceRange[0].toString());
-      params.set('maxPrice', priceRange[1].toString());
+      params.set("minPrice", priceRange[0].toString());
+      params.set("maxPrice", priceRange[1].toString());
     }
 
     router.push(`?${params.toString()}`);
-    setOpen(false);
+    close();
   };
 
   return (
-    <div>
-      <Button
-        onClick={toggleDrawer(true)}
-        startIcon={<TuneIcon />}>
+    <>
+      <Button variant="outline" onClick={open} leftSection={<TuneIcon />}>
         Lọc sản phẩm
       </Button>
 
       <Drawer
-        anchor='bottom'
-        open={open}
-        onClose={toggleDrawer(false)}>
-        <Stack
-          gap={2}
-          padding={2}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FilterListIcon />
-              <Typography variant='h6'>Bộ lọc sản phẩm</Typography>
-            </Box>
-            <IconButton
-              onClick={toggleDrawer(false)}
-              size='small'>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 2,
-            }}>
+        position="bottom"
+        opened={opened}
+        onClose={close}
+        title="Bộ lọc sản phẩm"
+        size="xs"
+      >
+        <Stack gap={8} p={2}>
+          <Flex
+            direction={{
+              base: "column",
+              sm: "row",
+            }}
+            gap={4}
+          >
             <FilterDropdown
-              title='Danh mục'
+              title="Danh mục"
               items={categories}
-              size='small'
-              width='100%'
+              size="small"
+              width="100%"
               initialValue={categoryValues}
               onValueChange={handleCategoryChange}
             />
 
             <FilterDropdown
-              title='Thương hiệu'
+              title="Thương hiệu"
               items={brands}
-              size='small'
-              width='100%'
+              size="small"
+              width="100%"
               initialValue={brandValues}
               onValueChange={handleBrandChange}
             />
-          </Box>
+          </Flex>
 
           <Paper>
-            <Typography gutterBottom>Khoảng giá</Typography>
+            <Text>Khoảng giá</Text>
 
-            <Box>
-              <Slider
-                value={priceRange}
-                onChange={(_, newValue) => setPriceRange(newValue as number[])}
-                valueLabelDisplay='auto'
-                min={0}
-                max={defaultMaxPrice}
-                valueLabelFormat={(value) =>
-                  `${formatNumberWithSeperator(value)} đ`
+            <RangeSlider
+              color="blue"
+              min={0}
+              max={defaultMaxPrice}
+              value={priceRange}
+              onChange={setPriceRange}
+            />
+            <Group gap={4} justify="space-between" align="flex-end">
+              <NumberInput
+                label="Giá tối thiểu"
+                value={priceRange[0]}
+                onChange={(value) =>
+                  setPriceRange([Number(value), priceRange[1]])
                 }
-                sx={{
-                  mx: 1,
-                  '& .MuiSlider-thumb': {
-                    height: 16,
-                    width: 16,
-                  },
-                }}
+                size="sm"
+                flex={1}
+                suffix="đ"
+                thousandSeparator="."
+                decimalSeparator=","
               />
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 2,
-                }}>
-                <TextField
-                  label='Giá tối thiểu'
-                  type='number'
-                  value={priceRange[0]}
-                  onChange={(e) =>
-                    setPriceRange([Number(e.target.value), priceRange[1]])
-                  }
-                  InputProps={{
-                    inputProps: { min: 0, max: priceRange[1] },
-                  }}
-                  sx={{
-                    width: '100%',
-                  }}
-                  size='small'
-                />
-                <Typography
-                  variant='body2'
-                  sx={{ color: theme.palette.text.secondary }}>
-                  đến
-                </Typography>
-                <TextField
-                  label='Giá tối đa'
-                  type='number'
-                  value={priceRange[1]}
-                  onChange={(e) =>
-                    setPriceRange([priceRange[0], Number(e.target.value)])
-                  }
-                  InputProps={{
-                    inputProps: { min: priceRange[0], max: defaultMaxPrice },
-                  }}
-                  sx={{
-                    width: '100%',
-                  }}
-                  size='small'
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}>
-                <Typography
-                  variant='body2'
-                  sx={{ color: theme.palette.text.secondary }}>
-                  {formatNumberWithSeperator(priceRange[0])} đ
-                </Typography>
-                <Typography
-                  variant='body2'
-                  sx={{ color: theme.palette.text.secondary }}>
-                  {formatNumberWithSeperator(priceRange[1])} đ
-                </Typography>
-              </Box>
-            </Box>
+              <Text>đến</Text>
+              <NumberInput
+                label="Giá tối đa"
+                value={priceRange[1]}
+                onChange={(value) =>
+                  setPriceRange([priceRange[0], Number(value)])
+                }
+                size="sm"
+                flex={1}
+                suffix="đ"
+                thousandSeparator="."
+                decimalSeparator=","
+              />
+            </Group>
           </Paper>
 
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 2,
-            }}>
+          <Group justify="space-between" gap={4}>
             <Button
-              fullWidth
-              variant='contained'
-              color='info'
-              onClick={handleReset}>
+              variant="contained"
+              color="info"
+              onClick={handleReset}
+              flex={1}
+            >
               Đặt lại
             </Button>
             <Button
-              fullWidth
-              variant='contained'
-              color='primary'
-              onClick={handleSubmit}>
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              flex={1}
+            >
               Áp dụng bộ lọc
             </Button>
-          </Box>
+          </Group>
         </Stack>
       </Drawer>
-    </div>
+    </>
   );
-}
+};

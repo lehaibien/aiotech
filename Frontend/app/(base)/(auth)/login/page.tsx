@@ -1,7 +1,7 @@
 import { LoginForm } from "@/features/auth/login/LoginForm";
-import SocialLogin from "@/features/auth/SocialLogin";
+import {SocialLogin} from "@/features/auth/SocialLogin";
 import { SearchParams } from "@/types";
-import { Divider, Stack, Typography } from "@mui/material";
+import { Container, Divider, Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -16,24 +16,24 @@ export default async function Page({
 }) {
   const { redirect } = await searchParams;
   return (
-    <Stack width={{ xs: "100%", md: "400px" }} margin="auto" gap={2}>
-      <Typography component="h1" variant="h4">
-        Đăng nhập
-      </Typography>
-      <LoginForm redirectTo={redirect ?? "/"} />
-      <Typography sx={{ textAlign: "center" }}>
-        Không có tài khoản?{" "}
-        <Link
-          href="/register"
-          style={{
-            fontWeight: 600,
-          }}
-        >
-          Đăng ký ngay
-        </Link>
-      </Typography>
-      <Divider>Hoặc</Divider>
-      <SocialLogin redirectTo={redirect} />
-    </Stack>
+    <Container size="sm">
+      <Stack gap={4}>
+        <Title order={1}>Đăng nhập</Title>
+        <LoginForm redirectTo={redirect ?? "/"} />
+        <Group justify="center" align="center" gap={4}>
+          Bạn chưa có tài khoản?{" "}
+          <Link
+            href="/register"
+            style={{
+              fontWeight: 600,
+            }}
+          >
+            Đăng ký ngay
+          </Link>
+        </Group>
+        <Divider my="xs" label="Hoặc" labelPosition="center" />
+        <SocialLogin redirectTo={redirect} />
+      </Stack>
+    </Container>
   );
 }

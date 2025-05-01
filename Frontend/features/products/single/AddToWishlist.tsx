@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { Button } from '@mui/material';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { useWishlist } from '@/hooks/useWishlist';
+import { useWishlist } from "@/hooks/useWishlist";
+import { Button } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { Heart } from "lucide-react";
 
 type AddToWishlistProps = {
   productId: string;
@@ -12,13 +13,19 @@ export const AddToWishlist = ({ productId }: AddToWishlistProps) => {
   const { addToWishlist } = useWishlist();
   const handleAddToWishlist = () => {
     addToWishlist(productId);
+    notifications.show({
+      message: "Thêm vào danh sách yêu thích thành công",
+      color: "green",
+    });
   };
   return (
     <Button
-      variant='contained'
-      color='secondary'
-      startIcon={<FavoriteBorderIcon />}
-      onClick={handleAddToWishlist}>
+      variant="filled"
+      color="pink"
+      size="sm"
+      leftSection={<Heart />}
+      onClick={handleAddToWishlist}
+    >
       Thêm vào yêu thích
     </Button>
   );

@@ -1,6 +1,5 @@
-import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { CategoryResponse } from "@/types";
-import { Grid, Stack } from "@mui/material";
+import { SimpleGrid, Stack, Title } from "@mantine/core";
 import { CategoryCard } from "./CategoryCard";
 
 type FeaturedCategoriesProps = {
@@ -9,24 +8,23 @@ type FeaturedCategoriesProps = {
 
 export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
   return (
-    <Stack spacing={2}>
-      <HighlightTypography
-        variant="h5"
-        component="h2"
-        gutterBottom
-        sx={{
-          fontWeight: 600,
+    <Stack gap={8}>
+      <Title order={3}>Danh mục nổi bật</Title>
+      <SimpleGrid
+        cols={{
+          xs: 2,
+          md: 4,
+          lg: 8,
         }}
       >
-        Danh mục nổi bật
-      </HighlightTypography>
-      <Grid container spacing={3}>
         {categories.map((category) => (
-          <Grid size={{ xs: 6, md: 3, lg: 12 / 8 }} key={category.id}>
-            <CategoryCard name={category.name} imageUrl={category.imageUrl} />
-          </Grid>
+          <CategoryCard
+            key={category.id}
+            name={category.name}
+            imageUrl={category.imageUrl}
+          />
         ))}
-      </Grid>
+      </SimpleGrid>
     </Stack>
   );
 }

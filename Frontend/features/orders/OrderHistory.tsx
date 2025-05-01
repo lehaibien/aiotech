@@ -1,99 +1,20 @@
-'use client'
+"use client";
 
 import CustomDataGrid, {
   CustomDataGridRef,
 } from "@/components/core/CustomDataGrid";
 import { API_URL } from "@/constant/apiUrl";
+import { useUserId } from "@/hooks/useUserId";
 import { getApi, getListApi } from "@/lib/apiClient";
-import {
-  formatDateFromString,
-  formatNumberWithSeperator,
-  mapOrderStatus,
-  parseUUID,
-} from "@/lib/utils";
+import { parseUUID } from "@/lib/utils";
 import { OrderGetListRequest, OrderResponse, PaginatedList } from "@/types";
-import PrintIcon from "@mui/icons-material/Print";
-import ViewIcon from "@mui/icons-material/RemoveRedEye";
-import { IconButton } from "@mui/material";
-import { GridColDef } from "@mui/x-data-grid";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useRef } from "react";
+import { createOrderHistoryColumns } from "./orderHistoryColumn";
 
-const createColumns = (
-  onPrint: (id: string, trackingNumber: string) => void
-): GridColDef<OrderResponse>[] => [
-  {
-    field: "trackingNumber",
-    headerName: "Mã đơn hàng",
-    width: 250,
-  },
-  {
-    field: "name",
-    headerName: "Tên khách hàng",
-    width: 200,
-  },
-  {
-    field: "createdDate",
-    headerName: "Ngày đặt hàng",
-    width: 200,
-    headerAlign: "center",
-    align: "center",
-    valueFormatter: (params) => formatDateFromString(params),
-  },
-  {
-    field: "totalPrice",
-    headerName: "Thành tiền",
-    flex: 1,
-    headerAlign: "right",
-    align: "right",
-    valueFormatter: (params) =>
-      formatNumberWithSeperator(Number((params as number).toFixed(2))),
-  },
-  {
-    field: "status",
-    headerName: "Trạng thái",
-    width: 200,
-    headerAlign: "center",
-    align: "center",
-    valueFormatter: (params) => mapOrderStatus(params as string),
-  },
-  {
-    field: "deliveryDate",
-    headerName: "Ngày giao hàng",
-    width: 200,
-    headerAlign: "center",
-    align: "center",
-    valueFormatter: (params) => formatDateFromString(params),
-  },
-  {
-    field: "action",
-    headerName: "Hành động",
-    width: 150,
-    headerAlign: "center",
-    align: "center",
-    renderCell: (params) => (
-      <>
-        <IconButton
-          LinkComponent={Link}
-          href={`/profile/orders/${params.row.id}`}
-        >
-          <ViewIcon />
-        </IconButton>
-        <IconButton
-          onClick={() => onPrint(params.row.id, params.row.trackingNumber)}
-        >
-          <PrintIcon />
-        </IconButton>
-      </>
-    ),
-  },
-];
-
-function OrderHistory() {
+export const OrderHistory = () => {
+  const userId = useUserId();
   const searchTerm = useRef("");
   const dataGridRef = useRef<CustomDataGridRef>(null);
-  const { data: session } = useSession();
   const handlePrint = useCallback(
     async (id: string, trackingNumber: string) => {
       const response = await getApi(API_URL.order + `/${id}/print`);
@@ -110,16 +31,13 @@ function OrderHistory() {
         link.setAttribute("download", `${trackingNumber}.pdf`); //or any other extension
         document.body.appendChild(link);
         link.click();
-        // clean up
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }
     },
     []
   );
-
-  const columns = useMemo(() => createColumns(handlePrint), [handlePrint]);
-
+  const columns = createOrderHistoryColumns(handlePrint);
   const loadData = useCallback(
     async (
       page: number,
@@ -129,7 +47,7 @@ function OrderHistory() {
         pageIndex: page,
         pageSize,
         textSearch: searchTerm.current,
-        customerId: parseUUID(session?.user.id ?? "") ?? undefined,
+        customerId: parseUUID(userId ?? "") ?? undefined,
       };
       const response = await getListApi(API_URL.order, getListRequest);
       if (response.success) {
@@ -138,7 +56,7 @@ function OrderHistory() {
       }
       throw new Error(response.message);
     },
-    [session?.user.id]
+    [userId]
   );
 
   return (
@@ -150,6 +68,4 @@ function OrderHistory() {
       loadData={loadData}
     />
   );
-}
-
-export default OrderHistory;
+};

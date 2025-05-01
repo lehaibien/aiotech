@@ -1,18 +1,15 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
-import OrderDetail from "@/features/orders/OrderDetail";
+import { OrderDetail } from "@/features/orders/OrderDetail";
 import { OrderDetailAction } from "@/features/orders/OrderDetailAction";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
-import { OrderResponse } from "@/types";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box, Button } from "@mui/material";
-import { UUID } from "@/types";
+import { OrderResponse, UUID } from "@/types";
+import { Button, Group } from "@mantine/core";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-type OrderDetailParams = Promise<{
-  id: string;
-}>;
+type Params = Promise<{ id: string }>;
 
 async function getOrderDetail(id: UUID) {
   const response = await getByIdApi(API_URL.order, { id });
@@ -23,31 +20,19 @@ async function getOrderDetail(id: UUID) {
   return undefined;
 }
 
-export default async function OrderDetailPage({
-  params,
-}: {
-  params: OrderDetailParams;
-}) {
+export default async function OrderDetailPage({ params }: { params: Params }) {
   const { id } = await params;
   const uuid = parseUUID(id);
   const order = await getOrderDetail(uuid);
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <Group justify="space-between" align="center">
         <Button
-          variant="text"
-          startIcon={<ArrowBackIcon />}
-          LinkComponent={Link}
+          variant="transparent"
+          color="dark"
+          leftSection={<ArrowLeft />}
+          component={Link}
           href="/profile?tab=2"
-          sx={{
-            fontWeight: "400",
-          }}
         >
           Quay lại
         </Button>
@@ -56,7 +41,7 @@ export default async function OrderDetailPage({
           status={order?.status || ""}
           trackingNumber={order?.trackingNumber || ""}
         />
-      </Box>
+      </Group>
       <OrderDetail order={order} />
     </>
   );

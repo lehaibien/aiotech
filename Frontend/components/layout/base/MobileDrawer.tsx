@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { baseNavItems } from '@/constant/routes';
-import { ComboBoxItem } from '@/types';
-import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import MenuIcon from '@mui/icons-material/Menu';
+import { baseNavItems } from "@/constant/routes";
+import { ComboBoxItem } from "@/types";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Box,
   Collapse,
@@ -16,10 +16,10 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-} from '@mui/material';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
+} from "@mui/material";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React, { useState } from "react";
 
 type MobileDrawerProps = {
   categories: ComboBoxItem[];
@@ -34,9 +34,9 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
       if (
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-          (event as React.KeyboardEvent).key === 'Shift')
+        event.type === "keydown" &&
+        ((event as React.KeyboardEvent).key === "Tab" ||
+          (event as React.KeyboardEvent).key === "Shift")
       ) {
         return;
       }
@@ -45,9 +45,9 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
 
   const onClose = (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' ||
-        (event as React.KeyboardEvent).key === 'Shift')
+      event.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
     ) {
       return;
     }
@@ -58,20 +58,16 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
       sx={{
         flex: 1,
         display: {
-          xs: 'flex',
-          md: 'none',
+          xs: "flex",
+          md: "none",
         },
-      }}>
-      <IconButton
-        color='inherit'
-        onClick={toggleDrawer(true)}>
+      }}
+    >
+      <IconButton color="inherit" onClick={toggleDrawer(true)}>
         <MenuIcon />
       </IconButton>
 
-      <Drawer
-        anchor='left'
-        open={drawerOpen}
-        onClose={onClose}>
+      <Drawer anchor="left" open={drawerOpen} onClose={onClose}>
         <Box sx={{ width: 280, p: 2 }}>
           {/* Main Navigation */}
           <List sx={{ mb: 2 }}>
@@ -80,20 +76,16 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
                 <ListItem disablePadding>
                   <ListItemButton
                     LinkComponent={Link}
-                    href={nav.href ?? '/'}
+                    href={nav.href ?? "/"}
                     selected={pathName === nav.href}
                     onClick={onClose}
                     sx={{
-                      '&.Mui-selected': {
-                        backgroundColor: 'action.selected',
+                      "&.Mui-selected": {
+                        backgroundColor: "action.selected",
                         fontWeight: 600,
                       },
-                    }}>
-                    {nav.icon && (
-                      <ListItemIcon>
-                        <nav.icon />
-                      </ListItemIcon>
-                    )}
+                    }}
+                  >
                     <ListItemText primary={nav.title} />
                   </ListItemButton>
                 </ListItem>
@@ -103,15 +95,16 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
                   <ListItem
                     disablePadding
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexDirection: 'column',
-                    }}>
+                      display: "flex",
+                      alignItems: "center",
+                      flexDirection: "column",
+                    }}
+                  >
                     <ListItemButton onClick={() => setExpanded(!expanded)}>
                       <ListItemIcon>
-                        <CategoryOutlinedIcon fontSize='small' />
+                        <CategoryOutlinedIcon fontSize="small" />
                       </ListItemIcon>
-                      <ListItemText primary='Danh mục sản phẩm' />
+                      <ListItemText primary="Danh mục sản phẩm" />
                       {expanded ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
                     <Collapse in={expanded}>
@@ -119,19 +112,19 @@ export function MobileDrawer({ categories }: MobileDrawerProps) {
                         <ListItem disablePadding>
                           <ListItemButton
                             component={Link}
-                            href='/products'
-                            onClick={onClose}>
-                            <ListItemText primary='Tất cả sản phẩm' />
+                            href="/products"
+                            onClick={onClose}
+                          >
+                            <ListItemText primary="Tất cả sản phẩm" />
                           </ListItemButton>
                         </ListItem>
                         {categories.map((category: ComboBoxItem) => (
-                          <ListItem
-                            key={category.value}
-                            disablePadding>
+                          <ListItem key={category.value} disablePadding>
                             <ListItemButton
                               component={Link}
                               href={`/products?category=${category.text}`}
-                              onClick={onClose}>
+                              onClick={onClose}
+                            >
                               <ListItemText primary={category.text} />
                             </ListItemButton>
                           </ListItem>

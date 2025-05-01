@@ -1,17 +1,14 @@
-import { Typography, TypographyProps } from "@mui/material";
+import { Title, TitleProps } from "@mantine/core";
 
-type HighlightTypographyProps = {
+type HighlightTitleProps = {
   children: React.ReactNode;
-} & TypographyProps;
+} & TitleProps;
 
-export function HighlightTypography({
-  children,
-  ...props
-}: HighlightTypographyProps) {
+export function HighlightTitle({ children, ...props }: HighlightTitleProps) {
   return (
-    <Typography
+    <Title
       {...props}
-      sx={{
+      style={{
         position: "relative",
         "&::after": {
           content: '""',
@@ -20,12 +17,12 @@ export function HighlightTypography({
           left: 0,
           width: 60,
           height: 4,
-          backgroundColor: "primary.main",
+          backgroundColor: "var(--mantine-color-blue-4)",
           borderRadius: 2,
         },
       }}
     >
       {children}
-    </Typography>
+    </Title>
   );
 }

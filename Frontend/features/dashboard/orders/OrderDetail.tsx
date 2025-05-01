@@ -37,7 +37,7 @@ type OrderDetailProps = {
   order?: OrderResponse;
 };
 
-export default function OrderDetail({ order }: OrderDetailProps) {
+export function OrderDetail({ order }: OrderDetailProps) {
   if (!order)
     return (
       <NoItem

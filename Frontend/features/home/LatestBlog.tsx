@@ -1,8 +1,7 @@
 "use client";
 
-import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { PostListItemResponse } from "@/types/post";
-import { Box, Button } from "@mui/material";
+import { Button, Group, Stack, Title } from "@mantine/core";
 import Link from "next/link";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -32,44 +31,18 @@ type LatestBlogProps = {
 
 export function LatestBlog({ posts }: LatestBlogProps) {
   return (
-    <Box
-      sx={{
-        mb: 4,
-        "& .swiper-button-next, .swiper-button-prev": {
-          color: "primary.main",
-          "&::after": {
-            fontSize: "16px",
-          },
-          width: "24px",
-          height: "24px",
-          padding: 2,
-          backgroundColor: "rgba(0, 0, 0, 0.15)",
-          borderRadius: "50%",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <HighlightTypography
-          variant="h5"
-          component="h2"
-          gutterBottom
-          sx={{
-            fontWeight: 600,
-          }}
+    <Stack>
+      <Group justify="space-between">
+        <Title order={3}>Tin công nghệ mới nhất</Title>
+        <Button
+          component={Link}
+          href="/blogs"
+          variant="transparent"
+          color="dark"
         >
-          Tin công nghệ mới nhất
-        </HighlightTypography>
-        <Button component={Link} href="/blogs" variant="text" color="primary">
           Xem thêm
         </Button>
-      </Box>
+      </Group>
 
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -94,6 +67,6 @@ export function LatestBlog({ posts }: LatestBlogProps) {
           </SwiperSlide>
         ))}
       </Swiper>
-    </Box>
+    </Stack>
   );
 }

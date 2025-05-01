@@ -1,94 +1,68 @@
-'use client'
+"use client";
 
 import useCart from "@/hooks/useCart";
 import { formatNumberWithSeperator } from "@/lib/utils";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import {
-  Box,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  Stack,
-  SxProps,
-  Typography,
-} from "@mui/material";
+import { ActionIcon, Group, Stack, Text } from "@mantine/core";
+import { Minus, Plus, Trash } from "lucide-react";
+
 import Image from "next/image";
 
-type CartItemListingProps = {
-  sx?: SxProps;
-};
-
-export const CartItemListing = ({ sx }: CartItemListingProps) => {
+export const CartItemListing = () => {
   const { cartItems, addToCart, removeFromCart } = useCart();
   return (
-    <List sx={{ ...sx, p: 0 }}>
+    <Stack>
       {cartItems.map((item) => (
-        <ListItem
-          key={item.productId}
-          sx={{
-            display: "flex",
-            gap: 2,
-            alignItems: "center",
-          }}
-        >
+        <Group key={item.productId} align="center" wrap="nowrap">
           <Image
             src={item.productImage || "/placeholder-product.png"}
             alt={item.productName}
             width={96}
             height={96}
           />
-
-          <Box>
-            <Typography>{item.productName}</Typography>
-            <Typography variant="body2" color="textSecondary">
+          <Stack gap={4} flex={1}>
+            <Text size="sm" lineClamp={2}>
+              {item.productName}
+            </Text>
+            <Text size="xs">
               {formatNumberWithSeperator(item.productPrice ?? 0)}₫
-            </Typography>
-          </Box>
+            </Text>
+          </Stack>
 
-          <Stack marginX="auto" alignItems="center">
-            <Stack direction="row" alignItems="center">
-              <IconButton
-                size="small"
-                onClick={() =>
-                  item.quantity > 1 &&
-                  addToCart({ ...item, quantity: item.quantity - 1 })
-                }
-                disabled={item.quantity <= 1}
-                sx={{ bgcolor: "action.hover", borderRadius: 1 }}
-              >
-                <RemoveIcon fontSize="inherit" />
-              </IconButton>
+          <Group wrap="nowrap" gap={12} style={{
+            justifySelf: "flex-end",
+          }}>
+            <ActionIcon
+              size="sm"
+              onClick={() =>
+                item.quantity > 1 &&
+                addToCart({ ...item, quantity: item.quantity - 1 })
+              }
+              disabled={item.quantity <= 1}
+            >
+              <Minus />
+            </ActionIcon>
 
-              <Typography
-                variant="body2"
-                sx={{ minWidth: 24, textAlign: "center" }}
-              >
-                {item.quantity}
-              </Typography>
+            <Text>{item.quantity}</Text>
 
-              <IconButton
-                size="small"
-                onClick={() =>
-                  addToCart({ ...item, quantity: item.quantity + 1 })
-                }
-              >
-                <AddIcon fontSize="inherit" />
-              </IconButton>
-            </Stack>
-
-            <Button
-              variant="text"
-              size="small"
-              color="error"
+            <ActionIcon
+              size="sm"
+              onClick={() =>
+                addToCart({ ...item, quantity: item.quantity + 1 })
+              }
+            >
+              <Plus />
+            </ActionIcon>
+            <ActionIcon
+              variant="transparent"
+              size="sm"
+              color="red"
               onClick={() => removeFromCart(item.productId)}
             >
-              Xóa
-            </Button>
-          </Stack>
-        </ListItem>
+              <Trash />
+            </ActionIcon>
+          </Group>
+        </Group>
       ))}
-    </List>
+    </Stack>
   );
 };

@@ -3,8 +3,8 @@
 import { NoItem } from "@/components/core/NoItem";
 import { ProductCard } from "@/components/core/ProductCard";
 import { ProductListItemResponse } from "@/types";
+import { Center, Pagination, SimpleGrid, Stack } from "@mantine/core";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import { Box, Grid, Pagination } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -14,15 +14,11 @@ type ShopListProps = {
   totalPage: number;
 };
 
-export default function ShopList({
-  items,
-  currentPage,
-  totalPage,
-}: ShopListProps) {
+export const ShopList = ({ items, currentPage, totalPage }: ShopListProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const handlePageChange = useCallback(
-    (event: React.ChangeEvent<unknown>, value: number) => {
+    (value: number) => {
       const params = new URLSearchParams(searchParams);
       params.set("page", value.toString());
       router.push(`?${params.toString()}`);
@@ -35,39 +31,34 @@ export default function ShopList({
       : "Chúng tôi xin lỗi quý khách, quý khách vui lòng thử lại sau";
   if (items.length === 0) {
     return (
-      <Grid container spacing={2}>
-        <NoItem
-          title={"Không có sản phẩm nào"}
-          description={message}
-          icon={ShoppingBagIcon}
-        />
-      </Grid>
+      <NoItem
+        title={"Không có sản phẩm nào"}
+        description={message}
+        icon={ShoppingBagIcon}
+      />
     );
   }
 
   return (
-    <>
-      <Grid container spacing={2}>
+    <Stack gap={8}>
+      <SimpleGrid
+        cols={{
+          xs: 1,
+          md: 2,
+          lg: 4,
+        }}
+      >
         {items.map((product) => (
-          <Grid key={product.id} size={{ xs: 12, md: 6, lg: 3 }}>
-            <ProductCard product={product} />
-          </Grid>
+          <ProductCard key={product.id} product={product} />
         ))}
-      </Grid>
-      <Box mt={2} justifyContent="center">
+      </SimpleGrid>
+      <Center>
         <Pagination
-          count={totalPage}
-          page={currentPage}
-          variant="text"
-          shape="rounded"
+          total={totalPage}
+          defaultValue={currentPage}
           onChange={handlePageChange}
-          color="primary"
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-          }}
         />
-      </Box>
-    </>
+      </Center>
+    </Stack>
   );
-}
+};

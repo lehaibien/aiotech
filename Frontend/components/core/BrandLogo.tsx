@@ -1,12 +1,24 @@
-import { Stack, Typography } from "@mui/material";
+import { Group, Title, TitleProps } from "@mantine/core";
 import Image from "next/image";
+import Link from "next/link";
 
-export default function BrandLogo() {
+type BrandLogoProps = {
+  href?: string;
+} & TitleProps;
+
+export const BrandLogo = ({ href, ...props }: BrandLogoProps) => {
+  return href ? (
+    <Link href={href}>
+      <BaseLogo {...props} />
+    </Link>
+  ) : (
+    <BaseLogo {...props} />
+  );
+}
+
+export const BaseLogo = (props: TitleProps) => {
   return (
-    <Stack direction="row" gap={1} alignItems='center' justifyContent={{
-      xs: "center",
-      md: "flex-start",
-    }}>
+    <Group gap={4}>
       <Image
         src="/favicon.svg"
         alt="Logo"
@@ -17,18 +29,9 @@ export default function BrandLogo() {
           minWidth: 32,
         }}
       />
-      <Typography
-        variant="h6"
-        sx={{
-          fontWeight: "semibold",
-          display: {
-            xs: "none",
-            md: "block",
-          },
-        }}
-      >
+      <Title order={5} {...props}>
         AioTech
-      </Typography>
-    </Stack>
+      </Title>
+    </Group>
   );
-}
+};

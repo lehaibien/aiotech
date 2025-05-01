@@ -1,22 +1,22 @@
 "use client";
 
-import { Box, Paper } from "@mui/material";
 import Image from "next/image";
 import { useCallback, useRef } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper/types";
 
+import { Group, Paper } from "@mantine/core";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 
-interface ImageGalleryProps {
+type ImageGalleryProps = {
   images: string[];
-}
+};
 
-export default function ImageGallery({ images }: ImageGalleryProps) {
+export const ImageGallery = ({ images }: ImageGalleryProps) => {
   const thumbsSwiper = useRef<SwiperType | null>(null);
   const mainSwiper = useRef<SwiperType | null>(null);
 
@@ -35,26 +35,12 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
   }, []);
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <>
       <Paper
-        variant="outlined"
-        sx={{
-          aspectRatio: "1/1",
-          position: "relative",
-          bgcolor: "white",
-          border: "none",
-          overflow: "hidden",
-          "& .swiper-button-next, .swiper-button-prev": {
-            color: "primary.main",
-            "&::after": {
-              fontSize: "16px",
-            },
-            width: "24px",
-            height: "24px",
-            padding: 2,
-            backgroundColor: "rgba(0, 0, 0, 0.25)",
-            borderRadius: "50%",
-          },
+        withBorder
+        style={{
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
         }}
       >
         <Swiper
@@ -67,15 +53,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         >
           {images.map((image, index) => (
             <SwiperSlide key={index}>
-              <Box
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 2,
-                }}
-              >
+              <Group justify="center" align="center" p={4}>
                 <Image
                   src={image}
                   alt={`Product ${index + 1}`}
@@ -88,13 +66,20 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                   }}
                   priority={index === 0}
                 />
-              </Box>
+              </Group>
             </SwiperSlide>
           ))}
         </Swiper>
       </Paper>
 
-      <Box sx={{ mt: 1 }}>
+      <Paper
+        withBorder
+        style={{
+          borderTop: 0,
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+        }}
+      >
         <Swiper
           onSwiper={setThumbsSwiper}
           spaceBetween={10}
@@ -105,36 +90,21 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         >
           {images.map((image, index) => (
             <SwiperSlide key={index} onClick={() => handleThumbClick(index)}>
-              <Paper
-                elevation={1}
-                sx={{
-                  aspectRatio: "1/1",
-                  cursor: "pointer",
-                  overflow: "hidden",
-                  opacity: 0.7,
-                  transition: "opacity 0.2s ease-in-out",
-                  "&.swiper-slide-thumb-active": {
-                    opacity: 1,
-                    outline: (theme) => `2px solid ${theme.palette.primary.main}`,
-                  },
+              <Image
+                src={image}
+                alt={`Product thumbnail ${index + 1}`}
+                width={100}
+                height={100}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
                 }}
-              >
-                <Image
-                  src={image}
-                  alt={`Product thumbnail ${index + 1}`}
-                  width={100}
-                  height={100}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              </Paper>
+              />
             </SwiperSlide>
           ))}
         </Swiper>
-      </Box>
-    </Box>
+      </Paper>
+    </>
   );
-}
+};

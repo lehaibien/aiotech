@@ -1,25 +1,18 @@
 "use client";
 
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { userLoginSchema } from "@/schemas/userSchema";
 import { UserLoginRequest } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Stack
-} from "@mui/material";
+import { Button, Group, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 
-export function LoginForm({ redirectTo }: { redirectTo: string }) {
+export const LoginForm = ({ redirectTo }: { redirectTo: string }) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
   const { control, handleSubmit } = useForm<UserLoginRequest>({
     resolver: zodResolver(userLoginSchema),
   });
@@ -31,67 +24,66 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         redirect: false,
       });
       if (result?.error) {
-        enqueueSnackbar(result.code, { variant: "error" });
+        notifications.show({
+          message: result.error,
+          color: "red",
+        });
         return;
       }
-      enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
+      notifications.show({
+        message: "Đăng nhập thành công",
+        color: "green",
+      });
       router.push(redirectTo);
     } catch (err) {
-      enqueueSnackbar((err as Error).message, { variant: "error" });
+      notifications.show({
+        message: (err as Error).message,
+        color: "red",
+      });
     }
     return;
   };
 
   return (
-    <Stack
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      spacing={2}
-      width="100%"
-    >
-      <FormControl>
-        <FormLabel htmlFor="username" required>
-          Tài khoản
-        </FormLabel>
-        <ControlledTextField
-          id="username"
-          name="username"
-          autoFocus
-          required
-          fullWidth
-          placeholder="Nhập tài khoản"
-          control={control}
-          size="small"
-        />
-      </FormControl>
-      <FormControl>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <FormLabel htmlFor="password" required>
-            Mật khẩu
-          </FormLabel>
-          <Link
-            href="/forgot-password"
-            style={{
-              textDecoration: "underline",
-              cursor: "pointer",
-            }}
-            tabIndex={-1}
-          >
-            Quên mật khẩu?
-          </Link>
-        </Box>
-        <ControlledTextField
-          id="password"
-          name="password"
-          type="password"
-          required
-          fullWidth
-          placeholder="Nhập mật khẩu"
-          control={control}
-          size="small"
-        />
-      </FormControl>
+    <Stack component="form" onSubmit={handleSubmit(onSubmit)} gap={8}>
+      <ControlledTextInput
+        id="username"
+        name="username"
+        autoFocus
+        required
+        placeholder="Nhập tài khoản"
+        autoComplete="username"
+        control={control}
+        size="md"
+        label="Tài khoản"
+      />
+      <Group justify="space-between" pos="relative">
+        <Link
+          href="/forgot-password"
+          style={{
+            cursor: "pointer",
+            textDecoration: "underline",
+            position: "absolute",
+            right: 0,
+            top: 10,
+            bottom: 0,
+          }}
+          tabIndex={-1}
+        >
+          Quên mật khẩu?
+        </Link>
+      </Group>
+      <ControlledTextInput
+        id="password"
+        name="password"
+        type="password"
+        required
+        placeholder="Nhập mật khẩu"
+        autoComplete="current-password"
+        control={control}
+        size="md"
+        label="Mật khẩu"
+      />
       <Button
         type="submit"
         fullWidth
@@ -103,4 +95,4 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
       </Button>
     </Stack>
   );
-}
+};

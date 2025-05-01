@@ -1,7 +1,7 @@
 import { API_URL } from "@/constant/apiUrl";
-import { HeroBanner } from "@/features/home/Banner";
 import { BestSeller } from "@/features/home/BestSeller";
 import { FeaturedCategories } from "@/features/home/FeaturedCategories";
+import { HeroBanner } from "@/features/home/HeroBanner";
 import { LatestBlog } from "@/features/home/LatestBlog";
 import { NewArrival } from "@/features/home/NewArrival";
 import { getApi, getApiQuery, getListApi } from "@/lib/apiClient";
@@ -12,7 +12,7 @@ import {
   ProductListItemResponse,
 } from "@/types";
 import { BannerConfiguration } from "@/types/sys-config";
-import { Container } from "@mui/material";
+import { Stack } from "@mantine/core";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -98,14 +98,7 @@ export default async function Home() {
     console.error("Failed to load posts: ", postsResponse.message);
   }
   return (
-    <Container
-      maxWidth="xl"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-      }}
-    >
+    <Stack gap={8}>
       <HeroBanner
         title={bannerConfig.title}
         description={bannerConfig.description}
@@ -119,6 +112,6 @@ export default async function Home() {
       <NewArrival items={newestProducts} />
 
       <LatestBlog posts={posts} />
-    </Container>
+    </Stack>
   );
 }

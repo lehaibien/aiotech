@@ -1,48 +1,65 @@
 "use client";
 
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import { ControlledTextarea } from "@/components/form/ControlledTextarea";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
+import { useUserId } from "@/hooks/useUserId";
 import { postApi } from "@/lib/apiClient";
 import { convertObjectToFormData, parseUUID } from "@/lib/utils";
+import { profileSchema } from "@/schemas/userSchema";
 import { ProfileFormData } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import EditIcon from "@mui/icons-material/Edit";
 import {
+  ActionIcon,
   Avatar,
-  Box,
   Button,
-  FormLabel,
+  Center,
   Grid,
-  IconButton,
-  TextField,
-} from "@mui/material";
-import { useSession } from "next-auth/react";
-import { useSnackbar } from "notistack";
-import { useEffect, useMemo, useState } from "react";
+  Stack,
+  TextInput,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { CloudUpload, Edit } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { EmailChangeDialog } from "./EmailChangeDialog";
-import { useProfileData } from "./hooks/useProfileData";
-import { profileSchema } from "@/schemas/userSchema";
 
-export const ProfileForm = () => {
-  const { data: session } = useSession();
-  const { enqueueSnackbar } = useSnackbar();
-  const [avatarPreview, setAvatarPreview] = useState<string>();
+type ProfileFormProps = {
+  /*
+  setValue("familyName", data.familyName);
+      setValue("givenName", data.givenName);
+      setValue("phoneNumber", data.phoneNumber);
+      setValue("address", data.address);
+      setAvatarPreview(data.avatarUrl === "" ? undefined : data.avatarUrl);
+  */
+  familyName: string;
+  givenName: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  avatarUrl: string;
+};
+
+export const ProfileForm = ({
+  familyName,
+  givenName,
+  email,
+  phoneNumber,
+  address,
+  avatarUrl,
+}: ProfileFormProps) => {
+  const userId = useUserId();
+  const [avatarPreview, setAvatarPreview] = useState<string>(avatarUrl);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [isImageChanged, setIsImageChanged] = useState(false);
-
-  const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
-
-  const { data, isValidating, error, mutate } = useProfileData(userId || "");
 
   const { control, handleSubmit, setValue } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      familyName: data?.familyName,
-      givenName: data?.givenName,
-      phoneNumber: data?.phoneNumber,
-      address: data?.address,
+      familyName: familyName,
+      givenName: givenName,
+      phoneNumber: phoneNumber,
+      address: address,
     },
   });
 
@@ -55,7 +72,7 @@ export const ProfileForm = () => {
     }
   };
 
-  const onSubmit = (data: ProfileFormData) => {
+  const onSubmit = async (data: ProfileFormData) => {
     const parsedId = parseUUID(userId || "");
     const extendedData = {
       ...data,
@@ -63,136 +80,122 @@ export const ProfileForm = () => {
       isImageEdited: isImageChanged,
     };
     const formData = convertObjectToFormData(extendedData);
-    postApi(API_URL.userProfile, formData).then((response) => {
-      if (response.success) {
-        enqueueSnackbar("Cập nhật tài khoản thành công", {
-          variant: "success",
-        });
-        mutate();
-      } else {
-        enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-          variant: "error",
-        });
+    const response = await postApi(API_URL.userProfile, formData);
+    if (response.success) {
+      notifications.show({
+        title: "Cập nhật thành công",
+        message: "Cập nhật thông tin thành công",
+        color: "green",
+      });
+      if (window) {
+        window.location.reload();
       }
-    });
-  };
-
-  useEffect(() => {
-    if (data) {
-      setValue("familyName", data.familyName);
-      setValue("givenName", data.givenName);
-      setValue("phoneNumber", data.phoneNumber);
-      setValue("address", data.address);
-      setAvatarPreview(data.avatarUrl === "" ? undefined : data.avatarUrl);
+    } else {
+      notifications.show({
+        title: "Cập nhật thất bại",
+        message: "Cập nhật thông tin thất bại",
+        color: "red",
+      });
     }
-  }, [data, setValue]);
-
-  if (error) {
-    enqueueSnackbar("Lỗi xảy ra: " + error.message, { variant: "error" });
-  }
-  if (isValidating) return <div>Đang tải...</div>;
-
+  };
   return (
-    <Box sx={{ mx: "auto" }}>
-      {/* Avatar Section */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
-        <input
-          accept="image/*"
-          id="avatar-upload"
-          type="file"
-          hidden
-          onChange={handleAvatarChange}
-        />
+    <Stack>
+      <input
+        accept="image/*"
+        id="avatar-upload"
+        type="file"
+        hidden
+        onChange={handleAvatarChange}
+      />
+      <Center>
         <label htmlFor="avatar-upload">
-          <IconButton component="span">
-            <Avatar src={avatarPreview} sx={{ width: 100, height: 100 }} />
-            <CloudUploadIcon
-              sx={{ position: "absolute", bottom: 0, right: 0 }}
-            />
-          </IconButton>
+          <span
+            style={{
+              position: "relative",
+              cursor: "pointer",
+            }}
+          >
+            <Avatar src={avatarPreview} w={100} h={100} />
+
+            <ActionIcon
+              color="gray"
+              variant="filled"
+              radius="xl"
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+              }}
+            >
+              <CloudUpload size={20} />
+            </ActionIcon>
+          </span>
         </label>
-      </Box>
-      <Grid
-        component="form"
-        container
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-        spacing={2}
-      >
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <FormLabel htmlFor="familyName">Họ</FormLabel>
-          <ControlledTextField
+      </Center>
+      <Grid component="form" onSubmit={handleSubmit(onSubmit)}>
+        <Grid.Col span={{ xs: 12, sm: 6 }}>
+          <ControlledTextInput
             control={control}
             name="familyName"
-            fullWidth
-            size="small"
+            size="sm"
+            label="Họ"
           />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <FormLabel htmlFor="givenName" required>
-            Tên
-          </FormLabel>
-          <ControlledTextField
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6 }}>
+          <ControlledTextInput
             control={control}
             name="givenName"
-            fullWidth
-            size="small"
+            size="sm"
             required
+            label="Tên"
           />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <FormLabel htmlFor="email" required>
-            Email
-          </FormLabel>
-          <TextField
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6 }}>
+          <TextInput
             name="email"
-            fullWidth
-            size="small"
-            value={data?.email}
+            size="sm"
+            value={email}
             disabled
-            InputProps={{
-              endAdornment: (
-                <IconButton onClick={() => setEmailDialogOpen(true)}>
-                  <EditIcon />
-                </IconButton>
-              ),
-            }}
+            rightSection={
+              <ActionIcon
+                color="dark"
+                variant="transparent"
+                onClick={() => setEmailDialogOpen(true)}
+              >
+                <Edit size={20} />
+              </ActionIcon>
+            }
+            required
+            label="Email"
           />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <FormLabel htmlFor="phoneNumber">Số điện thoại</FormLabel>
-          <ControlledTextField
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6 }}>
+          <ControlledTextInput
             control={control}
             name="phoneNumber"
-            fullWidth
-            size="small"
+            size="sm"
+            label="Số điện thoại"
           />
-        </Grid>
-        <Grid size={12}>
-          <FormLabel htmlFor="address">
-            Địa chỉ
-          </FormLabel>
-          <ControlledTextField
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <ControlledTextarea
             control={control}
             name="address"
-            multiline
-            size="small"
-            minRows={3}
-            required
-            fullWidth
+            size="sm"
+            rows={2}
+            label="Địa chỉ"
           />
-        </Grid>
-
-        <Button type="submit" variant="contained" color="primary">
-          Lưu
-        </Button>
+        </Grid.Col>
       </Grid>
+      <Button w="25%" type="submit" variant="filled">
+        Lưu
+      </Button>
 
       <EmailChangeDialog
-        oldEmail={data?.email}
+        oldEmail={email}
         open={emailDialogOpen}
         onClose={() => setEmailDialogOpen(false)}
       />
-    </Box>
+    </Stack>
   );
 };
