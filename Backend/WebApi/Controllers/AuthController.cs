@@ -1,5 +1,6 @@
 using Application.Authentication.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Extensions;
 using WebApi.Model;
 using IAuthenticationService = Application.Authentication.IAuthenticationService;
 
@@ -21,44 +22,28 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(AuthLoginRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.Login(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
 
         // HttpContext.Response.Cookies.Append("token", result.Data.AccessToken, _cookieOptions);
-        response.Data = result.Value;
         _logger.LogInformation(
             "The user with username {UserName} is logged in at {Timestamp}.",
             request.UserName,
             DateTime.UtcNow
         );
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost("social-login")]
     public async Task<IActionResult> SocialLogin(OAuthLoginRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.SocialLogin(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
 
         _logger.LogInformation(
             "A user with email {Email} is logged in through OAuth at {Timestamp}",
             request.Email,
             DateTime.UtcNow
         );
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     // [HttpGet("login-google")]
@@ -135,78 +120,42 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(AuthRegisterRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.Register(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
 
         _logger.LogInformation(
             "A user {UserName} has been created at {Timestamp}",
             request.UserName,
             DateTime.UtcNow
         );
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost("confirm-email")]
     public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.ConfirmEmail(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.RefreshToken(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        response.Data = result.Value;
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.ChangePassword(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
         _logger.LogInformation("User with id {Id} has changed their password", request.Id);
-        return Ok(response);
+        return this.FromResult(result);
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ForgotPassword(ResetPasswordRequest request)
     {
-        var response = new ApiResponse();
         var result = await _service.ResetPassword(request);
-        if (result.IsFailure)
-        {
-            response.Success = false;
-            response.Message = result.Message;
-            return BadRequest(response);
-        }
-        return Ok(response);
+        return this.FromResult(result);
     }
 }

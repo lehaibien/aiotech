@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Shared;
+using Application.Shared;
 
 namespace Application.Images;
 

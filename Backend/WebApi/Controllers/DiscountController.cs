@@ -1,6 +1,6 @@
 using Application.Discounts;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Model;
 
 namespace WebApi.Controllers;
@@ -20,7 +20,7 @@ public class DiscountController : ControllerBase
     public async Task<IActionResult> IsValid(string couponCode)
     {
         var response = new ApiResponse();
-        var result = await _service.IsDiscountValid(couponCode);
+        var result = await _service.IsDiscountValidAsync(couponCode);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -35,7 +35,7 @@ public class DiscountController : ControllerBase
     public async Task<IActionResult> ApplyCoupon(string couponCode)
     {
         var response = new ApiResponse();
-        var result = await _service.ApplyDiscount(couponCode);
+        var result = await _service.ApplyDiscountAsync(couponCode);
         if (result.IsFailure)
         {
             response.Success = false;

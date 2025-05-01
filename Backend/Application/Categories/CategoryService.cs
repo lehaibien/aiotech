@@ -9,7 +9,7 @@ using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shared;
+using Application.Shared;
 
 namespace Application.Categories;
 
@@ -40,7 +40,7 @@ public class CategoryService : ICategoryService
         _logger = logger;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(
+    public async Task<Result<PaginatedList<CategoryResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
@@ -70,23 +70,13 @@ public class CategoryService : ICategoryService
                 categoryQuery = categoryQuery.OrderBy(sortCol);
             }
         }
-        var totalRow = await categoryQuery.CountAsync(cancellationToken);
-        var result = await categoryQuery
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ProjectToCategoryResponse()
-            .ToListAsync(cancellationToken);
-        var response = new PaginatedList
-        {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = totalRow,
-            Items = result,
-        };
-        return Result<PaginatedList>.Success(response);
+
+        var dtoQuery = categoryQuery.ProjectToCategoryResponse();
+        var result = await PaginatedList<CategoryResponse>.CreateAsync(dtoQuery, request.PageIndex, request.PageSize, cancellationToken);
+        return Result<PaginatedList<CategoryResponse>>.Success(result);
     }
 
-    public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync()
+    public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync(CancellationToken cancellationToken = default)
     {
         var cacheResult = await _cacheService.GetAsync<List<CategoryResponse>>(
             CacheKeys.FeaturedCategories
@@ -100,12 +90,12 @@ public class CategoryService : ICategoryService
             .GetAll()
             .ProjectToCategoryResponse()
             .OrderByDescending(x => x.CreatedDate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         await _cacheService.SetAsync(CacheKeys.FeaturedCategories, result);
         return Result<List<CategoryResponse>>.Success(result);
     }
 
-    public async Task<Result<CategoryResponse>> GetByIdAsync(Guid id)
+    public async Task<Result<CategoryResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
         if (entity is null)
@@ -232,13 +222,13 @@ public class CategoryService : ICategoryService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync()
+    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(CancellationToken cancellationToken = default)
     {
         var result = await _unitOfWork
             .GetRepository<Category>()
-            .GetAll(x => x.IsDeleted == false)
+            .GetAll()
             .Select(x => new ComboBoxItem { Value = x.Id.ToString(), Text = x.Name })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         return Result<List<ComboBoxItem>>.Success(result);
     }
 

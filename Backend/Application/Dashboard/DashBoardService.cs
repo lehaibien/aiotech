@@ -2,7 +2,7 @@ using Application.Dashboard.Dtos;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using Shared;
+using Application.Shared;
 
 namespace Application.Dashboard;
 

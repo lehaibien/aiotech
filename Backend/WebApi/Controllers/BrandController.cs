@@ -2,7 +2,7 @@ using Application.Brands;
 using Application.Brands.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Extensions;
 
 namespace WebApi.Controllers;
@@ -30,7 +30,7 @@ public class BrandController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _service.GetById(id);
+        var result = await _service.GetByIdAsync(id);
         return this.FromResult(result);
     }
 
@@ -38,7 +38,7 @@ public class BrandController : ControllerBase
     [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Create([FromForm] BrandRequest request)
     {
-        var result = await _service.Create(request);
+        var result = await _service.CreateAsync(request);
         _logger.LogInformation("A brand with name {Name} has been created", request.Name);
         return this.FromResult(result);
     }
@@ -47,7 +47,7 @@ public class BrandController : ControllerBase
     [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Update([FromForm] BrandRequest request)
     {
-        var result = await _service.Update(request);
+        var result = await _service.UpdateAsync(request);
         _logger.LogInformation(
             "A brand with id {Id} and name {Name} has been updated",
             request.Id,
@@ -60,7 +60,7 @@ public class BrandController : ControllerBase
     [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var result = await _service.Delete(id);
+        var result = await _service.DeleteAsync(id);
         _logger.LogInformation("A brand with Id {Id} has been deleted.", id);
         return this.FromResult(result);
     }
@@ -69,7 +69,7 @@ public class BrandController : ControllerBase
     [Authorize(Policy = "Admin")]
     public async Task<IActionResult> DeleteList(List<Guid> ids)
     {
-        var result = await _service.DeleteList(ids);
+        var result = await _service.DeleteListAsync(ids);
         _logger.LogInformation("A list of brand has been deleted. Ids: {Id}", ids);
         return this.FromResult(result);
     }
@@ -77,7 +77,7 @@ public class BrandController : ControllerBase
     [HttpGet("combo-box")]
     public async Task<IActionResult> GetComboBox()
     {
-        var result = await _service.GetComboBox();
+        var result = await _service.GetComboBoxAsync();
         return this.FromResult(result);
     }
 }

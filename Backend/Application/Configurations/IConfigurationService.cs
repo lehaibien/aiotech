@@ -1,14 +1,14 @@
 using Application.Configurations.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Configurations;
 
 public interface IConfigurationService
 {
-    Task<Result<BannerConfiguration>> GetBannerConfiguration();
+    Task<Result<BannerConfiguration>> GetBannerConfigurationAsync(CancellationToken cancellationToken = default);
+    Task<Result<EmailConfiguration>> GetEmailConfiguration(CancellationToken cancellationToken = default);
     Task<Result<BannerConfiguration>> SetBannerConfiguration(
         BannerConfiguration bannerConfiguration
     );
-    Task<Result<EmailConfiguration>> GetEmailConfiguration();
     Task<Result<EmailConfiguration>> SetEmailConfiguration(EmailConfiguration emailConfiguration);
 }

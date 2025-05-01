@@ -21,7 +21,6 @@ using Application.Reviews;
 using Application.Roles;
 using Application.Users;
 using Application.Wishlist;
-using AutoMapper;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +36,6 @@ public static class DependencyInjection
     {
         services.AddApplicationOptions(configuration);
         services.AddHttpClient<MomoLibrary>();
-        services.AddApplicationAutoMapper();
         services.AddApplicationServices();
         services.AddValidators();
         services.AddElasticsearchSync();
@@ -53,15 +51,6 @@ public static class DependencyInjection
         services.Configure<MailSettingsOption>(configuration.GetSection("MailSettings"));
         services.Configure<MomoOption>(configuration.GetSection("Momo"));
         services.Configure<VnPayOption>(configuration.GetSection("VnPay"));
-        return services;
-    }
-
-    private static IServiceCollection AddApplicationAutoMapper(this IServiceCollection services)
-    {
-        var assembly = Assembly.GetAssembly(typeof(RoleProfile));
-        var mapperConfig = new MapperConfiguration(cfg => cfg.AddMaps(assembly));
-        var mapper = mapperConfig.CreateMapper();
-        services.AddSingleton(mapper);
         return services;
     }
 

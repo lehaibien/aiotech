@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Shared;
+using Application.Shared;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
@@ -9,8 +9,6 @@ namespace Application.Images;
 
 public class ImageService : IImageService
 {
-    private const string ImageFolder = "images";
-    private const string BucketName = "aiotech";
     private readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
     private readonly string[] AllowedMimeTypes =
     [

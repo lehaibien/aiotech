@@ -1,4 +1,4 @@
-namespace Shared;
+namespace Application.Shared;
 
 public static class CacheKeys
 {
@@ -9,4 +9,8 @@ public static class CacheKeys
 
     // Categories
     public const string FeaturedCategories = "FeaturedCategories";
+    
+    // Configurations
+    public const string BannerConfiguration = "BannerConfiguration";
+    public const string EmailConfiguration = "EmailConfiguration";
 }

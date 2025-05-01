@@ -20,7 +20,7 @@ public class ConfigurationController : ControllerBase
     public async Task<IActionResult> GetBannerConfiguration()
     {
         var response = new ApiResponse();
-        var result = await _service.GetBannerConfiguration();
+        var result = await _service.GetBannerConfigurationAsync();
         if (result.IsFailure)
         {
             response.Success = false;

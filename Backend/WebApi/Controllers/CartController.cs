@@ -1,7 +1,7 @@
 ﻿using Application.Carts;
 using Application.Carts.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Model;
 
 namespace WebApi.Controllers;
@@ -21,7 +21,7 @@ public class CartController : ControllerBase
     public async Task<IActionResult> GetByUserId(Guid id)
     {
         var response = new ApiResponse();
-        var result = await _service.GetCartByUserId(id);
+        var result = await _service.GetCartByUserIdAsync(id);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -37,7 +37,7 @@ public class CartController : ControllerBase
     public async Task<IActionResult> AddToCart([FromBody] CartRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.AddToCart(request);
+        var result = await _service.AddToCartAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;
@@ -53,7 +53,7 @@ public class CartController : ControllerBase
     public async Task<IActionResult> RemoveFromCart([FromBody] CartRemoveItemRequest request)
     {
         var response = new ApiResponse();
-        var result = await _service.RemoveFromCart(request);
+        var result = await _service.RemoveFromCartAsync(request);
         if (result.IsFailure)
         {
             response.Success = false;

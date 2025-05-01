@@ -2,7 +2,7 @@
 using Application.Users.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Application.Shared;
 using WebApi.Extensions;
 
 namespace WebApi.Controllers;

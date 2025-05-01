@@ -1,14 +1,13 @@
-﻿using System.Data;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Helpers;
 using Application.Images;
+using Application.Shared;
 using Application.Users.Dtos;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Shared;
 
 namespace Application.Users;
 
@@ -16,9 +15,9 @@ public class UserService : IUserService
 {
     private const string FolderUpload = "images/users";
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IImageService _imageService;
     private readonly IStorageService _storageService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UserService(
         IUnitOfWork unitOfWork,
@@ -33,13 +32,13 @@ public class UserService : IUserService
         _storageService = storageService;
     }
 
-    public async Task<Result<PaginatedList>> GetListAsync(
+    public async Task<Result<PaginatedList<UserResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     )
     {
         var query = _unitOfWork.GetRepository<User>().GetAll();
-        if (!string.IsNullOrEmpty(request.TextSearch))
+        if(!string.IsNullOrEmpty(request.TextSearch))
         {
             query = query.Where(x =>
                 x.UserName.ToLower().Contains(request.TextSearch.ToLower())
@@ -48,7 +47,8 @@ public class UserService : IUserService
                 || x.GivenName.ToLower().Contains(request.TextSearch.ToLower())
             );
         }
-        if (request.SortOrder?.ToLower() == "desc")
+
+        if(request.SortOrder?.ToLower() == "desc")
         {
             query = query.OrderByDescending(GetSortExpression(request.SortColumn));
         }
@@ -56,59 +56,60 @@ public class UserService : IUserService
         {
             query = query.OrderBy(GetSortExpression(request.SortColumn));
         }
-        var totalRow = await query.CountAsync(cancellationToken);
-        var result = await query
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ProjectToUserResponse()
-            .ToListAsync(cancellationToken);
-        var response = new PaginatedList
-        {
-            PageIndex = request.PageIndex,
-            PageSize = request.PageSize,
-            TotalCount = totalRow,
-            Items = result,
-        };
-        return Result<PaginatedList>.Success(response);
+
+        var dtoQuery = query.ProjectToUserResponse();
+        var result = await PaginatedList<UserResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
+        return Result<PaginatedList<UserResponse>>.Success(result);
     }
 
-    public async Task<Result<UserResponse>> GetByIdAsync(Guid id)
+    public async Task<Result<UserResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await _unitOfWork
             .GetRepository<User>()
-            .GetAll()
+            .GetAll(x => x.Id == id)
             .ProjectToUserResponse()
-            .FirstOrDefaultAsync(x => x.Id == id);
-        if (entity is null)
+            .FirstOrDefaultAsync(cancellationToken);
+        if(entity is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
+
         return Result<UserResponse>.Success(entity);
     }
 
-    public async Task<Result<UserResponse>> GetByUsernameAsync(string username)
+    public async Task<Result<UserResponse>> GetByUsernameAsync(string username,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.UserName == username);
-        if (user is null)
+        var user = await _unitOfWork.GetRepository<User>()
+            .FindAsync(x => x.UserName == username, true, cancellationToken);
+        if(user is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
+
         var response = user.MapToUserResponse();
         return Result<UserResponse>.Success(response);
     }
 
-    public async Task<Result<UserResponse>> GetByEmailAsync(string email)
+    public async Task<Result<UserResponse>> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Email == email);
-        if (user is null)
+        var user = await _unitOfWork.GetRepository<User>().FindAsync(x => x.Email == email, true, cancellationToken);
+        if(user is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
+
         var response = user.MapToUserResponse();
         return Result<UserResponse>.Success(response);
     }
 
-    public async Task<Result<UserProfileResponse>> GetProfileByIdAsync(Guid id)
+    public async Task<Result<UserProfileResponse>> GetProfileByIdAsync(Guid id,
+        CancellationToken cancellationToken = default)
     {
         var userProfile = await _unitOfWork
             .GetRepository<User>()
@@ -120,13 +121,14 @@ public class UserService : IUserService
                 Email = x.Email,
                 PhoneNumber = x.PhoneNumber,
                 AvatarUrl = x.AvatarUrl,
-                Address = x.Address,
+                Address = x.Address
             })
-            .FirstOrDefaultAsync();
-        if (userProfile is null)
+            .FirstOrDefaultAsync(cancellationToken);
+        if(userProfile is null)
         {
             return Result<UserProfileResponse>.Failure("Tài khoản không tồn tại");
         }
+
         return Result<UserProfileResponse>.Success(userProfile);
     }
 
@@ -135,10 +137,11 @@ public class UserService : IUserService
         var userExists = await _unitOfWork
             .GetRepository<User>()
             .FindAsync(u => u.UserName == request.UserName || u.Email == request.Email);
-        if (userExists is not null)
+        if(userExists is not null)
         {
             return Result<UserResponse>.Failure("Tài khoản đã tồn tại");
         }
+
         var user = request.MapToUser();
         var role = await _unitOfWork.GetRepository<Role>().FindAsync(r => r.Name == "User");
         user.RoleId = request.RoleId == Guid.Empty ? role.Id : request.RoleId;
@@ -146,13 +149,14 @@ public class UserService : IUserService
         user.Salt = Convert.ToBase64String(salt);
         user.CreatedDate = DateTime.UtcNow;
         user.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
-        if (request.Image is not null)
+        if(request.Image is not null)
         {
             var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
-            if (optimizedImage.IsFailure)
+            if(optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
+
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
                 CommonConst.PublicBucket,
@@ -169,48 +173,55 @@ public class UserService : IUserService
 
     public async Task<Result<UserResponse>> UpdateAsync(UserRequest request)
     {
-        if (request.Id == Guid.Empty)
+        if(request.Id == Guid.Empty)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
+
         var isExists = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(x => x.UserName == request.UserName && x.Id != request.Id);
-        if (isExists)
+        if(isExists)
         {
             return Result<UserResponse>.Failure("Tài khoản đã tồn tại");
         }
+
         var isEmailExists = await _unitOfWork
             .GetRepository<User>()
             .AnyAsync(x => x.Email == request.Email && x.Id != request.Id);
-        if (isEmailExists)
+        if(isEmailExists)
         {
             return Result<UserResponse>.Failure("Địa chỉ email được sử dụng");
         }
+
         var entity = await _unitOfWork.GetRepository<User>().FindAsync(u => u.Id != request.Id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
+
         entity = request.ApplyToUser(entity);
-        if (entity.Password != "JcBfYanUDPh6kN9GEy82KeLpb4gAs3qF")
+        if(entity.Password != "JcBfYanUDPh6kN9GEy82KeLpb4gAs3qF")
         {
             entity.Password = EncryptionHelper.HashPassword(request.Password, out var salt);
             entity.Salt = Convert.ToBase64String(salt);
         }
+
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
-        if (request.IsImageEdited)
+        if(request.IsImageEdited)
         {
-            if (entity.AvatarUrl is not null)
+            if(entity.AvatarUrl is not null)
             {
                 await _storageService.DeleteFromUrlAsync(entity.AvatarUrl);
             }
+
             var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
-            if (optimizedImage.IsFailure)
+            if(optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
+
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
                 CommonConst.PublicBucket,
@@ -218,6 +229,7 @@ public class UserService : IUserService
             );
             entity.AvatarUrl = uploadResult.Url;
         }
+
         _unitOfWork.GetRepository<User>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
         var response = entity.MapToUserResponse();
@@ -227,7 +239,7 @@ public class UserService : IUserService
     public async Task<Result<UserResponse>> UpdateProfileAsync(UserProfileRequest request)
     {
         var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(request.Id);
-        if (user is null)
+        if(user is null)
         {
             return Result<UserResponse>.Failure("Tài khoản không tồn tại");
         }
@@ -240,17 +252,19 @@ public class UserService : IUserService
             ? user.PhoneNumber
             : request.PhoneNumber;
         user.Address = string.IsNullOrWhiteSpace(request.Address) ? user.Address : request.Address;
-        if (request.IsImageEdited)
+        if(request.IsImageEdited)
         {
-            if (user.AvatarUrl is not null)
+            if(user.AvatarUrl is not null)
             {
                 await _storageService.DeleteFromUrlAsync(user.AvatarUrl);
             }
+
             var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Avatar);
-            if (optimizedImage.IsFailure)
+            if(optimizedImage.IsFailure)
             {
                 return Result<UserResponse>.Failure(optimizedImage.Message);
             }
+
             var uploadResult = await _storageService.UploadAsync(
                 optimizedImage.Value,
                 CommonConst.PublicBucket,
@@ -258,6 +272,7 @@ public class UserService : IUserService
             );
             user.AvatarUrl = uploadResult.Url;
         }
+
         _unitOfWork.GetRepository<User>().Update(user);
         await _unitOfWork.SaveChangesAsync();
         var response = user.MapToUserResponse();
@@ -267,10 +282,11 @@ public class UserService : IUserService
     public async Task<Result> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);
-        if (entity is null)
+        if(entity is null)
         {
             return Result.Failure("Tài khoản không tồn tại");
         }
+
         entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
@@ -286,10 +302,11 @@ public class UserService : IUserService
             .GetAll()
             .Where(x => ids.Contains(x.Id))
             .ToListAsync();
-        if (entities is null || entities.Count == 0)
+        if(entities is null || entities.Count == 0)
         {
             return Result.Failure("Danh sách tài khoản không tồn tại");
         }
+
         entities.ForEach(x =>
         {
             x.IsDeleted = true;
@@ -304,10 +321,11 @@ public class UserService : IUserService
     public async Task<Result> LockUserAsync(Guid id)
     {
         var user = await _unitOfWork.GetRepository<User>().GetByIdAsync(id);
-        if (user is null)
+        if(user is null)
         {
             return Result.Failure("Tài khoản không tồn tại");
         }
+
         user.IsLocked = true;
         _unitOfWork.GetRepository<User>().Update(user);
         await _unitOfWork.SaveChangesAsync();
@@ -322,7 +340,7 @@ public class UserService : IUserService
             "fullName" => x => x.GivenName,
             "email" => x => x.Email,
             "phoneNumber" => x => x.PhoneNumber,
-            _ => x => x.Id,
+            _ => x => x.Id
         };
     }
 }

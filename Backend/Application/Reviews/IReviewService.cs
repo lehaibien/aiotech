@@ -1,20 +1,21 @@
 ﻿using Application.Reviews.Dtos;
-using Shared;
+using Application.Shared;
 
 namespace Application.Reviews;
 
 public interface IReviewService
 {
-    Task<Result<PaginatedList>> GetListAsync(
+    Task<Result<PaginatedList<ReviewResponse>>> GetListAsync(
         GetListRequest request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<List<ReviewProductResponse>>> GetByProductId(
-        GetListReviewByProductIdRequest request
+    Task<Result<List<ReviewProductResponse>>> GetByProductIdAsync(
+        GetListReviewByProductIdRequest request,
+        CancellationToken cancellationToken = default
     );
-    Task<Result<ReviewResponse>> GetById(Guid id);
-    Task<Result<ReviewResponse>> Create(CreateReviewRequest request);
-    Task<Result<ReviewResponse>> Update(UpdateReviewRequest request);
-    Task<Result> Delete(Guid id);
-    Task<Result<string>> DeleteList(List<Guid> ids);
+    Task<Result<ReviewResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Result<ReviewResponse>> CreateAsync(ReviewRequest request);
+    Task<Result<ReviewResponse>> UpdateAsync(ReviewRequest request);
+    Task<Result> DeleteAsync(Guid id);
+    Task<Result> DeleteListAsync(List<Guid> ids);
 }

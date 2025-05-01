@@ -1,4 +1,4 @@
-using Shared;
+using Application.Shared;
 
 namespace Application.Products.Dtos;
 
@@ -17,5 +17,5 @@ public enum ProductSort
     PriceAsc,
     PriceDesc,
     Newest,
-    Oldest,
+    Oldest
 }
