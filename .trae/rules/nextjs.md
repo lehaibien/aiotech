@@ -27,6 +27,9 @@ globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 - Place static content and interfaces at file start
 - Use TypeScript for type safety
 - Use Mantine for UI components and styling
+- Mostly use Container components for layout
+- Minimize Container usage for pages
+- Use Mantine for UI components and styling
 
 
 ## Performance
