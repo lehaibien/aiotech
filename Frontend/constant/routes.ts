@@ -1,140 +1,144 @@
-import { DashboardNavItem, NavItem } from '@/types/ui';
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
-import BrandingWatermarkOutlinedIcon from '@mui/icons-material/BrandingWatermarkOutlined';
-import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import LocalMallIcon from '@mui/icons-material/LocalMall';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
-import SensorDoorOutlinedIcon from '@mui/icons-material/SensorDoorOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import { DashboardNavItem, NavItem } from "@/types/ui";
+import {
+  BadgeCheck,
+  ChartBar,
+  ChartLine,
+  ChartScatter,
+  LayoutDashboard,
+  LayoutGrid,
+  MonitorCog,
+  Package,
+  ReceiptText,
+  ScrollText,
+  Settings,
+  ShoppingBag,
+  Star,
+  StickyNote,
+  UserCog,
+} from "lucide-react";
 
 export const baseNavItems: NavItem[] = [
   {
-    title: 'Cửa hàng',
-    href: '/products',
+    title: "Cửa hàng",
+    href: "/products",
   },
   {
-    title: 'Tin tức',
-    href: '/blogs',
+    title: "Tin tức",
+    href: "/blogs",
   },
   {
-    title: 'Liên hệ',
-    href: '/contact',
+    title: "Liên hệ",
+    href: "/contact",
   },
   {
-    title: 'Giới thiệu',
-    href: '/about',
+    title: "Giới thiệu",
+    href: "/about",
   },
 ];
 
 export const dashboardNavItems: DashboardNavItem[] = [
   {
-    title: 'Trang tổng quan',
-    icon: DashboardOutlinedIcon,
-    href: '/dashboard',
+    title: "Trang tổng quan",
+    icon: LayoutDashboard,
+    href: "/dashboard",
   },
   {
-    title: 'Sản phẩm',
-    icon: ShoppingBagOutlinedIcon,
+    title: "Sản phẩm",
+    icon: ShoppingBag,
     items: [
       {
-        title: 'Danh sách',
-        icon: InventoryOutlinedIcon,
-        href: '/dashboard/products',
+        title: "Danh sách",
+        icon: Package,
+        href: "/dashboard/products",
       },
       {
-        title: 'Danh mục',
-        icon: CategoryOutlinedIcon,
-        href: '/dashboard/categories',
+        title: "Danh mục",
+        icon: LayoutGrid,
+        href: "/dashboard/categories",
       },
       {
-        title: 'Thương hiệu',
-        icon: BrandingWatermarkOutlinedIcon,
-        href: '/dashboard/brands',
+        title: "Thương hiệu",
+        icon: BadgeCheck,
+        href: "/dashboard/brands",
       },
     ],
   },
   {
-    title: 'Đơn hàng',
-    icon: ReceiptIcon,
+    title: "Đơn hàng",
+    icon: ReceiptText,
     items: [
       {
-        title: 'Quản lý',
-        icon: LocalMallIcon,
-        href: '/dashboard/orders',
+        title: "Quản lý",
+        icon: ScrollText,
+        href: "/dashboard/orders",
       },
       {
-        title: 'Đánh giá',
-        icon: ReviewsOutlinedIcon,
-        href: '/dashboard/reviews',
+        title: "Đánh giá",
+        icon: Star,
+        href: "/dashboard/reviews",
       },
     ],
   },
   {
-    title: 'Bài viết',
-    icon: DescriptionOutlinedIcon,
+    title: "Bài viết",
+    icon: StickyNote,
     items: [
       {
-        title: 'Danh sách',
-        icon: DescriptionOutlinedIcon,
-        href: '/dashboard/posts',
+        title: "Danh sách",
+        icon: StickyNote,
+        href: "/dashboard/posts",
       },
     ],
   },
   {
-    title: 'Báo cáo',
-    icon: BarChartOutlinedIcon,
+    title: "Báo cáo",
+    icon: ChartLine,
     items: [
       {
-        title: 'Báo cáo doanh thu',
-        icon: BarChartOutlinedIcon,
-        href: '/dashboard/reports/sale',
+        title: "Báo cáo doanh thu",
+        icon: ChartBar,
+        href: "/dashboard/reports/sale",
       },
       {
-        title: 'Báo cáo khách hàng mua nhiều',
-        icon: AccountCircleOutlinedIcon,
-        href: '/dashboard/reports/top-customer',
+        title: "Báo cáo khách hàng mua nhiều",
+        icon: ChartScatter,
+        href: "/dashboard/reports/top-customer",
       },
       {
-        title: 'Thống kê đánh giá sản phẩm',
-        icon: ShoppingBagOutlinedIcon,
-        href: '/dashboard/reports/product-rating',
+        title: "Thống kê đánh giá sản phẩm",
+        icon: Star,
+        href: "/dashboard/reports/product-rating",
       },
       {
-        title: 'Thống kê trạng thái kho',
-        icon: InventoryOutlinedIcon,
-        href: '/dashboard/reports/inventory-status',
+        title: "Thống kê trạng thái kho",
+        icon: ShoppingBag,
+        href: "/dashboard/reports/inventory-status",
       },
       {
-        title: 'Thống kê hiệu suất danh mục',
-        icon: CategoryOutlinedIcon,
-        href: '/dashboard/reports/category-performance',
+        title: "Thống kê hiệu suất danh mục",
+        icon: LayoutGrid,
+        href: "/dashboard/reports/category-performance",
       },
       {
-        title: 'Thống kê hiệu suất thương hiệu',
-        icon: BrandingWatermarkOutlinedIcon,
-        href: '/dashboard/reports/brand-performance',
+        title: "Thống kê hiệu suất thương hiệu",
+        icon: BadgeCheck,
+        href: "/dashboard/reports/brand-performance",
       },
     ],
   },
   {
-    title: 'Hệ thống',
-    icon: SensorDoorOutlinedIcon,
+    title: "Hệ thống",
+    icon: MonitorCog,
     items: [
       {
-        title: 'Tài khoản',
-        icon: AccountCircleOutlinedIcon,
-        href: '/dashboard/users',
+        title: "Tài khoản",
+        icon: UserCog,
+        href: "/dashboard/users",
       },
       {
-        title: 'Cài đặt hệ thống',
-        icon: SettingsOutlinedIcon,
-        href: '/dashboard/config',
+        title: "Cài đặt hệ thống",
+        icon: Settings,
+        href: "/dashboard/config",
       },
     ],
   },

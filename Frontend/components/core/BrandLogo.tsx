@@ -18,7 +18,7 @@ export const BrandLogo = ({ href, ...props }: BrandLogoProps) => {
 
 export const BaseLogo = (props: TitleProps) => {
   return (
-    <Group gap={4}>
+    <Group gap='sm' wrap="nowrap">
       <Image
         src="/favicon.svg"
         alt="Logo"

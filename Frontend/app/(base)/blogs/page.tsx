@@ -54,7 +54,7 @@ export default async function BlogsPage({
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
-    <Stack gap={8}>
+    <Stack gap='md'>
       <div>
         <Title order={1}>Tin tức công nghệ</Title>
         <Text>Khám phá những tin tức công nghệ mới nhất và hữu ích nhất</Text>

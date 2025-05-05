@@ -1,6 +1,7 @@
 import { ProductCard } from "@/components/core/ProductCard";
 import { ProductListItemResponse } from "@/types";
-import { SimpleGrid, Stack, Title } from "@mantine/core";
+import { Button, Group, SimpleGrid, Stack, Title } from "@mantine/core";
+import Link from "next/link";
 
 type BestSellerProps = {
   items: ProductListItemResponse[];
@@ -9,7 +10,17 @@ type BestSellerProps = {
 export const BestSeller = ({ items }: BestSellerProps) => {
   return (
     <Stack gap={8}>
-      <Title order={3}>Sản phẩm bán chạy</Title>
+      <Group justify="space-between">
+        <Title order={3}>Sản phẩm bán chạy</Title>
+        <Button
+          component={Link}
+          href="/products"
+          variant="transparent"
+          color="dark"
+        >
+          Xem thêm
+        </Button>
+      </Group>
       <SimpleGrid
         cols={{
           xs: 2,

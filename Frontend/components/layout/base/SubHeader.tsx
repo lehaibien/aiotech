@@ -12,7 +12,6 @@ type SubHeaderProps = {
 export const SubHeader = ({ categories }: SubHeaderProps) => {
   return (
     <Group
-      gap={2}
       display={{
         base: "none",
         md: "flex",

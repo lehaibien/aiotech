@@ -48,7 +48,6 @@ export const AuthMenu = () => {
         </Popover>
       ) : (
         <ActionIcon
-          color="dark"
           variant="transparent"
           component={Link}
           href={`/login?redirect=${pathName ?? "/"}`}

@@ -1,22 +1,20 @@
 "use client";
 
-import FilterDropdown from "@/components/core/FilterDropDown";
 import { ComboBoxItem } from "@/types";
 import {
   Button,
   Drawer,
-  Flex,
   Group,
+  Input,
+  MultiSelect,
   NumberInput,
-  Paper,
   RangeSlider,
   Stack,
-  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import TuneIcon from "@mui/icons-material/Tune";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type FilterDrawerProps = {
   brands: ComboBoxItem[];
@@ -33,54 +31,32 @@ export const FilterDrawer = ({
 }: FilterDrawerProps) => {
   const defaultMaxPrice = 900000000;
   const [opened, { open, close }] = useDisclosure(false);
-  const [category, setCategory] = useState<string[]>(defaultCategories);
-  const [brand, setBrand] = useState<string[]>(defaultBrands);
+  const [selectedCategories, setSelectedCategories] =
+    useState<string[]>(defaultCategories);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(defaultBrands);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     0,
     defaultMaxPrice,
   ]);
-
-  const categoryValues = useMemo(
-    () =>
-      categories.filter((x) => category?.includes(x.text)).map((x) => x.value),
-    [categories, category]
-  );
-
-  const brandValues = useMemo(
-    () => brands.filter((x) => brand?.includes(x.text)).map((x) => x.value),
-    [brands, brand]
-  );
-
-  const flatCategory = useMemo(
-    () => categories.map((x) => x.text).filter((x) => category?.includes(x)),
-    [categories, category]
-  );
-
-  const flatBrand = useMemo(
-    () => brands.map((x) => x.text).filter((x) => brand?.includes(x)),
-    [brands, brand]
-  );
+  const categoriesData = categories.map((x) => {
+    return {
+      label: x.text,
+      value: x.value,
+    };
+  });
+  const brandsData = brands.map((x) => {
+    return {
+      label: x.text,
+      value: x.value,
+    };
+  });
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleCategoryChange = (values: string[]) => {
-    const selectedCategories = categories
-      .filter((x) => values.includes(x.value))
-      .map((x) => x.text);
-    setCategory(selectedCategories);
-  };
-
-  const handleBrandChange = (values: string[]) => {
-    const selectedBrands = brands
-      .filter((x) => values.includes(x.value))
-      .map((x) => x.text);
-    setBrand(selectedBrands);
-  };
-
   const handleReset = () => {
-    setCategory([]);
-    setBrand([]);
+    setSelectedCategories([]);
+    setSelectedBrands([]);
     setPriceRange([0, defaultMaxPrice]);
     close();
     router.push("/products");
@@ -93,11 +69,17 @@ export const FilterDrawer = ({
     params.delete("minPrice");
     params.delete("maxPrice");
     params.delete("page");
-    if (category.length > 0) {
-      params.set("category", flatCategory.join(","));
+    if (selectedCategories.length > 0) {
+      const selectedCategoryTexts = categories
+        .filter((x) => selectedCategories.includes(x.value))
+        .map((x) => x.text);
+      params.set("category", selectedCategoryTexts.join(","));
     }
-    if (brand.length > 0) {
-      params.set("brand", flatBrand.join(","));
+    if (selectedBrands.length > 0) {
+      const selectedBrandsTexts = brands
+        .filter((x) => selectedBrands.includes(x.value))
+        .map((x) => x.text);
+      params.set("brand", selectedBrandsTexts.join(","));
     }
     if (priceRange[0] > 0 || priceRange[1] < defaultMaxPrice) {
       params.set("minPrice", priceRange[0].toString());
@@ -115,77 +97,56 @@ export const FilterDrawer = ({
       </Button>
 
       <Drawer
-        position="bottom"
+        position="left"
         opened={opened}
         onClose={close}
         title="Bộ lọc sản phẩm"
-        size="xs"
+        size="sm"
       >
-        <Stack gap={8} p={2}>
-          <Flex
-            direction={{
-              base: "column",
-              sm: "row",
-            }}
-            gap={4}
-          >
-            <FilterDropdown
-              title="Danh mục"
-              items={categories}
-              size="small"
-              width="100%"
-              initialValue={categoryValues}
-              onValueChange={handleCategoryChange}
-            />
-
-            <FilterDropdown
-              title="Thương hiệu"
-              items={brands}
-              size="small"
-              width="100%"
-              initialValue={brandValues}
-              onValueChange={handleBrandChange}
-            />
-          </Flex>
-
-          <Paper>
-            <Text>Khoảng giá</Text>
-
-            <RangeSlider
-              color="blue"
-              min={0}
-              max={defaultMaxPrice}
-              value={priceRange}
-              onChange={setPriceRange}
-            />
-            <Group gap={4} justify="space-between" align="flex-end">
-              <NumberInput
-                label="Giá tối thiểu"
-                value={priceRange[0]}
-                onChange={(value) =>
-                  setPriceRange([Number(value), priceRange[1]])
-                }
-                size="sm"
-                flex={1}
-                suffix="đ"
-                thousandSeparator="."
-                decimalSeparator=","
-              />
-              <Text>đến</Text>
-              <NumberInput
-                label="Giá tối đa"
-                value={priceRange[1]}
-                onChange={(value) =>
-                  setPriceRange([priceRange[0], Number(value)])
-                }
-                size="sm"
-                flex={1}
-                suffix="đ"
-                thousandSeparator="."
-                decimalSeparator=","
-              />
-            </Group>
-          </Paper>
+        <Stack gap="md">
+          <MultiSelect
+            label="Danh mục"
+            data={categoriesData}
+            value={selectedCategories}
+            onChange={setSelectedCategories}
+            searchable
+          />
+          <MultiSelect
+            label="Thương hiệu"
+            data={brandsData}
+            value={selectedBrands}
+            onChange={setSelectedBrands}
+            searchable
+          />
+          <Input.Label htmlFor="price-slider">Khoảng giá</Input.Label>
+          <RangeSlider
+            id="price-slider"
+            color="blue"
+            min={0}
+            max={defaultMaxPrice}
+            value={priceRange}
+            onChange={setPriceRange}
+          />
+          <NumberInput
+            label="Giá tối thiểu"
+            value={priceRange[0]}
+            onChange={(value) => setPriceRange([Number(value), priceRange[1]])}
+            size="sm"
+            flex={1}
+            suffix="đ"
+            thousandSeparator="."
+            decimalSeparator=","
+          />
+          <NumberInput
+            label="Giá tối đa"
+            value={priceRange[1]}
+            onChange={(value) => setPriceRange([priceRange[0], Number(value)])}
+            size="sm"
+            flex={1}
+            suffix="đ"
+            thousandSeparator="."
+            decimalSeparator=","
+          />
 
           <Group justify="space-between" gap={4}>
             <Button
@@ -202,7 +163,7 @@ export const FilterDrawer = ({
               onClick={handleSubmit}
               flex={1}
             >
-              Áp dụng bộ lọc
+              Áp dụng
             </Button>
           </Group>
         </Stack>

@@ -1,18 +1,33 @@
-'use client'
+"use client";
 
-import { DarkMode, LightMode } from '@mui/icons-material';
-import { IconButton, useColorScheme } from '@mui/material';
+import { ActionIcon, useMantineColorScheme } from "@mantine/core";
+import { Moon, Sun } from "lucide-react";
 
-function ColorSchemeSwitch() {
-  const { mode, setMode } = useColorScheme();
-  function toggleMode() {
-    setMode(mode === 'light' ? 'dark' : 'light');
-  }
+export const ColorSchemeSwitch = () => {
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const toggleMode = () => {
+    setColorScheme(colorScheme === "dark" ? "light" : "dark");
+  };
   return (
-    <IconButton color='inherit' onClick={toggleMode} aria-label='Dark mode'>
-      {mode === 'light' ? <LightMode /> : <DarkMode />}
-    </IconButton>
+    <>
+      <ActionIcon
+        onClick={toggleMode}
+        variant="transparent"
+        color="var(--mantine-color-text)"
+        aria-label="Change theme"
+        lightHidden
+      >
+        <Sun />
+      </ActionIcon>
+      <ActionIcon
+        onClick={toggleMode}
+        variant="transparent"
+        color="var(--mantine-color-text)"
+        aria-label="Change theme"
+        darkHidden
+      >
+        <Moon />
+      </ActionIcon>
+    </>
   );
-}
-
-export default ColorSchemeSwitch;
+};

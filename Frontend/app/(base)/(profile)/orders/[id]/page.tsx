@@ -29,10 +29,10 @@ export default async function OrderDetailPage({ params }: { params: Params }) {
       <Group justify="space-between" align="center">
         <Button
           variant="transparent"
-          color="dark"
+          color="var(--mantine-color-text)"
           leftSection={<ArrowLeft />}
           component={Link}
-          href="/profile?tab=2"
+          href="/orders"
         >
           Quay lại
         </Button>

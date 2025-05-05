@@ -8,9 +8,19 @@ import { getApi } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import type { PostListItemResponse, PostResponse } from "@/types";
 import { UUID } from "@/types";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import { Box, Chip, Divider, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Flex,
+  Grid,
+  GridCol,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 
 type Params = Promise<{ slug: string }>;
@@ -34,125 +44,78 @@ async function getRelatedPosts(id: UUID) {
 export default async function Page({ params }: { params: Params }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  const relatedPosts = await getRelatedPosts(post!.id);
   if (post === undefined || post.isPublished === false) {
     return (
       <NoItem
-        icon={CalendarTodayIcon}
         title="Không tìm thấy bài viết"
         description="Vui lòng thử lại sau hoặc đọc bài viết khác"
       />
     );
   }
-
+  const relatedPosts = await getRelatedPosts(post.id);
   const postDate = dayjs(post.createdDate).tz(DEFAULT_TIMEZONE);
   const formattedDate = postDate.format("DD/MM/YYYY");
   const hours = postDate.format("HH");
   const minutes = postDate.format("mm");
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        gap: 2,
-        flexDirection: { xs: "column", md: "row" },
-      }}
-    >
-      <Box sx={{ width: { xs: 0, md: 280 }, flexShrink: 0 }}>
+    <Flex gap="md" direction={{ base: "column", md: "row" }}>
+      <Box w={{ base: "100%", md: 280 }} miw={280}>
         <TableOfContents html={post.content} />
       </Box>
 
-      <Box sx={{ flexGrow: 1 }}>
-        <Paper
-          elevation={2}
-          sx={{ borderRadius: 2, overflow: "hidden", mb: 4 }}
-        >
-          <Box sx={{ position: "relative" }}>
-            <Chip
-              label="Bài viết"
-              size="small"
-              color="primary"
-              sx={{
+      <Box flex={1}>
+        <Paper radius="md" mb="xl" withBorder>
+          <Box
+            pos="relative"
+            w="100%"
+            style={{
+              "&::after": {
+                content: '""',
                 position: "absolute",
-                top: 8,
-                left: 8,
-                zIndex: 2,
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                height: "30%",
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
+                zIndex: 1,
+              },
+            }}
+          >
+            <Image
+              src={post.imageUrl || "/image-not-found.jpg"}
+              alt={post.title}
+              width={1200}
+              height={630}
+              priority
+              style={{
+                width: "100%",
+                aspectRatio: "1200/630",
+                objectFit: "fill",
               }}
             />
-            <Box
-              sx={{
-                position: "relative",
-                width: "100%",
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "30%",
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
-                  zIndex: 1,
-                },
-              }}
-            >
-              <Image
-                src={
-                  post.imageUrl == "" ? "/image-not-found.jpg" : post.imageUrl
-                }
-                alt={post.title}
-                width={1200}
-                height={630}
-                priority
-                style={{
-                  width: "100%",
-                  aspectRatio: 1200 / 630,
-                  objectFit: "fill",
-                }}
-              />
-            </Box>
           </Box>
 
-          {/* Content */}
-          <Stack padding={2} spacing={2}>
-            {/* Title and Meta */}
-            <Stack spacing={2}>
-              <Typography component="h2" variant="h1">
-                {post.title}
-              </Typography>
+          <Stack p="md" gap="md">
+            <Stack gap="md">
+              <Title order={1}>{post.title}</Title>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <CalendarTodayIcon fontSize="small" />
-                  <Typography variant="body2">{formattedDate}</Typography>
-                </Box>
+              <Group gap="md" wrap="wrap">
+                <Group gap="xs">
+                  <Calendar size={16} />
+                  <Text size="sm" c="dimmed">
+                    {formattedDate}
+                  </Text>
+                </Group>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <AccessTimeIcon fontSize="small" />
-                  <Typography variant="body2">
+                <Group gap="xs">
+                  <Clock size={16} />
+                  <Text size="sm" c="dimmed">
                     {hours}:{minutes}
-                  </Typography>
-                </Box>
-              </Box>
+                  </Text>
+                </Group>
+              </Group>
 
               <Divider />
             </Stack>
@@ -161,46 +124,35 @@ export default async function Page({ params }: { params: Params }) {
           </Stack>
         </Paper>
 
-        {/* Related Posts */}
         {relatedPosts.length > 0 && (
-          <Box sx={{}}>
-            <Typography
-              variant="h5"
-              component="h2"
-              gutterBottom
-              sx={{
-                borderBottom: "2px solid",
-                borderColor: "primary.main",
+          <Box>
+            <Title
+              order={2}
+              mb="md"
+              pb="xs"
+              style={{
+                borderBottom: "2px solid var(--mantine-color-blue-filled)",
                 display: "inline-block",
               }}
             >
               Bài viết liên quan
-            </Typography>
+            </Title>
 
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "repeat(2, 1fr)",
-                  md: "repeat(3, 1fr)",
-                },
-                gap: 2,
-              }}
-            >
+            <Grid gutter="md">
               {relatedPosts.map((post) => (
-                <BlogPostItem
-                  key={post.id}
-                  slug={post.slug}
-                  title={post.title}
-                  imageUrl={post.thumbnailUrl}
-                  createdDate={post.createdDate}
-                />
+                <GridCol key={post.id} span={{ base: 12, sm: 6, md: 4 }}>
+                  <BlogPostItem
+                    slug={post.slug}
+                    title={post.title}
+                    imageUrl={post.thumbnailUrl}
+                    createdDate={post.createdDate}
+                  />
+                </GridCol>
               ))}
-            </Box>
+            </Grid>
           </Box>
         )}
       </Box>
-    </Box>
+    </Flex>
   );
 }

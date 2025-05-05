@@ -137,7 +137,7 @@ export const CheckoutComponent = ({
             }}
           >
             <Stack>
-              <Group gap={4}>
+              <Group gap='sm'>
                 <Truck />
                 <Title order={5}>Thông tin giao hàng</Title>
               </Group>
@@ -182,7 +182,7 @@ export const CheckoutComponent = ({
                   />
                 </Grid.Col>
               </Grid>
-              <Group gap={4}>
+              <Group gap='sm'>
                 <CreditCard />
                 <Title order={5}>Phương thức thanh toán</Title>
               </Group>
@@ -222,7 +222,7 @@ export const CheckoutComponent = ({
                             key={option.value}
                             value={option.value.toString()}
                           >
-                            <Flex gap={4} align="center" p={4}>
+                            <Flex gap='sm' align="center" p='sm'>
                               <Radio.Indicator icon={Check} />
                               <Image
                                 src={option.icon}
@@ -244,7 +244,7 @@ export const CheckoutComponent = ({
 
           <Grid.Col span={{ xs: 12, md: 5 }}>
             <Stack>
-              <Group gap={4}>
+              <Group gap='sm'>
                 <ShoppingBag />
                 <Title order={5}>Tổng quan đơn hàng</Title>
               </Group>
@@ -253,7 +253,7 @@ export const CheckoutComponent = ({
                 <Stack>
                   {cartItems.map((item) => (
                     <Card key={item.productId}>
-                      <Group wrap="nowrap" gap={4}>
+                      <Group wrap="nowrap" gap='sm'>
                         <Image
                           src={item.productImage}
                           alt={item.productName}

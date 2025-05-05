@@ -7,6 +7,29 @@ type ShopSortProps = {
   defaultSort: string;
 };
 
+const sortData = [
+  {
+    label: "Mặc định",
+    value: "default",
+  },
+  {
+    label: "Giá: Thấp đến cao",
+    value: "price_asc",
+  },
+  {
+    label: "Giá: Cao đến thấp",
+    value: "price_desc",
+  },
+  {
+    label: "Mới nhất",
+    value: "newest",
+  },
+  {
+    label: "Cũ nhất",
+    value: "oldest",
+  },
+];
+
 export const ShopSort = ({ defaultSort }: ShopSortProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,29 +42,8 @@ export const ShopSort = ({ defaultSort }: ShopSortProps) => {
   return (
     <Select
       id="sort-select"
-      data={[
-        {
-          label: "Mặc định",
-          value: "default",
-        },
-        {
-          label: "Giá: Thấp đến cao",
-          value: "price_asc",
-        },
-        {
-          label: "Giá: Cao đến thấp",
-          value: "price_desc",
-        },
-        {
-          label: "Mới nhất",
-          value: "newest",
-        },
-        {
-          label: "Cũ nhất",
-          value: "oldest",
-        },
-      ]}
-      defaultValue={defaultSort}
+      data={sortData}
+      value={defaultSort}
       label="Sắp xếp theo"
       onChange={(_, option) => onChange(option.value)}
     />

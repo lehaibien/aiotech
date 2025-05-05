@@ -1,21 +1,76 @@
-'use client'
+"use client";
 
-import { Box, Button, Container, Typography, useTheme } from '@mui/material'
-import Head from 'next/head'
-import { useRouter } from 'next/navigation'
+import { Box, Button, Container, SimpleGrid, Text, Title } from "@mantine/core";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Custom404() {
-  const theme = useTheme();
-  const router = useRouter();
-
   return (
     <>
       <Head>
         <title>404 | AioTech</title>
-        <meta name="description" content="Trang bạn đang tìm kiếm không tồn tại." />
+        <meta
+          name="description"
+          content="Trang bạn đang tìm kiếm không tồn tại."
+        />
       </Head>
-      <Container maxWidth="md">
-        <Box
+      <Container
+        size="lg"
+        p={{
+          base: "xl",
+          md: 80,
+        }}
+        w="100vw"
+        h="100vh"
+      >
+        <SimpleGrid
+          spacing={{ base: "lg", sm: "xl" }}
+          cols={{ base: 1, sm: 2 }}
+        >
+          <Box
+            display={{
+              base: "block",
+              md: "none",
+            }}
+          >
+            <Image
+              src="/images/404.svg"
+              alt="404"
+              width={250}
+              height={150}
+              style={{
+                margin: "auto",
+              }}
+            />
+          </Box>
+          <div>
+            <Title>Có gì đó không đúng...</Title>
+            <Text c="dimmed" size="lg">
+              Trang bạn đang tìm kiếm không tồn tại. Bạn có thể đã nhập sai địa
+              chỉ, hoặc trang đã bị chuyển sang một URL khác. Nếu bạn nghĩ đây
+              là lỗi, hãy liên hệ với chúng tôi.
+            </Text>
+            <Button
+              variant="outline"
+              size="md"
+              mt="xl"
+              component={Link}
+              href="/"
+            >
+              Quay lại trang chủ
+            </Button>
+          </div>
+          <Box
+            display={{
+              base: "none",
+              md: "block",
+            }}
+          >
+            <Image src="/images/404.svg" alt="404" width={500} height={300} />
+          </Box>
+        </SimpleGrid>
+        {/* <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -49,7 +104,7 @@ export default function Custom404() {
               strokeWidth="4"
             />
             <path
-              d="M80 90L120 110M120 90L80 110"
+              d="M80 90L1 20 110M120 90L80 110"
               stroke={theme.palette.error.main}
               strokeWidth="4"
               strokeLinecap="round"
@@ -73,8 +128,8 @@ export default function Custom404() {
           >
             Quay lại
           </Button>
-        </Box>
+        </Box> */}
       </Container>
     </>
-  )
+  );
 }

@@ -1,20 +1,20 @@
 "use client";
 
-import CustomDataGrid, {
-  CustomDataGridRef,
-} from "@/components/core/CustomDataGrid";
+import { MantineDataTable } from "@/components/data-table/MantineDataTable";
 import { API_URL } from "@/constant/apiUrl";
 import { useUserId } from "@/hooks/useUserId";
 import { getApi, getListApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { OrderGetListRequest, OrderResponse, PaginatedList } from "@/types";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
+import useSWR from "swr";
 import { createOrderHistoryColumns } from "./orderHistoryColumn";
 
 export const OrderHistory = () => {
   const userId = useUserId();
   const searchTerm = useRef("");
-  const dataGridRef = useRef<CustomDataGridRef>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const handlePrint = useCallback(
     async (id: string, trackingNumber: string) => {
       const response = await getApi(API_URL.order + `/${id}/print`);
@@ -47,7 +47,7 @@ export const OrderHistory = () => {
         pageIndex: page,
         pageSize,
         textSearch: searchTerm.current,
-        customerId: parseUUID(userId ?? "") ?? undefined,
+        customerId: parseUUID(userId),
       };
       const response = await getListApi(API_URL.order, getListRequest);
       if (response.success) {
@@ -59,13 +59,28 @@ export const OrderHistory = () => {
     [userId]
   );
 
+  const { data, isValidating, error } = useSWR([page - 1, pageSize], {
+    fetcher: loadData,
+    revalidateOnMount: true,
+    revalidateOnFocus: false,
+    errorRetryCount: 2,
+    errorRetryInterval: 3000,
+  });
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
-    <CustomDataGrid
-      ref={dataGridRef}
+    <MantineDataTable
       columns={columns}
-      withRowNumber
-      checkboxSelection={false}
-      loadData={loadData}
+      data={data?.items ?? []}
+      totalRows={data?.totalCount ?? 0}
+      loading={isValidating}
+      page={page}
+      pageSize={pageSize}
+      onPageChange={setPage}
+      onPageSizeChange={setPageSize}
     />
   );
 };

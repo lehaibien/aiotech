@@ -73,7 +73,6 @@ export const OrderDetailAction = ({
   return (
     <Group>
       <Button
-        variant="transparent"
         color="green"
         leftSection={<Check size={16} />}
         disabled={status.toLowerCase() !== "delivered"}

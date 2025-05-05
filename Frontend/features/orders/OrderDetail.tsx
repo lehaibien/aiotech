@@ -23,6 +23,7 @@ type OrderDetailProps = {
 
 export const OrderDetail = ({ order }: OrderDetailProps) => {
   if (!order)
+  {
     return (
       <NoItem
         title="Đơn hàng không tồn tại"
@@ -30,6 +31,7 @@ export const OrderDetail = ({ order }: OrderDetailProps) => {
         icon={ReceiptIcon}
       />
     );
+  }
   return (
     <>
       <Grid>
@@ -165,170 +167,6 @@ export const OrderDetail = ({ order }: OrderDetailProps) => {
           </Table.Tbody>
         </Table>
       </Card>
-      {/* <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Thông tin đơn hàng
-              </Typography>
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <PackageIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Mã đơn hàng"
-                    secondary={order.trackingNumber}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <CalendarIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Ngày đặt hàng"
-                    secondary={dayjs(order.createdDate).format("DD/MM/YYYY")}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <TruckIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Ngày giao hàng"
-                    secondary={
-                      order.deliveryDate
-                        ? dayjs(order.deliveryDate).format("DD/MM/YYYY")
-                        : "Chưa cập nhật"
-                    }
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <PendingIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Trạng thái:"
-                    secondary={mapOrderStatus(order.status)}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Thông tin khách hàng
-              </Typography>
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Tên" secondary={order.name} />
-                </ListItem>
-                {order.phoneNumber && (
-                  <ListItem>
-                    <ListItemIcon>
-                      <PhoneIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Số điện thoại"
-                      secondary={order.phoneNumber}
-                    />
-                  </ListItem>
-                )}
-                <ListItem>
-                  <ListItemIcon>
-                    <MapPinIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Địa chỉ" secondary={order.address} />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <CreditCardIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Phương thức thanh toán"
-                    secondary={order.paymentProvider}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-      <Card sx={{ marginTop: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Chi tiết đơn hàng
-          </Typography>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Sản phẩm</TableCell>
-                <TableCell align="right">Giá</TableCell>
-                <TableCell align="right">Số lượng</TableCell>
-                <TableCell align="right">Thành tiền</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {order.orderItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.productName}</TableCell>
-                  <TableCell align="right">
-                    {formatNumberWithSeperator(item.price)} đ
-                  </TableCell>
-                  <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell align="right">
-                    {formatNumberWithSeperator(item.totalPrice)} đ
-                  </TableCell>
-                </TableRow>
-              ))}
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  align="right"
-                  sx={{ fontWeight: "bold" }}
-                >
-                  Thuế GTGT
-                </TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                  {formatNumberWithSeperator(order.tax)} đ
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  align="right"
-                  sx={{ fontWeight: "bold" }}
-                >
-                  Thành tiền
-                </TableCell>
-                <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                  {formatNumberWithSeperator(order.totalPrice)} đ
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      {order.note && (
-        <Card sx={{ marginTop: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Ghi chú
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <FileTextIcon />
-              <Typography>{order.note}</Typography>
-            </Box>
-          </CardContent>
-        </Card>
-      )} */}
     </>
   );
 };

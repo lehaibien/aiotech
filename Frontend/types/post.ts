@@ -18,6 +18,17 @@ export type PostResponse = {
   isPublished: boolean;
   tags: string[];
   createdDate: Date;
+  updatedDate: Date;
+};
+
+export type PostUpdateResponse = {
+  id: UUID;
+  title: string;
+  slug: string;
+  content: string;
+  imageUrl: string;
+  isPublished: boolean;
+  tags: string[];
 };
 
 export type PostRequest = z.infer<typeof postRequestSchema>;

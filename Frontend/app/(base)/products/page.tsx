@@ -11,9 +11,7 @@ import {
   ProductSort,
 } from "@/types";
 import { Group, Stack, Title } from "@mantine/core";
-import { Box, CircularProgress, Typography } from "@mui/material";
 import { Metadata } from "next";
-import { Suspense } from "react";
 
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
@@ -114,10 +112,10 @@ export default async function ShopPage({
     brands = brandResponse.data as ComboBoxItem[];
   }
   return (
-    <Stack gap={2}>
+    <Stack gap="xs">
       <Title order={1}>Cửa hàng</Title>
-      <Stack gap={3}>
-        <Group gap={2} justify="space-between">
+      <Stack gap="sm">
+        <Group justify="space-between">
           <FilterDrawer
             brands={brands}
             categories={categories}
@@ -127,32 +125,11 @@ export default async function ShopPage({
           <ShopSort defaultSort={sort ?? "default"} />
         </Group>
 
-        <Box sx={{ position: "relative", minHeight: "200px" }}>
-          <Suspense
-            key={"Products page"}
-            fallback={
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "300px",
-                }}
-              >
-                <CircularProgress size={60} thickness={4} />
-                <Typography variant="body1" sx={{ ml: 2 }}>
-                  Đang tải sản phẩm...
-                </Typography>
-              </Box>
-            }
-          >
-            <ShopList
-              items={dataList.items}
-              currentPage={page}
-              totalPage={Math.ceil(dataList.totalCount / pageSize)}
-            />
-          </Suspense>
-        </Box>
+        <ShopList
+          items={dataList.items}
+          currentPage={page}
+          totalPage={Math.ceil(dataList.totalCount / pageSize)}
+        />
       </Stack>
     </Stack>
   );

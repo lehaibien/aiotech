@@ -38,7 +38,7 @@ export default async function RootLayout({
   }
   return (
     <>
-      <Stack gap={4} p={16}>
+      <Stack gap="sm" px="lg" py="md">
         <Header categories={categories} />
         <SubHeader categories={categories} />
       </Stack>

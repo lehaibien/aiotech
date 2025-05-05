@@ -22,8 +22,8 @@ export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
     >
       <Popover.Target>
         <Button
-          variant="subtle"
-          color="dark"
+          variant="transparent"
+          color='var(--mantine-color-text)'
           px={0}
           leftSection={<GridViewOutlinedIcon />}
           rightSection={
