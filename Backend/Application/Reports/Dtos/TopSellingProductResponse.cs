@@ -5,6 +5,6 @@ public record TopSellingProductResponse(
     string Sku,
     string ProductName,
     int TotalQuantitySold,
-    double TotalRevenue,
+    decimal TotalRevenue,
     double AverageRating
 );

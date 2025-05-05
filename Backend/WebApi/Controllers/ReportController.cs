@@ -64,8 +64,8 @@ public class ReportController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("out-of-stock")]
-    public async Task<IActionResult> GetOutOfStockReportAsync(
+    [HttpGet("inventory-status")]
+    public async Task<IActionResult> GetInventoryStatusReportAsync(
         [FromQuery] InventoryStatusReportRequest request
     )
     {

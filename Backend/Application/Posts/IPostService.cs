@@ -30,17 +30,13 @@ public interface IPostService
         CancellationToken cancellationToken = default
     );
 
-    Task<Result<PostResponse>> CreateAsync(
-        PostRequest request
-    );
+    Task<Result<PostUpdateResponse>> GetForUpdateAsync(Guid id);
 
-    Task<Result<PostResponse>> UpdateAsync(
-        PostRequest request
-    );
+    Task<Result<PostResponse>> CreateAsync(PostRequest request);
+
+    Task<Result<PostResponse>> UpdateAsync(PostRequest request);
 
     Task<Result<string>> DeleteAsync(Guid id);
 
-    Task<Result<string>> DeleteListAsync(
-        List<Guid> ids
-    );
+    Task<Result<string>> DeleteListAsync(List<Guid> ids);
 }

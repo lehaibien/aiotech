@@ -33,5 +33,5 @@ public class OrderItemRequest
     public int Quantity { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Giá sản phẩm phải lớn hơn hoặc bằng 0")]
-    public double Price { get; set; }
+    public decimal Price { get; set; }
 }

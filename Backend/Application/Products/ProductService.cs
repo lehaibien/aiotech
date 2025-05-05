@@ -87,6 +87,200 @@ public class ProductService : IProductService
         return Result<PaginatedList<ProductResponse>>.Success(result);
     }
 
+    public async Task<Result<PaginatedList<ProductListItemResponse>>> GetListFilteredAsync(
+        GetListFilteredProductRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var isUnfilteredFirstPage =
+            request.PageIndex == 0
+            && string.IsNullOrEmpty(request.TextSearch)
+            && request.MinPrice == 0
+            && request.MaxPrice == 900000000
+            && string.IsNullOrEmpty(request.Categories)
+            && string.IsNullOrEmpty(request.Brands)
+            && request.Sort == ProductSort.Default;
+        if (isUnfilteredFirstPage)
+        {
+            var cachedResult = await _cacheService.GetAsync<PaginatedList<ProductListItemResponse>>(
+                CacheKeys.FirstPageProducts
+            );
+            if (cachedResult != null)
+            {
+                return Result<PaginatedList<ProductListItemResponse>>.Success(cachedResult);
+            }
+        }
+
+        var listBrands = string.IsNullOrWhiteSpace(request.Brands)
+            ? []
+            : request.Brands.Split(',', options: StringSplitOptions.RemoveEmptyEntries);
+        var listCategories = string.IsNullOrWhiteSpace(request.Categories)
+            ? []
+            : request.Categories.Split(',', options: StringSplitOptions.RemoveEmptyEntries);
+
+        var query = _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x =>
+                (listBrands.Length == 0 || listBrands.Contains(x.Brand.Name))
+                && (listCategories.Length == 0 || listCategories.Contains(x.Category.Name))
+                && x.Price >= request.MinPrice
+                && x.Price <= request.MaxPrice
+                && x.Name.Contains(request.TextSearch)
+            );
+
+        query = ApplyFilterSort(query, request.Sort);
+        var dtoQuery = query.ProjectToProductListItemResponse();
+        var result = await PaginatedList<ProductListItemResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
+        if (isUnfilteredFirstPage)
+        {
+            await _cacheService.SetAsync(
+                CacheKeys.FirstPageProducts,
+                result,
+                TimeSpan.FromMinutes(30)
+            );
+        }
+
+        return Result<PaginatedList<ProductListItemResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductResponse>>> SearchAsync(
+        SearchProductRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x =>
+                !x.IsDeleted
+                && (request.Category == null || x.Category.Name == request.Category)
+                && x.Name.Contains(request.TextSearch)
+            )
+            .ProjectToProductResponse()
+            .Take(request.SearchLimit)
+            .ToListAsync(cancellationToken);
+        return Result<List<ProductResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(
+        int top = 12,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
+            CacheKeys.TopProducts
+        );
+        if (productInCache is not null)
+        {
+            return Result<List<ProductListItemResponse>>.Success(productInCache);
+        }
+
+        var orderItems = _unitOfWork
+            .GetRepository<OrderItem>()
+            .GetAll(oi => oi.Order.Status != OrderStatus.Cancelled && !oi.Order.IsDeleted);
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Stock >= 8)
+            .OrderByDescending(p =>
+                orderItems.Where(oi => oi.ProductId == p.Id).Sum(oi => oi.Quantity)
+            )
+            .ThenByDescending(x => x.IsFeatured)
+            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
+            .ThenByDescending(x => x.CreatedDate)
+            .ProjectToProductListItemResponse()
+            .Take(top)
+            .ToListAsync(cancellationToken);
+        await _cacheService.SetAsync(CacheKeys.TopProducts, result, TimeSpan.FromMinutes(30));
+        return Result<List<ProductListItemResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(
+        int top = 12,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
+            CacheKeys.NewestProducts
+        );
+        if (productInCache is not null)
+        {
+            return Result<List<ProductListItemResponse>>.Success(productInCache);
+        }
+
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Stock >= 10)
+            .OrderByDescending(x => x.CreatedDate)
+            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
+            .ProjectToProductListItemResponse()
+            .Take(top)
+            .ToListAsync(cancellationToken);
+
+        await _cacheService.SetAsync(CacheKeys.NewestProducts, result, TimeSpan.FromMinutes(30));
+        return Result<List<ProductListItemResponse>>.Success(result);
+    }
+
+    public async Task<Result<List<ProductListItemResponse>>> GetRelatedProductsAsync(
+        GetRelatedProductsRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var entity = await _unitOfWork
+            .GetRepository<Product>()
+            .GetByIdAsync(request.Id, cancellationToken);
+        if (entity is null)
+        {
+            return Result<List<ProductListItemResponse>>.Failure("Sản phẩm không tồn tại");
+        }
+
+        var result = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Id != request.Id && x.CategoryId == entity.CategoryId)
+            .ProjectToProductListItemResponse()
+            .ToListAsync(cancellationToken);
+        return Result<List<ProductListItemResponse>>.Success(result);
+    }
+
+    public async Task<Result<ProductDetailResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var entity = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Id == id)
+            .ProjectToProductDetailResponse()
+            .FirstOrDefaultAsync(cancellationToken);
+        if (entity is null)
+        {
+            return Result<ProductDetailResponse>.Failure("Sản phẩm không tồn tại");
+        }
+
+        return Result<ProductDetailResponse>.Success(entity);
+    }
+
+    public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var entity = await _unitOfWork
+            .GetRepository<Product>()
+            .GetAll(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (entity is null)
+        {
+            return Result<ProductUpdateResponse>.Failure("Sản phẩm không tồn tại");
+        }
+
+        var response = entity.MapToProductUpdateResponse();
+        return Result<ProductUpdateResponse>.Success(response);
+    }
+
     public async Task<Result<ProductResponse>> CreateAsync(ProductRequest request)
     {
         _logger.LogInformation(
@@ -283,196 +477,6 @@ public class ProductService : IProductService
         await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
         _logger.LogInformation("Successfully deleted {Count} products", ids.Count);
         return Result<string>.Success("Xóa thành công");
-    }
-
-    public async Task<Result<PaginatedList<ProductListItemResponse>>> GetListFilteredAsync(
-        GetListFilteredProductRequest request,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var isUnfilteredFirstPage =
-            request.PageIndex == 0
-            && string.IsNullOrEmpty(request.TextSearch)
-            && request.MinPrice == 0
-            && request.MaxPrice == 900000000
-            && string.IsNullOrEmpty(request.Categories)
-            && string.IsNullOrEmpty(request.Brands)
-            && request.Sort == ProductSort.Default;
-        if (isUnfilteredFirstPage)
-        {
-            var cachedResult = await _cacheService.GetAsync<PaginatedList<ProductListItemResponse>>(
-                CacheKeys.FirstPageProducts
-            );
-            if (cachedResult != null)
-            {
-                return Result<PaginatedList<ProductListItemResponse>>.Success(cachedResult);
-            }
-        }
-
-        var query = _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x =>
-                (string.IsNullOrEmpty(request.Brands) || x.Brand.Name.Contains(request.Brands))
-                && (
-                    string.IsNullOrEmpty(request.Categories)
-                    || x.Category.Name.Contains(request.Categories)
-                )
-                && x.Price >= request.MinPrice
-                && x.Price <= request.MaxPrice
-                && x.Name.Contains(request.TextSearch)
-            );
-
-        query = ApplyFilterSort(query, request.Sort);
-        var dtoQuery = query.ProjectToProductListItemResponse();
-        var result = await PaginatedList<ProductListItemResponse>.CreateAsync(
-            dtoQuery,
-            request.PageIndex,
-            request.PageSize,
-            cancellationToken
-        );
-        if (isUnfilteredFirstPage)
-        {
-            await _cacheService.SetAsync(
-                CacheKeys.FirstPageProducts,
-                result,
-                TimeSpan.FromMinutes(30)
-            );
-        }
-
-        return Result<PaginatedList<ProductListItemResponse>>.Success(result);
-    }
-
-    public async Task<Result<List<ProductResponse>>> SearchAsync(
-        SearchProductRequest request,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var result = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x =>
-                !x.IsDeleted
-                && (request.Category == null || x.Category.Name == request.Category)
-                && x.Name.Contains(request.TextSearch)
-            )
-            .ProjectToProductResponse()
-            .Take(request.SearchLimit)
-            .ToListAsync(cancellationToken);
-        return Result<List<ProductResponse>>.Success(result);
-    }
-
-    public async Task<Result<List<ProductListItemResponse>>> GetTopProductsAsync(
-        int top = 12,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
-            CacheKeys.TopProducts
-        );
-        if (productInCache is not null)
-        {
-            return Result<List<ProductListItemResponse>>.Success(productInCache);
-        }
-
-        var orderItems = _unitOfWork
-            .GetRepository<OrderItem>()
-            .GetAll(oi => oi.Order.Status != OrderStatus.Cancelled && !oi.Order.IsDeleted);
-        var result = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Stock >= 8)
-            .OrderByDescending(p =>
-                orderItems.Where(oi => oi.ProductId == p.Id).Sum(oi => oi.Quantity)
-            )
-            .ThenByDescending(x => x.IsFeatured)
-            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
-            .ThenByDescending(x => x.CreatedDate)
-            .ProjectToProductListItemResponse()
-            .Take(top)
-            .ToListAsync(cancellationToken);
-        await _cacheService.SetAsync(CacheKeys.TopProducts, result, TimeSpan.FromMinutes(30));
-        return Result<List<ProductListItemResponse>>.Success(result);
-    }
-
-    public async Task<Result<List<ProductListItemResponse>>> GetNewestProductsAsync(
-        int top = 12,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var productInCache = await _cacheService.GetAsync<List<ProductListItemResponse>>(
-            CacheKeys.NewestProducts
-        );
-        if (productInCache is not null)
-        {
-            return Result<List<ProductListItemResponse>>.Success(productInCache);
-        }
-
-        var result = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Stock >= 10)
-            .OrderByDescending(x => x.CreatedDate)
-            .ThenByDescending(x => x.Reviews.Count > 0 ? x.Reviews.Average(r => r.Rating) : 0)
-            .ProjectToProductListItemResponse()
-            .Take(top)
-            .ToListAsync(cancellationToken);
-
-        await _cacheService.SetAsync(CacheKeys.NewestProducts, result, TimeSpan.FromMinutes(30));
-        return Result<List<ProductListItemResponse>>.Success(result);
-    }
-
-    public async Task<Result<List<ProductListItemResponse>>> GetRelatedProductsAsync(
-        GetRelatedProductsRequest request,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var entity = await _unitOfWork
-            .GetRepository<Product>()
-            .GetByIdAsync(request.Id, cancellationToken);
-        if (entity is null)
-        {
-            return Result<List<ProductListItemResponse>>.Failure("Sản phẩm không tồn tại");
-        }
-
-        var result = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Id != request.Id && x.CategoryId == entity.CategoryId)
-            .ProjectToProductListItemResponse()
-            .ToListAsync(cancellationToken);
-        return Result<List<ProductListItemResponse>>.Success(result);
-    }
-
-    public async Task<Result<ProductDetailResponse>> GetByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var entity = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Id == id)
-            .ProjectToProductDetailResponse()
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity is null)
-        {
-            return Result<ProductDetailResponse>.Failure("Sản phẩm không tồn tại");
-        }
-
-        return Result<ProductDetailResponse>.Success(entity);
-    }
-
-    public async Task<Result<ProductUpdateResponse>> GetRequestByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var entity = await _unitOfWork
-            .GetRepository<Product>()
-            .GetAll(x => x.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (entity is null)
-        {
-            return Result<ProductUpdateResponse>.Failure("Sản phẩm không tồn tại");
-        }
-
-        var response = entity.MapToProductUpdateResponse();
-        return Result<ProductUpdateResponse>.Success(response);
     }
 
     private static Expression<Func<Product, object>>? GetSortExpression(string? orderBy)

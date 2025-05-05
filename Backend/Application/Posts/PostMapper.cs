@@ -42,6 +42,19 @@ public static class PostMapper
         );
     }
 
+    public static PostUpdateResponse MapToPostUpdateResponse(this Post post)
+    {
+        return new PostUpdateResponse(
+            post.Id,
+            post.Title,
+            post.Slug,
+            post.Content,
+            post.ImageUrl,
+            post.IsPublished,
+            post.Tags
+        );
+    }
+
     // Request
 
     public static Post MapToPost(this PostRequest request)
@@ -52,7 +65,7 @@ public static class PostMapper
             Slug = request.Slug,
             Content = request.Content,
             IsPublished = request.IsPublished,
-            Tags = request.Tags
+            Tags = request.Tags,
         };
     }
 
@@ -105,6 +118,21 @@ public static class PostMapper
             p.ImageUrl,
             p.Tags,
             p.CreatedDate
+        ));
+    }
+
+    public static IQueryable<PostUpdateResponse> ProjectToPostUpdateResponse(
+        this IQueryable<Post> query
+    )
+    {
+        return query.Select(p => new PostUpdateResponse(
+            p.Id,
+            p.Title,
+            p.Slug,
+            p.Content,
+            p.ImageUrl,
+            p.IsPublished,
+            p.Tags
         ));
     }
 }

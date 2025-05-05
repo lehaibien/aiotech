@@ -4,12 +4,12 @@ using Application.Abstractions;
 using Application.Categories.Dtos;
 using Application.Helpers;
 using Application.Images;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Application.Shared;
 
 namespace Application.Categories;
 
@@ -72,11 +72,18 @@ public class CategoryService : ICategoryService
         }
 
         var dtoQuery = categoryQuery.ProjectToCategoryResponse();
-        var result = await PaginatedList<CategoryResponse>.CreateAsync(dtoQuery, request.PageIndex, request.PageSize, cancellationToken);
+        var result = await PaginatedList<CategoryResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
         return Result<PaginatedList<CategoryResponse>>.Success(result);
     }
 
-    public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<List<CategoryResponse>>> GetFeaturedAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         var cacheResult = await _cacheService.GetAsync<List<CategoryResponse>>(
             CacheKeys.FeaturedCategories
@@ -95,7 +102,10 @@ public class CategoryService : ICategoryService
         return Result<List<CategoryResponse>>.Success(result);
     }
 
-    public async Task<Result<CategoryResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<CategoryResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork.GetRepository<Category>().GetByIdAsync(id);
         if (entity is null)
@@ -162,13 +172,16 @@ public class CategoryService : ICategoryService
         entity = request.ApplyToCategory(entity);
         entity.UpdatedDate = DateTime.UtcNow;
         entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
-        if(request.IsImageEdited)
+        if (request.IsImageEdited)
         {
-            if(!string.IsNullOrWhiteSpace(entity.ImageUrl))
+            if (!string.IsNullOrWhiteSpace(entity.ImageUrl))
             {
                 await _storageService.DeleteFromUrlAsync(entity.ImageUrl);
             }
-            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Branding);
+            var optimizedImage = await _imageService.OptimizeAsync(
+                request.Image,
+                ImageType.Branding
+            );
             if (optimizedImage.IsFailure)
             {
                 return Result<CategoryResponse>.Failure(optimizedImage.Message);
@@ -222,7 +235,9 @@ public class CategoryService : ICategoryService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await _unitOfWork
             .GetRepository<Category>()
