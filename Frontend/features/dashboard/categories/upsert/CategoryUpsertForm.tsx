@@ -1,33 +1,38 @@
 "use client";
 
+import { MantineImageUploader } from "@/components/core/MantineImageUploader";
 import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
+import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
 import { postApi, putApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
 import { categoryRequestSchema } from "@/schemas/categorySchema";
 import { CategoryRequest, CategoryResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, FormControl, FormLabel, Typography } from "@mui/material";
+import { Button, Group, Input, Stack } from "@mantine/core";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import ImageUpload from "./ImageUpload";
 
 type CategoryUpsertFormProps = {
-  category: CategoryResponse;
+  defaultValue: CategoryResponse;
 };
 
-export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
+export const CategoryUpsertForm = ({
+  defaultValue,
+}: CategoryUpsertFormProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [isImageChanged, setIsImageChanged] = useState(false);
+
   const { control, handleSubmit } = useForm<CategoryRequest>({
-    defaultValues: category as CategoryRequest,
+    defaultValues: defaultValue,
     resolver: zodResolver(categoryRequestSchema),
   });
   const onSubmit = async (data: CategoryRequest) => {
@@ -39,16 +44,16 @@ export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
     };
     const formData = convertObjectToFormData(request);
     try {
-      const action = category.id === EMPTY_UUID ? postApi : putApi;
+      const action = data.id === EMPTY_UUID ? postApi : putApi;
+      const method = data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật";
       const response = await action(API_URL.category, formData);
       if (response.success) {
-        const message = category.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật";
-        enqueueSnackbar(message + " danh mục thành công", {
+        enqueueSnackbar(method + " danh mục thành công", {
           variant: "success",
         });
         router.push("/dashboard/categories");
       } else {
-        enqueueSnackbar("Lỗi xảy ra: " + response.message, {
+        enqueueSnackbar(method + " danh mục thất bại: " + response.message, {
           variant: "error",
         });
       }
@@ -62,11 +67,14 @@ export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
   useEffect(() => {
     const getImage = async (url: string) => {
       if (!url) return undefined;
-
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          mode: "cors",
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch image");
+        if (!response.ok) {
+          throw new Error("Failed to fetch image");
+        }
 
         const blob = await response.blob();
         return new File([blob], url.substring(url.lastIndexOf("/") + 1));
@@ -76,81 +84,62 @@ export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
       }
     };
 
-    getImage(category.imageUrl)
+    getImage(defaultValue.imageUrl)
       .then(setImage)
       .catch((err) => console.error("Image processing error:", err));
-  }, [category.imageUrl]);
+  }, [defaultValue.imageUrl]);
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Stack component="form" onSubmit={handleSubmit(onSubmit)}>
+      <ControlledTextInput control={control} name="id" type="hidden" />
       <ControlledTextInput
         control={control}
-        name="id"
-        type="hidden"
-        sx={{
-          display: "none",
-        }}
+        name="name"
+        required
+        size="sm"
+        label="Tên danh mục"
       />
-      <FormControl margin="normal" fullWidth>
-        <FormLabel htmlFor="name" required>
-          Tên danh mục
-        </FormLabel>
-        <ControlledTextInput
-          control={control}
-          name="name"
-          required
-          fullWidth
-          size="small"
-        />
-      </FormControl>
-      <FormControl
-        margin="normal"
-        sx={{
-          width: "30%",
-        }}
-      >
-        <Typography variant="h6" className="mb-4">
-          Ảnh danh mục
-        </Typography>
-        <ImageUpload
-          image={image}
-          onUpload={(img) => {
+      <div>
+        <Input.Label required>Hình ảnh</Input.Label>
+        <MantineImageUploader
+          onDrop={(files) => {
+            setImage(files[0]);
             setIsImageChanged(true);
-            setImage(img);
           }}
         />
-      </FormControl>
-      <FormControl
-        margin="normal"
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-end",
-          gap: 1,
-        }}
-        fullWidth
-      >
+        <Image
+          src={image ? URL.createObjectURL(image) : "/image-not-found.jpg"}
+          width={600}
+          height={400}
+          alt="hero banner"
+          style={{
+            marginTop: 8,
+            objectFit: "fill",
+            maxWidth: "100%",
+            maxHeight: "100%",
+            aspectRatio: IMAGE_ASPECT_RATIO.BRANDING,
+          }}
+        />
+      </div>
+      <Group justify="flex-end">
         <Button
           type="button"
-          LinkComponent={Link}
+          component={Link}
           href="/dashboard/categories"
-          variant="contained"
+          variant="filled"
+          color="red"
           disabled={isLoading}
         >
           Hủy
         </Button>
         <Button
           type="submit"
-          variant="contained"
-          color="primary"
+          variant="filled"
           disabled={isLoading}
+          loading={isLoading}
         >
-          {isLoading
-            ? "Đang xử lý..."
-            : category.id === EMPTY_UUID
-            ? "Thêm mới"
-            : "Cập nhật"}
+          {defaultValue.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
         </Button>
-      </FormControl>
-    </form>
+      </Group>
+    </Stack>
   );
 };

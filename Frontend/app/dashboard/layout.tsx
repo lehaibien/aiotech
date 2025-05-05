@@ -1,27 +1,68 @@
-import DashboardMenuProvider from '@/contexts/DashboardMenuProvider';
-import AppNavbar from '@/components/layout/dashboard/AppNavbar';
-import Header from '@/components/layout/dashboard/Header';
-import MainContent from '@/components/layout/dashboard/MainContent';
-import Box from '@mui/material/Box';
-import dayjs from 'dayjs';
-import 'dayjs/locale/vi'; // You might need this if you want Vietnamese locale support later.
-import * as React from 'react';
+"use client";
 
-dayjs.locale('vi');
+import { BrandLogo } from "@/components/core/BrandLogo";
+import { ColorSchemeSwitch } from "@/components/core/ColorSchemeSwitch";
+import { AccountSection } from "@/components/layout/dashboard/AccountSection";
+import { MenuContent } from "@/components/layout/dashboard/MenuContent";
+import { AppShell, Burger, Group } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
-export default async function Dashboard({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+
   return (
-    <DashboardMenuProvider>
-      <Box display='flex' flexDirection='column'>
-        <Header />
-        <AppNavbar />
-        {/* Main content */}
-        <MainContent>{children}</MainContent>
-      </Box>
-    </DashboardMenuProvider>
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{
+        width: 300,
+        breakpoint: "sm",
+        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+      }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Group
+          h="100%"
+          px="md"
+          justify="space-between"
+          align="center"
+          wrap="nowrap"
+        >
+          <Group wrap="nowrap">
+            <Burger
+              opened={mobileOpened}
+              onClick={toggleMobile}
+              hiddenFrom="sm"
+              size="sm"
+            />
+            <Burger
+              opened={desktopOpened}
+              onClick={toggleDesktop}
+              visibleFrom="sm"
+              size="sm"
+            />
+            <BrandLogo
+              display={{
+                base: "none",
+                md: "inline-block",
+              }}
+            />
+          </Group>
+          <Group wrap="nowrap" gap='sm'>
+            <ColorSchemeSwitch />
+            <AccountSection />
+          </Group>
+        </Group>
+      </AppShell.Header>
+      <AppShell.Navbar p="md">
+        <MenuContent />
+      </AppShell.Navbar>
+      <AppShell.Main>{children}</AppShell.Main>
+    </AppShell>
   );
 }

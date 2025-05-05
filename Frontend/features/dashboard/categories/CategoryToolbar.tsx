@@ -1,7 +1,7 @@
 import { DataTableSearchInput } from "@/components/data-table/DataTableSearchInput";
 import { API_URL } from "@/constant/apiUrl";
 import { deleteListApi } from "@/lib/apiClient";
-import { PostResponse } from "@/types";
+import { CategoryResponse } from "@/types";
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { debounce } from "@mui/material";
@@ -9,15 +9,15 @@ import { Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useMemo } from "react";
 
-type PostToolbarProps = {
-  selectedRows: PostResponse[];
+type CategoryToolbarProps = {
+  selectedRows: CategoryResponse[];
   onSearch: (searchTerm: string) => void;
 };
 
-export const PostToolbar = ({
+export const CategoryToolbar = ({
   selectedRows,
   onSearch,
-}: PostToolbarProps) => {
+}: CategoryToolbarProps) => {
   const handleDelete = async () => {
     if (selectedRows.length === 0) {
       notifications.show({
@@ -28,7 +28,7 @@ export const PostToolbar = ({
       return;
     }
     const ids = selectedRows.map((row) => row.id);
-    const response = await deleteListApi(API_URL.post, ids);
+    const response = await deleteListApi(API_URL.category, ids);
     if (response.success) {
       notifications.show({
         title: "Hệ thống",
@@ -62,7 +62,7 @@ export const PostToolbar = ({
           variant="filled"
           leftSection={<Plus />}
           component={Link}
-          href="/dashboard/posts/upsert"
+          href="/dashboard/categories/upsert"
         >
           Thêm mới
         </Button>

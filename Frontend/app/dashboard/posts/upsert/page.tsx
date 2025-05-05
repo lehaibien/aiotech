@@ -1,11 +1,10 @@
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { PostUpsertForm } from "@/features/dashboard/posts/upsert/PostUpsertForm";
-import { getByIdApi } from "@/lib/apiClient";
-import dayjs from "@/lib/extended-dayjs";
+import { getApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
-import { PostResponse, SearchParams } from "@/types";
-import { Stack, Typography } from "@mui/material";
+import { PostUpdateResponse, SearchParams } from "@/types";
+import { Stack, Title } from "@mantine/core";
 
 export default async function UpsertPage({
   searchParams,
@@ -14,27 +13,27 @@ export default async function UpsertPage({
 }) {
   const { id } = await searchParams;
   const parsedId = parseUUID(id);
-  let post: PostResponse = {
+  let post: PostUpdateResponse = {
     id: EMPTY_UUID,
     title: "",
+    slug: "",
     content: "",
     imageUrl: "",
     isPublished: false,
     tags: [],
-    createdDate: dayjs().toDate(),
   };
   if (parsedId !== EMPTY_UUID) {
-    const response = await getByIdApi(API_URL.post, { id: parsedId });
+    const response = await getApi(API_URL.post + `/${parsedId}/update`);
     if (response.success) {
-      post = response.data as PostResponse;
+      post = response.data as PostUpdateResponse;
     }
   }
   return (
-    <Stack spacing={2}>
-      <Typography component="h1" variant="h4">
+    <Stack>
+      <Title order={4}>
         {post.id === null || post.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}{" "}
         bài viết
-      </Typography>
+      </Title>
       <PostUpsertForm post={post} />
     </Stack>
   );

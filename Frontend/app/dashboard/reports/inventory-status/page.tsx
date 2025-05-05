@@ -1,10 +1,10 @@
 import { API_URL } from "@/constant/apiUrl";
+import { InventoryStatusReportFilter } from "@/features/dashboard/reports/inventory-status/InventoryStatusReportFilter";
+import { InventoryStatusReportGrid } from "@/features/dashboard/reports/inventory-status/InventoryStatusReportGrid";
 import { getApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, SearchParams } from "@/types";
-import { Stack, Typography } from "@mui/material";
-import InventoryStatusReportFilter from "./InventoryStatusReportFilter";
-import InventoryStatusReportGrid from "./InventoryStatusReportGrid";
+import { Stack, Title } from "@mantine/core";
 
 export default async function OutOfStockReportPage({
   searchParams,
@@ -26,8 +26,8 @@ export default async function OutOfStockReportPage({
   const categoryList = (categoryComboboxResponse.data as ComboBoxItem[]) ?? [];
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">Thống kê trạng thái kho</Typography>
+    <Stack>
+      <Title order={5}>Thống kê trạng thái kho</Title>
       <InventoryStatusReportFilter
         brandList={brandList}
         categoryList={categoryList}

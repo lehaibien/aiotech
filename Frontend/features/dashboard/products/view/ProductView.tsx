@@ -1,18 +1,22 @@
-import { ProductDetailResponse } from '@/types';
-import { CheckCircle, Warning } from '@mui/icons-material';
+"use client";
+
+import { HtmlContent } from "@/components/core/HtmlContent";
+import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { ProductDetailResponse } from "@/types";
 import {
-  Box,
   Button,
-  Chip,
   Divider,
   Grid,
-  Paper,
+  Group,
+  Pill,
   Stack,
-  Typography,
-} from '@mui/material';
-import Link from 'next/link';
-import ProductImageView from './ProductImageView';
-import { HtmlContent } from '@/components/core/HtmlContent';
+  Text,
+  Title,
+} from "@mantine/core";
+import { CheckCircle, CircleAlert } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ProductImageView } from "./ProductImageView";
 
 type ProductViewProps = {
   product: ProductDetailResponse;
@@ -20,195 +24,129 @@ type ProductViewProps = {
 
 export default function ProductView({ product }: ProductViewProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-        }}>
-        <Typography
-          variant='h3'
-          component='h1'
-          sx={{
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}>
-          {product.name}
-          <Chip
-            label={product.isFeatured ? 'Nổi bật' : 'Thường'}
-            color={product.isFeatured ? 'primary' : 'default'}
-            size='small'
-          />
-        </Typography>
-      </Box>
+    <Stack>
+      <Group>
+        <Title order={3}>{product.name}</Title>
+        <Pill c={product.isFeatured ? "blue" : "dimmed"}>
+          {product.isFeatured ? "Sản phẩm nổi bật" : "Sản phẩm thường"}
+        </Pill>
+      </Group>
 
-      <Grid
-        container
-        spacing={4}>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Paper
-            elevation={3}
-            sx={{
-              padding: 2,
-              mb: 2,
-            }}>
-            <Typography
-              variant='h5'
-              gutterBottom>
-              Thông tin chung
-            </Typography>
+      <Grid>
+        <Grid.Col span={{ base: 12, md: 9 }}>
+          <Title order={6}>Thông tin chung</Title>
 
-            <Stack
-              spacing={2}
-              divider={<Divider flexItem />}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  SKU:
-                </Typography>
-                <Typography variant='body1'>{product.sku}</Typography>
-              </Box>
+          <Stack>
+            <Group justify="space-between">
+              <Text>SKU:</Text>
+              <Text>{product.sku}</Text>
+            </Group>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Giá niêm yết:
-                </Typography>
-                <Typography variant='body1'>
-                  {product.price.toLocaleString()} đ
-                </Typography>
-              </Box>
+            <Divider />
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Giá khuyến mãi:
-                </Typography>
-                <Typography
-                  variant='body1'
-                  color={product.discountPrice ? 'success' : undefined}>
-                  {product.discountPrice
-                    ? `${product.discountPrice.toLocaleString()} đ`
-                    : '-'}
-                </Typography>
-              </Box>
+            <Group justify="space-between">
+              <Text>Giá niêm yết:</Text>
+              <Text>{product.price.toLocaleString()} đ</Text>
+            </Group>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Tồn kho:
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {product.stock > 0 ? (
-                    <>
-                      <CheckCircle
-                        color='success'
-                        fontSize='small'
-                      />
-                      <Typography variant='body1'>{product.stock}</Typography>
-                    </>
-                  ) : (
-                    <>
-                      <Warning
-                        color='error'
-                        fontSize='small'
-                      />
-                      <Typography
-                        variant='body1'
-                        color='error'>
-                        Hết hàng
-                      </Typography>
-                    </>
-                  )}
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Thương hiệu:
-                </Typography>
-                <Typography variant='body1'>{product.brand}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Danh mục:
-                </Typography>
-                <Typography variant='body1'>{product.category}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Thẻ:
-                </Typography>
-                <Typography variant='body1'>
-                  {product.tags.join(', ')}
-                </Typography>
-              </Box>
-              <Stack>
-                <Typography
-                  variant='body2'
-                  color='text.secondary'>
-                  Mô tả:
-                </Typography>
-                <HtmlContent content={product.description} />
-              </Stack>
+            <Divider />
+
+            <Group justify="space-between">
+              <Text>Giá khuyến mãi:</Text>
+              <Text c={product.discountPrice ? "green" : "default"}>
+                {product.discountPrice
+                  ? `${product.discountPrice.toLocaleString()} đ`
+                  : "-"}
+              </Text>
+            </Group>
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Text>Tồn kho:</Text>
+              <Group gap="xs">
+                {product.stock > 0 ? (
+                  <>
+                    <CheckCircle color="green" size={16} />
+                    <Text>{product.stock}</Text>
+                  </>
+                ) : (
+                  <>
+                    <CircleAlert color="red" size={16} />
+                    <Text c="red">Hết hàng</Text>
+                  </>
+                )}
+              </Group>
+            </Group>
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Text>Thương hiệu:</Text>
+              <Text>{product.brand}</Text>
+            </Group>
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Text>Danh mục:</Text>
+              <Text>{product.category}</Text>
+            </Group>
+
+            <Divider />
+
+            <Group justify="space-between">
+              <Text>Thẻ:</Text>
+              <Text>{product.tags.join(", ")}</Text>
+            </Group>
+
+            <Divider />
+
+            <Stack gap='xs'>
+              <Text>Mô tả:</Text>
+              <HtmlContent content={product.description} />
             </Stack>
-          </Paper>
-        </Grid>
+          </Stack>
+        </Grid.Col>
 
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Paper
-            elevation={3}
-            sx={{
-              padding: 2,
-              mb: 2,
-            }}>
-            <Typography
-              variant='h5'
-              gutterBottom>
-              Ảnh sản phẩm
-            </Typography>
-            <ProductImageView images={product.imageUrls} />
-          </Paper>
-        </Grid>
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <Stack>
+            <Title order={6}>Ảnh đại diện</Title>
+            <Image
+              src={product.imageUrls[0]}
+              alt={product.name}
+              width={300}
+              height={300}
+              style={{
+                objectFit: "fill",
+                height: "100%",
+                width: "100%",
+                aspectRatio: IMAGE_ASPECT_RATIO.PRODUCT,
+                backgroundColor: "white",
+                padding: "var(--mantine-spacing-xs)",
+              }}
+            />
+            <Title order={6}>Hình ảnh chi tiết</Title>
+            <ProductImageView imageUrls={product.imageUrls} />
+          </Stack>
+        </Grid.Col>
       </Grid>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          gap: 2,
-          '& .MuiButton-root': {
-            minWidth: 120,
-            textTransform: 'none',
-            fontWeight: 600,
-          },
-        }}>
+      <Group justify="flex-end">
         <Button
-          variant='contained'
-          color='inherit'
-          LinkComponent={Link}
-          href='/dashboard/products'>
+          variant="outline"
+          component={Link}
+          href="/dashboard/products"
+        >
           Quay lại
         </Button>
         <Button
-          variant='contained'
-          color='primary'
-          LinkComponent={Link}
-          href={`/dashboard/products/upsert?id=${product.id}`}>
+          component={Link}
+          href={`/dashboard/products/upsert?id=${product.id}`}
+        >
           Chỉnh sửa
         </Button>
-      </Box>
-    </Box>
+      </Group>
+    </Stack>
   );
 }

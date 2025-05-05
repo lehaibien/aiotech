@@ -1,27 +1,28 @@
 "use client";
 
-import ControlledComboBox from "@/components/form/ControlledComboBox";
+import { MantineImageUploader } from "@/components/core/MantineImageUploader";
+import { ControlledCombobox } from "@/components/form/ControlledMantineCombobox";
+import { ControlledPillInput } from "@/components/form/ControlledPillInput";
+import { ControlledRichTextEditor } from "@/components/form/ControlledRichTextEditor";
+import { ControlledSelect } from "@/components/form/ControlledSelect";
 import { ControlledTextInput } from "@/components/form/ControlledTextField";
-import RichTextEditor, {
-  RichTextEditorRef,
-} from "@/components/core/RichTextEditor";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
+import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
 import { postApi, putApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
 import { productRequestSchema } from "@/schemas/productSchema";
 import { ComboBoxItem } from "@/types";
 import { ProductRequest } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormLabel, Grid, Stack, Typography } from "@mui/material";
-import { MuiChipsInput } from "mui-chips-input";
+import { Button, Grid, Group, Input, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Control, FieldValues, useForm } from "react-hook-form";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
-import { FormActions } from "./ProductFormActions";
-import { ThumbnailUpload } from "./ThumbnailUpload";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
@@ -44,9 +45,6 @@ export const ProductUpsertForm = ({
   defaultThumbnail,
 }: ProductUpsertFormProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
-  const rteRef = useRef<RichTextEditorRef>(null);
-
   const { control, handleSubmit } = useForm<ProductRequest>({
     defaultValues: {
       ...product,
@@ -55,7 +53,6 @@ export const ProductUpsertForm = ({
     resolver: zodResolver(productRequestSchema),
   });
 
-  const [chips, setChips] = useState<string[]>(product.tags ?? []);
   const [thumbnail, setThumbnail] = useState<File | undefined>(undefined);
   const [images, setImages] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,8 +67,6 @@ export const ProductUpsertForm = ({
       const request: ProductRequest = {
         ...data,
         discountPrice: data.discountPrice || undefined,
-        description: rteRef.current?.content ?? "",
-        tags: chips,
         thumbnail,
         images,
       };
@@ -85,15 +80,25 @@ export const ProductUpsertForm = ({
           product.id === EMPTY_UUID
             ? "Thêm mới sản phẩm thành công"
             : "Cập nhật sản phẩm thành công";
-        enqueueSnackbar(message, { variant: "success" });
+        notifications.show({
+          title: message,
+          message: "Chuyển hướng về danh sách sản phẩm",
+          color: "green",
+        });
         router.push("/dashboard/products");
       } else {
-        enqueueSnackbar(response.message ?? "Đã xảy ra lỗi khi xử lý yêu cầu", {
-          variant: "error",
+        notifications.show({
+          title: "Đã xảy ra lỗi khi xử lý yêu cầu",
+          message: response.message ?? "Lỗi không xác định",
+          color: "red",
         });
       }
     } catch (error) {
-      enqueueSnackbar("Đã xảy ra lỗi khi xử lý yêu cầu", { variant: "error" });
+      notifications.show({
+        title: "Đã xảy ra lỗi khi xử lý yêu cầu",
+        message: (error as Error).message,
+        color: "red",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +114,9 @@ export const ProductUpsertForm = ({
             const response = await fetch(url, {
               mode: "cors",
             });
-            if (!response.ok) throw new Error("Failed to fetch image");
+            if (!response.ok) {
+              throw new Error("Failed to fetch image");
+            }
 
             const blob = await response.blob();
             return new File([blob], url.substring(url.lastIndexOf("/") + 1), {
@@ -136,163 +143,183 @@ export const ProductUpsertForm = ({
       .then((files) => setThumbnail(files[0]))
       .catch((err) => console.error("Image processing error:", err));
   }, [defaultImages, defaultThumbnail]);
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <Grid container spacing={2}>
-        <Grid size={{ sm: 12, lg: 9 }}>
-          <Typography variant="h5" gutterBottom>
-            Thông tin chung
-          </Typography>
-
-          <Grid container spacing={2}>
-            <Grid size={6}>
-              <FormLabel htmlFor="sku" required>
-                Mã sản phẩm
-              </FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="sku"
-                required
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormLabel htmlFor="name" required>
-                Tên sản phẩm
-              </FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="name"
-                required
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormLabel required>Giá nhập</FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="costPrice"
-                type="number"
-                required
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormLabel required>Giá gốc</FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="price"
-                type="number"
-                required
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormLabel>Giá khuyến mãi</FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="discountPrice"
-                type="number"
-                fullWidth
-                size="small"
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormLabel required>Số lượng tồn kho</FormLabel>
-              <ControlledTextInput
-                control={control}
-                name="stock"
-                type="number"
-                required
-                fullWidth
-                size="small"
-              />
-            </Grid>
-
-            <Grid size={6}>
-              <FormLabel required>Thương hiệu</FormLabel>
-              <ControlledComboBox
-                control={control as unknown as Control<FieldValues>}
-                name="brandId"
-                items={brands}
-                required
-                size="small"
-              />
-            </Grid>
-
-            <Grid size={6}>
-              <FormLabel required>Danh mục</FormLabel>
-              <ControlledComboBox
-                control={control as unknown as Control<FieldValues>}
-                name="categoryId"
-                items={categories}
-                required
-                size="small"
-              />
-            </Grid>
-
-            <Grid size={6}>
-              <FormLabel>Nổi bật</FormLabel>
-              <ControlledComboBox
-                control={control as unknown as Control<FieldValues>}
-                name="isFeatured"
-                items={featuredOptions}
-                required
-                size="small"
-              />
-            </Grid>
-
-            <Grid size={6}>
-              <FormLabel htmlFor="tags">Thẻ</FormLabel>
-              <MuiChipsInput
-                fullWidth
-                name="tags"
-                size="small"
-                value={chips}
-                onChange={setChips}
-                placeholder="Nhập và nhấn Enter để thêm thẻ"
-              />
-            </Grid>
-
-            <Grid size={12}>
-              <Typography variant="h5" gutterBottom>
-                Mô tả
-              </Typography>
-              <RichTextEditor
-                ref={rteRef}
-                defaultContent={product.description ?? ""}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid size={{ sm: 12, lg: 3 }}>
-          <Stack spacing={2}>
-            <Typography variant="h5" gutterBottom>
-              Ảnh đại diện
-            </Typography>
-            <ThumbnailUpload image={thumbnail} onUpload={setThumbnail} />
-          </Stack>
-          <Stack spacing={2}>
-            <Typography variant="h5" gutterBottom>
-              Ảnh sản phẩm
-            </Typography>
-            <ImageUpload
-              images={images}
-              onUpload={setImages}
-              onDelete={handleDeleteImage}
-              onReorder={setImages}
+    <Grid component="form" onSubmit={handleSubmit(onSubmit)}>
+      <Grid.Col span={{ sm: 12, lg: 9 }}>
+        <Grid>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="sku"
+              required
+              size="sm"
+              label="Mã sản phẩm"
             />
-          </Stack>
-        </Grid>
-      </Grid>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="name"
+              required
+              size="sm"
+              label="Tên sản phẩm"
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="costPrice"
+              type="number"
+              required
+              size="sm"
+              label="Giá nhập"
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="price"
+              type="number"
+              required
+              size="sm"
+              label="Giá bán gốc"
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="discountPrice"
+              type="number"
+              size="sm"
+              label="Giá khuyến mãi"
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ControlledTextInput
+              control={control}
+              name="stock"
+              type="number"
+              required
+              size="sm"
+              label="Số lượng tồn kho"
+            />
+          </Grid.Col>
 
-      <FormActions isLoading={isLoading} isNew={product.id === EMPTY_UUID} />
-    </form>
+          <Grid.Col span={6}>
+            <ControlledCombobox
+              control={control}
+              name="brandId"
+              options={brands}
+              required
+              size="sm"
+              label="Thương hiệu"
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <ControlledCombobox
+              control={control}
+              name="categoryId"
+              options={categories}
+              required
+              size="sm"
+              label="Danh mục"
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <ControlledSelect
+              control={control}
+              name="isFeatured"
+              options={featuredOptions}
+              required
+              size="sm"
+              label="Nổi bật"
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <ControlledPillInput
+              control={control}
+              name="tags"
+              size="sm"
+              label="Thẻ"
+              placeholder="Nhập thẻ"
+            />
+          </Grid.Col>
+
+          <Grid.Col span={12}>
+            <ControlledRichTextEditor
+              control={control}
+              name="description"
+              required
+              label="Mô tả"
+              mih={400}
+            />
+          </Grid.Col>
+        </Grid>
+      </Grid.Col>
+
+      <Grid.Col span={{ sm: 12, lg: 3 }}>
+        <Stack gap="xs">
+          <Input.Label required>Ảnh đại diện</Input.Label>
+          <MantineImageUploader
+            onDrop={(files) => {
+              setThumbnail(files[0]);
+              // setIsImageChanged(true);
+            }}
+          />
+          <Image
+            src={
+              thumbnail
+                ? URL.createObjectURL(thumbnail)
+                : "/image-not-found.jpg"
+            }
+            width={300}
+            height={300}
+            alt="Thumbnail"
+            style={{
+              marginTop: 8,
+              objectFit: "fill",
+              width: "100%",
+              height: "100%",
+              backgroundColor: "white",
+              aspectRatio: IMAGE_ASPECT_RATIO.PRODUCT,
+            }}
+          />
+          <Input.Label required>Hình ảnh chi tiết</Input.Label>
+          <ImageUpload
+            images={images}
+            onDelete={handleDeleteImage}
+            onUpload={setImages}
+            onReorder={setImages}
+          />
+        </Stack>
+      </Grid.Col>
+
+      <Group
+        w="100%"
+        justify="flex-end"
+        style={{
+          position: "sticky",
+          bottom: 0,
+          right: 0,
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          component={Link}
+          href="/dashboard/products"
+          type="button"
+          variant="outline"
+          disabled={isLoading}
+        >
+          Hủy
+        </Button>
+        <Button type="submit" disabled={isLoading} loading={isLoading}>
+          {product.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+        </Button>
+      </Group>
+    </Grid>
   );
 };

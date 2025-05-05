@@ -25,7 +25,7 @@ export const MantineImageUploader = ({
     >
       <Group
         justify="center"
-        gap="xl"
+        gap="md"
         mih={120}
         style={{ pointerEvents: "none" }}
       >
@@ -39,7 +39,7 @@ export const MantineImageUploader = ({
           <ImageIcon size={48} />
         </Dropzone.Idle>
 
-        <Stack gap={4}>
+        <Stack gap='sm'>
           <Text size="sm">Thả hình ảnh vào đây hoặc chọn tệp để tải lên</Text>
           <Text size="sm">
             Chỉ chấp nhận hình ảnh có định dạng JPG, JPEG, PNG, GIF, WEBP và

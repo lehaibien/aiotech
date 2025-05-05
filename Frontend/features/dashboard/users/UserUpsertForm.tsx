@@ -1,30 +1,21 @@
-'use client';
+"use client";
 
-import ControlledComboBox from '@/components/form/ControlledComboBox';
-import { ControlledTextInput } from '@/components/form/ControlledTextField';
-import { API_URL } from '@/constant/apiUrl';
-import { EMPTY_UUID } from '@/constant/common';
-import { postApi, putApi } from '@/lib/apiClient';
-import { convertObjectToFormData } from '@/lib/utils';
-import { userRequestSchema } from '@/schemas/userSchema';
-import { ComboBoxItem, UserRequest, UserResponse } from '@/types';
-import { zodResolver } from '@hookform/resolvers/zod';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import {
-  Avatar,
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  IconButton,
-  Stack,
-} from '@mui/material';
-import TextField from '@mui/material/TextField';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useSnackbar } from 'notistack';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { ControlledCombobox } from "@/components/form/ControlledMantineCombobox";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
+import { API_URL } from "@/constant/apiUrl";
+import { EMPTY_UUID } from "@/constant/common";
+import { postApi, putApi } from "@/lib/apiClient";
+import { convertObjectToFormData } from "@/lib/utils";
+import { userRequestSchema } from "@/schemas/userSchema";
+import { ComboBoxItem, UserRequest, UserResponse } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Avatar, Button, Grid, Group, Input, TextInput } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { CloudUpload } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 type UserUpsertFormProps = {
   data: UserResponse;
@@ -32,12 +23,11 @@ type UserUpsertFormProps = {
 };
 
 export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
-  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [avatarPreview, setAvatarPreview] = useState(data.avatarUrl);
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, setValue, control } = useForm<UserRequest>({
-    defaultValues: { ...data, password: '' },
+    defaultValues: { ...data, password: "" },
     resolver: zodResolver(userRequestSchema),
   });
   const onSubmit = async (request: UserRequest) => {
@@ -45,21 +35,27 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
     const formData = convertObjectToFormData(request);
     try {
       const action = data.id === EMPTY_UUID ? postApi : putApi;
-      const actionMessage = data.id === EMPTY_UUID ? 'Thêm mới' : 'Cập nhật';
+      const actionMessage = data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật";
       const response = await action(API_URL.user, formData);
       if (response.success) {
-        enqueueSnackbar(`${actionMessage} tài khoản thành công`, {
-          variant: 'success',
+        notifications.show({
+          title: "Thông báo",
+          message: `${actionMessage} tài khoản thành công`,
+          color: "green",
         });
-        router.push('/dashboard/users');
+        router.push("/dashboard/users");
       } else {
-        enqueueSnackbar('Lỗi xảy ra: ' + response.message, {
-          variant: 'error',
+        notifications.show({
+          title: "Thông báo",
+          message: `${actionMessage} tài khoản thất bại`,
+          color: "red",
         });
       }
     } catch (err) {
-      enqueueSnackbar('Lỗi xảy ra: ' + (err as Error).message, {
-        variant: 'error',
+      notifications.show({
+        title: "Thông báo",
+        message: "Lỗi xảy ra: " + (err as Error).message,
+        color: "red",
       });
     }
     setIsLoading(false);
@@ -67,184 +63,164 @@ export function UserUpsertForm({ data, roleCombobox }: UserUpsertFormProps) {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setValue('image', file);
+      setValue("image", file);
       setAvatarPreview(URL.createObjectURL(file));
     }
   };
   return (
-    <Stack
-      component='form'
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      spacing={2}>
-      <TextField
-        type='hidden'
-        {...register('id')}
-        sx={{
-          display: 'none',
+    <Grid component="form" onSubmit={handleSubmit(onSubmit)}>
+      <TextInput type="hidden" {...register("id")} display="none" />
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
         }}
-      />
-      <Box
-        sx={{
-          display: { sm: 'block', md: 'flex' },
-          gap: 2,
-        }}>
-        <FormControl fullWidth>
-          <FormLabel
-            htmlFor='userName'
-            required>
-            Tên tài khoản
-          </FormLabel>
-          <ControlledTextInput
-            required
-            control={control}
-            name='userName'
-            size='small'
-            autoFocus
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel
-            htmlFor='email'
-            required>
-            Email
-          </FormLabel>
-          <ControlledTextInput
-            required
-            control={control}
-            name='email'
-            size='small'
-            type='email'
-            autoComplete='email'
-          />
-        </FormControl>
-      </Box>
-      <Box
-        sx={{
-          display: { sm: 'block', md: 'flex' },
-          gap: 2,
-        }}>
-        <FormControl fullWidth>
-          <FormLabel
-            htmlFor='familyName'
-            required>
-            Họ
-          </FormLabel>
-          <ControlledTextInput
-            required
-            control={control}
-            name='familyName'
-            size='small'
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel
-            htmlFor='givenName'
-            required>
-            Tên
-          </FormLabel>
-          <ControlledTextInput
-            required
-            control={control}
-            name='givenName'
-            size='small'
-          />
-        </FormControl>
-      </Box>
-
-      <Box
-        sx={{
-          display: { sm: 'block', md: 'flex' },
-          gap: 2,
-        }}>
-        <FormControl fullWidth>
-          <FormLabel htmlFor='phoneNumber'>Số điện thoại</FormLabel>
-          <ControlledTextInput
-            control={control}
-            name='phoneNumber'
-            size='small'
-            type='tel'
-            autoComplete='tel'
-          />
-        </FormControl>
-        <FormControl fullWidth>
-          <FormLabel
-            htmlFor='roleId'
-            required>
-            Vai trò
-          </FormLabel>
-          <ControlledComboBox
-            control={control}
-            items={roleCombobox}
-            name='roleId'
-            size='small'
-            compareBy='text'
-          />
-        </FormControl>
-      </Box>
-      <FormControl fullWidth>
-        <FormLabel htmlFor='password'>Password</FormLabel>
+      >
         <ControlledTextInput
           control={control}
-          name='password'
-          size='small'
-          type='password'
-          autoComplete='current-password'
+          name="userName"
+          size="sm"
+          autoFocus
+          label="Tên tài khoản"
+          required
         />
-      </FormControl>
-      <FormControl fullWidth>
-        <FormLabel htmlFor='avatar-upload'>Hình ảnh</FormLabel>
-        <Box>
+      </Grid.Col>
+
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledTextInput
+          control={control}
+          name="email"
+          size="sm"
+          type="email"
+          autoComplete="email"
+          label="Email"
+          required
+        />
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledTextInput
+          control={control}
+          name="familyName"
+          size="sm"
+          label="Họ"
+        />
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledTextInput
+          control={control}
+          name="givenName"
+          size="sm"
+          label="Tên"
+          required
+        />
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledTextInput
+          control={control}
+          name="phoneNumber"
+          size="sm"
+          type="tel"
+          autoComplete="tel"
+          label="Số điện thoại"
+        />
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledCombobox
+          control={control}
+          options={roleCombobox}
+          name="roleId"
+          label="Vai trò"
+          required
+        />
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 6,
+        }}
+      >
+        <ControlledTextInput
+          control={control}
+          name="password"
+          size="sm"
+          type="password"
+          autoComplete="current-password"
+          label="Mật khẩu"
+          required
+        />
+      </Grid.Col>
+      <Grid.Col span={12}>
+        <Input.Label htmlFor="avatar-upload">Hình ảnh</Input.Label>
+        <div>
           <input
-            accept='image/*'
-            id='avatar-upload'
-            name='avatar-upload'
-            type='file'
+            accept="image/*"
+            id="avatar-upload"
+            name="avatar-upload"
+            type="file"
             hidden
             onChange={handleAvatarChange}
           />
-          <label htmlFor='avatar-upload'>
-            <IconButton
-              disableRipple
-              component='span'>
-              <Avatar
-                src={avatarPreview}
-                sx={{ width: 100, height: 100, mb: 1 }}
+          <label htmlFor="avatar-upload">
+            <Button
+              variant="transparent"
+              color="gray"
+              h="100%"
+              component="span"
+              pos="relative"
+            >
+              <Avatar src={avatarPreview} h={100} w={100} radius="50%" />
+              <CloudUpload
+                style={{ position: "absolute", bottom: 0, right: 8 }}
               />
-              <CloudUploadIcon
-                sx={{ position: 'absolute', bottom: 8, right: 8 }}
-              />
-            </IconButton>
+            </Button>
           </label>
-        </Box>
-      </FormControl>
-      <FormControl
-        fullWidth
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          gap: 1,
-        }}>
-        <Button
-          type='button'
-          LinkComponent={Link}
-          href='/dashboard/users'
-          variant='contained'
-          disabled={isLoading}>
-          Hủy
-        </Button>
-        <Button
-          type='submit'
-          variant='contained'
-          color='primary'>
-          {isLoading
-            ? 'Đang xử lý...'
-            : data.id === EMPTY_UUID
-            ? 'Thêm mới'
-            : 'Cập nhật'}
-        </Button>
-      </FormControl>
-    </Stack>
+        </div>
+      </Grid.Col>
+      <Grid.Col
+        span={{
+          base: 12,
+          md: 12,
+        }}
+      >
+        <Group justify="flex-end">
+          <Button
+            type="button"
+            component={Link}
+            href="/dashboard/users"
+            disabled={isLoading}
+          >
+            Hủy
+          </Button>
+          <Button type="submit" disabled={isLoading} loading={isLoading}>
+            {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"}
+          </Button>
+        </Group>
+      </Grid.Col>
+    </Grid>
   );
 }

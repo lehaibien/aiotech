@@ -1,14 +1,13 @@
 "use client";
 
 import { BrandLogo } from "@/components/core/BrandLogo";
-import ColorSchemeSwitch from "@/components/core/ColorSchemeSwitch";
+import { ColorSchemeSwitch } from "@/components/core/ColorSchemeSwitch";
+import { DashboardMenuContext } from "@/contexts/DashboardMenuProvider";
 import { Menu } from "@mui/icons-material";
 import { Box, IconButton, Typography } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import * as React from "react";
-import AccountSection from "../dashboard/Account";
-import Searchbar from "../dashboard/SearchBar";
-import { DashboardMenuContext } from "@/contexts/DashboardMenuProvider";
+import AccountSection from "../dashboard/AccountSection";
 
 export default function ShipperHeader() {
   const [open, setOpen] = React.useContext(DashboardMenuContext);
@@ -52,7 +51,6 @@ export default function ShipperHeader() {
         </IconButton>
       </Box>
       <Stack direction="row" sx={{ gap: 1 }}>
-        <Searchbar />
         <ColorSchemeSwitch />
         <AccountSection />
       </Stack>

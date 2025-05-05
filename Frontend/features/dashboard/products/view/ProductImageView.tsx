@@ -1,30 +1,30 @@
 "use client";
 
-import { ImageList, ImageListItem } from "@mui/material";
+import { SimpleGrid } from "@mantine/core";
 import Image from "next/image";
 
 type ProductImageViewProps = {
-  images: string[];
+  imageUrls: string[];
 };
 
-export default function ProductImageView({ images }: ProductImageViewProps) {
+export const ProductImageView = ({ imageUrls }: ProductImageViewProps) => {
   return (
-    <ImageList variant="masonry" cols={2} gap={8}>
-      {images.map((imgUrl) => (
-        <ImageListItem key={imgUrl}>
-          <Image
-            src={imgUrl}
-            alt="Product image"
-            width={300}
-            height={300}
-            style={{
-              width: "100%",
-              height: "auto",
-              borderRadius: "4px",
-            }}
-          />
-        </ImageListItem>
+    <SimpleGrid cols={2}>
+      {imageUrls.map((url) => (
+        <Image
+          key={url}
+          src={url}
+          alt="Product image"
+          width={300}
+          height={300}
+          style={{
+            width: "100%",
+            height: "auto",
+            backgroundColor: 'white',
+            padding: 'var(--mantine-spacing-xs)'
+          }}
+        />
       ))}
-    </ImageList>
+    </SimpleGrid>
   );
-}
+};

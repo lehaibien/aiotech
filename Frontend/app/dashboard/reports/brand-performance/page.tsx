@@ -1,13 +1,14 @@
 import { API_URL } from "@/constant/apiUrl";
+import { BrandPerformanceCardGrid } from "@/features/dashboard/reports/brand-performance/BrandPerformanceCardGrid";
+import { BrandPerformanceChart } from "@/features/dashboard/reports/brand-performance/BrandPerformanceChart";
+import { BrandPerformanceGrid } from "@/features/dashboard/reports/brand-performance/BrandPerformanceGrid";
 import { getListApi } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import {
   BrandPerformanceReportRequest,
   BrandPerformanceReportResponse,
 } from "@/types";
-import { Box, Stack, Typography } from "@mui/material";
-import { BrandPerformanceChart } from "./BrandPerformanceChart";
-import { BrandPerformanceGrid } from "./BrandPerformanceGrid";
+import { Stack, Title } from "@mantine/core";
 
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
@@ -21,8 +22,8 @@ export default async function BrandPerformancePage({
   const startDate = start_date ? dayjs(start_date) : dayjs().startOf("year");
   const endDate = end_date ? dayjs(end_date) : dayjs().endOf("year");
   const request: BrandPerformanceReportRequest = {
-    startDate: startDate.toJSON(),
-    endDate: endDate.toJSON(),
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
   };
   const response = await getListApi(API_URL.brandPerformanceReport, request);
   if (response.success) {
@@ -34,28 +35,19 @@ export default async function BrandPerformancePage({
   const top10Categories = data
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 10);
-
+  const highestBrand = data.sort((a, b) => b.totalRevenue - a.totalRevenue)[0];
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">Báo cáo hiệu suất thương hiệu</Typography>
-
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Top 10 thương hiệu theo doanh thu
-        </Typography>
-        <Box sx={{ width: "100%", height: 400 }}>
-          <BrandPerformanceChart data={top10Categories} />
-        </Box>
-      </Box>
-
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Chi tiết hiệu suất thương hiệu
-        </Typography>
-        <Box sx={{ height: 600, width: "100%" }}>
-          <BrandPerformanceGrid data={data} />
-        </Box>
-      </Box>
+    <Stack>
+      <Title order={5}>Báo cáo hiệu suất thương hiệu</Title>
+      <BrandPerformanceCardGrid highestBrand={highestBrand} />
+      <Stack>
+        <Title order={6}>Top 10 thương hiệu theo doanh thu</Title>
+        <BrandPerformanceChart data={top10Categories} />
+      </Stack>
+      <Stack>
+        <Title order={6}>Chi tiết</Title>
+        <BrandPerformanceGrid data={data} />
+      </Stack>
     </Stack>
   );
 }

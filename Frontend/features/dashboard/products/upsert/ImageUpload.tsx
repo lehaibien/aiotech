@@ -1,10 +1,9 @@
 "use client";
 
-import { FileUpload } from "@/components/core/FileUpload";
+import { MantineImageUploader } from "@/components/core/MantineImageUploader";
 import { IMAGE_TYPES } from "@/constant/common";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { Box, Divider, ImageList, ImageListItem, Stack } from "@mui/material";
+import { Box, Group, SimpleGrid, Stack } from "@mantine/core";
+import { GripVertical, Trash } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
@@ -23,7 +22,7 @@ export const ImageUpload = ({
 }: ImageUploadProps) => {
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [dragOverItem, setDragOverItem] = useState<number | null>(null);
-  const imageListRef = useRef<HTMLUListElement>(null);
+  const imageListRef = useRef<HTMLDivElement>(null);
   const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
 
   const handleFileChange = (files: File[]) => {
@@ -77,67 +76,63 @@ export const ImageUpload = ({
   };
 
   return (
-    <Stack spacing={2}>
-      <FileUpload
-        required
+    <Stack gap="md">
+      <MantineImageUploader
+        onDrop={handleFileChange}
+        maxSize={10 * 1024 ** 2}
+        accept={IMAGE_TYPES}
         multiple
-        onChange={handleFileChange}
-        maxSize={10}
-        name="files"
-        fileTypes={IMAGE_TYPES}
       />
-      <Divider className="my-4" />
       {images.length > 0 && (
-        <ImageList
-          ref={imageListRef}
-          sx={{ width: "100%" }}
+        <SimpleGrid
           cols={2}
-          rowHeight="auto"
-          draggable={false}
+          ref={imageListRef}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
           {images.map((image, index) => (
-            <ImageListItem
+            <Box
               key={index}
-              draggable={false}
+              pos="relative"
               onDragOver={(e) => handleDragOver(e, index)}
-              sx={{
+              style={{
                 aspectRatio: "1/1",
-                position: "relative",
                 cursor: "default",
-                border: dragOverItem === index ? "2px dashed #1976d2" : "none",
+                border:
+                  dragOverItem === index
+                    ? "2px dashed var(--mantine-color-blue-6)"
+                    : "none",
                 opacity: draggedItem === index ? 0.5 : 1,
                 transition: "all 0.2s",
               }}
             >
-              <Box
-                draggable
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                sx={{
-                  position: "absolute",
-                  top: 2,
-                  left: 2,
-                  zIndex: 1,
-                  backgroundColor: "rgba(255,255,255,0.7)",
-                  borderRadius: "4px",
-                  padding: "2px",
-                  cursor: "grab",
-                }}
+              <Group
+                wrap="nowrap"
+                gap="xs"
+                pos="absolute"
+                top={5}
+                left={5}
+                style={{ zIndex: 1 }}
               >
-                <DragIndicatorIcon color="primary" />
-              </Box>
-              <DeleteOutlineOutlinedIcon
-                color="error"
-                sx={{
-                  position: "absolute",
-                  top: 2,
-                  right: 2,
-                  cursor: "pointer",
-                }}
-                onClick={() => onDelete(index)}
-              />
+                <Box
+                  component="span"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                  bg="white"
+                  style={{ cursor: "grab", borderRadius: 4, padding: 2 }}
+                >
+                  <GripVertical size={20} color="var(--mantine-color-blue-6)" />
+                </Box>
+                <Box
+                  component="span"
+                  onClick={() => onDelete(index)}
+                  bg="white"
+                  style={{ cursor: "pointer", borderRadius: 4, padding: 2 }}
+                >
+                  <Trash size={20} color="var(--mantine-color-red-6)" />
+                </Box>
+              </Group>
               <Image
                 ref={(el: HTMLImageElement | null) => {
                   imageRefs.current[index] = el;
@@ -156,9 +151,9 @@ export const ImageUpload = ({
                   backgroundColor: "white",
                 }}
               />
-            </ImageListItem>
+            </Box>
           ))}
-        </ImageList>
+        </SimpleGrid>
       )}
     </Stack>
   );
