@@ -1,4 +1,4 @@
-import { SvgIconComponent } from '@mui/icons-material';
+import { LucideIcon } from "lucide-react";
 
 export type NavItem = {
   title: string;
@@ -7,7 +7,7 @@ export type NavItem = {
 
 export type DashboardNavItem = {
   title: string;
-  icon: SvgIconComponent;
+  icon: LucideIcon;
   href?: string;
   items?: DashboardNavItem[];
 };

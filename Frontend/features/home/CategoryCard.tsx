@@ -10,7 +10,7 @@ type CategoryCardProps = {
   imageUrl: string;
 };
 
-export function CategoryCard({ name, imageUrl }: CategoryCardProps) {
+export const CategoryCard = ({ name, imageUrl }: CategoryCardProps) => {
   return (
     <Card
       component={Link}
@@ -36,16 +36,9 @@ export function CategoryCard({ name, imageUrl }: CategoryCardProps) {
           priority
         />
       </Card.Section>
-      <Title
-        order={4}
-        size="sm"
-        c="dark"
-        style={{
-          textAlign: "center",
-        }}
-      >
+      <Title order={4} size="sm" ta="center">
         {name}
       </Title>
     </Card>
   );
-}
+};

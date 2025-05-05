@@ -27,8 +27,10 @@ export const productRequestSchema = z.object({
   stock: z
     .number({ message: "Số lượng sản phẩm không hợp lệ" })
     .min(1, { message: "Số lượng sản phẩm phải lớn hơn 0" }),
-  brandId: z.string().uuid(),
-  categoryId: z.string().uuid(),
+  brandId: z.string().uuid({ message: "Thương hiệu không hợp lệ" }),
+  categoryId: z.string().uuid({
+    message: "Danh mục không hợp lệ",
+  }),
   tags: z.array(z.string()).optional(),
   thumbnail: z
     .any()

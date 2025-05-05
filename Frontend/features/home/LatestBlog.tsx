@@ -54,7 +54,7 @@ export function LatestBlog({ posts }: LatestBlogProps) {
         }}
         breakpoints={swiperBreakpoints}
         loop={true}
-        style={{ padding: "10px 0 40px 0" }}
+        style={{ padding: "10px 0 40px 0", margin: 0 }}
       >
         {posts.map((post) => (
           <SwiperSlide key={post.id}>

@@ -98,7 +98,7 @@ export default async function Home() {
     console.error("Failed to load posts: ", postsResponse.message);
   }
   return (
-    <Stack gap={8}>
+    <Stack gap='md'>
       <HeroBanner
         title={bannerConfig.title}
         description={bannerConfig.description}

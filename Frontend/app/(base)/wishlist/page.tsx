@@ -1,20 +1,14 @@
-import { WishlistGrid } from '@/features/wishlist/WishlistGrid';
-import { Divider, Stack, Typography } from '@mui/material';
+import { WishlistGrid } from "@/features/wishlist/WishlistGrid";
+import { Divider, Stack, Text, Title } from "@mantine/core";
 
 export default function Page() {
   return (
-    <Stack spacing={1}>
-      <Typography
-        variant='h3'
-        component='h1'>
-        Danh sách yêu thích
-      </Typography>
-      <Typography
-        variant='body1'
-        color='textDisabled'>
+    <Stack gap='xs'>
+      <Title order={4}>Danh sách yêu thích</Title>
+      <Text c="gray">
         Danh sách yêu thích của bạn sẽ giúp bạn theo dõi những sản phẩm mà bạn
         quan tâm nhất.
-      </Typography>
+      </Text>
       <Divider />
       <WishlistGrid />
     </Stack>

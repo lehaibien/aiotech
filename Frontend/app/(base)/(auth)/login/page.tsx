@@ -17,10 +17,10 @@ export default async function Page({
   const { redirect } = await searchParams;
   return (
     <Container size="sm">
-      <Stack gap={4}>
+      <Stack gap='sm'>
         <Title order={1}>Đăng nhập</Title>
         <LoginForm redirectTo={redirect ?? "/"} />
-        <Group justify="center" align="center" gap={4}>
+        <Group justify="center" align="center" gap='sm'>
           Bạn chưa có tài khoản?{" "}
           <Link
             href="/register"

@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <Container size="sm">
-      <Stack gap={4}>
-        <Title order={1}>Đăng nhập</Title>
+      <Stack gap='sm'>
+        <Title order={1}>Đăng ký</Title>
         <RegisterForm />
-        <Group justify="center" align="center" gap={4}>
+        <Group justify="center" align="center" gap='sm'>
           Đã có tài khoản?{" "}
           <Link
             href="/login"
