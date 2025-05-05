@@ -1,7 +1,7 @@
 "use client";
 
-import ControlledComboBox from "@/components/core/ControlledComboBox";
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import ControlledComboBox from "@/components/form/ControlledComboBox";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import RichTextEditor, {
   RichTextEditorRef,
 } from "@/components/core/RichTextEditor";
@@ -150,7 +150,7 @@ export const ProductUpsertForm = ({
               <FormLabel htmlFor="sku" required>
                 Mã sản phẩm
               </FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="sku"
                 required
@@ -162,7 +162,7 @@ export const ProductUpsertForm = ({
               <FormLabel htmlFor="name" required>
                 Tên sản phẩm
               </FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="name"
                 required
@@ -172,7 +172,7 @@ export const ProductUpsertForm = ({
             </Grid>
             <Grid size={6}>
               <FormLabel required>Giá nhập</FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="costPrice"
                 type="number"
@@ -183,7 +183,7 @@ export const ProductUpsertForm = ({
             </Grid>
             <Grid size={6}>
               <FormLabel required>Giá gốc</FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="price"
                 type="number"
@@ -194,7 +194,7 @@ export const ProductUpsertForm = ({
             </Grid>
             <Grid size={6}>
               <FormLabel>Giá khuyến mãi</FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="discountPrice"
                 type="number"
@@ -204,7 +204,7 @@ export const ProductUpsertForm = ({
             </Grid>
             <Grid size={6}>
               <FormLabel required>Số lượng tồn kho</FormLabel>
-              <ControlledTextField
+              <ControlledTextInput
                 control={control}
                 name="stock"
                 type="number"

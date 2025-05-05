@@ -1,18 +1,29 @@
-import Footer from '@/components/layout/base/Footer';
-import Header from '@/components/layout/base/Header';
-import { Container } from '@mui/material';
-import { Metadata } from 'next';
-import React from 'react';
+import { Footer } from "@/components/layout/base/Footer";
+import { Header } from "@/components/layout/base/Header";
+import { SubHeader } from "@/components/layout/base/SubHeader";
+import { API_URL } from "@/constant/apiUrl";
+import { getApi } from "@/lib/apiClient";
+import { ComboBoxItem } from "@/types";
+import { Container, Stack } from "@mantine/core";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: 'Aiotech',
-    template: '%s | Aiotech',
+    default: "Aiotech",
+    template: "%s | Aiotech",
   },
   description:
-    'Aiotech is a place for everyone to buy electronic parts, computer parts, pc, laptop and gaming gear.',
-  keywords: ['e-commerce', 'technology', 'tech', 'shopping', 'pc', 'laptop'],
-  applicationName: 'AioTech',
+    "Aiotech là nơi chuyên cung cấp linh kiện điện tử, máy tính, máy tính xách tay và đồ chơi máy tính.",
+  keywords: [
+    "technology",
+    "tech",
+    "shopping",
+    "pc",
+    "laptop",
+    "electronics",
+    "aiotech",
+  ],
+  applicationName: "AioTech",
 };
 
 export default async function RootLayout({
@@ -20,13 +31,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let categories: ComboBoxItem[] = [];
+  const response = await getApi(API_URL.categoryComboBox);
+  if (response.success) {
+    categories = response.data as ComboBoxItem[];
+  }
   return (
     <>
-      <Header />
-      <Container
-        maxWidth='xl'
-        component='main'
-        sx={{ py: 2 }}>
+      <Stack gap={4} p={16}>
+        <Header categories={categories} />
+        <SubHeader categories={categories} />
+      </Stack>
+      <Container size="xl" component="main" pb={8}>
         {children}
       </Container>
       <Footer />

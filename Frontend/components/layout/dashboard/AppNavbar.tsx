@@ -1,6 +1,6 @@
 'use client';
 
-import BrandLogo from '@/components/core/BrandLogo';
+import { BrandLogo } from '@/components/core/BrandLogo';
 import MenuButton from '@/components/core/MenuButton';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import AppBar from '@mui/material/AppBar';

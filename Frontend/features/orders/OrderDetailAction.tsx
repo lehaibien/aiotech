@@ -2,15 +2,14 @@
 
 import AlertDialog from "@/components/core/AlertDialog";
 import { API_URL } from "@/constant/apiUrl";
-import { getApi, postApi, putApi } from "@/lib/apiClient";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CheckIcon from "@mui/icons-material/Check";
-import PrintIcon from "@mui/icons-material/Print";
-import { Box, Button } from "@mui/material";
+import { postApi, putApi } from "@/lib/apiClient";
 import { UUID } from "@/types";
+import { Button, Group } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { Ban, Check, Printer } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
+import { useOrderPrint } from "./hooks/useOrderPrint";
 
 type OrderDetailActionProps = {
   id: UUID;
@@ -18,9 +17,12 @@ type OrderDetailActionProps = {
   trackingNumber: string;
 };
 
-export function OrderDetailAction({ id, status, trackingNumber }: OrderDetailActionProps) {
+export const OrderDetailAction = ({
+  id,
+  status,
+  trackingNumber,
+}: OrderDetailActionProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
   const isCancelable = useMemo(() => {
     return (
       status.toLowerCase() === "pending" ||
@@ -33,39 +35,22 @@ export function OrderDetailAction({ id, status, trackingNumber }: OrderDetailAct
       if (status.toLowerCase() === "delivered") {
         const response = await postApi(API_URL.orderConfirm + `/${id}`, {});
         if (response.success) {
-          enqueueSnackbar("Xác nhận đơn hàng thành công", {
-            variant: "success",
+          notifications.show({
+            message: "Xác nhận đơn hàng thành công",
+            color: "green",
           });
           router.refresh();
         } else {
-          enqueueSnackbar("Xác nhận đơn hàng thất bại: " + response.message, {
-            variant: "error",
+          notifications.show({
+            message: "Xác nhận đơn hàng thất bại: " + response.message,
+            color: "red",
           });
         }
       }
     },
-    [enqueueSnackbar, router, status]
+    [router, status]
   );
-  const handlePrint = useCallback(async (id: string) => {
-    const response = await getApi(API_URL.order + `/${id}/print`);
-    if (response.success) {
-      const data = response.data as string;
-      const binary = atob(data);
-      const buffer = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        buffer[i] = binary.charCodeAt(i);
-      }
-      const url = window.URL.createObjectURL(new Blob([buffer]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${trackingNumber}.pdf`); 
-      document.body.appendChild(link);
-      link.click();
-      // clean up
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }
-  }, []);
+  const handlePrint = useOrderPrint(id, trackingNumber);
   const handleCancel = async () => {
     const request = {
       id: id,
@@ -73,33 +58,35 @@ export function OrderDetailAction({ id, status, trackingNumber }: OrderDetailAct
     };
     const response = await putApi(API_URL.orderCancel, request);
     if (response.success) {
-      enqueueSnackbar("Hủy đơn hàng thành công", {
-        variant: "success",
+      notifications.show({
+        message: "Hủy đơn hàng thành công",
+        color: "green",
       });
-      router.push("/profile/?tab=2");
+      router.push("/orders");
     } else {
-      enqueueSnackbar("Hủy đơn hàng thất bại: " + response.message, {
-        variant: "error",
+      notifications.show({
+        message: "Hủy đơn hàng thất bại: " + response.message,
+        color: "red",
       });
     }
   };
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-      }}
-    >
+    <Group>
       <Button
-        onClick={() => handleConfirm(id)}
-        startIcon={<CheckIcon />}
-        color="primary"
+        variant="transparent"
+        color="green"
+        leftSection={<Check size={16} />}
         disabled={status.toLowerCase() !== "delivered"}
+        onClick={() => handleConfirm(id)}
+        size="sm"
       >
         Đã nhận hàng
       </Button>
-      <Button onClick={() => handlePrint(id)} startIcon={<PrintIcon />}>
+      <Button
+        onClick={() => handlePrint(id)}
+        leftSection={<Printer size={16} />}
+        size="sm"
+      >
         In
       </Button>
 
@@ -109,13 +96,14 @@ export function OrderDetailAction({ id, status, trackingNumber }: OrderDetailAct
         onConfirm={handleCancel}
       >
         <Button
-          color="error"
-          startIcon={<CancelIcon />}
+          color="red"
+          leftSection={<Ban size={16} />}
           disabled={isCancelable === false}
+          size="sm"
         >
           Hủy
         </Button>
       </AlertDialog>
-    </Box>
+    </Group>
   );
-}
+};

@@ -1,4 +1,4 @@
-import BrandLogo from '@/components/core/BrandLogo';
+import { BrandLogo } from '@/components/core/BrandLogo';
 import ColorSchemeSwitch from '@/components/core/ColorSchemeSwitch';
 import { Box } from '@mui/material';
 import Stack from '@mui/material/Stack';

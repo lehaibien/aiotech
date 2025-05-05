@@ -1,16 +1,16 @@
-import { TextField, TextFieldProps } from '@mui/material';
+import { TextInput, TextInputProps } from '@mantine/core';
 import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 
-type ControlledTextFieldProps<T extends FieldValues> = {
+type ControlledTextInputProps<T extends FieldValues> = {
   control: Control<T>;
   name: FieldPath<T>;
-} & Omit<TextFieldProps, 'name' | 'onChange' | 'value' | 'error' | 'helperText'>;
+} & Omit<TextInputProps, 'name' | 'onChange' | 'value' | 'error' | 'helperText'>;
 
-export const ControlledTextField = <T extends FieldValues>({
+export const ControlledTextInput = <T extends FieldValues>({
   control,
   name,
   ...props
-}: ControlledTextFieldProps<T>) => {
+}: ControlledTextInputProps<T>) => {
   return (
     <Controller
       name={name}
@@ -27,13 +27,12 @@ export const ControlledTextField = <T extends FieldValues>({
           }
         };
         return (
-          <TextField
+          <TextInput
             {...restField}
             name={name}
             value={value ?? ''}
             onChange={handleChange}
-            error={!!error}
-            helperText={error?.message}
+            error={error?.message}
             {...props}
           />
         );

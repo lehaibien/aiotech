@@ -4,12 +4,12 @@ using Application.Abstractions;
 using Application.Brands.Dtos;
 using Application.Helpers;
 using Application.Images;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Application.Shared;
 
 namespace Application.Brands;
 
@@ -68,11 +68,19 @@ public class BrandService : IBrandService
             }
         }
         var dtoQuery = brandQuery.ProjectToBrandResponse();
-        var result = await PaginatedList<BrandResponse>.CreateAsync(dtoQuery, request.PageIndex, request.PageSize, cancellationToken);
+        var result = await PaginatedList<BrandResponse>.CreateAsync(
+            dtoQuery,
+            request.PageIndex,
+            request.PageSize,
+            cancellationToken
+        );
         return Result<PaginatedList<BrandResponse>>.Success(result);
     }
 
-    public async Task<Result<BrandResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<BrandResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id, cancellationToken);
         if (entity is null)
@@ -191,7 +199,9 @@ public class BrandService : IBrandService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         var result = await _unitOfWork
             .GetRepository<Brand>()

@@ -1,81 +1,48 @@
-import { formatNumberWithSeperator } from '@/lib/utils';
-import { ProductDetailResponse } from '@/types/product';
-import { Box, Chip, Rating, Stack, Typography } from '@mui/material';
-import { AddToCartButton } from './AddToCartButton';
-import { AddToWishlist } from './AddToWishlist';
+import { formatNumberWithSeperator } from "@/lib/utils";
+import { ProductDetailResponse } from "@/types/product";
+import { Badge, Group, Rating, Stack, Text, Title } from "@mantine/core";
+import { AddToCartButton } from "./AddToCartButton";
+import { AddToWishlist } from "./AddToWishlist";
 
-interface ProductInfoProps {
+type ProductInfoProps = {
   product: ProductDetailResponse;
-}
+};
 
-export default function ProductInfo({ product }: ProductInfoProps) {
+export const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
-    <Stack spacing={1}>
-      <Typography variant='h4'>{product.name}</Typography>
-      <Stack
-        direction='row'
-        alignItems='center'
-        gap={2}>
-        <Typography variant='subtitle2'>Mã hàng: {product.sku}</Typography>
-        <Typography
-          variant='subtitle2'
-          color='textSecondary'>
-          Thương hiệu: {product.brand}
-        </Typography>
-      </Stack>
-
-      <Box
-        display='flex'
-        alignItems='center'>
-        <Rating
-          value={product.rating}
-          readOnly
-          precision={0.5}
-          size='large'
-        />
-        <Typography
-          variant='body2'
-          ml={1}>
-          ({product.rating.toFixed(1)})
-        </Typography>
-      </Box>
+    <Stack gap={4}>
+      <Title order={1}>{product.name}</Title>
+      <Group>
+        <Text>Mã hàng: {product.sku}</Text>
+        <Text>Thương hiệu: {product.brand}</Text>
+      </Group>
+      <Group>
+        <Rating defaultValue={product.rating} readOnly size="md" />
+        <Text>({product.rating.toFixed(1)})</Text>
+      </Group>
       {product.discountPrice ? (
-        <Stack
-          direction='row'
-          gap={1}
-          alignItems='center'>
-          <Typography
-            variant='h3'
-            color='error'>
+        <Group gap={4} align="center">
+          <Text c="red" size="xl">
             {formatNumberWithSeperator(product.discountPrice)} VNĐ
-          </Typography>
-          <Typography
-            variant='h6'
-            color='textSecondary'
-            sx={{ textDecoration: 'line-through' }}>
+          </Text>
+          <Text td="line-through">
             {formatNumberWithSeperator(product.price)} VNĐ
-          </Typography>
-          <Chip
-            label={`-${(
+          </Text>
+          <Badge color="red" size="md" variant="outline">
+            -
+            {(
               ((product.price - product.discountPrice) / product.price) *
               100
-            ).toFixed(2)}%`}
-            color='error'
-            size='small'
-            variant='outlined'
-          />
-        </Stack>
+            ).toFixed(2)}
+            %
+          </Badge>
+        </Group>
       ) : (
-        <Typography
-          variant='h3'
-          color='error'>
+        <Text c="red" size="lg">
           {formatNumberWithSeperator(product.price)} VNĐ
-        </Typography>
+        </Text>
       )}
-      <Stack
-        direction='row'
-        gap={2}
-        alignItems='center'>
+      <Group gap={8}>
         <AddToCartButton
           productId={product.id}
           productName={product.name}
@@ -83,12 +50,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           productImage={product.imageUrls[0]}
         />
         <AddToWishlist productId={product.id} />
-        <Typography
-          variant='body2'
-          ml={2}>
-          {product.stock} trong kho
-        </Typography>
-      </Stack>
+        <Text>{product.stock} trong kho</Text>
+      </Group>
     </Stack>
   );
-}
+};

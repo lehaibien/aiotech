@@ -25,6 +25,14 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: [
+      "@mantine/core",
+      "@mantine/charts",
+      "@mantine/dates",
+      "@mantine/dropzone",
+      "@mantine/hooks",
+      "@mantine/modals",
+      "@mantine/notifications",
+      "@mantine/tiptap",
       "@mui/x-data-grid",
       "@mui/x-date-pickers",
       "@mui/x-charts",

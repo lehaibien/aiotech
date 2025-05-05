@@ -1,5 +1,5 @@
 ---
-description: Next.js with TypeScript and MUI best practices
+description: Next.js with TypeScript and Mantine best practices
 globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 ---
 
@@ -26,7 +26,7 @@ globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 - Implement proper error boundaries
 - Place static content and interfaces at file start
 - Use TypeScript for type safety
-- Use MUI for UI components and styling
+- Use Mantine for UI components and styling
 
 
 ## Performance

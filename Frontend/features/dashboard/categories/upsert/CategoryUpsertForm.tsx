@@ -1,6 +1,6 @@
 "use client";
 
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
@@ -82,7 +82,7 @@ export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
   }, [category.imageUrl]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <ControlledTextField
+      <ControlledTextInput
         control={control}
         name="id"
         type="hidden"
@@ -94,7 +94,7 @@ export const CategoryUpsertForm = ({ category }: CategoryUpsertFormProps) => {
         <FormLabel htmlFor="name" required>
           Tên danh mục
         </FormLabel>
-        <ControlledTextField
+        <ControlledTextInput
           control={control}
           name="name"
           required

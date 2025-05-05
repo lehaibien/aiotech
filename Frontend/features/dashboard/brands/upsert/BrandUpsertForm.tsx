@@ -1,6 +1,6 @@
 "use client";
 
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
 import { postApi, putApi } from "@/lib/apiClient";
@@ -86,24 +86,20 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
   }, [defaultValue.imageUrl]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <ControlledTextField
+      <ControlledTextInput
         control={control}
         name="id"
         type="hidden"
-        sx={{
-          display: "none",
-        }}
       />
       <FormControl margin="normal" fullWidth>
         <FormLabel htmlFor="name" required>
           Tên thương hiệu
         </FormLabel>
-        <ControlledTextField
+        <ControlledTextInput
           control={control}
           name="name"
           required
-          fullWidth
-          size="small"
+          size="sm"
         />
       </FormControl>
       <FormControl

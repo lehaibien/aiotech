@@ -1,6 +1,6 @@
 "use client";
 
-import BrandLogo from "@/components/core/BrandLogo";
+import { BrandLogo } from "@/components/core/BrandLogo";
 import ColorSchemeSwitch from "@/components/core/ColorSchemeSwitch";
 import { Menu } from "@mui/icons-material";
 import { Box, IconButton, Typography } from "@mui/material";

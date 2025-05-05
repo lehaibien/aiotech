@@ -1,7 +1,7 @@
 "use client";
 
 import { FacebookIcon, GoogleIcon } from "@/components/core/CustomIcon";
-import { Box, Button, styled } from "@mui/material";
+import { Button, Flex } from "@mantine/core";
 import { signIn } from "next-auth/react";
 
 type SocialLoginProps = {
@@ -9,36 +9,37 @@ type SocialLoginProps = {
   isRegister?: boolean;
 };
 
-const SocialMediaButton = styled(Button)(({ theme }) => ({
-  textTransform: "none",
-  boxShadow: "none",
-  color: theme.palette.text.primary,
-}));
-
-function SocialLogin({ redirectTo, isRegister }: SocialLoginProps) {
-  const loginSocial = async (provider: "facebook" | "google") => {
-    signIn(provider, { redirectTo: redirectTo });
-  };
+export const SocialLogin = ({ redirectTo, isRegister }: SocialLoginProps) => {
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
-      <SocialMediaButton
-        variant="contained"
-        startIcon={<GoogleIcon />}
-        onClick={() => loginSocial("google")}
+    <Flex
+      direction={{
+        base: "column",
+        md: "row",
+      }}
+      gap={4}
+    >
+      <Button
+        variant="filled"
+        color="dark"
+        leftSection={<GoogleIcon />}
+        onClick={() => signIn("google", { redirectTo: redirectTo })}
         data-umami-event={`${isRegister ? "Đăng ký" : "Đăng nhập"} với Google`}
+        flex={1}
       >
         {isRegister ? "Đăng ký" : "Đăng nhập"} với Google
-      </SocialMediaButton>
-      <SocialMediaButton
-        variant="contained"
-        startIcon={<FacebookIcon />}
-        onClick={() => loginSocial("facebook")}
-        data-umami-event={`${isRegister ? "Đăng ký" : "Đăng nhập"} với Facebook`}
+      </Button>
+      <Button
+        variant="filled"
+        color="dark"
+        leftSection={<FacebookIcon />}
+        onClick={() => signIn("facebook", { redirectTo: redirectTo })}
+        data-umami-event={`${
+          isRegister ? "Đăng ký" : "Đăng nhập"
+        } với Facebook`}
+        flex={1}
       >
         {isRegister ? "Đăng ký" : "Đăng nhập"} với Facebook
-      </SocialMediaButton>
-    </Box>
+      </Button>
+    </Flex>
   );
-}
-
-export default SocialLogin;
+};

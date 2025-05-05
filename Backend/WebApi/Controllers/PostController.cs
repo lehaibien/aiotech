@@ -1,7 +1,7 @@
 using Application.Posts;
 using Application.Posts.Dtos;
-using Microsoft.AspNetCore.Mvc;
 using Application.Shared;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Extensions;
 
 namespace WebApi.Controllers;
@@ -49,6 +49,13 @@ public class PostController : ControllerBase
     public async Task<IActionResult> GetBySlugAsync(string slug)
     {
         var result = await _service.GetBySlugAsync(slug);
+        return this.FromResult(result);
+    }
+
+    [HttpGet("{id:guid}/update")]
+    public async Task<IActionResult> GetForUpdateAsync(Guid id)
+    {
+        var result = await _service.GetForUpdateAsync(id);
         return this.FromResult(result);
     }
 

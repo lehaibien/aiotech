@@ -1,122 +1,62 @@
 "use client";
 
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import { Avatar, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import { ActionIcon, Avatar, Popover, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import { usePathname } from "next/navigation";
 
-export function AuthMenu() {
+export const AuthMenu = () => {
   const pathName = usePathname();
-  const router = useRouter();
   const { data: session } = useSession();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const handleLogout = () => {
-    signOut();
-    router.push(pathName ?? "/");
-  };
+  const [opened, { toggle, close }] = useDisclosure(false);
   return (
     <>
       {session?.user ? (
-        <>
-          <IconButton
-            color="inherit"
-            id="basic-button"
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}
-            sx={{
-              borderRadius: "5px",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                fontWeight: 600,
-                display: {
-                  xs: "none",
-                  md: "block",
-                },
-              }}
-            >
-              {session.user.name ?? "Nguoi Dung"}
-            </Typography>
+        <Popover opened={opened} onClose={close} onDismiss={close} withArrow>
+          <Popover.Target>
             <Avatar
-              sx={{
-                width: {
-                  xs: 24,
-                  md: 28,
-                },
-                height: {
-                  xs: 24,
-                  md: 28,
-                },
+              size="sm"
+              src={session.user.image ?? "/user-avatar.png"}
+              alt={session.user.name ?? "user-avatar"}
+              radius="xl"
+              onClick={toggle}
+              style={{
+                cursor: "pointer",
               }}
-            >
-              <Image
-                src={session.user.image ?? "/user-avatar.png"}
-                width={28}
-                height={28}
-                alt={session.user.name ?? "user-avatar"}
-              />
-            </Avatar>
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem>
+            />
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Stack>
               <Link href="/profile">Thông tin cá nhân</Link>
-            </MenuItem>
-            {session.user.role.toLowerCase() === "admin" && (
-              <MenuItem>
+              {session.user.role.toLowerCase() === "admin" && (
                 <Link href="/dashboard">Trang quản lý</Link>
-              </MenuItem>
-            )}
-            {/* {(session.user.role.toLowerCase() === "shipper" ||
-              session.user.role.toLowerCase() === "admin") && (
-              <MenuItem>
-                <Link href="/shipper">Quản lý giao hàng</Link>
-              </MenuItem>
-            )} */}
-            <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
-          </Menu>
-        </>
+              )}
+              <Link href="/orders">Đơn hàng của tôi</Link>
+              <Text
+                style={{
+                  cursor: "pointer",
+                }}
+                onClick={async () => signOut()}
+              >
+                Đăng xuất
+              </Text>
+              {/* <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem> */}
+            </Stack>
+          </Popover.Dropdown>
+        </Popover>
       ) : (
-        <IconButton
-          color="inherit"
-          LinkComponent={Link}
+        <ActionIcon
+          color="dark"
+          variant="transparent"
+          component={Link}
           href={`/login?redirect=${pathName ?? "/"}`}
           aria-label="Đăng nhập"
         >
-          <PersonOutlineOutlinedIcon />
-        </IconButton>
+          <User size={20}/>
+        </ActionIcon>
       )}
     </>
   );
-}
+};

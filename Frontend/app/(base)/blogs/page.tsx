@@ -1,17 +1,10 @@
-import { HighlightTypography } from "@/components/core/HighlightTypography";
 import { API_URL } from "@/constant/apiUrl";
 import BlogList from "@/features/blog/BlogList";
 import { getListApi } from "@/lib/apiClient";
 import { PaginatedList, SearchParams } from "@/types";
 import { PostListItemResponse } from "@/types/post";
+import { Box, Stack, Text, TextInput, Title } from "@mantine/core";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  Box,
-  InputAdornment,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -61,31 +54,20 @@ export default async function BlogsPage({
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
-    <Stack gap={2}>
-      <Box>
-        <HighlightTypography variant="h4" component="h1" gutterBottom>
-          Tin tức công nghệ
-        </HighlightTypography>
-        <Typography variant="subtitle1" color="textSecondary">
-          Khám phá những tin tức công nghệ mới nhất và hữu ích nhất
-        </Typography>
-      </Box>
+    <Stack gap={8}>
+      <div>
+        <Title order={1}>Tin tức công nghệ</Title>
+        <Text>Khám phá những tin tức công nghệ mới nhất và hữu ích nhất</Text>
+      </div>
 
       {/* Search Box */}
       <Box component="form" method="get" action="/blogs">
-        <TextField
-          fullWidth
-          size="small"
+        <TextInput
+          size="md"
           placeholder="Tìm kiếm bài viết..."
           name="search"
           defaultValue={search}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
+          leftSection={<SearchIcon />}
         />
       </Box>
 

@@ -1,4 +1,4 @@
-﻿using Application.Reports.Dtos;
+using Application.Reports.Dtos;
 using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
@@ -75,12 +75,12 @@ public class ReportService : IReportService
             new("@iEndDate", request.EndDate),
             new(
                 "@iCustomerUsername",
-                request.CustomerUsername is null ? DBNull.Value : request.CustomerUsername
+                (object?) request.CustomerUsername ?? DBNull.Value
             ),
         };
         var reports = await _unitOfWork
             .GetRepository<OrderReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetOrderReport, parameters);
+            .ExecuteStoredProcedureAsync(StoredProcedure.GetOrderReport, parameters, cancellationToken);
 
         return Result<List<OrderReportResponse>>.Success(reports.ToList());
     }
@@ -100,6 +100,7 @@ public class ReportService : IReportService
                 && (request.CategoryId == null || x.CategoryId == request.CategoryId)
             );
         var dtoQuery = query
+            .OrderBy(p => p.Stock)
             .Select(p => new InventoryStatusReportResponse(
                 p.Id,
                 p.Sku,
@@ -112,8 +113,7 @@ public class ReportService : IReportService
                     : p.Stock <= lowStockThreshold ? "Low Stock"
                     : "In Stock",
                 p.Stock <= lowStockThreshold
-            ))
-            .OrderBy(p => p.CurrentStock);
+            ));
         var result = await PaginatedList<InventoryStatusReportResponse>.CreateAsync(
             dtoQuery,
             request.PageIndex,
@@ -129,19 +129,113 @@ public class ReportService : IReportService
         CancellationToken cancellationToken = default
     )
     {
-        var parameters = new SqlParameter[]
-        {
-            new("@iStartDate", request.StartDate),
-            new("@iEndDate", request.EndDate),
-        };
-        var reports = await _unitOfWork
-            .GetRepository<BrandPerformanceReportResponse>()
-            .ExecuteStoredProcedureAsync(
-                StoredProcedure.GetBrandPerformanceReport,
-                parameters,
-                cancellationToken
-            );
-        return Result<List<BrandPerformanceReportResponse>>.Success(reports.ToList());
+        var productQuery = _unitOfWork.GetRepository<Product>().GetAll();
+        var orderItemQuery = _unitOfWork.GetRepository<OrderItem>().GetAll();
+        var orderQuery = _unitOfWork.GetRepository<Order>().GetAll();
+        var brandOrderStats = await _unitOfWork
+            .GetRepository<Brand>()
+            .GetAll()
+            .GroupJoin(
+                productQuery,
+                b => b.Id,
+                p => p.BrandId,
+                (b, products) => new { Brand = b, Products = products }
+            )
+            .SelectMany(
+                bp => bp.Products.DefaultIfEmpty(),
+                (bp, p) => new { bp.Brand, Product = p }
+            )
+            .GroupJoin(
+                orderItemQuery,
+                bp => bp.Product.Id,
+                oi => oi.ProductId,
+                (bp, orderItems) =>
+                    new
+                    {
+                        bp.Brand,
+                        bp.Product,
+                        OrderItems = orderItems,
+                    }
+            )
+            .SelectMany(
+                bpo => bpo.OrderItems.DefaultIfEmpty(),
+                (bpo, oi) =>
+                    new
+                    {
+                        bpo.Brand,
+                        bpo.Product,
+                        OrderItem = oi,
+                    }
+            )
+            .GroupJoin(
+                orderQuery.Where(o =>
+                    o.CreatedDate >= request.StartDate
+                    && o.CreatedDate <= request.EndDate
+                    && o.Status == OrderStatus.Completed
+                ),
+                bpoi => bpoi.OrderItem.OrderId,
+                o => o.Id,
+                (bpoi, orders) =>
+                    new
+                    {
+                        bpoi.Brand,
+                        bpoi.Product,
+                        bpoi.OrderItem,
+                        Orders = orders,
+                    }
+            )
+            .GroupBy(x => new { x.Brand.Id, x.Brand.Name })
+            .Select(g => new
+            {
+                BrandId = g.Key.Id,
+                BrandName = g.Key.Name,
+                TotalRevenue = g.Sum(x =>
+                    x.OrderItem != null ? x.OrderItem.Price * x.OrderItem.Quantity : 0
+                ),
+                TotalUnitsSold = g.Sum(x => x.OrderItem != null ? x.OrderItem.Quantity : 0),
+            })
+            .ToListAsync(cancellationToken);
+
+        var productCounts = await productQuery
+            .GroupBy(p => p.BrandId)
+            .Select(g => new { BrandId = g.Key, ProductCount = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        var brandRatings = await productQuery
+            .Where(p => p.Reviews.Any())
+            .GroupBy(p => p.BrandId)
+            .Select(g => new
+            {
+                BrandId = g.Key,
+                AverageRating = g.SelectMany(p => p.Reviews).Average(r => r.Rating),
+            })
+            .ToListAsync(cancellationToken);
+
+        var result = brandOrderStats
+            .GroupJoin(
+                productCounts,
+                bos => bos.BrandId,
+                pc => pc.BrandId,
+                (bos, pc) => new { bos, ProductCount = pc.FirstOrDefault()?.ProductCount ?? 0 }
+            )
+            .GroupJoin(
+                brandRatings,
+                x => x.bos.BrandId,
+                br => br.BrandId,
+                (x, br) =>
+                    new BrandPerformanceReportResponse(
+                        x.bos.BrandId,
+                        x.bos.BrandName,
+                        x.ProductCount,
+                        x.bos.TotalRevenue,
+                        x.bos.TotalUnitsSold,
+                        br.FirstOrDefault()?.AverageRating ?? 0
+                    )
+            )
+            .OrderByDescending(x => x.TotalRevenue)
+            .ToList();
+
+        return Result<List<BrandPerformanceReportResponse>>.Success(result);
     }
 
     public async Task<

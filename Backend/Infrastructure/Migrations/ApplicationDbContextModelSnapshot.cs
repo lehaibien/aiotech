@@ -17,7 +17,7 @@ namespace Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -182,13 +182,13 @@ namespace Infrastructure.Migrations
                     b.Property<int>("DiscountPercentage")
                         .HasColumnType("int");
 
-                    b.Property<double?>("MaximumDiscountAmount")
+                    b.Property<decimal?>("MaximumDiscountAmount")
                         .HasPrecision(18, 2)
-                        .HasColumnType("float(18)");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<double>("MinimumOrderAmount")
+                    b.Property<decimal>("MinimumOrderAmount")
                         .HasPrecision(18, 2)
-                        .HasColumnType("float(18)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("Uses")
                         .HasColumnType("int");
@@ -335,11 +335,11 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("Price")
+                    b.Property<decimal>("Price")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(18, 2)
-                        .HasColumnType("float(18)")
-                        .HasDefaultValue(0.0);
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");

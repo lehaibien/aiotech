@@ -6,6 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import ErrorIcon from "@mui/icons-material/Error";
+import { useState } from 'react';
 
 type AlertDialogProps = {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ export default function AlertDialog({
   onBeforeConfirm,
   onConfirm,
 }: AlertDialogProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     const isValid = onBeforeShow ? onBeforeShow() : true;

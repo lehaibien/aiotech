@@ -1,51 +1,49 @@
 "use client";
 
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Select } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
 
-interface ShopSortProps {
+type ShopSortProps = {
   defaultSort: string;
-}
+};
 
-export function ShopSort({ defaultSort }: ShopSortProps) {
+export const ShopSort = ({ defaultSort }: ShopSortProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const onChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value;
+  const onChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set("sort", value);
     params.delete("page");
     router.push(`?${params.toString()}`);
   };
   return (
-    <FormControl
-      sx={{
-        width: 300,
-      }}
-    >
-      <InputLabel id="sort-select-label" size="small">
-        Sắp xếp theo
-      </InputLabel>
-      <Select
-        labelId="sort-select-label"
-        id="sort-select"
-        size="small"
-        value={defaultSort}
-        label="Sắp xếp theo"
-        onChange={onChange}
-      >
-        <MenuItem value="default">Mặc định</MenuItem>
-        <MenuItem value="price_asc">Giá: Thấp đến cao</MenuItem>
-        <MenuItem value="price_desc">Giá: Cao đến thấp</MenuItem>
-        <MenuItem value="newest">Mới nhất</MenuItem>
-        <MenuItem value="oldest">Cũ nhất</MenuItem>
-      </Select>
-    </FormControl>
+    <Select
+      id="sort-select"
+      data={[
+        {
+          label: "Mặc định",
+          value: "default",
+        },
+        {
+          label: "Giá: Thấp đến cao",
+          value: "price_asc",
+        },
+        {
+          label: "Giá: Cao đến thấp",
+          value: "price_desc",
+        },
+        {
+          label: "Mới nhất",
+          value: "newest",
+        },
+        {
+          label: "Cũ nhất",
+          value: "oldest",
+        },
+      ]}
+      defaultValue={defaultSort}
+      label="Sắp xếp theo"
+      onChange={(_, option) => onChange(option.value)}
+    />
   );
-}
+};

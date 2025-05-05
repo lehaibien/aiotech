@@ -1,5 +1,5 @@
 import { API_URL } from "@/constant/apiUrl";
-import OrderDetail from "@/features/dashboard/orders/OrderDetail";
+import { OrderDetail } from "@/features/dashboard/orders/OrderDetail";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { OrderResponse, UUID } from "@/types";

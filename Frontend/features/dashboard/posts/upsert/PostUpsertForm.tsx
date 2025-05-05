@@ -1,7 +1,7 @@
 "use client";
 
-import ControlledComboBox from "@/components/core/ControlledComboBox";
-import { ControlledTextField } from "@/components/core/ControlledTextField";
+import ControlledComboBox from "@/components/form/ControlledComboBox";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import RichTextEditor, {
   RichTextEditorRef,
 } from "@/components/core/RichTextEditor";
@@ -135,7 +135,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
           <FormLabel required htmlFor="title">
             Tiêu đề
           </FormLabel>
-          <ControlledTextField
+          <ControlledTextInput
             control={control}
             name="title"
             required
@@ -156,7 +156,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
           >
             Tạo slug
           </Button>
-          <ControlledTextField
+          <ControlledTextInput
             control={control}
             name="slug"
             required

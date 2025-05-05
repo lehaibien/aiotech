@@ -1,26 +1,21 @@
-'use client';
+"use client";
 
-import { ControlledTextField } from '@/components/core/ControlledTextField';
-import { API_URL } from '@/constant/apiUrl';
-import { postApi } from '@/lib/apiClient';
-import { EmailConfiguration } from '@/types/sys-config';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Button,
-  Paper,
-  Typography,
-  Grid,
-  FormLabel,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { ControlledNumberInput } from "@/components/form/ControlledNumberInput";
+import { ControlledTextInput } from "@/components/form/ControlledTextField";
+import { API_URL } from "@/constant/apiUrl";
+import { postApi } from "@/lib/apiClient";
+import { EmailConfiguration } from "@/types/sys-config";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, SimpleGrid, Title } from "@mantine/core";
+import { useSnackbar } from "notistack";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const emailSchema = z.object({
-  email: z.string().email('Vui lòng nhập email hợp lệ'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-  host: z.string().min(1, 'Vui lòng nhập host'),
-  port: z.string().min(1, 'Vui lòng nhập port hợp lệ'),
+  email: z.string().email("Vui lòng nhập email hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+  host: z.string().min(1, "Vui lòng nhập host"),
+  port: z.string().min(1, "Vui lòng nhập port hợp lệ"),
 });
 
 type EmailConfigFormProps = {
@@ -36,73 +31,52 @@ export const EmailConfigForm = ({ email }: EmailConfigFormProps) => {
   const onSubmit = async (data: EmailConfiguration) => {
     const response = await postApi(API_URL.emailConfig, data);
     if (response.success) {
-      enqueueSnackbar('Lưu cấu hình email thành công', { variant: 'success' });
+      enqueueSnackbar("Lưu cấu hình email thành công", { variant: "success" });
     } else {
-      enqueueSnackbar('Lưu cấu hình email thất bại: ' + response.message, {
-        variant: 'error',
+      enqueueSnackbar("Lưu cấu hình email thất bại: " + response.message, {
+        variant: "error",
       });
     }
   };
   return (
-    <Paper
-      sx={{
-        p: 2,
-      }}>
-      <Typography
-        variant='h6'
-        gutterBottom>
-        Cấu Hình Email
-      </Typography>
-      <Grid
-        container
-        spacing={2}
-        component='form'
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate>
-        <Grid size={12}>
-          <FormLabel required>Email</FormLabel>
-          <ControlledTextField
-            name='email'
-            control={control}
-            fullWidth
-            size='small'
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormLabel required>Mật khẩu</FormLabel>
-          <ControlledTextField
-            name='password'
-            control={control}
-            fullWidth
-            size='small'
-            type='password'
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormLabel required>Máy chủ</FormLabel>
-          <ControlledTextField
-            name='host'
-            control={control}
-            fullWidth
-            size='small'
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormLabel required>Cổng</FormLabel>
-          <ControlledTextField
-            name='port'
-            control={control}
-            fullWidth
-            size='small'
-          />
-        </Grid>
-        <Button
-          type='submit'
-          variant='contained'
-          color='primary'>
+    <>
+      <Title order={6}>Cấu Hình Email</Title>
+      <SimpleGrid cols={2} component="form" onSubmit={handleSubmit(onSubmit)}>
+        <ControlledTextInput
+          name="email"
+          control={control}
+          size="sm"
+          required
+          label="Email"
+          autoComplete="email"
+        />
+        <ControlledTextInput
+          type="password"
+          name="password"
+          control={control}
+          size="sm"
+          required
+          label="Mật khẩu"
+          autoComplete="current-password"
+        />
+        <ControlledTextInput
+          name="host"
+          control={control}
+          size="sm"
+          required
+          label="Máy chủ"
+        />
+        <ControlledNumberInput
+          name="port"
+          control={control}
+          size="sm"
+          required
+          label="Cổng"
+        />
+        <Button type="submit" w="50%">
           Lưu cấu hình
         </Button>
-      </Grid>
-    </Paper>
+      </SimpleGrid>
+    </>
   );
 };

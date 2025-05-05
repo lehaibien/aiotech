@@ -3,11 +3,11 @@ using Application.Abstractions;
 using Application.Helpers;
 using Application.Images;
 using Application.Posts.Dtos;
+using Application.Shared;
 using Domain.Entities;
 using Domain.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Application.Shared;
 
 namespace Application.Posts;
 
@@ -81,16 +81,14 @@ public class PostService : IPostService
         var query = _unitOfWork
             .GetRepository<Post>()
             .GetAll(x => x.IsPublished && x.Title.Contains(request.TextSearch));
-        
+
         if (!string.IsNullOrEmpty(request.TextSearch))
         {
-            query = query.Where(x =>
-                x.Title.ToLower().Contains(request.TextSearch.ToLower())
-            );
+            query = query.Where(x => x.Title.ToLower().Contains(request.TextSearch.ToLower()));
         }
 
-        var dtoQuery = query.ProjectToPostListItemResponse()
-            .OrderByDescending(x => x.CreatedDate);
+        var dtoQuery = query.OrderByDescending(x => x.CreatedDate).ProjectToPostListItemResponse();
+
         var result = await PaginatedList<PostListItemResponse>.CreateAsync(
             dtoQuery,
             request.PageIndex,
@@ -150,9 +148,21 @@ public class PostService : IPostService
         return Result<PostDetailResponse>.Success(result);
     }
 
-    public async Task<Result<PostResponse>> CreateAsync(
-        PostRequest request
-    )
+    public async Task<Result<PostUpdateResponse>> GetForUpdateAsync(Guid id)
+    {
+        var result = await _unitOfWork
+            .GetRepository<Post>()
+            .GetAll(x => x.Id == id)
+            .ProjectToPostUpdateResponse()
+            .FirstOrDefaultAsync();
+        if (result is null)
+        {
+            return Result<PostUpdateResponse>.Failure("Bài viết không tồn tại");
+        }
+        return Result<PostUpdateResponse>.Success(result);
+    }
+
+    public async Task<Result<PostResponse>> CreateAsync(PostRequest request)
     {
         var isExists = await _unitOfWork
             .GetRepository<Post>()
@@ -166,10 +176,7 @@ public class PostService : IPostService
         entity.Id = Guid.NewGuid();
         entity.CreatedDate = DateTime.UtcNow;
         entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
-        var optimizedImage = await _imageService.OptimizeAsync(
-            request.Image,
-            ImageType.Blog
-        );
+        var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Blog);
         var thumbnailImage = await _imageService.OptimizeAsync(
             request.Image,
             ImageType.BlogThumbnail,
@@ -197,9 +204,7 @@ public class PostService : IPostService
         return Result<PostResponse>.Success(response);
     }
 
-    public async Task<Result<PostResponse>> UpdateAsync(
-        PostRequest request
-    )
+    public async Task<Result<PostResponse>> UpdateAsync(PostRequest request)
     {
         if (request.Id == Guid.Empty)
         {
@@ -232,17 +237,13 @@ public class PostService : IPostService
                 request.Image,
                 ImageType.BlogThumbnail,
                 ThumbnailPrefix
-              
             );
             if (thumbnailImage.IsFailure)
             {
                 return Result<PostResponse>.Failure(thumbnailImage.Message);
             }
 
-            var optimizedImage = await _imageService.OptimizeAsync(
-                request.Image,
-                ImageType.Blog
-            );
+            var optimizedImage = await _imageService.OptimizeAsync(request.Image, ImageType.Blog);
             if (optimizedImage.IsFailure)
             {
                 return Result<PostResponse>.Failure(optimizedImage.Message);
@@ -263,9 +264,7 @@ public class PostService : IPostService
         return Result<PostResponse>.Success(response);
     }
 
-    public async Task<Result<string>> DeleteAsync(
-        Guid id
-    )
+    public async Task<Result<string>> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Post>().GetByIdAsync(id);
         if (entity is null)
@@ -281,19 +280,16 @@ public class PostService : IPostService
         return Result<string>.Success("Xóa thành công");
     }
 
-    public async Task<Result<string>> DeleteListAsync(
-        List<Guid> ids)
+    public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
     {
         var entites = _unitOfWork.GetRepository<Post>().GetAll(x => ids.Contains(x.Id));
-        await entites.ForEachAsync(
-            x =>
-            {
-                x.DeletedDate = DateTime.UtcNow;
-                x.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
-                x.IsDeleted = true;
-                _unitOfWork.GetRepository<Post>().Update(x);
-            }
-        );
+        await entites.ForEachAsync(x =>
+        {
+            x.DeletedDate = DateTime.UtcNow;
+            x.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
+            x.IsDeleted = true;
+            _unitOfWork.GetRepository<Post>().Update(x);
+        });
 
         await _unitOfWork.SaveChangesAsync();
         return Result<string>.Success("Xóa thành công");

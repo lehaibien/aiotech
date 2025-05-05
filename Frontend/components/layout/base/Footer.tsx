@@ -1,198 +1,181 @@
-import BrandLogo from "@/components/core/BrandLogo";
-import { HighlightTypography } from "@/components/core/HighlightTypography";
+"use client";
+
+import { BrandLogo } from "@/components/core/BrandLogo";
 import dayjs from "@/lib/extended-dayjs";
-import {
-  Email,
-  Facebook,
-  Instagram,
-  LocationOn,
-  Phone,
-  X,
-  YouTube,
-} from "@mui/icons-material";
 import {
   Box,
   Grid,
-  IconButton,
-  Link,
+  Group,
   Stack,
-  Typography,
-} from "@mui/material";
+  Text,
+  Title,
+  UnstyledButton,
+} from "@mantine/core";
+import {
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  Phone,
+  Twitter,
+  Youtube,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
-export default function Footer() {
+export const Footer = () => {
   return (
-    <Box
-      component="footer"
-      sx={{
-        p: 2,
-        pb: 0,
-        borderTop: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      <Grid container spacing={4}>
-        {/* Về chúng tôi */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <BrandLogo />
-          <Typography variant="body1" gutterBottom>
-            Hệ thống bán lẻ điện tử công nghệ hàng đầu Việt Nam
-          </Typography>
+    <Box component="footer" p="md">
+      <Grid>
+        {/* About Us */}
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <Stack gap="sm">
+            <BrandLogo />
+            <Text size="sm" c="gray">
+              Hệ thống bán lẻ điện tử công nghệ hàng đầu Việt Nam
+            </Text>
 
-          <Typography variant="body1" gutterBottom sx={{ fontWeight: 600 }}>
-            Hỗ trợ thanh toán
-          </Typography>
-          <Stack spacing={2} direction="row">
-            {["VnPay", "Momo"].map((text) => (
-              <Box key={text} display="flex" alignItems="center" gap={1}>
-                <Image
-                  src={`/${text.toLowerCase()}-icon.svg`}
-                  alt={text}
-                  width={24}
-                  height={24}
-                />
-                <Typography variant="body2">{text}</Typography>
-              </Box>
-            ))}
+            <Text fw={600} size="sm">
+              Hỗ trợ thanh toán
+            </Text>
+            <Group gap="sm">
+              {["VnPay", "Momo"].map((text) => (
+                <Group key={text} gap="xs">
+                  <Image
+                    src={`/${text.toLowerCase()}-icon.svg`}
+                    alt={text}
+                    width={24}
+                    height={24}
+                  />
+                  <Text size="sm">{text}</Text>
+                </Group>
+              ))}
+            </Group>
           </Stack>
-        </Grid>
+        </Grid.Col>
 
-        {/* Hỗ trợ khách hàng */}
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Stack spacing={1}>
-            <HighlightTypography variant="h6">Hỗ trợ</HighlightTypography>
+        {/* Support */}
+        <Grid.Col span={{ base: 6, md: 3 }}>
+          <Stack gap="sm">
+            <Title order={6}>Hỗ trợ</Title>
             {[
               "Trung tâm hỗ trợ",
               "Hướng dẫn mua hàng",
               "Tra cứu đơn hàng",
               "Chính sách bảo hành",
             ].map((text) => (
-              <Link
+              <UnstyledButton
                 key={text}
+                component={Link}
                 href="#"
-                sx={{
-                  display: "block",
-                  py: 0.5,
-                  color: "inherit",
-                  transition: "color 0.2s",
-                  "&:hover": { color: "primary.main" },
-                }}
+                c="gray"
+                fz="sm"
               >
                 {text}
-              </Link>
+              </UnstyledButton>
             ))}
           </Stack>
-        </Grid>
+        </Grid.Col>
 
-        {/* Chính sách */}
-        <Grid size={{ xs: 6, md: 3 }}>
-          <Stack spacing={1}>
-            <HighlightTypography variant="h6">Chính sách</HighlightTypography>
+        {/* Policies */}
+        <Grid.Col span={{ base: 6, md: 3 }}>
+          <Stack gap="sm">
+            <Title order={6}>Chính sách</Title>
             {["Bảo mật thông tin", "Vận chuyển", "Đổi trả", "Thanh toán"].map(
               (text) => (
-                <Link
+                <UnstyledButton
                   key={text}
+                  component={Link}
                   href="#"
-                  sx={{
-                    display: "block",
-                    py: 0.5,
-                    color: "inherit",
-                    transition: "color 0.2s",
-                    "&:hover": { color: "primary.main" },
-                  }}
+                  c="gray"
+                  fz="sm"
+                  color="primary"
                 >
                   {text}
-                </Link>
+                </UnstyledButton>
               )
             )}
           </Stack>
-        </Grid>
+        </Grid.Col>
 
-        {/* Liên hệ */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <Stack spacing={2}>
-            <HighlightTypography variant="h6">Liên hệ</HighlightTypography>
-            <Stack spacing={2}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <LocationOn fontSize="small" color="primary" />
-                <Typography variant="body2">
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <Stack gap="md">
+            <Title order={6}>Liên hệ</Title>
+            <Stack gap="sm">
+              <Group gap="xs" wrap="nowrap">
+                <MapPin size={18} />
+                <Text size="sm" c="gray">
                   Số 123, Đường Công nghệ, Q.1, TP.HCM
-                </Typography>
-              </Box>
+                </Text>
+              </Group>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Phone fontSize="small" color="primary" />
-                <Typography variant="body2">1900 123 456</Typography>
-              </Box>
+              <Group gap="xs">
+                <Phone size={18} />
+                <Text size="sm" c="gray">
+                  1900 123 456
+                </Text>
+              </Group>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Email fontSize="small" color="primary" />
-                <Link
+              <Group gap="xs">
+                <Mail size={18} />
+                <UnstyledButton
+                  component="a"
                   href="mailto:support@aiotech.cloud"
-                  color="inherit"
-                  sx={{
-                    textDecoration: "none",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
+                  c="gray"
+                  fz="sm"
+                  color="primary"
                 >
                   support@aiotech.cloud
-                </Link>
-              </Box>
+                </UnstyledButton>
+              </Group>
             </Stack>
 
-            <Stack spacing={2} direction="row">
+            <Group gap="xs">
               {[
                 {
-                  icon: <Facebook sx={{ fontSize: 28 }} />,
+                  icon: Facebook,
                   color: "#1877F2",
                   href: "https://www.facebook.com",
                 },
+                { icon: Twitter, color: "#000", href: "https://x.com" },
                 {
-                  icon: <X sx={{ fontSize: 28 }} />,
-                  color: "#000",
-                  href: "https://x.com",
-                },
-                {
-                  icon: <Instagram sx={{ fontSize: 28 }} />,
+                  icon: Instagram,
                   color: "#E4405F",
                   href: "https://instagram.com",
                 },
                 {
-                  icon: <YouTube sx={{ fontSize: 28 }} />,
+                  icon: Youtube,
                   color: "#CD201F",
                   href: "https://youtube.com",
                 },
-              ].map((social, index) => (
-                <IconButton
-                  LinkComponent={Link}
-                  href={social.href}
-                  key={index}
-                  sx={{
-                    p: 1,
-                    bgcolor: "background.paper",
-                    "&:hover": {
-                      bgcolor: social.color,
-                      "& svg": { color: "white" },
-                    },
-                  }}
-                >
-                  {social.icon}
-                </IconButton>
-              ))}
-            </Stack>
+              ].map((social, index) => {
+                const Icon = social.icon;
+                return (
+                  <UnstyledButton
+                    key={index}
+                    component="a"
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    p="xs"
+                    variant="light"
+                    color="primary"
+                  >
+                    <Icon size={24} />
+                  </UnstyledButton>
+                );
+              })}
+            </Group>
           </Stack>
-        </Grid>
+        </Grid.Col>
 
-        {/* Bản quyền */}
-        <Grid
-          size={12}
-          sx={{ py: 1, borderTop: "1px solid", borderColor: "divider" }}
-        >
-          <Typography variant="body2" textAlign="center" sx={{ opacity: 0.7 }}>
+        {/* Copyright */}
+        <Grid.Col span={12} py="xs" mt="md">
+          <Text ta="center" size="sm" c="gray">
             © {dayjs().year()} AioTech. Bảo lưu mọi quyền.
-          </Typography>
-        </Grid>
+          </Text>
+        </Grid.Col>
       </Grid>
     </Box>
   );
-}
+};

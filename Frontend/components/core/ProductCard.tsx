@@ -5,22 +5,20 @@ import useCart from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import { ProductListItemResponse } from "@/types";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {
-  Box,
+  Badge,
   Button,
   Card,
-  CardContent,
-  CardMedia,
-  Chip,
+  Group,
   Rating,
   Stack,
-  Typography,
-} from "@mui/material";
+  Text,
+  Title,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSnackbar } from "notistack";
 
 type ProductCardProps = {
   product: ProductListItemResponse;
@@ -29,7 +27,6 @@ type ProductCardProps = {
 export const ProductCard = ({ product }: ProductCardProps) => {
   const { id, name, brand, price, discountPrice, rating, thumbnailUrl, stock } =
     product;
-  const { enqueueSnackbar } = useSnackbar();
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist();
   const discountPercent =
@@ -46,10 +43,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         productImage: thumbnailUrl,
         quantity: 1,
       });
-      enqueueSnackbar("Đã thêm sản phẩm vào giỏ hàng", { variant: "success" });
+      notifications.show({
+        message: "Đã thêm sản phẩm vào giỏ hàng",
+        color: "green",
+      });
       return;
     }
-    enqueueSnackbar("Sản phẩm đã hết hàng", { variant: "error" });
+    notifications.show({
+      message: "Sản phẩm đã hết hàng",
+      color: "red",
+    });
   };
 
   const handleAddToWishlistClick = async (
@@ -59,18 +62,22 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     e.stopPropagation();
     const message = await addToWishlist(id);
     if (message === "") {
-      enqueueSnackbar("Đã thêm sản phẩm vào danh sách yêu thích", {
-        variant: "success",
+      notifications.show({
+        message: "Đã thêm sản phẩm vào danh sách yêu thích",
+        color: "green",
       });
     } else {
-      enqueueSnackbar(message, { variant: "error" });
+      notifications.show({
+        message: message,
+        color: "red",
+      });
     }
   };
 
   const getStockColor = () => {
-    if (stock <= 0) return "error";
-    if (stock <= LOW_STOCK_THRESHOLD) return "warning";
-    return "success";
+    if (stock <= 0) return "red";
+    if (stock <= LOW_STOCK_THRESHOLD) return "orange";
+    return "green";
   };
 
   const getStockText = () => {
@@ -79,158 +86,91 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     return "Còn hàng";
   };
   return (
-    <Card
-      component={Link}
-      href={`/products/${id}`}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {stock <= LOW_STOCK_THRESHOLD && (
-        <Chip
-          label={getStockText()}
-          color={getStockColor()}
-          size="small"
-          sx={{
-            position: "absolute",
-            top: 8,
-            left: 8,
-            zIndex: 1,
-            fontWeight: 600,
-          }}
-        />
-      )}
-      <CardMedia
-        sx={{
-          position: "relative",
-          height: 300,
-          display: "flex",
-          backgroundColor: "background.default",
-          border: "1px solid",
-          borderBottom: "none",
-          borderColor: "background.paper",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      >
+    <Card component={Link} href={`/products/${id}`} withBorder>
+      <Card.Section pos="relative">
         <Image
           src={thumbnailUrl}
-          height={300}
           width={300}
+          height={300}
           alt={name}
           style={{
             objectFit: "contain",
           }}
         />
-        {product.discountPrice && (
-          <Chip
-            label={discountPercent + "%"}
-            color="error"
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-            }}
-          />
+        {stock <= LOW_STOCK_THRESHOLD && (
+          <Badge
+            color={getStockColor()}
+            variant="filled"
+            pos="absolute"
+            top={8}
+            left={8}
+          >
+            {getStockText()}
+          </Badge>
         )}
-      </CardMedia>
-      <CardContent
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: 1,
-          px: 2,
-          py: 0,
-        }}
-      >
-        <Box>
-          <Typography variant="overline" color="primary" noWrap>
-            {brand}
-          </Typography>
-          <Typography
-            variant="body1"
-            component="h3"
-            sx={{
-              fontWeight: 600,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {name}
-          </Typography>
-        </Box>
-        <Stack spacing={1}>
-          {discountPrice ? (
-            <div>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{
-                  lineHeight: 1,
-                  textDecoration: "line-through",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {formatNumberWithSeperator(price)} đ
-              </Typography>
-              <Typography variant="h6" fontWeight={600} color="error" noWrap>
-                {formatNumberWithSeperator(discountPrice)} đ
-              </Typography>
-            </div>
-          ) : (
-            <Typography variant="h6" fontWeight={600} color="error" noWrap>
+        {discountPrice && (
+          <Badge color="red" variant="filled" pos="absolute" top={8} right={8}>
+            -{discountPercent + "%"}
+          </Badge>
+        )}
+      </Card.Section>
+      <Stack gap={4}>
+        <Text size="sm" c="blue" fw={600} tt="uppercase">
+          {brand}
+        </Text>
+        <Title order={6} lineClamp={2}>
+          {name}
+        </Title>
+        {discountPrice ? (
+          <Stack gap={0}>
+            <Text
+              size="md"
+              c="gray"
+              fw={600}
+              style={{
+                textDecoration: "line-through",
+              }}
+            >
               {formatNumberWithSeperator(price)} đ
-            </Typography>
-          )}
-          <Stack direction="row" alignItems="center">
-            <Rating value={rating} precision={0.1} size="small" readOnly />
-            <Typography variant="caption" color="text.secondary">
-              ({rating.toFixed(1)})
-            </Typography>
+            </Text>
+            <Text size="md" c="red" fw={600}>
+              {formatNumberWithSeperator(discountPrice)} đ
+            </Text>
           </Stack>
-          <Stack
-            direction="row"
-            alignItems="center"
-            sx={{
-              mt: "auto",
-              gap: 1,
-            }}
+        ) : (
+          <Text size="sm" c="red" fw={600}>
+            {formatNumberWithSeperator(price)} đ
+          </Text>
+        )}
+        <Group gap={4}>
+          <Rating value={rating} readOnly />
+          <Text size="sm" c="gray" tt="uppercase">
+            ({rating.toFixed(1)})
+          </Text>
+        </Group>
+        <Group justify="space-between" align="center" mt="auto" gap={4}>
+          <Button
+            flex={1}
+            variant="filled"
+            size="compact-md"
+            disabled={stock <= 0}
+            onClick={handleAddToCartClick}
+            data-umami-event="Thêm vào giỏ hàng"
+            leftSection={<ShoppingCart />}
           >
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="small"
-              disabled={stock <= 0}
-              onClick={handleAddToCartClick}
-              data-umami-event="Thêm vào giỏ hàng"
-            >
-              <AddShoppingCartIcon fontSize="medium" sx={{ mr: 1 }} />
-              Thêm vào giỏ
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={handleAddToWishlistClick}
-              data-umami-event="Yêu thích sản phẩm"
-            >
-              <FavoriteBorderIcon fontSize="medium" />
-            </Button>
-          </Stack>
-        </Stack>
-      </CardContent>
+            Thêm vào giỏ
+          </Button>
+          <Button
+            variant="filled"
+            color="pink"
+            size="compact-md"
+            onClick={handleAddToWishlistClick}
+            data-umami-event="Yêu thích sản phẩm"
+          >
+            <Heart />
+          </Button>
+        </Group>
+      </Stack>
     </Card>
   );
 };
