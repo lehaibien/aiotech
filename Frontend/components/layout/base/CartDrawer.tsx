@@ -35,13 +35,13 @@ export const CartDrawer = () => {
       <ActionIcon
         aria-label="Danh sách yêu thích"
         variant="transparent"
-        color="dark"
         pos="relative"
         w={40}
         h={40}
         onClick={open}
       >
-        <ShoppingBag size={20} />
+        
+        <ShoppingBag size={20} color="var(--mantine-color-text)" />
         {cartItems.length > 0 && (
           <Badge pos="absolute" top={0} right={0} circle>
             {cartItems.length}
@@ -55,7 +55,7 @@ export const CartDrawer = () => {
         position="right"
         title="Giỏ hàng"
         withCloseButton
-        size='lg'
+        size="lg"
         styles={{
           body: {
             height: "calc(100% - 60px)",

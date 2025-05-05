@@ -45,7 +45,7 @@ export const Header = ({ categories }: HeaderProps) => {
       </Box>
       <Group
         flex={1}
-        gap={4}
+        gap='xs'
         justify="flex-end"
         align="center"
         wrap="nowrap"

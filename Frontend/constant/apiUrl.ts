@@ -51,7 +51,7 @@ export const API_URL = {
   // report
   saleReport: "report/sale",
   orderReport: "report/order",
-  outOfStockReport: "report/out-of-stock",
+  inventoryStatusReport: "report/inventory-status",
   brandPerformanceReport: "report/brand-performance",
   categoryPerformanceReport: "report/category-performance",
   productRatingReport: "report/product-rating",

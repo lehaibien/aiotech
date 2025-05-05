@@ -1,12 +1,12 @@
 "use client";
 
+import { notifications } from "@mantine/notifications";
 import {
   HubConnection,
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
 import { useSession } from "next-auth/react";
-import { useSnackbar } from "notistack";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const SignalRContext = createContext<HubConnection | null>(null);
@@ -17,9 +17,7 @@ type SignalRProviderProps = {
 
 export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   const { data: session } = useSession();
-  const { enqueueSnackbar } = useSnackbar();
   const [connection, setConnection] = useState<HubConnection | null>(null);
-  // Memoize the user's role
   const userRole = useMemo(() => {
     return session?.user?.role?.toLowerCase();
   }, [session]);
@@ -40,7 +38,6 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
         .configureLogging(LogLevel.Error)
         .build();
 
-      // Start the connection
       newConnection
         .start()
         .then(() => {
@@ -51,38 +48,35 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
           console.error("SignalR Connection Error: ", err);
         });
 
-      // Cleanup on unmount
       return () => {
         if (newConnection) {
           newConnection
             .stop()
-            .then(() => console.log("SignalR Disconnected"))
             .catch((err: Error) =>
               console.error("SignalR Disconnection Error: ", err)
             );
         }
       };
     }
-  }, [accessToken, userRole]); // Re-run effect if userRole changes
+  }, [accessToken, userRole]);
 
   useEffect(() => {
     if (connection) {
       connection.on("ReceiveNotification", (message) => {
-        enqueueSnackbar(message, {
-          key: "admin-notification",
-          variant: "info",
-          persist: true,
-          preventDuplicate: false,
-          disableWindowBlurListener: false,
+        notifications.show({
+          title: "Thông báo",
+          message: message,
+          color: "teal",
+          autoClose: false,
+          position: "top-right",
         });
       });
 
-      // Cleanup on unmount
       return () => {
         connection.off("ReceiveNotification");
       };
     }
-  }, [connection, enqueueSnackbar]);
+  }, [connection]);
 
   return (
     <SignalRContext.Provider value={connection}>
@@ -91,7 +85,6 @@ export const SignalRProvider = ({ children }: SignalRProviderProps) => {
   );
 };
 
-// Custom hook to use the SignalR connection
 export const useSignalR = () => {
   return useContext(SignalRContext);
 };

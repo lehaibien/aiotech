@@ -114,7 +114,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </Badge>
         )}
       </Card.Section>
-      <Stack gap={4}>
+      <Stack gap="xs">
         <Text size="sm" c="blue" fw={600} tt="uppercase">
           {brand}
         </Text>
@@ -123,14 +123,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </Title>
         {discountPrice ? (
           <Stack gap={0}>
-            <Text
-              size="md"
-              c="gray"
-              fw={600}
-              style={{
-                textDecoration: "line-through",
-              }}
-            >
+            <Text size="sm" c="gray" fw={600} td="line-through">
               {formatNumberWithSeperator(price)} đ
             </Text>
             <Text size="md" c="red" fw={600}>
@@ -142,13 +135,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             {formatNumberWithSeperator(price)} đ
           </Text>
         )}
-        <Group gap={4}>
+        <Group gap='sm'>
           <Rating value={rating} readOnly />
           <Text size="sm" c="gray" tt="uppercase">
             ({rating.toFixed(1)})
           </Text>
         </Group>
-        <Group justify="space-between" align="center" mt="auto" gap={4}>
+        <Group justify="space-between" align="center" mt="auto" gap='sm'>
           <Button
             flex={1}
             variant="filled"

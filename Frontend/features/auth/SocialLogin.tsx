@@ -16,7 +16,7 @@ export const SocialLogin = ({ redirectTo, isRegister }: SocialLoginProps) => {
         base: "column",
         md: "row",
       }}
-      gap={4}
+      gap='sm'
     >
       <Button
         variant="filled"

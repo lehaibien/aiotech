@@ -34,7 +34,7 @@ export const ControlledRadioGroup = <T extends FieldValues>({
           error={error ? error.message : undefined}
           {...props}
         >
-          <Flex gap={4} direction={direction}>
+          <Flex gap='sm' direction={direction}>
             {options.map((option) => (
               <Radio
                 key={option.value}

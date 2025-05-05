@@ -19,7 +19,7 @@ export const CartItemListing = () => {
             width={96}
             height={96}
           />
-          <Stack gap={4} flex={1}>
+          <Stack gap='sm' flex={1}>
             <Text size="sm" lineClamp={2}>
               {item.productName}
             </Text>

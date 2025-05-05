@@ -34,7 +34,7 @@ export const RegisterForm = () => {
     }
   };
   return (
-    <Stack component="form" onSubmit={handleSubmit(onSubmit)} gap={8}>
+    <Stack component="form" onSubmit={handleSubmit(onSubmit)} gap='md'>
       <ControlledTextInput
         id="username"
         name="userName"

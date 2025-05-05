@@ -9,7 +9,7 @@ export const Navigation = () => {
   const pathName = usePathname();
 
   return (
-    <Flex gap={8} direction={{
+    <Flex gap='md' direction={{
       xs: "column",
       md: "row",
     }} align="center">
