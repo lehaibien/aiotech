@@ -19,8 +19,7 @@ export const SocialLogin = ({ redirectTo, isRegister }: SocialLoginProps) => {
       gap='sm'
     >
       <Button
-        variant="filled"
-        color="dark"
+        variant="outline"
         leftSection={<GoogleIcon />}
         onClick={() => signIn("google", { redirectTo: redirectTo })}
         data-umami-event={`${isRegister ? "Đăng ký" : "Đăng nhập"} với Google`}
@@ -29,8 +28,7 @@ export const SocialLogin = ({ redirectTo, isRegister }: SocialLoginProps) => {
         {isRegister ? "Đăng ký" : "Đăng nhập"} với Google
       </Button>
       <Button
-        variant="filled"
-        color="dark"
+        variant="outline"
         leftSection={<FacebookIcon />}
         onClick={() => signIn("facebook", { redirectTo: redirectTo })}
         data-umami-event={`${

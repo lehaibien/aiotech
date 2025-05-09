@@ -57,7 +57,7 @@ export type ProductUpdateResponse = {
   stock: number;
   brandId: UUID;
   categoryId: UUID;
-  thumbnailUrl: string;
+  thumbnailUrl: string | undefined;
   tags: string[];
   imageUrls: string[];
   isFeatured?: boolean;

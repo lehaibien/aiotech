@@ -1,9 +1,9 @@
 "use client";
 
 import { ComboBoxItem } from "@/types";
-import { Group } from "@mantine/core";
-import { Navigation } from "./Navigation";
+import { Grid, GridCol } from "@mantine/core";
 import { CategoryMenu } from "./CategoryMenu";
+import { Navigation } from "./Navigation";
 
 type SubHeaderProps = {
   categories: ComboBoxItem[];
@@ -11,7 +11,7 @@ type SubHeaderProps = {
 
 export const SubHeader = ({ categories }: SubHeaderProps) => {
   return (
-    <Group
+    <Grid
       display={{
         base: "none",
         md: "flex",
@@ -19,8 +19,12 @@ export const SubHeader = ({ categories }: SubHeaderProps) => {
       justify="space-between"
       align="center"
     >
-      <CategoryMenu categories={categories || []} />
-      <Navigation />
-    </Group>
+      <GridCol span={2}>
+        <CategoryMenu categories={categories || []} />
+      </GridCol>
+      <GridCol span={4}>
+        <Navigation />
+      </GridCol>
+    </Grid>
   );
 };

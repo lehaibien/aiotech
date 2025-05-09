@@ -1,40 +1,26 @@
 "use client";
 
 import { API_URL } from "@/constant/apiUrl";
-import { deleteApi, postApi, putApi } from "@/lib/apiClient";
+import { deleteApi, putApi } from "@/lib/apiClient";
 import { formatDate } from "@/lib/utils";
-import { ApiResponse, ReviewRequest, UUID } from "@/types";
-import { Center, Flex, Group, Rating, Stack, Text, Title } from "@mantine/core";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Divider,
-  Pagination,
-  TextField,
-  Typography
-} from "@mui/material";
+import { UUID } from "@/types";
+import { Alert, Box, Button, Card, Center, Divider, Flex, Group, Loader, Pagination, Rating, Stack, Text, Textarea, Title } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useSnackbar } from "notistack";
 import { useMemo, useState } from "react";
 import { useProductReview } from "./hooks/useProductReview";
-import { ReviewSectionDeleteButton } from "./ReviewSectionDeleteButton";
 import { WriteReviewSection } from "./WriteReviewSection";
 
 type ReviewSectionProps = {
   productId: UUID;
 };
 
-export default function ReviewSection({ productId }: ReviewSectionProps) {
+export const ReviewSection = ({ productId }: ReviewSectionProps) => {
   const pageSize = 5;
-  const { enqueueSnackbar } = useSnackbar();
   const { data: session } = useSession();
   const user = useMemo(() => session?.user, [session]);
-  const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedComment, setEditedComment] = useState({
@@ -56,34 +42,6 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
     [data]
   );
 
-  const handleSubmitReview = () => {
-    if (user?.id) {
-      const request: ReviewRequest = {
-        productID: productId,
-        userId: user.id,
-        rating: newReview.rating,
-        comment: newReview.comment,
-      };
-      postApi(API_URL.review, request).then((res: ApiResponse) => {
-        if (res.success) {
-          enqueueSnackbar("Đánh giá thành công", {
-            variant: "success",
-          });
-          setNewReview({ rating: 0, comment: "" });
-          if (window) {
-            window.location.reload();
-          }
-        } else {
-          enqueueSnackbar(res.message, { variant: "error" });
-        }
-      });
-    } else {
-      enqueueSnackbar("Vui lòng đăng nhập đê để thêm nhận xét", {
-        variant: "error",
-      });
-    }
-  };
-
   const handleEditComment = (index: number) => {
     const comment = data?.[index];
     if (comment) {
@@ -96,22 +54,35 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
   };
 
   const handleDeleteComment = async (index: number) => {
-    if (data && data[index].id) {
-      const response = await deleteApi(API_URL.review + `/${data[index].id}`);
-      if (!response.success) {
-        enqueueSnackbar(response.message, { variant: "error" });
-        return;
+    modals.openConfirmModal({
+      title: "Xác nhận xóa",
+      children: "Bạn có chắc chắn muốn xóa đánh giá này?",
+      labels: { confirm: "Xóa", cancel: "Hủy" },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        if (data && data[index].id) {
+          const response = await deleteApi(API_URL.review + `/${data[index].id}`);
+          if (!response.success) {
+            notifications.show({
+              title: "Lỗi xảy ra khi xóa đánh giá",
+              message: response.message,
+              color: "red",
+            });
+            return;
+          }
+          notifications.show({
+            title: "Xóa đánh giá thành công",
+            message: "Đánh giá của bạn đã được xóa thành công.",
+            color: "green",
+          });
+          if (window) {
+            window.location.reload();
+          }
+        }
       }
-      enqueueSnackbar("Xóa đánh giá thành công", {
-        variant: "success",
-      });
-      if (window) {
-        window.location.reload();
-      }
-    }
+    })
   };
 
-  // Add save edit handler
   const handleSaveEdit = async (index: number) => {
     if (data && data[index] && user?.id) {
       const updatedComment = {
@@ -123,13 +94,19 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
       };
       const response = await putApi(API_URL.review, updatedComment);
       if (!response.success) {
-        enqueueSnackbar(response.message, { variant: "error" });
+        notifications.show({
+          title: "Lỗi xảy ra khi cập nhật đánh giá",
+          message: response.message,
+          color: "red",
+        })
         return;
       }
       setEditingIndex(null);
-      enqueueSnackbar("Cập nhật đánh giá thành công", {
-        variant: "success",
-      });
+      notifications.show({
+        title: "Cập nhật đánh giá thành công",
+        message: "Đánh giá của bạn đã được cập nhật thành công.",
+        color: "green",
+      })
       if (window) {
         window.location.reload();
       }
@@ -137,199 +114,144 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
   };
 
   if (error) {
-    enqueueSnackbar("Lỗi xảy ra khi lấy dữ liệu", { variant: "error" });
+    notifications.show({
+      title: "Lỗi xảy ra khi lấy dữ liệu",
+      message: error.message,
+      color: "red",
+    });
   }
 
   return (
-    <Stack gap={4}>
+    <Stack gap="md">
       <Title order={5}>Đánh giá sản phẩm</Title>
-      <Flex
-        direction={{
-          xs: "column",
-          md: "row",
-        }}
-        gap={8}
-        p={4}
-      >
-        <Group gap={4}>
-          <Text size="xl">{totalRating.toFixed(1)}</Text>
-          <Rating value={totalRating} readOnly size="md" />
-          <Typography variant="body2" color="text.secondary">
-            ({data?.length || 0} đánh giá)
-          </Typography>
-        </Group>
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{
-            display: {
-              xs: "none",
-              md: "block",
-            },
+      <Card withBorder p="md">
+        <Flex
+          direction={{
+            base: "column",
+            md: "row",
           }}
-        />
-        <div
-          style={{
-            flex: 1,
-          }}
+          gap="md"
+          align="center"
         >
-          <Text size="lg">Đánh giá từ khách hàng</Text>
-          <Text size="md" c="gray">
-            Chia sẻ trải nghiệm của bạn để giúp người khác đưa ra quyết định tốt
-            hơn.
-          </Text>
-        </div>
-      </Flex>
+          <Group gap="xs">
+            <Text size="xl" fw={600}>{totalRating.toFixed(1)}</Text>
+            <Rating value={totalRating} readOnly size="lg" />
+            <Text size="sm" c="dimmed">({data?.length || 0} đánh giá)</Text>
+          </Group>
+          <Divider orientation="vertical" />
+          <Box style={{ flex: 1 }}>
+            <Text size="lg" fw={500}>Đánh giá từ khách hàng</Text>
+            <Text size="sm" c="dimmed">
+              Chia sẻ trải nghiệm của bạn để giúp người khác đưa ra quyết định tốt hơn.
+            </Text>
+          </Box>
+        </Flex>
+      </Card>
 
       {user ? (
-        <WriteReviewSection handleSubmitReview={handleSubmitReview} />
+        <WriteReviewSection productId={productId} />
       ) : (
-        <Alert severity="info">
+        <Alert color="blue" title="Thông báo">
           Vui lòng đăng nhập để viết đánh giá cho sản phẩm này.
         </Alert>
       )}
 
       {isValidating && !data ? (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <CircularProgress />
-        </Box>
+        <Center>
+          <Loader size="lg" />
+        </Center>
       ) : data?.length === 0 ? (
         <Center>
-          <Text c="gray">Chưa có đánh giá nào cho sản phẩm này.</Text>
+          <Text c="dimmed">Chưa có đánh giá nào cho sản phẩm này.</Text>
         </Center>
       ) : (
-        <Stack gap={4}>
+        <Stack gap="md">
           {data?.map((review, index) => (
-            <Card
-              key={review.id}
-              sx={{
-                position: "relative",
-                backgroundColor: "background.default",
-                borderRadius: 2,
-              }}
-            >
+            <Card key={review.id} withBorder>
               {index === 0 && user?.name && data[0].userName === user.name && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 16,
-                    right: 16,
-                    display: "flex",
-                    gap: 1,
-                  }}
-                >
+                <Group justify="flex-end" gap="xs" mb="sm">
                   {editingIndex === index ? (
                     <>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={() => handleSaveEdit(index)}
-                        sx={{ minWidth: 80 }}
-                      >
+                      <Button onClick={() => handleSaveEdit(index)}>
                         Lưu
                       </Button>
-                      <Button
-                        size="small"
-                        color="secondary"
-                        onClick={() => setEditingIndex(null)}
-                      >
+                      <Button variant="light" onClick={() => setEditingIndex(null)}>
                         Hủy
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Button
-                        size="small"
-                        onClick={() => handleEditComment(index)}
-                        sx={{ color: "text.secondary" }}
-                      >
+                      <Button size='sm' onClick={() => handleEditComment(index)}>
                         Sửa
                       </Button>
-                      <ReviewSectionDeleteButton
-                        index={index}
-                        handleDelete={handleDeleteComment}
+                      <Button size="sm" variant="light" color="red" onClick={() => handleDeleteComment(index)}>
+                        Xóa
+                      </Button>
+                    </>
+                  )}
+                </Group>
+              )}
+              <Group align="flex-start" gap="md">
+                <Image
+                  src={review.userImageUrl || "/user-avatar.png"}
+                  width={40}
+                  height={40}
+                  alt={review.userName}
+                  style={{
+                    borderRadius: "50%",
+                    objectFit: "fill",
+                  }}
+                />
+                <Box style={{ flex: 1 }}>
+                  {editingIndex === index ? (
+                    <Stack gap="sm">
+                      <Rating
+                        value={editedComment.rating}
+                        onChange={(value) =>
+                          setEditedComment({
+                            ...editedComment,
+                            rating: value || 0,
+                          })
+                        }
+                        size="md"
                       />
+                      <Textarea
+                        value={editedComment.comment}
+                        onChange={(e) =>
+                          setEditedComment({
+                            ...editedComment,
+                            comment: e.target.value,
+                          })
+                        }
+                        placeholder="Nhập đánh giá của bạn"
+                        minRows={3}
+                      />
+                    </Stack>
+                  ) : (
+                    <>
+                      <Text fw={500} size="sm">{review.userName}</Text>
+                      <Group gap="xs" my="xs">
+                        <Rating value={review.rating} readOnly size="sm" />
+                        <Text size="xs" c="dimmed">{formatDate(review.createdDate)}</Text>
+                      </Group>
+                      <Text size="sm">{review.comment}</Text>
                     </>
                   )}
                 </Box>
-              )}
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Image
-                    src={review.userImageUrl || "/user-avatar.png"}
-                    width={40}
-                    height={40}
-                    alt={review.userName}
-                    style={{
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <Box>
-                    {editingIndex === index ? (
-                      <>
-                        <Rating
-                          value={editedComment.rating}
-                          onChange={(value) =>
-                            setEditedComment({
-                              ...editedComment,
-                              rating: value || 0,
-                            })
-                          }
-                          size="md"
-                        />
-                        <TextField
-                          fullWidth
-                          multiline
-                          rows={3}
-                          value={editedComment.comment}
-                          onChange={(e) =>
-                            setEditedComment({
-                              ...editedComment,
-                              comment: e.target.value,
-                            })
-                          }
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          {review.userName}
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Rating value={review.rating} readOnly size="sm" />
-                          <Typography variant="body2" color="text.secondary">
-                            {formatDate(review.createdDate)}
-                          </Typography>
-                        </Box>
-                        <Typography variant="body1">
-                          {review.comment}
-                        </Typography>
-                      </>
-                    )}
-                  </Box>
-                </Box>
-              </CardContent>
+              </Group>
             </Card>
           ))}
           {data && data.length > pageSize && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Group justify="center">
               <Pagination
-                count={Math.ceil(data.length / pageSize)}
-                page={currentPage}
-                onChange={(_event, value) => setCurrentPage(value)}
-                color="primary"
+                total={Math.ceil(data.length / pageSize)}
+                value={currentPage}
+                onChange={setCurrentPage}
               />
-            </Box>
+            </Group>
           )}
         </Stack>
       )}
     </Stack>
   );
-}
+};

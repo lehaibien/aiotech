@@ -105,7 +105,12 @@ export async function deleteApi(action: string) {
 }
 
 export async function deleteApiWithBody(action: string, request: object) {
-  return fetchApi(buildUrl(action), "DELETE", request, API_CONFIG.defaultHeaders);
+  return fetchApi(
+    buildUrl(action),
+    "DELETE",
+    request,
+    API_CONFIG.defaultHeaders
+  );
 }
 
 export async function deleteApiQuery(action: string, request: object) {

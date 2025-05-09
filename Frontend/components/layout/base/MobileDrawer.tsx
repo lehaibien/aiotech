@@ -2,21 +2,16 @@
 
 import { baseNavItems } from "@/constant/routes";
 import { ComboBoxItem } from "@/types";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import MenuIcon from "@mui/icons-material/Menu";
 import {
-  Box,
+  Burger,
   Collapse,
   Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+  Flex,
+  NavLink,
+  Stack
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -25,119 +20,84 @@ type MobileDrawerProps = {
   categories: ComboBoxItem[];
 };
 
-// Update the MobileDrawer component
-export function MobileDrawer({ categories }: MobileDrawerProps) {
-  const pathName = usePathname();
-  const [expanded, setExpanded] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const toggleDrawer =
-    (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
-      if (
-        event.type === "keydown" &&
-        ((event as React.KeyboardEvent).key === "Tab" ||
-          (event as React.KeyboardEvent).key === "Shift")
-      ) {
-        return;
-      }
-      setDrawerOpen(open);
-    };
-
-  const onClose = (event: React.KeyboardEvent | React.MouseEvent) => {
-    if (
-      event.type === "keydown" &&
-      ((event as React.KeyboardEvent).key === "Tab" ||
-        (event as React.KeyboardEvent).key === "Shift")
-    ) {
-      return;
-    }
-    setDrawerOpen(false);
-  };
+export const MobileDrawer = ({ categories }: MobileDrawerProps) => {
+  const [opened, { close, toggle }] = useDisclosure(false);
   return (
-    <Box
-      sx={{
-        flex: 1,
-        display: {
-          xs: "flex",
-          md: "none",
-        },
+    <Flex
+      display={{
+        xs: "flex",
+        md: "none",
       }}
     >
-      <IconButton color="inherit" onClick={toggleDrawer(true)}>
-        <MenuIcon />
-      </IconButton>
+      <Burger
+        size="sm"
+        opened={opened}
+        onClick={toggle}
+        aria-label="Toggle navigation"
+      />
 
-      <Drawer anchor="left" open={drawerOpen} onClose={onClose}>
-        <Box sx={{ width: 280, p: 2 }}>
-          {/* Main Navigation */}
-          <List sx={{ mb: 2 }}>
-            {baseNavItems.map((nav, index) => (
-              <React.Fragment key={nav.title}>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    LinkComponent={Link}
-                    href={nav.href ?? "/"}
-                    selected={pathName === nav.href}
-                    onClick={onClose}
-                    sx={{
-                      "&.Mui-selected": {
-                        backgroundColor: "action.selected",
-                        fontWeight: 600,
-                      },
-                    }}
-                  >
-                    <ListItemText primary={nav.title} />
-                  </ListItemButton>
-                </ListItem>
-
-                {/* Insert categories after first navigation item */}
-                {index === 0 && (
-                  <ListItem
-                    disablePadding
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <ListItemButton onClick={() => setExpanded(!expanded)}>
-                      <ListItemIcon>
-                        <CategoryOutlinedIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary="Danh mục sản phẩm" />
-                      {expanded ? <ExpandLess /> : <ExpandMore />}
-                    </ListItemButton>
-                    <Collapse in={expanded}>
-                      <List disablePadding>
-                        <ListItem disablePadding>
-                          <ListItemButton
-                            component={Link}
-                            href="/products"
-                            onClick={onClose}
-                          >
-                            <ListItemText primary="Tất cả sản phẩm" />
-                          </ListItemButton>
-                        </ListItem>
-                        {categories.map((category: ComboBoxItem) => (
-                          <ListItem key={category.value} disablePadding>
-                            <ListItemButton
-                              component={Link}
-                              href={`/products?category=${category.text}`}
-                              onClick={onClose}
-                            >
-                              <ListItemText primary={category.text} />
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Collapse>
-                  </ListItem>
-                )}
-              </React.Fragment>
-            ))}
-          </List>
-        </Box>
+      <Drawer opened={opened} onClose={close} size="md" withCloseButton>
+        <MobileNavigation categories={categories} onClose={close} />
       </Drawer>
-    </Box>
+    </Flex>
   );
-}
+};
+
+const MobileNavigation = ({
+  categories,
+  onClose,
+}: {
+  categories: ComboBoxItem[];
+  onClose: () => void;
+}) => {
+  const pathName = usePathname();
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Stack>
+      {baseNavItems.map((nav, index) => (
+        <React.Fragment key={nav.title}>
+          <NavLink
+            component={Link}
+            href={nav.href ?? "/"}
+            label={nav.title}
+            active={pathName === nav.href}
+            onClick={onClose}
+          />
+          {index === 0 && (
+            <>
+              <NavLink
+                label="Danh mục sản phẩm"
+                rightSection={
+                  expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                }
+                onClick={() => setExpanded((prev) => !prev)}
+              />
+              <Collapse in={expanded}>
+                <NavLink
+                  component={Link}
+                  href="/products"
+                  label="Tất cả sản phẩm"
+                  active={
+                    pathName === "/products" && !pathName.includes("category=")
+                  }
+                  onClick={onClose}
+                />
+                {categories.map((category: ComboBoxItem) => (
+                  <NavLink
+                    key={category.value}
+                    component={Link}
+                    href={`/products?category=${category.text}`}
+                    label={category.text}
+                    active={pathName === `/products?category=${category.text}`}
+                    onClick={onClose}
+                  />
+                ))}
+              </Collapse>
+            </>
+          )}
+        </React.Fragment>
+      ))}
+    </Stack>
+  );
+};

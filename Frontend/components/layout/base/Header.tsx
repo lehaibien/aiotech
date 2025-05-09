@@ -16,12 +16,13 @@ type HeaderProps = {
 export const Header = ({ categories }: HeaderProps) => {
   return (
     <Group justify="space-between">
-      <Box
+      <Group
         flex={1}
         style={{
-          order: 2,
+          order: 1,
         }}
       >
+        <MobileDrawer categories={categories} />
         <BrandLogo
           href="/"
           display={{
@@ -29,8 +30,7 @@ export const Header = ({ categories }: HeaderProps) => {
             md: "inline-block",
           }}
         />
-      </Box>
-      <MobileDrawer categories={categories} />
+      </Group>
       <Box
         display={{
           base: "none",
@@ -45,7 +45,7 @@ export const Header = ({ categories }: HeaderProps) => {
       </Box>
       <Group
         flex={1}
-        gap='xs'
+        gap="xs"
         justify="flex-end"
         align="center"
         wrap="nowrap"

@@ -3,13 +3,9 @@ import { API_URL } from "@/constant/apiUrl";
 import { getApiQuery } from "@/lib/apiClient";
 import { UUID } from "@/types";
 import { ProductListItemResponse } from "@/types/product";
-import { Box, Grid, Typography } from "@mui/material";
+import { SimpleGrid, Title } from "@mantine/core";
 
-export default async function RelatedProducts({
-  productId,
-}: {
-  productId: UUID;
-}) {
+export async function RelatedProducts({ productId }: { productId: UUID }) {
   let relatedProducts: ProductListItemResponse[] = [];
   const relatedResponse = await getApiQuery(API_URL.productRelated, {
     id: productId,
@@ -25,18 +21,20 @@ export default async function RelatedProducts({
   }
 
   return (
-    <Box mt={2}>
-      <Typography variant="h5" gutterBottom>
-        Sản phẩm liên quan
-      </Typography>
+    <>
+      <Title order={6}>Sản phẩm liên quan</Title>
 
-      <Grid container spacing={3}>
+      <SimpleGrid
+        cols={{
+          base: 12,
+          sm: 6,
+          md: 3,
+        }}
+      >
         {relatedProducts.map((product) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={product.id}>
-            <ProductCard product={product} />
-          </Grid>
+          <ProductCard product={product} key={product.id} />
         ))}
-      </Grid>
-    </Box>
+      </SimpleGrid>
+    </>
   );
 }

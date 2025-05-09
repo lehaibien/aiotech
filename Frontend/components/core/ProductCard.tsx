@@ -9,6 +9,7 @@ import {
   Badge,
   Button,
   Card,
+  Center,
   Group,
   Rating,
   Stack,
@@ -88,15 +89,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card component={Link} href={`/products/${id}`} withBorder>
       <Card.Section pos="relative">
-        <Image
-          src={thumbnailUrl}
-          width={300}
-          height={300}
-          alt={name}
-          style={{
-            objectFit: "contain",
-          }}
-        />
+        <Center>
+          <Image
+            src={thumbnailUrl}
+            width={300}
+            height={300}
+            alt={name}
+            style={{
+              objectFit: "contain",
+            }}
+          />
+        </Center>
         {stock <= LOW_STOCK_THRESHOLD && (
           <Badge
             color={getStockColor()}
@@ -135,13 +138,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             {formatNumberWithSeperator(price)} đ
           </Text>
         )}
-        <Group gap='sm'>
+        <Group gap="sm">
           <Rating value={rating} readOnly />
           <Text size="sm" c="gray" tt="uppercase">
             ({rating.toFixed(1)})
           </Text>
         </Group>
-        <Group justify="space-between" align="center" mt="auto" gap='sm'>
+        <Group justify="space-between" align="center" mt="auto" gap="sm">
           <Button
             flex={1}
             variant="filled"

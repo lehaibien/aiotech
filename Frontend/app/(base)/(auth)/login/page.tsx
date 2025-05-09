@@ -1,5 +1,5 @@
 import { LoginForm } from "@/features/auth/login/LoginForm";
-import {SocialLogin} from "@/features/auth/SocialLogin";
+import { SocialLogin } from "@/features/auth/SocialLogin";
 import { SearchParams } from "@/types";
 import { Container, Divider, Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
@@ -17,10 +17,10 @@ export default async function Page({
   const { redirect } = await searchParams;
   return (
     <Container size="sm">
-      <Stack gap='sm'>
+      <Stack gap="sm">
         <Title order={1}>Đăng nhập</Title>
         <LoginForm redirectTo={redirect ?? "/"} />
-        <Group justify="center" align="center" gap='sm'>
+        <Group justify="center" align="center" gap="sm">
           Bạn chưa có tài khoản?{" "}
           <Link
             href="/register"

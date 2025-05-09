@@ -1,7 +1,7 @@
 "use client";
 
+import { Container, Stack, Text, Title } from "@mantine/core";
 import { SvgIconComponent } from "@mui/icons-material";
-import { Box, Container, Typography } from "@mui/material";
 import { LucideIcon } from "lucide-react";
 
 type NoItemProps = {
@@ -16,25 +16,20 @@ export const NoItem = ({
   icon: Icon,
 }: NoItemProps) => {
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: "60vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-        }}
+    <Container size="sm">
+      <Stack
+        justify="center"
+        align="center"
+        mih='60vh'
       >
         {Icon && <Icon />}
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Title order={2}>
           {title}
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
+        </Title>
+        <Text c='dimmed'>
           {description}
-        </Typography>
-      </Box>
+        </Text>
+      </Stack>
     </Container>
   );
 };

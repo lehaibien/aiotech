@@ -1,71 +1,57 @@
 'use client';
 
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Container, Stack, Title, Text, Button } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 
 const OrderSuccessPage = () => {
   const router = useRouter();
 
   return (
-    <Container maxWidth='sm' sx={{ textAlign: 'center', mt: 8 }}>
+    <Container size="sm" py={32} ta="center">
       {/* Cool SVG Illustration */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+      <Stack align="center" gap="lg">
         <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='150'
-          height='150'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='#4CAF50'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
+          xmlns="http://www.w3.org/2000/svg"
+          width={150}
+          height={150}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#4CAF50"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <path d='M22 11.08V12a10 10 0 1 1-5.93-9.14' />
-          <polyline points='22 4 12 14.01 9 11.01' />
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
-      </Box>
 
-      {/* Order Confirmation Message */}
-      <Typography
-        variant='h4'
-        component='h1'
-        gutterBottom
-        sx={{ fontWeight: 'bold' }}
-      >
-        Đặt hàng thành công
-      </Typography>
-      <Typography variant='body1' gutterBottom>
-        Cảm ơn bạn đã mua hàng. Đơn hàng của bạn sẽ nhanh chóng được giao. Vui
-        lòng kiểm tra email và chờ cuộc gọi giao hàng từ điện thoại.
-      </Typography>
+        {/* Order Confirmation Message */}
+        <Title order={2} fw={700}>
+          Đặt hàng thành công
+        </Title>
+        <Text size="md">
+          Cảm ơn bạn đã mua hàng. Đơn hàng của bạn sẽ nhanh chóng được giao. Vui
+          lòng kiểm tra email và chờ cuộc gọi giao hàng từ điện thoại.
+        </Text>
 
-      {/* Order Details */}
-      {/* <Box
-        sx={{
-          p: 3,
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-        }}
-      >
-        <Typography variant='body1' gutterBottom>
-          Mã đơn hàng: <strong>{orderDetails.orderId}</strong>
-        </Typography>
-        <Typography variant='body1' gutterBottom>
-          Tổng thanh toán: <strong>{orderDetails.total}</strong>
-        </Typography>
-      </Box> */}
+        {/* Order Details */}
+        {/* <Paper shadow="xs" p="md" bg="gray.0" radius="md">
+          <Text>
+            Mã đơn hàng: <strong>{orderDetails.orderId}</strong>
+          </Text>
+          <Text>
+            Tổng thanh toán: <strong>{orderDetails.total}</strong>
+          </Text>
+        </Paper> */}
 
-      {/* Continue Shopping Button */}
-      <Button
-        variant='contained'
-        color='primary'
-        size='large'
-        onClick={() => router.push('/products')}
-        sx={{ mt: 2 }}
-      >
-        Tiếp tục mua hàng
-      </Button>
+        <Button
+          size="lg"
+          onClick={() => router.push('/products')}
+          mt="md"
+        >
+          Tiếp tục mua hàng
+        </Button>
+      </Stack>
     </Container>
   );
 };
