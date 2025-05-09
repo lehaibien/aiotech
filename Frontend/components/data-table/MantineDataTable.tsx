@@ -27,6 +27,8 @@ type MantineDataTableProps<T> = {
   onSelectedRecordsChange?: (selectedRecords: T[]) => void;
   onSortStatusChange?: (sortStatus: DataTableSortStatus<T>) => void;
   height?: number | string;
+  minHeight?: number;
+  idAccessor?: (keyof T | (string & NonNullable<unknown>)) | ((record: T) => React.Key);
 };
 
 export const MantineDataTable = <T,>({
@@ -48,6 +50,8 @@ export const MantineDataTable = <T,>({
   onSelectedRecordsChange,
   onSortStatusChange,
   height = "100%",
+  minHeight = 0,
+  idAccessor = "id",
 }: MantineDataTableProps<T>) => {
   const [selectedRecords, setSelectedRecords] = useState<T[]>([]);
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus<T>>({
@@ -86,7 +90,9 @@ export const MantineDataTable = <T,>({
   };
   return (
     <DataTable
+      idAccessor={idAccessor}
       height={height}
+      minHeight={minHeight}
       withTableBorder={withTableBorder}
       withColumnBorders={withColumnBorders}
       borderRadius={borderRadius}

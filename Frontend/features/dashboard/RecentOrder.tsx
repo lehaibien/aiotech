@@ -1,114 +1,49 @@
-'use client';
+"use client";
 
-import NoRowOverlay from '@/components/core/NoRowOverlay';
-import { formatDate, formatNumberWithSeperator } from '@/lib/utils';
-import { OrderResponse } from '@/types';
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import { grey } from '@mui/material/colors';
-import { GridColDef } from '@mui/x-data-grid';
-
-const columns: GridColDef<OrderResponse>[] = [
-  {
-    field: 'trackingNumber',
-    headerName: 'Mã đơn hàng',
-    width: 250,
-  },
-  { field: 'name', headerName: 'Khách hàng', flex: 1, minWidth: 200 },
-  {
-    field: 'phoneNumber',
-    headerName: 'Số điện thoại',
-    width: 180,
-  },
-  {
-    field: 'createdDate',
-    headerName: 'Ngày đặt hàng',
-    minWidth: 160,
-    valueFormatter: (params) => formatDate(params),
-  },
-  {
-    field: 'totalPrice',
-    headerName: 'Thành tiền',
-    minWidth: 200,
-    type: 'number',
-    align: 'right',
-  },
-];
+import { formatDate, formatNumberWithSeperator } from "@/lib/utils";
+import { OrderResponse } from "@/types";
+import { Center, Table, Text } from "@mantine/core";
 
 type RecentOrdersProps = {
   data: OrderResponse[];
 };
 
-export function RecentOrders({ data }: RecentOrdersProps) {
+export const RecentOrders = ({ data }: RecentOrdersProps) => {
   return (
-    <TableContainer
-      component={Paper}
-      elevation={0}
-      sx={{
-        position: 'relative',
-        minHeight: 400,
-        height: '100%',
-        '& .MuiTableCell-root': {
-          px: { xs: 1, sm: 2 },
-          py: 1.5,
-        },
-      }}>
-      <Table>
-        <TableHead sx={{ bgcolor: grey[50] }}>
-          <TableRow>
-            {columns.map((column) => (
-              <TableCell
-                key={column.field}
-                sx={{
-                  width: column.width,
-                  minWidth: column.minWidth,
-                }}
-                align={column.align}>
-                <Typography
-                  variant='subtitle2'
-                  fontWeight={600}>
-                  {column.headerName}
-                </Typography>
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
+    <Table striped highlightOnHover>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>Mã đơn hàng</Table.Th>
+          <Table.Th>Khách hàng</Table.Th>
+          <Table.Th>Số điện thoại</Table.Th>
+          <Table.Th ta="center">Ngày đặt hàng</Table.Th>
+          <Table.Th ta="right">Thành tiền</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
 
-        <TableBody>
-          {data.map((row) => (
-            <TableRow
-              key={row.trackingNumber}
-              hover
-              sx={{ '&:last-child td': { borderBottom: 0 } }}>
-              <TableCell>{row.trackingNumber}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.phoneNumber}</TableCell>
-              <TableCell align='center'>
-                {formatDate(row.createdDate)}
-              </TableCell>
-              <TableCell align='right'>
-                {formatNumberWithSeperator(row.totalPrice)} đ
-              </TableCell>
-            </TableRow>
-          ))}
+      <Table.Tbody>
+        {data.map((row) => (
+          <Table.Tr key={row.trackingNumber}>
+            <Table.Td>{row.trackingNumber}</Table.Td>
+            <Table.Td>{row.name}</Table.Td>
+            <Table.Td>{row.phoneNumber}</Table.Td>
+            <Table.Td ta="center">{formatDate(row.createdDate)}</Table.Td>
+            <Table.Td ta="right">
+              {formatNumberWithSeperator(row.totalPrice)} đ
+            </Table.Td>
+          </Table.Tr>
+        ))}
 
-          {data.length === 0 && (
-            <TableRow sx={{ height: 400 }}>
-              <TableCell colSpan={columns.length}>
-                <NoRowOverlay />
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+        {data.length === 0 && (
+          <Table.Tr>
+            <Table.Td colSpan={5} style={{ height: "400px" }}>
+              <Center>
+                <Text c="dimmed">Không có dữ liệu</Text>
+              </Center>
+            </Table.Td>
+          </Table.Tr>
+        )}
+      </Table.Tbody>
+    </Table>
   );
-}
+};

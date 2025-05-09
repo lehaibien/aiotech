@@ -39,6 +39,7 @@ export default function Page() {
       <Title order={5}>Quản lý thương hiệu</Title>
       <BrandToolbar selectedRows={selectedRecords} onSearch={handleSearch} />
       <MantineDataTable
+        minHeight={300}
         columns={brandDataTableColumns}
         data={data?.items || []}
         totalRows={data?.totalCount || 0}

@@ -1,74 +1,88 @@
-'use client';
+"use client";
 
-import { MonthPicker } from '@/components/core/MonthPicker';
-import dayjs from '@/lib/extended-dayjs';
-import { Box, Button } from '@mui/material';
-import { Dayjs } from 'dayjs';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import dayjs from "@/lib/extended-dayjs";
+import { Button, SimpleGrid } from "@mantine/core";
+import { MonthPickerInput } from "@mantine/dates";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-type TopCustomerFilterProps = {
+type TopCustomerReportFilterProps = {
   defaultStartDate: Date;
   defaultEndDate: Date;
 };
 
-export default function TopCustomerFilter({
+export const TopCustomerReportFilter = ({
   defaultStartDate,
   defaultEndDate,
-}: TopCustomerFilterProps) {
+}: TopCustomerReportFilterProps) => {
   const router = useRouter();
-  const [startDate, setStartDate] = useState<Dayjs | null>(
-    dayjs(defaultStartDate)
-  );
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(defaultEndDate));
+  const [startDate, setStartDate] = useState<Date | null>(defaultStartDate);
+  const [endDate, setEndDate] = useState<Date | null>(defaultEndDate);
+
   const onApplyFilter = () => {
     if (!startDate || !endDate || dayjs(startDate).isAfter(endDate)) {
-      router.push('/dashboard/reports/top-customer');
+      router.push("/dashboard/reports/top-customer");
       return;
     }
     const start = dayjs(startDate).toISOString();
     const end = dayjs(endDate).toISOString();
-    router.push(`/dashboard/reports/top-customer?start_date=${start}&end_date=${end}`);
+    router.push(
+      `/dashboard/reports/top-customer?start_date=${start}&end_date=${end}`
+    );
   };
 
-  const handleStartDateChange = (newValue: Dayjs | null) => {
+  const handleStartDateChange = (newValue: Date | null) => {
     setStartDate(newValue);
     if (!newValue) {
       setEndDate(null);
       return;
     }
-    const oneYearFromStart = newValue.add(1, 'year');
-    if (endDate && endDate.isAfter(oneYearFromStart)) {
-      setEndDate(oneYearFromStart);
+    if (endDate && dayjs(endDate).isBefore(newValue)) {
+      setEndDate(dayjs(newValue).add(1, "day").toDate());
+      return;
+    }
+    const oneYearFromStart = dayjs(newValue).add(1, "year");
+    if (endDate && dayjs(endDate).isAfter(oneYearFromStart)) {
+      setEndDate(oneYearFromStart.toDate());
     }
   };
 
-  const handleEndDateChange = (newValue: Dayjs | null) => {
-    if (!newValue) return;
-    if (startDate && newValue.isBefore(startDate)) {
-      setEndDate(startDate.add(1, 'day'));
+  const handleEndDateChange = (newValue: Date | null) => {
+    if (!newValue) {
+    }
+    if (startDate && dayjs(newValue).isBefore(startDate)) {
+      setEndDate(dayjs(startDate).add(1, "day").toDate());
       return;
     }
     setEndDate(newValue);
   };
+
   return (
-    <Box sx={{ display: 'flex', gap: 2 }}>
-      <MonthPicker
-        label='Từ tháng'
+    <SimpleGrid
+      cols={{
+        base: 1,
+        md: 6,
+      }}
+      w="100%"
+      style={{
+        alignItems: "flex-end",
+      }}
+    >
+      <MonthPickerInput
+        label="Từ tháng"
         value={startDate}
         onChange={handleStartDateChange}
       />
-      <MonthPicker
-        label='Đến tháng'
+      <MonthPickerInput
+        label="Đến tháng"
         value={endDate}
         onChange={handleEndDateChange}
+        minDate={dayjs(startDate).add(1, "day").toDate()}
+        maxDate={dayjs(startDate).add(1, "year").subtract(1, "day").toDate()}
       />
-      <Button
-        onClick={onApplyFilter}
-        variant='contained'
-        color='info'>
+      <Button onClick={onApplyFilter} variant="filled" color="cyan">
         Lọc
       </Button>
-    </Box>
+    </SimpleGrid>
   );
-}
+};

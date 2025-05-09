@@ -3,8 +3,8 @@ import { OrderDetail } from "@/features/dashboard/orders/OrderDetail";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { OrderResponse, UUID } from "@/types";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
+import { ArrowBigLeft } from "lucide-react";
 import Link from "next/link";
 
 type DashboardOrderDetailParams = Promise<{
@@ -31,13 +31,10 @@ export default async function Page({
   return (
     <>
       <Button
-        variant="text"
-        startIcon={<ArrowBackIcon />}
-        LinkComponent={Link}
+        variant="transparent"
+        leftSection={<ArrowBigLeft />}
+        component={Link}
         href="/dashboard/orders"
-        sx={{
-          fontWeight: "400",
-        }}
       >
         Quay lại
       </Button>

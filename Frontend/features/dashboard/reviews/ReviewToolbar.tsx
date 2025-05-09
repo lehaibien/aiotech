@@ -1,20 +1,22 @@
 import { DataTableSearchInput } from "@/components/data-table/DataTableSearchInput";
 import { API_URL } from "@/constant/apiUrl";
 import { deleteListApi } from "@/lib/apiClient";
-import { PostResponse } from "@/types";
+import { ReviewResponse } from "@/types";
 import { Button, Group } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { Plus, Trash } from "lucide-react";
-import Link from "next/link";
+import { Trash } from "lucide-react";
 import { useCallback } from "react";
 
-type PostToolbarProps = {
-  selectedRows: PostResponse[];
+type ReviewToolbarProps = {
+  selectedRows: ReviewResponse[];
   onSearch: (searchTerm: string) => void;
 };
 
-export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
+export const ReviewToolbar = ({
+  selectedRows,
+  onSearch,
+}: ReviewToolbarProps) => {
   const handleDelete = async () => {
     if (selectedRows.length === 0) {
       notifications.show({
@@ -25,7 +27,7 @@ export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
       return;
     }
     const ids = selectedRows.map((row) => row.id);
-    const response = await deleteListApi(API_URL.post, ids);
+    const response = await deleteListApi(API_URL.review, ids);
     if (response.success) {
       notifications.show({
         title: "Hệ thống",
@@ -52,14 +54,6 @@ export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
   return (
     <Group justify="space-between">
       <Group>
-        <Button
-          variant="filled"
-          leftSection={<Plus />}
-          component={Link}
-          href="/dashboard/posts/upsert"
-        >
-          Thêm mới
-        </Button>
         <Button
           variant="filled"
           color="red"

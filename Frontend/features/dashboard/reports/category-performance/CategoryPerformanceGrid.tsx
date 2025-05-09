@@ -1,14 +1,14 @@
 "use client";
 
 import { formatNumberWithSeperator } from "@/lib/utils";
-import { BrandPerformanceReportResponse } from "@/types";
+import { CategoryPerformanceReportResponse } from "@/types";
 import { DataTableColumn } from "mantine-datatable";
 import { MantineDataTable } from "@/components/data-table/MantineDataTable";
 import { useState } from "react";
 
-const columns: DataTableColumn<BrandPerformanceReportResponse>[] = [
+const columns: DataTableColumn<CategoryPerformanceReportResponse>[] = [
   {
-    accessor: "brandName",
+    accessor: "categoryName",
     title: "Danh mục",
     width: 300,
   },
@@ -38,17 +38,17 @@ const columns: DataTableColumn<BrandPerformanceReportResponse>[] = [
   },
 ];
 
-type BrandPerformanceGridProps = {
-  data: BrandPerformanceReportResponse[];
+type CategoryPerformanceGridProps = {
+  data: CategoryPerformanceReportResponse[];
 };
 
-export const BrandPerformanceGrid = ({ data }: BrandPerformanceGridProps) => {
+export const CategoryPerformanceGrid = ({ data }: CategoryPerformanceGridProps) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   return (
     <MantineDataTable
-      idAccessor="brandId"
+      idAccessor='categoryId'
       columns={columns}
       data={data}
       totalRows={data.length}

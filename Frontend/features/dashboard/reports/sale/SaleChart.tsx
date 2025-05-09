@@ -11,8 +11,12 @@ type SaleChartProps = {
 
 export const SaleChart = ({ data }: SaleChartProps) => {
   const chartData = data.sort((a, b) => dayjs(a.date).diff(dayjs(b.date)));
+  const validData = chartData.filter((item) => item.revenue > 0);
   const averageRevenue =
-    chartData.reduce((acc, item) => acc + item.revenue, 0) / chartData.length;
+    validData.length > 0
+      ? validData.reduce((acc, item) => acc + item.revenue, 0) /
+        validData.length
+      : 0;
   return (
     <LineChart
       h={600}
@@ -38,14 +42,18 @@ export const SaleChart = ({ data }: SaleChartProps) => {
       xAxisProps={{
         label: "Tháng",
       }}
-      referenceLines={averageRevenue > 0 ? [
-        {
-          y: averageRevenue,
-          color: 'red.5',
-          label: 'Doanh thu trung bình',
-          labelPosition: 'insideTopRight',
-        },
-      ] : []}
+      referenceLines={
+        averageRevenue > 0
+          ? [
+              {
+                y: averageRevenue,
+                color: "red.5",
+                label: "Doanh thu trung bình",
+                labelPosition: "insideTopRight",
+              },
+            ]
+          : []
+      }
       connectNulls
     />
   );

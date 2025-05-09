@@ -1,7 +1,7 @@
 import { DataTableSearchInput } from "@/components/data-table/DataTableSearchInput";
 import { API_URL } from "@/constant/apiUrl";
 import { deleteListApi } from "@/lib/apiClient";
-import { PostResponse } from "@/types";
+import { UserResponse } from "@/types";
 import { Button, Group } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -9,12 +9,12 @@ import { Plus, Trash } from "lucide-react";
 import Link from "next/link";
 import { useCallback } from "react";
 
-type PostToolbarProps = {
-  selectedRows: PostResponse[];
+type UserToolbarProps = {
+  selectedRows: UserResponse[];
   onSearch: (searchTerm: string) => void;
 };
 
-export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
+export const UserToolbar = ({ selectedRows, onSearch }: UserToolbarProps) => {
   const handleDelete = async () => {
     if (selectedRows.length === 0) {
       notifications.show({
@@ -25,7 +25,7 @@ export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
       return;
     }
     const ids = selectedRows.map((row) => row.id);
-    const response = await deleteListApi(API_URL.post, ids);
+    const response = await deleteListApi(API_URL.user, ids);
     if (response.success) {
       notifications.show({
         title: "Hệ thống",
@@ -56,7 +56,7 @@ export const PostToolbar = ({ selectedRows, onSearch }: PostToolbarProps) => {
           variant="filled"
           leftSection={<Plus />}
           component={Link}
-          href="/dashboard/posts/upsert"
+          href="/dashboard/users/upsert"
         >
           Thêm mới
         </Button>

@@ -13,7 +13,7 @@ import { postApi, putApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
 import { productRequestSchema } from "@/schemas/productSchema";
 import { ComboBoxItem } from "@/types";
-import { ProductRequest } from "@/types/product";
+import { ProductRequest, ProductUpdateResponse } from "@/types/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Grid, Group, Input, Stack } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -27,9 +27,7 @@ import { ImageUpload } from "./ImageUpload";
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
   categories: ComboBoxItem[];
-  defaultImages?: string[];
-  defaultThumbnail?: string;
-  product: ProductRequest;
+  product: ProductUpdateResponse;
 };
 
 const featuredOptions = [
@@ -41,8 +39,6 @@ export const ProductUpsertForm = ({
   brands,
   categories,
   product,
-  defaultImages = [],
-  defaultThumbnail,
 }: ProductUpsertFormProps) => {
   const router = useRouter();
   const { control, handleSubmit } = useForm<ProductRequest>({
@@ -135,14 +131,14 @@ export const ProductUpsertForm = ({
       }
     };
 
-    getImages(defaultImages)
+    getImages(product.imageUrls)
       .then(setImages)
       .catch((err) => console.error("Image processing error:", err));
 
-    getImages([defaultThumbnail ?? ""])
+    getImages([product.thumbnailUrl ?? ""])
       .then((files) => setThumbnail(files[0]))
       .catch((err) => console.error("Image processing error:", err));
-  }, [defaultImages, defaultThumbnail]);
+  }, [product.imageUrls, product.thumbnailUrl]);
   return (
     <Grid component="form" onSubmit={handleSubmit(onSubmit)}>
       <Grid.Col span={{ sm: 12, lg: 9 }}>

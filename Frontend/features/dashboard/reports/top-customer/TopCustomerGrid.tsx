@@ -1,48 +1,48 @@
-'use client';
+"use client";
 
-import { formatNumberWithSeperator } from '@/lib/utils';
-import { TopCustomerReportResponse } from '@/types/report';
-import { alpha } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import dayjs from '@/lib/extended-dayjs';
+import { MantineDataTable } from "@/components/data-table/MantineDataTable";
+import dayjs from "@/lib/extended-dayjs";
+import { formatNumberWithSeperator } from "@/lib/utils";
+import { TopCustomerReportResponse } from "@/types/report";
+import { DataTableColumn } from "mantine-datatable";
+import { useState } from "react";
 
-const columns: GridColDef[] = [
-  { field: 'customerName', headerName: 'Khách hàng', width: 200 },
+const columns: DataTableColumn<TopCustomerReportResponse>[] = [
   {
-    field: 'orderCount',
-    headerName: 'Tổng số đơn',
+    accessor: "customerName",
+    title: "Khách hàng",
+    width: 200,
+  },
+  {
+    accessor: "orderCount",
+    title: "Tổng số đơn",
     width: 150,
+    render: (record) => formatNumberWithSeperator(record.orderCount),
   },
   {
-    field: 'totalSpent',
-    headerName: 'Tổng chi',
+    accessor: "totalSpent",
+    title: "Tổng chi",
     width: 250,
-    valueFormatter: (params) => {
-      return formatNumberWithSeperator(params as number);
-    },
+    render: (record) => formatNumberWithSeperator(record.totalSpent),
   },
   {
-    field: 'averageOrderValue',
-    headerName: 'Trung bình mỗi đơn hàng',
+    accessor: "averageOrderValue",
+    title: "Trung bình mỗi đơn hàng",
     width: 250,
-    valueFormatter: (params) => {
-      return formatNumberWithSeperator(params as number);
-    },
+    render: (record) => formatNumberWithSeperator(record.averageOrderValue),
   },
   {
-    field: 'daysSinceLastPurchase',
-    headerName: 'Lần mua cuối',
+    accessor: "daysSinceLastPurchase",
+    title: "Lần mua cuối",
     width: 220,
-    valueFormatter: (params: number) => {
-      return dayjs.utc().add(params, 'day').format('DD/MM/YYYY');
-    },
+    render: (record) =>
+      dayjs.utc().add(record.daysSinceLastPurchase, "day").format("DD/MM/YYYY"),
   },
   {
-    field: 'frequentlyPurchasedCategories',
-    headerName: 'Danh mục thường mua',
-    flex: 1,
-    minWidth: 300,
-    valueFormatter: (params: string[]) => params.join(', '),
+    accessor: "frequentlyPurchasedCategories",
+    title: "Danh mục thường mua",
+    width: 300,
+    render: (record) => record.frequentlyPurchasedCategories.join(", "),
   },
 ];
 
@@ -50,44 +50,25 @@ type TopCustomerGridProps = {
   data: TopCustomerReportResponse[];
 };
 
-export default function TopCustomerGrid({ data }: TopCustomerGridProps) {
+export const TopCustomerGrid = ({ data }: TopCustomerGridProps) => {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   return (
-    <DataGrid
-      rows={data}
+    <MantineDataTable
+      idAccessor="customerId"
       columns={columns}
-      getRowId={(row) => row.customerId}
-      initialState={{
-        sorting: {
-          sortModel: [{ field: 'totalSpent', sort: 'desc' }],
-        },
-      }}
-      pageSizeOptions={[10, 25, 50]}
-      disableColumnMenu
-      disableRowSelectionOnClick
-      showCellVerticalBorder
-      sx={(theme) => ({
-        '& .MuiDataGrid-columnHeader': {
-          backgroundColor: alpha(theme.palette.background.paper, 0.1),
-        },
-        '& .MuiDataGrid-cell:focus': {
-          outline: 'none',
-        },
-        '& .MuiDataGrid-cell': {
-          display: 'flex',
-          alignItems: 'center',
-          px: 1,
-        },
-        '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: 1 },
-        '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
-          py: 2,
-        },
-        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
-          py: 3,
-        },
-        '& .MuiDataGrid-selectedRowCount': {
-          display: 'none',
-        },
-      })}
+      data={data}
+      totalRows={data.length}
+      page={page}
+      pageSize={pageSize}
+      onPageChange={setPage}
+      onPageSizeChange={setPageSize}
+      withColumnBorders
+      withTableBorder
+      highlightOnHover
+      borderRadius="sm"
+      height="100%"
     />
   );
-}
+};

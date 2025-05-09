@@ -1,34 +1,34 @@
 import { API_URL } from "@/constant/apiUrl";
 import { deleteApi } from "@/lib/apiClient";
-import { CategoryResponse } from "@/types";
+import { ReviewResponse } from "@/types";
 import { ActionIcon, Group, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { Edit, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export const CategoryDataTableAction = (record: CategoryResponse) => {
+export const ReviewDataTableAction = (record: ReviewResponse) => {
   const router = useRouter();
   const handleDelete = () => {
     modals.openConfirmModal({
-      title: "Xác nhận xóa danh mục sản phẩm",
-      children: "Bạn có chắc chắn muốn xóa danh mục sản phẩm này?",
+      title: "Xác nhận xóa đánh giá",
+      children: "Bạn có chắc chắn muốn xóa đánh giá này?",
       labels: { confirm: "Xóa", cancel: "Hủy" },
       confirmProps: { color: "red" },
       onConfirm: async () => {
         try {
-          const response = await deleteApi(API_URL.category + `/${record.id}`);
+          const response = await deleteApi(API_URL.review + `/${record.id}`);
           if (!response.success) {
             notifications.show({
               title: "Hệ thống",
-              message: "Xóa danh mục sản phẩm thất bại: " + response.message,
+              message: "Xóa đánh giá thất bại: " + response.message,
               color: "red",
             });
             return;
           }
           notifications.show({
             title: "Hệ thống",
-            message: "Xóa danh mục sản phẩm thành công",
+            message: "Xóa đánh giá thành công",
             color: "green",
           });
           router.refresh();
@@ -36,7 +36,7 @@ export const CategoryDataTableAction = (record: CategoryResponse) => {
           notifications.show({
             title: "Thất bại",
             message:
-              "Xóa danh mục sản phẩm thất bại: " + (err as Error).message,
+              "Xóa đánh giá thất bại: " + (err as Error).message,
             color: "red",
           });
         }
@@ -46,16 +46,6 @@ export const CategoryDataTableAction = (record: CategoryResponse) => {
 
   return (
     <Group gap="xs" justify="center">
-      <Tooltip label="Chỉnh sửa">
-        <ActionIcon
-          variant="subtle"
-          onClick={() =>
-            router.push(`/dashboard/categories/upsert?id=${record.id}`)
-          }
-        >
-          <Edit size="1rem" />
-        </ActionIcon>
-      </Tooltip>
       <Tooltip label="Xóa">
         <ActionIcon variant="subtle" color="red" onClick={handleDelete}>
           <Trash size="1rem" />

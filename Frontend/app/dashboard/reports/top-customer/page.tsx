@@ -1,7 +1,7 @@
 import { API_URL } from "@/constant/apiUrl";
-import TopCustomerChart from "@/features/dashboard/reports/top-customer/TopCustomerChart";
-import TopCustomerFilter from "@/features/dashboard/reports/top-customer/TopCustomerFilter";
-import TopCustomerGrid from "@/features/dashboard/reports/top-customer/TopCustomerGrid";
+import { TopCustomerChart } from "@/features/dashboard/reports/top-customer/TopCustomerChart";
+import { TopCustomerReportFilter } from "@/features/dashboard/reports/top-customer/TopCustomerFilter";
+import { TopCustomerGrid } from "@/features/dashboard/reports/top-customer/TopCustomerGrid";
 import { getApiQuery } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import {
@@ -9,7 +9,7 @@ import {
   TopCustomerReportRequest,
   TopCustomerReportResponse,
 } from "@/types";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 
 async function getTopCustomerData(request: TopCustomerReportRequest) {
   const response = await getApiQuery(API_URL.topCustomerReport, request);
@@ -40,12 +40,9 @@ export default async function Page({
   const data = await getTopCustomerData(request);
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">
-        Báo cáo khách hàng mua hàng nhiều nhất
-      </Typography>
-
-      <TopCustomerFilter
+    <Stack>
+      <Title order={5}>Báo cáo khách hàng mua hàng nhiều nhất</Title>
+      <TopCustomerReportFilter
         defaultStartDate={startDate.toDate()}
         defaultEndDate={endDate.toDate()}
       />

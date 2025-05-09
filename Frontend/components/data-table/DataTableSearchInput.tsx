@@ -13,6 +13,7 @@ export const DataTableSearchInput = ({
       placeholder="Tìm kiếm"
       size="sm"
       radius="sm"
+      w={250}
       leftSection={<Search />}
       onChange={(e) => onChange(e.target.value.trim())}
     />
