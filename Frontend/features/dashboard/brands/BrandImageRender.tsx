@@ -1,8 +1,8 @@
 import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
-import { CategoryResponse } from "@/types";
+import { BrandResponse } from "@/types";
 import Image from "next/image";
 
-export const CategoryImageRender = (record: CategoryResponse) => {
+export const BrandImageRender = (record: BrandResponse) => {
   return (
     <Image
       src={record.imageUrl ?? "/image-not-found.jpg"}
@@ -14,7 +14,7 @@ export const CategoryImageRender = (record: CategoryResponse) => {
         height: "100%",
         objectFit: "fill",
         aspectRatio: IMAGE_ASPECT_RATIO.BRANDING,
-        backgroundColor: "white",
+        backgroundColor: 'white',
       }}
     />
   );

@@ -5,9 +5,18 @@ import { getByIdApi } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import { parseUUID } from "@/lib/utils";
 import { BrandResponse, SearchParams, UUID } from "@/types";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 
 async function getBrandById(id: UUID) {
+  if (id === EMPTY_UUID) {
+    return {
+      id: EMPTY_UUID,
+      name: "",
+      imageUrl: "",
+      createdDate: dayjs().toDate(),
+      createdBy: "",
+    };
+  }
   const response = await getByIdApi(API_URL.brand, { id });
   if (response.success) {
     return response.data as BrandResponse;
@@ -31,10 +40,10 @@ export default async function Page({
   const uuid = parseUUID(id);
   const data = await getBrandById(uuid);
   return (
-    <Stack spacing={2}>
-      <Typography component="h1" variant="h4">
+    <Stack>
+      <Title order={4}>
         {uuid === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} thương hiệu
-      </Typography>
+      </Title>
       <BrandUpsertForm defaultValue={data} />
     </Stack>
   );

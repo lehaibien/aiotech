@@ -1,12 +1,12 @@
 import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
-import { CategoryResponse } from "@/types";
+import { PostResponse } from "@/types";
 import Image from "next/image";
 
-export const CategoryImageRender = (record: CategoryResponse) => {
+export const PostImageRender = (record: PostResponse) => {
   return (
     <Image
       src={record.imageUrl ?? "/image-not-found.jpg"}
-      alt={record.name}
+      alt={record.title}
       width={300}
       height={200}
       style={{

@@ -19,14 +19,27 @@ const emailSchema = z.object({
 });
 
 type EmailConfigFormProps = {
-  email: EmailConfiguration;
+  email: string;
+  password: string;
+  host: string;
+  port: number;
 };
 
-export const EmailConfigForm = ({ email }: EmailConfigFormProps) => {
+export const EmailConfigForm = ({
+  email,
+  password,
+  host,
+  port,
+}: EmailConfigFormProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<EmailConfiguration>({
     resolver: zodResolver(emailSchema),
-    defaultValues: email,
+    defaultValues: {
+      email,
+      password,
+      host,
+      port,
+    },
   });
   const onSubmit = async (data: EmailConfiguration) => {
     const response = await postApi(API_URL.emailConfig, data);

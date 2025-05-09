@@ -1,18 +1,18 @@
 import { API_URL } from "@/constant/apiUrl";
 import { getApi } from "@/lib/apiClient";
 import { BannerConfiguration, EmailConfiguration } from "@/types/sys-config";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 import { BannerConfigForm } from "./BannerConfigForm";
 import { EmailConfigForm } from "./EmailConfigForm";
 
 export default async function ConfigurationPage() {
-  let banner: BannerConfiguration = {
+  let bannerConfig: BannerConfiguration = {
     title: "",
     description: "",
     imageUrl: "",
   };
 
-  let email: EmailConfiguration = {
+  let emailConfig: EmailConfiguration = {
     email: "",
     password: "",
     host: "",
@@ -21,22 +21,31 @@ export default async function ConfigurationPage() {
 
   const bannerResponse = await getApi(API_URL.bannerConfig);
   if (bannerResponse.success) {
-    banner = bannerResponse.data as BannerConfiguration;
+    bannerConfig = bannerResponse.data as BannerConfiguration;
   } else {
     console.error("Failed to load banner config: ", bannerResponse.message);
   }
 
   const emailResponse = await getApi(API_URL.emailConfig);
   if (emailResponse.success) {
-    email = emailResponse.data as EmailConfiguration;
+    emailConfig = emailResponse.data as EmailConfiguration;
   } else {
     console.error("Failed to load email config: ", emailResponse.message);
   }
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">Cài đặt hệ thống</Typography>
-      <BannerConfigForm banner={banner} />
-      <EmailConfigForm email={email} />
+    <Stack>
+      <Title order={5}>Cài đặt hệ thống</Title>
+      <BannerConfigForm
+        title={bannerConfig.title}
+        description={bannerConfig.description}
+        imageUrl={bannerConfig.imageUrl}
+      />
+      <EmailConfigForm
+        email={emailConfig.email}
+        password={emailConfig.password}
+        host={emailConfig.host}
+        port={emailConfig.port}
+      />
     </Stack>
   );
 }

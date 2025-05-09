@@ -1,16 +1,11 @@
-'use client';
+"use client";
 
-import { SaleCard } from '@/features/dashboard/reports/sale/SaleCard';
-import SalesChart from '@/features/dashboard/reports/sale/SalesChart';
-import { formatNumberWithSeperator } from '@/lib/utils';
-import { SaleReportResponse } from '@/types';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PendingIcon from '@mui/icons-material/Pending';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { Grid, Typography } from '@mui/material';
+import { SaleCard } from "@/features/dashboard/reports/sale/SaleCard";
+import { formatNumberWithSeperator } from "@/lib/utils";
+import { SaleReportResponse } from "@/types";
+import { Grid, Title } from "@mantine/core";
+import { ArrowUpRight, Ban, CircleCheck, DollarSign, Clock, ShoppingCart } from "lucide-react";
+import { SaleChart } from "./SaleChart";
 
 type SaleStatProps = {
   total: number;
@@ -30,95 +25,67 @@ export const SaleStat = ({
   chartData,
 }: SaleStatProps) => {
   return (
-    <Grid
-      container
-      spacing={2}>
-      <Grid size={{ xs: 12, md: 4 }}>
+    <Grid gutter="md">
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Tổng doanh thu'
-          icon={
-            <TrendingUpIcon
-              color='success'
-              fontSize='large'
-            />
-          }>
+          title="Tổng doanh thu"
+          icon={<ArrowUpRight size={24} color="green" />}
+        >
           {formatNumberWithSeperator(total)} đ
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Tổng đơn hàng'
-          icon={
-            <ShoppingCartIcon
-              color='primary'
-              fontSize='large'
-            />
-          }>
+          title="Tổng đơn hàng"
+          icon={<ShoppingCart size={24} color="blue" />}
+        >
           {totalOrders} đơn
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Giá trị trung bình/đơn hàng'
-          icon={
-            <AttachMoneyIcon
-              color='success'
-              fontSize='large'
-            />
-          }>
+          title="Giá trị trung bình/đơn hàng"
+          icon={<DollarSign size={24} color="green" />}
+        >
           {formatNumberWithSeperator(averageOrderValue)} đ
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Tổng đơn hàng hoàn thành'
-          icon={
-            <CheckCircleIcon
-              color='success'
-              fontSize='large'
-            />
-          }>
+          title="Tổng đơn hàng hoàn thành"
+          icon={<CircleCheck size={24} color="green" />}
+        >
           {totalCompletedOrders} đơn
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Tổng đơn hàng đang xử lý'
-          icon={
-            <PendingIcon
-              color='warning'
-              fontSize='large'
-            />
-          }>
+          title="Tổng đơn hàng đang xử lý"
+          icon={<Clock size={24} color="orange" />}
+        >
           {totalOrders - totalCompletedOrders - totalCancelledOrders} đơn
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid.Col span={{ base: 12, md: 4 }}>
         <SaleCard
-          title='Tổng đơn hàng đã hủy'
-          icon={
-            <CancelIcon
-              color='error'
-              fontSize='large'
-            />
-          }>
+          title="Tổng đơn hàng đã hủy"
+          icon={<Ban size={24} color="red" />}
+        >
           {totalCancelledOrders} đơn
         </SaleCard>
-      </Grid>
+      </Grid.Col>
 
-      <Grid size={12}>
-        <Typography
-          variant='h6'
-          gutterBottom>
+      <Grid.Col span={12}>
+        <Title order={3} mb="md">
           Biểu đồ doanh thu theo thời gian
-        </Typography>
-        <SalesChart data={chartData} />
-      </Grid>
+        </Title>
+        <SaleChart data={chartData} />
+      </Grid.Col>
     </Grid>
   );
 };

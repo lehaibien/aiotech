@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
+import { Card, Group, Stack, Text } from "@mantine/core";
 
 type SaleCardProps = {
   title: string;
@@ -10,23 +10,18 @@ type SaleCardProps = {
 
 export const SaleCard = ({ title, icon, children }: SaleCardProps) => {
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack
-          direction='row'
-          alignItems='center'
-          spacing={2}>
-          {icon}
-          <Box>
-            <Typography
-              color='text.secondary'
-              gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant='h5'>{children}</Typography>
-          </Box>
+    <Card h="100%" p="md">
+      <Group gap="md">
+        {icon}
+        <Stack gap={4}>
+          <Text size="sm" c="dimmed">
+            {title}
+          </Text>
+          <Text size="xl" fw={500}>
+            {children}
+          </Text>
         </Stack>
-      </CardContent>
+      </Group>
     </Card>
   );
 };

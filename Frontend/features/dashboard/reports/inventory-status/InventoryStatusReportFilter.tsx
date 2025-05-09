@@ -1,10 +1,10 @@
 "use client";
 
 import { ComboBoxItem } from "@/types";
-import { Autocomplete, Button, Stack, TextField } from "@mui/material";
 import { UUID } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Autocomplete, Button, SimpleGrid } from "@mantine/core";
 
 type InventoryStatusReportFilterProps = {
   brandList: ComboBoxItem[];
@@ -13,12 +13,12 @@ type InventoryStatusReportFilterProps = {
   defaultCategoryId?: UUID;
 };
 
-export default function InventoryStatusReportFilter({
+export const InventoryStatusReportFilter = ({
   brandList,
   categoryList,
   defaultBrandId,
   defaultCategoryId,
-}: InventoryStatusReportFilterProps) {
+}: InventoryStatusReportFilterProps) => {
   const router = useRouter();
 
   const defaultBrand = defaultBrandId
@@ -55,48 +55,42 @@ export default function InventoryStatusReportFilter({
   };
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <SimpleGrid cols={4} spacing="md">
       <Autocomplete
-        id="brand-filter"
-        size="small"
-        options={brandList}
-        value={selectedBrand}
-        onChange={(_, newValue) => {
-          setSelectedBrand(newValue);
+        label="Thương hiệu"
+        data={brandList.map(item => ({ value: item.value, label: item.text }))}
+        value={selectedBrand?.text || ''}
+        onChange={(value) => {
+          if (!value) {
+            setSelectedBrand(null);
+            return;
+          }
+          const newValue = brandList.find(item => item.text === value);
+          setSelectedBrand(newValue || null);
         }}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        getOptionLabel={(option) => option.text}
-        renderInput={(params) => <TextField {...params} label="Thương hiệu" />}
-        sx={{
-          flex: 1,
-          maxWidth: "25%",
-          minWidth: 200,
-        }}
+        placeholder="Chọn thương hiệu"
+        size="sm"
+        clearable
       />
       <Autocomplete
-        id="category-filter"
-        size="small"
-        options={categoryList}
-        value={selectedCategory}
-        onChange={(_, newValue) => {
-          setSelectedCategory(newValue);
+        label="Danh mục"
+        data={categoryList.map(item => ({ value: item.value, label: item.text }))}
+        value={selectedCategory?.text || ''}
+        onChange={(value) => {
+          if (!value) {
+            setSelectedCategory(null);
+            return;
+          }
+          const newValue = categoryList.find(item => item.text === value);
+          setSelectedCategory(newValue || null);
         }}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        getOptionLabel={(option) => option.text}
-        renderInput={(params) => <TextField {...params} label="Danh mục" />}
-        sx={{
-          flex: 1,
-          maxWidth: "25%",
-          minWidth: 200,
-        }}
+        placeholder="Chọn danh mục"
+        size="sm"
+        clearable
       />
-      <Button
-        onClick={onApplyFilter}
-        variant="contained"
-        color="primary"
-      >
+      <Button onClick={onApplyFilter} variant="filled" color="blue">
         Lọc
       </Button>
-    </Stack>
+    </SimpleGrid>
   );
-}
+};

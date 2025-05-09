@@ -1,31 +1,26 @@
-import { API_URL } from '@/constant/apiUrl';
-import KPISection from '@/features/dashboard/KPISection';
-import { RecentOrders } from '@/features/dashboard/RecentOrder';
-import { RevenueChart } from '@/features/dashboard/RevenueChart';
-import { StockAlertSection } from '@/features/dashboard/StockAlert';
-import { TopSelling } from '@/features/dashboard/TopSelling';
-import { getApi, getApiQuery } from '@/lib/apiClient';
-import { formatNumberWithSeperator } from '@/lib/utils';
+import { API_URL } from "@/constant/apiUrl";
+import { KPISection } from "@/features/dashboard/KPISection";
+import { RecentOrders } from "@/features/dashboard/RecentOrder";
+import { RevenueChart } from "@/features/dashboard/RevenueChart";
+import { StockAlertSection } from "@/features/dashboard/StockAlert";
+import { TopSelling } from "@/features/dashboard/TopSelling";
+import { getApi, getApiQuery } from "@/lib/apiClient";
+import { formatNumberWithSeperator } from "@/lib/utils";
 import {
   DashboardCard,
   DashboardSale,
   DashboardTopProduct,
   OrderResponse,
   StockAlert,
-} from '@/types';
-import UserIcon from '@mui/icons-material/AccountCircleOutlined';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoneyOutlined';
-import OrderIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Grid, Paper, SvgIconTypeMap, Typography } from '@mui/material';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
+} from "@/types";
+import { Grid, GridCol, Stack, Text, Title } from "@mantine/core";
+import { DollarSign, LucideIcon, Receipt, User } from "lucide-react";
 
 type KPI = {
   title: string;
   value: string;
   percentageChange: number;
-  icon: OverridableComponent<SvgIconTypeMap<object, 'svg'>> & {
-    muiName: string;
-  };
+  icon: LucideIcon;
 };
 
 export default async function Page() {
@@ -58,28 +53,28 @@ export default async function Page() {
     const data = kpiResponse.data as DashboardCard;
     kpi = [
       {
-        title: 'Doanh thu',
+        title: "Doanh thu",
         value: formatNumberWithSeperator(data.revenue),
         percentageChange: data.revenueDiff,
-        icon: AttachMoneyIcon,
+        icon: DollarSign,
       },
       {
-        title: 'Đơn hàng mới',
+        title: "Đơn hàng mới",
         value: data.order.toString(),
         percentageChange: data.orderDiff,
-        icon: OrderIcon,
+        icon: Receipt,
       },
       {
-        title: 'Trung bình đơn hàng',
+        title: "Trung bình đơn hàng",
         value: formatNumberWithSeperator(data.averageOrderValue),
         percentageChange: data.averageOrderValueDiff,
-        icon: AttachMoneyIcon,
+        icon: DollarSign,
       },
       {
-        title: 'Khách hàng mới',
+        title: "Khách hàng mới",
         value: data.newUser.toString(),
         percentageChange: data.newUserDiff,
-        icon: UserIcon,
+        icon: User,
       },
     ];
   }
@@ -96,87 +91,42 @@ export default async function Page() {
     stockAlerts = stockAlertResponse.data as StockAlert[];
   }
   return (
-    <>
-      <Typography
-        variant='h5'
-        sx={{ mb: 3 }}>
-        Trang tổng quan
-      </Typography>
-      <Grid
-        container
-        spacing={3}>
-        <Grid size={{ xs: 12 }}>
+    <Stack>
+      <Title order={5}>Trang tổng quan</Title>
+      <Grid>
+        {/* <GridCol span={{ xs: 12 }}>
           <KPISection data={kpi} />
-        </Grid>
+        </GridCol> */}
 
-        <Grid
-          size={{ xs: 12, lg: 8 }}
-          sx={{
-            height: 500,
-          }}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography
-              variant='h6'
-              gutterBottom>
-              Biểu đồ doanh thu
-            </Typography>
-            <RevenueChart data={saleData} />
-          </Paper>
-        </Grid>
-        <Grid
-          size={{ xs: 12, lg: 4 }}
-          sx={{
-            height: 500,
-            overflowY: 'auto',
-          }}>
-          <Paper sx={{ p: 2, minHeight: '100%' }}>
-            <Typography
-              variant='h6'
-              gutterBottom>
-              Danh sách sản phẩm bán chạy
-            </Typography>
-            <TopSelling data={topProducts} />
-          </Paper>
-        </Grid>
-        <Grid
-          size={{ xs: 12, lg: 8 }}
-          sx={{
-            height: 500,
-          }}>
-          <Paper
-            sx={{
-              height: '100%',
-            }}>
-            <Typography
-              variant='h6'
-              gutterBottom
-              sx={{
-                px: 2,
-                pt: 2,
-              }}>
-              Đơn hàng gần đây
-            </Typography>
-            <RecentOrders data={recentOrders} />
-          </Paper>
-        </Grid>
-        <Grid
-          size={{ xs: 12, lg: 4 }}
-          sx={{
-            height: 500,
-            overflowY: 'auto',
-          }}>
-          <Paper
-            elevation={2}
-            sx={{ p: 2 }}>
-            <Typography
-              variant='h6'
-              gutterBottom>
-              Cảnh báo hàng tồn kho
-            </Typography>
-            <StockAlertSection data={stockAlerts} />
-          </Paper>
-        </Grid>
+        <GridCol span={{ xs: 12, lg: 8 }} h={500}>
+          <Text size="lg">Biểu đồ doanh thu</Text>
+          <RevenueChart data={saleData} />
+        </GridCol>
+        <GridCol
+          span={{ xs: 12, lg: 4 }}
+          h={500}
+          style={{
+            overflowY: "auto",
+          }}
+        >
+          <Text size="lg">Sản phẩm bán chạy</Text>
+          <TopSelling data={topProducts} />
+        </GridCol>
+        <GridCol span={{ xs: 12, lg: 8 }} h={500}>
+          <Text size="lg">Đơn hàng gần đây</Text>
+          <RecentOrders data={recentOrders} />
+        </GridCol>
+        <GridCol
+          span={{ xs: 12, lg: 4 }}
+          h={500}
+          style={{
+            overflowY: "auto",
+          }}
+        >
+          <Text size="lg">Cảnh báo hàng tồn kho</Text>
+          <StockAlertSection data={stockAlerts} />
+        </GridCol>
       </Grid>
-    </>
+    </Stack>
   );
 }

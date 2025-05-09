@@ -1,119 +1,81 @@
-import { DataTableRef } from "@/components/core/DataTable";
+import { DataTableSearchInput } from "@/components/data-table/DataTableSearchInput";
 import { API_URL } from "@/constant/apiUrl";
-import { ERROR_MESSAGE } from "@/constant/message";
-import { AddRounded, EditRounded, Visibility } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
-import { DashboardDeleteButton } from "../DashboardDeleteButton";
-import { DashboardSearchBar } from "../DashboardSearchBar";
+import { deleteListApi } from "@/lib/apiClient";
+import { ProductResponse } from "@/types";
+import { Button, Group } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { debounce } from "@mui/material";
+import { Plus, Trash } from "lucide-react";
+import Link from "next/link";
+import { useCallback, useMemo } from "react";
 
 type ProductToolbarProps = {
-  dataGridRef: React.RefObject<DataTableRef | null>;
+  selectedRows: ProductResponse[];
+  onSearch: (searchTerm: string) => void;
 };
 
-export function ProductToolbar({ dataGridRef }: ProductToolbarProps) {
-  const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
-  function triggerView() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
-    if(rowSelection?.size === undefined) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size === 0) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size > 1) {
-      enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, {
-        variant: "error",
+export const ProductToolbar = ({
+  selectedRows,
+  onSearch,
+}: ProductToolbarProps) => {
+  const handleDelete = async () => {
+    if (selectedRows.length === 0) {
+      notifications.show({
+        title: "Hệ thống",
+        message: "Vui lòng chọn ít nhất một đối tượng",
+        color: "red",
       });
       return;
     }
-    const selectedData = rowSelection.values().next().value;
-    if (selectedData) {
-      dataGridRef.current?.clearSelection();
-      router.push(`/dashboard/products/view/${selectedData}`);
-    }
-  }
-
-  function triggerAdd() {
-    dataGridRef.current?.clearSelection();
-    router.push("/dashboard/products/upsert");
-  }
-  function triggerEdit() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
-    if(rowSelection?.size === undefined) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size === 0) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size > 1) {
-      enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, {
-        variant: "error",
+    const ids = selectedRows.map((row) => row.id);
+    const response = await deleteListApi(API_URL.product, ids);
+    if (response.success) {
+      notifications.show({
+        title: "Hệ thống",
+        message: `Xóa thành công ${ids.length} đối tượng`,
+        color: "green",
       });
       return;
     }
-    const selectedData = rowSelection.values().next().value;
-    if (selectedData) {
-      dataGridRef.current?.clearSelection();
-      router.push(`/dashboard/products/upsert?id=${selectedData}`);
-    }
-  }
-  return (
-    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-      <Button
-        variant="contained"
-        color="info"
-        onClick={triggerView}
-        startIcon={<Visibility />}
-        sx={{
-          textTransform: "none",
-          ".MuiButton-startIcon": {
-            marginRight: "2px",
-          },
-        }}
-      >
-        Xem
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={triggerAdd}
-        startIcon={<AddRounded />}
-        sx={{
-          textTransform: "none",
-          ".MuiButton-startIcon": {
-            marginRight: "2px",
-          },
-        }}
-      >
-        Thêm mới
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={triggerEdit}
-        startIcon={<EditRounded />}
-        sx={{
-          textTransform: "none",
-          ".MuiButton-startIcon": {
-            marginRight: "2px",
-          },
-        }}
-      >
-        Cập nhật
-      </Button>
-      <DashboardDeleteButton
-        apiUrl={API_URL.product}
-        name="sản phẩm"
-        dataGridRef={dataGridRef}
-      />
-      <DashboardSearchBar dataGridRef={dataGridRef} />
-    </Box>
+    notifications.show({
+      title: "Hệ thống",
+      message: response.message,
+      color: "red",
+    });
+  };
+  const handleSearchQueryChange = useCallback(
+    (searchTerm: string) => {
+      const trimmedSearch = searchTerm.trim();
+      onSearch(trimmedSearch);
+    },
+    [onSearch]
   );
-}
+
+  const debouncedSearch = useMemo(
+    () => debounce(handleSearchQueryChange, 500),
+    [handleSearchQueryChange]
+  );
+  return (
+    <Group justify="space-between">
+      <Group>
+        <Button
+          variant="filled"
+          leftSection={<Plus />}
+          component={Link}
+          href="/dashboard/products/upsert"
+        >
+          Thêm mới
+        </Button>
+        <Button
+          variant="filled"
+          color="red"
+          leftSection={<Trash />}
+          onClick={handleDelete}
+        >
+          Xóa {selectedRows.length > 0 ? selectedRows.length + " dòng" : ""}
+        </Button>
+      </Group>
+      <DataTableSearchInput onChange={debouncedSearch} />
+    </Group>
+  );
+};
