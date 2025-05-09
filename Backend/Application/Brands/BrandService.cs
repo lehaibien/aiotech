@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using Application.Abstractions;
 using Application.Brands.Dtos;
@@ -116,6 +116,7 @@ public class BrandService : IBrandService
         entity.ImageUrl = uploadResult.Url;
         _unitOfWork.GetRepository<Brand>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Brand created with ID: {BrandId} and Name: {BrandName}", entity.Id, entity.Name);
         var response = entity.MapToBrandResponse();
         return Result<BrandResponse>.Success(response);
     }
@@ -162,33 +163,35 @@ public class BrandService : IBrandService
         }
         _unitOfWork.GetRepository<Brand>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
+        _logger.LogInformation("Brand updated with ID: {BrandId} and Name: {BrandName}", entity.Id, entity.Name);
         var response = entity.MapToBrandResponse();
         return Result<BrandResponse>.Success(response);
     }
 
-    public async Task<Result<string>> DeleteAsync(Guid id)
+    public async Task<Result> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
         if (entity is null)
         {
-            return Result<string>.Failure("Thương hiệu không tồn tại");
+            return Result.Failure("Thương hiệu không tồn tại");
         }
         entity.DeletedDate = DateTime.UtcNow;
         entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         entity.IsDeleted = true;
         _unitOfWork.GetRepository<Brand>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        return Result<string>.Success("Xóa thành công");
+        _logger.LogInformation("Brand marked as deleted with ID: {BrandId} and Name: {BrandName}", entity.Id, entity.Name);
+        return Result.Success();
     }
 
-    public async Task<Result<string>> DeleteListAsync(List<Guid> ids)
+    public async Task<Result> DeleteListAsync(List<Guid> ids)
     {
         foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Brand>().GetByIdAsync(id);
             if (entity is null)
             {
-                return Result<string>.Failure("Thương hiệu không tồn tại");
+                return Result.Failure("Thương hiệu không tồn tại");
             }
             entity.DeletedDate = DateTime.UtcNow;
             entity.DeletedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
@@ -196,7 +199,8 @@ public class BrandService : IBrandService
             _unitOfWork.GetRepository<Brand>().Update(entity);
         }
         await _unitOfWork.SaveChangesAsync();
-        return Result<string>.Success("Xóa thành công");
+        _logger.LogInformation("Brands marked as deleted with IDs: {BrandIds}", string.Join(", ", ids));
+        return Result.Success();
     }
 
     public async Task<Result<List<ComboBoxItem>>> GetComboBoxAsync(

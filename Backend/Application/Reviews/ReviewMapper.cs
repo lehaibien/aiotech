@@ -18,7 +18,7 @@ public static class ReviewMapper
             UpdatedDate = review.UpdatedDate,
         };
     }
-    
+
     public static ReviewProductResponse MapToReviewProductResponse(this Review review)
     {
         return new ReviewProductResponse(
@@ -30,7 +30,7 @@ public static class ReviewMapper
             review.CreatedDate
         );
     }
-    
+
     public static Review MapToReview(this ReviewRequest request)
     {
         return new Review
@@ -41,7 +41,7 @@ public static class ReviewMapper
             Comment = request.Comment,
         };
     }
-    
+
     public static Review ApplyToReview(this ReviewRequest request, Review review)
     {
         review.ProductId = request.ProductId;
@@ -50,7 +50,7 @@ public static class ReviewMapper
         review.Comment = request.Comment;
         return review;
     }
-    
+
     // Projection
     public static IQueryable<ReviewResponse> ProjectToReviewResponse(this IQueryable<Review> query)
     {
@@ -65,8 +65,10 @@ public static class ReviewMapper
             UpdatedDate = x.UpdatedDate,
         });
     }
-    
-    public static IQueryable<ReviewProductResponse> ProjectToReviewProductResponse(this IQueryable<Review> query)
+
+    public static IQueryable<ReviewProductResponse> ProjectToReviewProductResponse(
+        this IQueryable<Review> query
+    )
     {
         return query.Select(x => new ReviewProductResponse(
             x.Id,

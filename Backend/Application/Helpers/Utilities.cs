@@ -87,4 +87,9 @@ public static class Utilities
         }
         return result.ToString();
     }
+
+    public static string GenerateOrderInfo(string trackingNumber, string name, decimal totalPrice)
+    {
+        return $"Đơn hàng #{trackingNumber} - {name}: {totalPrice}";
+    }
 }

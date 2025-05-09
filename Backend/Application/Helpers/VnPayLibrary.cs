@@ -20,6 +20,7 @@ public class VnPayLibrary
 
     public static string CreatePaymentUrl(Order order, VnPayOption option, HttpContext context)
     {
+        var info = Utilities.GenerateOrderInfo(order.TrackingNumber, order.Name, order.TotalPrice);
         var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(option.TimeZoneId);
         var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
         var pay = new VnPayLibrary();
@@ -33,10 +34,7 @@ public class VnPayLibrary
         pay.AddRequestData("vnp_CurrCode", option.CurrCode);
         pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
         pay.AddRequestData("vnp_Locale", option.Locale);
-        pay.AddRequestData(
-            "vnp_OrderInfo",
-            $"Đơn hàng #{order.TrackingNumber} - {order.Name}: {order.TotalPrice}"
-        );
+        pay.AddRequestData("vnp_OrderInfo", info);
         pay.AddRequestData("vnp_OrderType", 130000.ToString());
         pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
         pay.AddRequestData("vnp_TxnRef", order.Id.ToString());
