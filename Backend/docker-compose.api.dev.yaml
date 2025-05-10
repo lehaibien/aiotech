@@ -6,7 +6,6 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=database;Database=AioTech;User Id=sa;Password=S3cr3tP@ssw0rd;Trusted_Connection=false;TrustServerCertificate=True;MultipleActiveResultSets=true
       - ConnectionStrings__Redis=redis:6379
-      - ConnectionStrings__ElasticSearch=elastic_search:9200
       - ConnectionStrings__Minio=minio:9000
       - ELASTICSEARCH_PASSWORD=123456
       - MINIO_ROOT_USER=aiotech
@@ -33,7 +32,7 @@ services:
     image: datalust/seq:latest
     container_name: aiotech_seq
     ports:
-      - "5341:80"  # Seq UI on http://localhost:5341
+      - "5341:80"  # Seq UI
     environment:
       - ACCEPT_EULA=Y
     networks:
@@ -73,19 +72,6 @@ services:
       timeout: 3s
       retries: 10
       start_period: 10s
-  elastic_search:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:9.0.0"
-    container_name: aiotech_elastic_search
-    ports:
-      - 9200:9200
-    environment:
-      - ELASTIC_PASSWORD=123456
-      - xpack.security.enabled=false
-      - discovery.type=single-node
-    volumes:
-      - elastic_data:/usr/share/elasticsearch/data
-    networks:
-      - backend
   minio:
     image: minio/minio
     container_name: aiotech_minio
@@ -106,7 +92,6 @@ volumes:
   database-data:
   wwwroot:
   redis_data:
-  elastic_data:
   storage_data:
 
 networks:
