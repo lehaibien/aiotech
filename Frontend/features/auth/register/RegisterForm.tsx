@@ -7,14 +7,13 @@ import { userRegisterSchema } from "@/schemas/userSchema";
 import { UserRegisterRequest } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Stack, TextInput } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 export const RegisterForm = () => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
   const [fullname, setFullname] = useState<string>("");
   const { control, handleSubmit } = useForm<UserRegisterRequest>({
     resolver: zodResolver(userRegisterSchema),
@@ -25,16 +24,22 @@ export const RegisterForm = () => {
     data.familyName = trimmedName.join(" ");
     const response = await postApi(API_URL.register, data);
     if (response.success) {
-      enqueueSnackbar("Đăng ký thành công!", { variant: "success" });
+      notifications.show({
+        title: "Hoàn tất",
+        message: "Đăng ký thành công!",
+        color: "green",
+      });
       router.push("/login");
     } else {
-      enqueueSnackbar("Đăng ký thất bại: " + response.message, {
-        variant: "error",
+      notifications.show({
+        title: "Lỗi đăng ký",
+        message: response.message,
+        color: "red",
       });
     }
   };
   return (
-    <Stack component="form" onSubmit={handleSubmit(onSubmit)} gap='md'>
+    <Stack component="form" onSubmit={handleSubmit(onSubmit)} gap="md">
       <ControlledTextInput
         id="username"
         name="userName"

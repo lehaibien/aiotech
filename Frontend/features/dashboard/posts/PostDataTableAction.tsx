@@ -11,8 +11,8 @@ export const PostDataTableAction = (record: PostResponse) => {
   const router = useRouter();
   const handleDelete = () => {
     modals.openConfirmModal({
-      title: "Xác nhận xóa danh mục sản phẩm",
-      children: "Bạn có chắc chắn muốn xóa danh mục sản phẩm này?",
+      title: "Xác nhận xóa bài viết",
+      children: "Bạn có chắc chắn muốn xóa bài viết này?",
       labels: { confirm: "Xóa", cancel: "Hủy" },
       confirmProps: { color: "red" },
       onConfirm: async () => {
@@ -21,21 +21,21 @@ export const PostDataTableAction = (record: PostResponse) => {
           if (!response.success) {
             notifications.show({
               title: "Hệ thống",
-              message: "Xóa danh mục sản phẩm thất bại: " + response.message,
+              message: "Xóa bài viết thất bại: " + response.message,
               color: "red",
             });
             return;
           }
           notifications.show({
             title: "Hệ thống",
-            message: "Xóa danh mục sản phẩm thành công",
+            message: "Xóa bài viết thành công",
             color: "green",
           });
           router.refresh();
         } catch(err){
           notifications.show({
             title: "Thất bại",
-            message: "Xóa danh mục sản phẩm thất bại: " + (err as Error).message,
+            message: "Xóa bài viết thất bại: " + (err as Error).message,
             color: "red",
           });
         }

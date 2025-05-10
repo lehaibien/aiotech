@@ -2,6 +2,7 @@
 
 import { API_URL } from "@/constant/apiUrl";
 import useCart from "@/hooks/useCart";
+import { useUserId } from "@/hooks/useUserId";
 import { getByIdApi } from "@/lib/apiClient";
 import { cartItemsAtom } from "@/lib/globalState";
 import { formatNumberWithSeperator, parseUUID } from "@/lib/utils";
@@ -10,14 +11,12 @@ import { ActionIcon, Badge, Button, Drawer, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useSetAtom } from "jotai";
 import { ShoppingBag } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { CartItemListing } from "./CartItemListing";
 
 export const CartDrawer = () => {
-  const { data: session } = useSession();
-  const userId = useMemo(() => session?.user?.id, [session?.user?.id]);
+  const userId = useUserId();
   const setCartItems = useSetAtom(cartItemsAtom);
   const { cartItems } = useCart();
   const [opened, { open, close }] = useDisclosure(false);
@@ -33,14 +32,13 @@ export const CartDrawer = () => {
   return (
     <>
       <ActionIcon
-        aria-label="Danh sách yêu thích"
+        aria-label="Giỏ hàng"
         variant="transparent"
         pos="relative"
         w={40}
         h={40}
         onClick={open}
       >
-        
         <ShoppingBag size={20} color="var(--mantine-color-text)" />
         {cartItems.length > 0 && (
           <Badge pos="absolute" top={0} right={0} circle>

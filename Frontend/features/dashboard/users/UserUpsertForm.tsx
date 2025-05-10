@@ -1,6 +1,6 @@
 "use client";
 
-import { ControlledCombobox } from "@/components/form/ControlledMantineCombobox";
+import { ControlledCombobox } from "@/components/form/ControlledCombobox";
 import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";

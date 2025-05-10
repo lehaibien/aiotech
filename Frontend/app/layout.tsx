@@ -1,5 +1,5 @@
 import { theme } from "@/config/theme";
-import RootClientProvider from "@/contexts/RootClientProvider";
+import { SignalRProvider } from "@/contexts/SignalRProvider";
 import "@mantine/charts/styles.css";
 import {
   ColorSchemeScript,
@@ -14,10 +14,13 @@ import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
+import "dayjs/locale/vi";
+import { Provider as JotaiProvider } from "jotai";
 import "mantine-datatable/styles.layer.css";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Be_Vietnam_Pro } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import React from "react";
 import "./globals.css";
 
@@ -59,41 +62,43 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="vi"
-      {...mantineHtmlProps}
-    >
+    <html lang="vi" {...mantineHtmlProps}>
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <ColorSchemeScript defaultColorScheme="auto" />
-        <script
+        {/* Umami below*/}
+        {/* <script
           defer
           src="http://localhost:8000/script.js"
           data-website-id="68fd00af-c00c-4758-9acd-12d56487b8a2"
-        />
+        /> */}
       </head>
       <body className={`${beVietnamPro.className} antialiased`}>
-        <SessionProvider>
-          <RootClientProvider>
-            <MantineProvider
-              theme={theme}
-              defaultColorScheme="auto"
-              classNamesPrefix="aiotech"
+        <NuqsAdapter>
+          <SessionProvider>
+            <DatesProvider
+              settings={{
+                locale: "vi",
+                firstDayOfWeek: 1,
+                timezone: "UTC",
+              }}
             >
-              <DatesProvider
-                settings={{
-                  locale: "vi",
-                  firstDayOfWeek: 1,
-                  timezone: "UTC",
-                }}
+              <MantineProvider
+                theme={theme}
+                defaultColorScheme="auto"
+                classNamesPrefix="aiotech"
               >
-                <ModalsProvider>{children}</ModalsProvider>
-              </DatesProvider>
-              <Notifications limit={3} />
-            </MantineProvider>
-          </RootClientProvider>
-        </SessionProvider>
+                <ModalsProvider>
+                  <SignalRProvider>
+                    <JotaiProvider>{children}</JotaiProvider>
+                  </SignalRProvider>
+                </ModalsProvider>
+                <Notifications limit={3} />
+              </MantineProvider>
+            </DatesProvider>
+          </SessionProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

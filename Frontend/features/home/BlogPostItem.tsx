@@ -1,9 +1,9 @@
 "use client";
 
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import dayjs from "@/lib/extended-dayjs";
 import { Card, Group, Text } from "@mantine/core";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,7 +25,7 @@ export default function BlogPostItem({
   const postDate = dayjs(createdDate);
   const formattedDate = postDate.format("DD/MM/YYYY");
   return (
-    <Card padding={8} component={Link} href={`/blogs/${slug}`} withBorder>
+    <Card padding='lg' component={Link} href={`/blogs/${slug}`}>
       <Card.Section h={imgHeight}>
         <Image
           src={imageUrl}
@@ -45,7 +45,7 @@ export default function BlogPostItem({
         {title}
       </Text>
       <Group gap={4}>
-        <CalendarTodayIcon fontSize="small" />
+        <Calendar fontSize="small" />
         <Text size="sm">{formattedDate}</Text>
       </Group>
     </Card>

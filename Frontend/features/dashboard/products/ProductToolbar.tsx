@@ -3,11 +3,11 @@ import { API_URL } from "@/constant/apiUrl";
 import { deleteListApi } from "@/lib/apiClient";
 import { ProductResponse } from "@/types";
 import { Button, Group } from "@mantine/core";
+import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { debounce } from "@mui/material";
 import { Plus, Trash } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 type ProductToolbarProps = {
   selectedRows: ProductResponse[];
@@ -51,10 +51,7 @@ export const ProductToolbar = ({
     [onSearch]
   );
 
-  const debouncedSearch = useMemo(
-    () => debounce(handleSearchQueryChange, 500),
-    [handleSearchQueryChange]
-  );
+  const debounceSearch = useDebouncedCallback(handleSearchQueryChange, 500);
   return (
     <Group justify="space-between">
       <Group>
@@ -75,7 +72,7 @@ export const ProductToolbar = ({
           Xóa {selectedRows.length > 0 ? selectedRows.length + " dòng" : ""}
         </Button>
       </Group>
-      <DataTableSearchInput onChange={debouncedSearch} />
+      <DataTableSearchInput onChange={debounceSearch} />
     </Group>
   );
 };

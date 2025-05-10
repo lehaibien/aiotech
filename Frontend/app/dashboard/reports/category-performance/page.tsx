@@ -1,4 +1,7 @@
 import { API_URL } from "@/constant/apiUrl";
+import { CategoryPerformanceCardGrid } from "@/features/dashboard/reports/category-performance/CategoryPerformanceCardGrid";
+import { CategoryPerformanceChart } from "@/features/dashboard/reports/category-performance/CategoryPerformanceChart";
+import { CategoryPerformanceGrid } from "@/features/dashboard/reports/category-performance/CategoryPerformanceGrid";
 import { getListApi } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import {
@@ -6,10 +9,8 @@ import {
   CategoryPerformanceReportResponse,
   SearchParams,
 } from "@/types";
-import { Box, Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 import { Dayjs } from "dayjs";
-import { CategoryPerformanceChart } from "./CategoryPerformanceChart";
-import { CategoryPerformanceGrid } from "./CategoryPerformanceGrid";
 
 async function fetchCategoryPerformanceData(startDate: Dayjs, endDate: Dayjs) {
   const request: CategoryPerformanceReportRequest = {
@@ -34,35 +35,23 @@ export default async function CategoryPerformancePage({
   searchParams: SearchParams;
 }) {
   const { start_date, end_date } = await searchParams;
-  const startDate = start_date
-    ? dayjs.utc(start_date)
-    : dayjs.utc().startOf("year");
-  const endDate = end_date ? dayjs(end_date) : dayjs.utc().endOf("year");
+  const startDate = start_date ? dayjs(start_date) : dayjs().startOf("year");
+  const endDate = end_date ? dayjs(end_date) : dayjs().endOf("year");
   const data = await fetchCategoryPerformanceData(startDate, endDate);
   const top10Categories = data
     .sort((a, b) => b.totalRevenue - a.totalRevenue)
     .slice(0, 10);
-
+  const highestCategory = data.sort(
+    (a, b) => b.totalRevenue - a.totalRevenue
+  )[0];
   return (
-    <Stack spacing={2}>
-      <Typography variant="h5">Báo cáo hiệu suất danh mục</Typography>
-
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Top 10 danh mục theo doanh thu
-        </Typography>
-        <Box sx={{ width: "100%", height: 400 }}>
-          <CategoryPerformanceChart data={top10Categories} />
-        </Box>
-      </Box>
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Chi tiết hiệu suất danh mục
-        </Typography>
-        <Box sx={{ height: 600, width: "100%" }}>
-          <CategoryPerformanceGrid data={data} />
-        </Box>
-      </Box>
+    <Stack>
+      <Title order={5}>Báo cáo hiệu suất danh mục</Title>
+      <CategoryPerformanceCardGrid highestCategory={highestCategory} />
+      <Title order={6}>Top 10 danh mục theo doanh thu</Title>
+      <CategoryPerformanceChart data={top10Categories} />
+      <Title order={6}>Chi tiết</Title>
+      <CategoryPerformanceGrid data={data} />
     </Stack>
   );
 }

@@ -1,8 +1,6 @@
-import { Rating } from '@mui/material';
-import { GridRenderCellParams } from '@mui/x-data-grid';
+import { ReviewResponse } from "@/types";
+import { Rating } from "@mantine/core";
 
-export default function ReviewRatingRenderer(
-  params: GridRenderCellParams<{ rating: number }>
-) {
-  return <Rating value={params.row.rating} readOnly />;
-}
+export const ReviewRatingRenderer = (record: ReviewResponse) => {
+  return <Rating value={record.rating} readOnly size='sm'/>;
+};

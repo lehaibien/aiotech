@@ -21,7 +21,7 @@ public class MomoLibrary
 
     public async Task<string> CreatePaymentUrlAsync(Order order)
     {
-        var info = $"Đơn hàng #{order.TrackingNumber} - {order.Name}: {order.TotalPrice}";
+        var info = Utilities.GenerateOrderInfo(order.TrackingNumber, order.Name, order.TotalPrice);
         var rawData =
             $"partnerCode={_options.PartnerCode}&accessKey={_options.AccessKey}&requestId={order.Id}&amount={order.TotalPrice}&orderId={order.Id}&orderInfo={info}&returnUrl={_options.ReturnUrl}&notifyUrl={_options.NotifyUrl}&extraData=";
 
@@ -58,23 +58,28 @@ public class MomoLibrary
         return content.PayUrl;
     }
 
-    public async Task<PaymentResponse> PaymentExecuteAsync(IQueryCollection collection)
+    public static PaymentResponse PaymentExecute(IQueryCollection collection)
     {
         collection.TryGetValue("orderInfo", out var orderInfo);
         collection.TryGetValue("orderId", out var orderId);
         collection.TryGetValue("transId", out var transactionId);
         collection.TryGetValue("errorCode", out var code);
         collection.TryGetValue("signature", out var hash);
+        collection.TryGetValue("amount", out var amount);
+        collection.TryGetValue("responseTime", out var responseTime);
+        var payDate = new DateTime(Convert.ToInt64(responseTime));
 
         return new PaymentResponse()
         {
             Success = code.Equals("0"),
-            OrderId = orderId,
-            Token = hash,
-            OrderDescription = orderInfo,
-            TransactionId = transactionId,
-            PaymentId = transactionId,
             PaymentMethod = "Momo",
+            OrderId = orderId,
+            OrderDescription = orderInfo,
+            PaymentId = transactionId,
+            TransactionId = transactionId,
+            Amount = Convert.ToDecimal(amount),
+            PayDate = payDate,
+            Token = hash,
             ResponseCode = code,
         };
     }

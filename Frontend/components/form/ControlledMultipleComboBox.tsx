@@ -1,52 +1,55 @@
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-import { ComboBoxItem } from '@/types';
-import { Autocomplete, TextField } from '@mui/material';
+import { ComboBoxItem } from "@/types";
+import { MultiSelect, MultiSelectProps } from "@mantine/core";
+import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
-type ControlledMultipleComboBoxProps<T extends FieldValues> = {
-  items: ComboBoxItem[];
+type ControlledMultipleComboboxProps<T extends FieldValues> = {
   control: Control<T>;
-  name: Path<T>;
-};
+  name: FieldPath<T>;
+  options: ComboBoxItem[];
+  label?: string;
+  required?: boolean;
+} & Omit<MultiSelectProps, "value" | "onChange" | "error" | "data">;
 
-export default function ControlledMultipleComboBox<T extends FieldValues>({
-  items,
+export const ControlledMultipleCombobox = <T extends FieldValues>({
   control,
   name,
-}: ControlledMultipleComboBoxProps<T>) {
+  options,
+  label,
+  required,
+  ...props
+}: ControlledMultipleComboboxProps<T>) => {
+  // Transform options to format expected by MultiSelect
+  const transformedOptions = options.map((option) => ({
+    label: option.text,
+    value: option.value,
+  }));
+
   return (
     <Controller
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => {
-        const { onChange, value } = field;
+        const { onChange, value, ...restField } = field;
 
         // Normalize the value to ensure it's always an array
         const normalizedValue: string[] = Array.isArray(value) ? value : [];
 
         return (
-          <Autocomplete
-            multiple
-            autoHighlight
-            noOptionsText='Không có kết quả'
-            options={items}
-            getOptionLabel={(option) => option.text || ''}
-            isOptionEqualToValue={(option, { value }) => option.value === value}
-            value={items.filter((item) =>
-              normalizedValue.includes(item.value)
-            )}
-            onChange={(_event, newValue) => {
-              onChange(newValue.map((item) => item.value));
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={!!error}
-                helperText={error?.message}
-              />
-            )}
+          <MultiSelect
+            {...restField}
+            data={transformedOptions}
+            value={normalizedValue}
+            onChange={onChange}
+            error={error?.message}
+            label={label}
+            required={required}
+            placeholder="Tìm kiếm..."
+            searchable
+            nothingFoundMessage="Không có kết quả"
+            {...props}
           />
         );
       }}
     />
   );
-}
+};

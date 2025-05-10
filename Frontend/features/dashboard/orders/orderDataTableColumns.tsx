@@ -3,13 +3,11 @@ import {
   formatNumberWithSeperator,
   mapOrderStatus,
 } from "@/lib/utils";
-import { OrderResponse, OrderStatus } from "@/types";
-import { Select } from "@mantine/core";
+import { OrderResponse } from "@/types";
 import { DataTableColumn } from "mantine-datatable";
+import { OrderDataTableAction } from "./OrderDataTableAction";
 
-export const createOrderDataTableColumns = (
-  onUpdateStatus: (id: string, status: string) => void
-): DataTableColumn<OrderResponse>[] => [
+export const orderDataTableColumns: DataTableColumn<OrderResponse>[] = [
   {
     accessor: "trackingNumber",
     title: "Mã đơn hàng",
@@ -40,25 +38,7 @@ export const createOrderDataTableColumns = (
     title: "Trạng thái",
     width: 200,
     textAlign: "center",
-    render: (record) => {
-      if (record.status === "Completed" || record.status === "Cancelled") {
-        return mapOrderStatus(record.status);
-      }
-      return (
-        <Select
-          value={record.status}
-          onChange={(value) => onUpdateStatus(record.id, value!)}
-          size="xs"
-          data={Object.keys(OrderStatus)
-            .filter((key) => isNaN(Number(key)))
-            .filter((key) => key !== "Completed" && key !== "Cancelled")
-            .map((status) => ({
-              label: mapOrderStatus(status),
-              value: status,
-            }))}
-        />
-      );
-    },
+    render: (record) => mapOrderStatus(record.status),
   },
   {
     accessor: "deliveryDate",
@@ -69,8 +49,9 @@ export const createOrderDataTableColumns = (
       record.deliveryDate ? formatDate(record.deliveryDate) : "",
   },
   {
-    accessor: "paymentProvider",
-    title: "Đơn vị thanh toán",
+    accessor: "action",
+    title: "Hành động",
     width: 150,
+    render: OrderDataTableAction,
   },
 ];

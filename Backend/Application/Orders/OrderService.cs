@@ -354,7 +354,7 @@ public class OrderService : IOrderService
             }
             else if (!string.IsNullOrWhiteSpace(partnerCode))
             {
-                paymentResponse = await _momoLibrary.PaymentExecuteAsync(queryCollection);
+                paymentResponse = MomoLibrary.PaymentExecute(queryCollection);
             }
 
             var orderId = Guid.Parse(paymentResponse.OrderId);

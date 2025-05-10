@@ -20,7 +20,7 @@ export const BrandPerformanceCardGrid = ({
         lg: 4,
       }}
     >
-      <Card withBorder p="md" radius="md" key="highest-brand">
+      <Card p="md" radius="md" key="highest-brand">
         <Group justify="space-between" c="dimmed">
           <Text size="sm" tt="uppercase" fw={600}>
             Thương hiệu bán chạy nhất

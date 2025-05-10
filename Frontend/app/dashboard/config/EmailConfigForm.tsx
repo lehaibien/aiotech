@@ -7,7 +7,7 @@ import { postApi } from "@/lib/apiClient";
 import { EmailConfiguration } from "@/types/sys-config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, SimpleGrid, Title } from "@mantine/core";
-import { useSnackbar } from "notistack";
+import { notifications } from "@mantine/notifications";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -31,7 +31,6 @@ export const EmailConfigForm = ({
   host,
   port,
 }: EmailConfigFormProps) => {
-  const { enqueueSnackbar } = useSnackbar();
   const { control, handleSubmit } = useForm<EmailConfiguration>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
@@ -44,10 +43,16 @@ export const EmailConfigForm = ({
   const onSubmit = async (data: EmailConfiguration) => {
     const response = await postApi(API_URL.emailConfig, data);
     if (response.success) {
-      enqueueSnackbar("Lưu cấu hình email thành công", { variant: "success" });
+      notifications.show({
+        title: "Lưu cấu hình email thành công",
+        message: "Cấu hình email đã được lưu thành công",
+        color: "green",
+      });
     } else {
-      enqueueSnackbar("Lưu cấu hình email thất bại: " + response.message, {
-        variant: "error",
+      notifications.show({
+        title: "Lưu cấu hình email thất bại",
+        message: "Đã xảy ra lỗi khi lưu cấu hình email: " + response.message,
+        color: "red",
       });
     }
   };

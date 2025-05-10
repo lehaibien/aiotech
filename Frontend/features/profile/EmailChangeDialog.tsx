@@ -1,16 +1,7 @@
 import { emailSchema } from "@/schemas/userSchema";
 import { EmailFormData } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormLabel,
-  TextField,
-} from "@mui/material";
+import { Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 import { Controller, useForm } from "react-hook-form";
 
 type EmailChangeDialogProps = {
@@ -39,49 +30,44 @@ export const EmailChangeDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Thay đổi địa chỉ email</DialogTitle>
-      <form onSubmit={handleSubmit(handleEmailChange)}>
-        <DialogContent>
-          <Box>
-            <FormLabel htmlFor="oldEmail">Địa chỉ email cũ</FormLabel>
-            <TextField
-              autoFocus
-              margin="dense"
-              name="oldEmail"
+    <Modal
+      opened={open}
+      onClose={onClose}
+      title="Thay đổi địa chỉ email"
+      size="md"
+    >
+      <Stack component="form" onSubmit={handleSubmit(handleEmailChange)}>
+        <TextInput
+          label="Địa chỉ email cũ"
+          name="oldEmail"
+          type="email"
+          value={oldEmail}
+          disabled
+          size="sm"
+        />
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              label="Địa chỉ email mới"
+              name="email"
               type="email"
-              value={oldEmail}
-              disabled
-              fullWidth
+              size="sm"
+              error={errors.email?.message}
             />
-          </Box>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <>
-                <FormLabel htmlFor="email">Địa chỉ email mới</FormLabel>
-                <TextField
-                  {...field}
-                  autoFocus
-                  margin="dense"
-                  name="email"
-                  type="email"
-                  fullWidth
-                  error={!!errors.email}
-                  helperText={errors.email?.message}
-                />
-              </>
-            )}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Hủy</Button>
-          <Button type="submit" variant="contained" color="secondary">
+          )}
+        />
+        <Group justify="flex-end" mt="md">
+          <Button variant="outline" onClick={onClose}>
+            Hủy
+          </Button>
+          <Button type="submit" color="blue">
             Lưu
           </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </Group>
+      </Stack>
+    </Modal>
   );
 };

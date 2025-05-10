@@ -14,10 +14,7 @@ public class ReviewService : IReviewService
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ReviewService(
-        IUnitOfWork unitOfWork,
-        IHttpContextAccessor contextAccessor
-    )
+    public ReviewService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
     {
         _unitOfWork = unitOfWork;
         _contextAccessor = contextAccessor;
@@ -29,13 +26,13 @@ public class ReviewService : IReviewService
     )
     {
         var query = _unitOfWork.GetRepository<Review>().GetAll();
-        if(!string.IsNullOrEmpty(request.TextSearch))
+        if (!string.IsNullOrEmpty(request.TextSearch))
         {
             query = query.Where(x => x.User.UserName.Contains(request.TextSearch));
         }
 
         var sortCol = GetSortExpression(request.SortColumn);
-        if(sortCol is null)
+        if (sortCol is null)
         {
             query = query
                 .OrderByDescending(x => x.UpdatedDate)
@@ -43,7 +40,7 @@ public class ReviewService : IReviewService
         }
         else
         {
-            if(request.SortOrder?.ToLower() == "desc")
+            if (request.SortOrder?.ToLower() == "desc")
             {
                 query = query.OrderByDescending(sortCol);
             }
@@ -68,22 +65,29 @@ public class ReviewService : IReviewService
         CancellationToken cancellationToken = default
     )
     {
+        var userId = _contextAccessor
+            .HttpContext.User.Claims.FirstOrDefault(x => x.Type == "nameid")
+            ?.Value;
         var result = await _unitOfWork
             .GetRepository<Review>()
             .GetAll(x => x.ProductId == request.ProductId)
             .Include(x => x.User)
+            .OrderByDescending(x => userId != null && x.UserId == Guid.Parse(userId))
+            .ThenByDescending(x => x.Rating)
             .ProjectToReviewProductResponse()
-            .OrderByDescending(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name)
             .Skip(request.PageSize * request.PageIndex)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
         return Result<List<ReviewProductResponse>>.Success(result);
     }
 
-    public async Task<Result<ReviewResponse>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<ReviewResponse>> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default
+    )
     {
         var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id, cancellationToken);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
@@ -96,13 +100,9 @@ public class ReviewService : IReviewService
     {
         var isCommented = await _unitOfWork
             .GetRepository<Review>()
-            .GetAll(x =>
-                x.ProductId == request.ProductId
-                && x.UserId == request.UserId
-                && x.IsDeleted == false
-            )
-            .FirstOrDefaultAsync();
-        if(isCommented != null)
+            .GetAll(x => x.ProductId == request.ProductId && x.UserId == request.UserId)
+            .AnyAsync();
+        if (isCommented)
         {
             return Result<ReviewResponse>.Failure("Bạn đã đánh giá sản phẩm này rồi");
         }
@@ -110,35 +110,35 @@ public class ReviewService : IReviewService
         var hasBought = await _unitOfWork
             .GetRepository<Order>()
             .GetAll(x =>
-                x.IsDeleted == false
-                && x.CustomerId == request.UserId
-                && !x.IsDeleted
+                x.CustomerId == request.UserId
                 && x.OrderItems.Any(y => y.ProductId == request.ProductId)
             )
             .AnyAsync();
-        if(!hasBought)
+        if (!hasBought)
         {
             return Result<ReviewResponse>.Failure("Bạn chưa mua sản phẩm này");
         }
 
         var entity = request.MapToReview();
-        entity.CreatedDate = DateTime.UtcNow;
-        entity.CreatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Add(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = entity.MapToReviewResponse();
+        var response = await _unitOfWork
+            .GetRepository<Review>()
+            .GetAll(x => x.Id == entity.Id)
+            .ProjectToReviewResponse()
+            .FirstOrDefaultAsync();
         return Result<ReviewResponse>.Success(response);
     }
 
     public async Task<Result<ReviewResponse>> UpdateAsync(ReviewRequest request)
     {
-        if(request.Id == Guid.Empty)
+        if (request.Id == Guid.Empty)
         {
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
 
         var entity = await _unitOfWork.GetRepository<Review>().FindAsync(x => x.Id == request.Id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result<ReviewResponse>.Failure("Đánh giá không tồn tại");
         }
@@ -148,14 +148,18 @@ public class ReviewService : IReviewService
         entity.UpdatedBy = Utilities.GetUsernameFromContext(_contextAccessor.HttpContext);
         _unitOfWork.GetRepository<Review>().Update(entity);
         await _unitOfWork.SaveChangesAsync();
-        var response = entity.MapToReviewResponse();
+        var response = await _unitOfWork
+            .GetRepository<Review>()
+            .GetAll(x => x.Id == entity.Id)
+            .ProjectToReviewResponse()
+            .FirstOrDefaultAsync();
         return Result<ReviewResponse>.Success(response);
     }
 
     public async Task<Result> DeleteAsync(Guid id)
     {
         var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
-        if(entity is null)
+        if (entity is null)
         {
             return Result.Failure("Đánh giá không tồn tại");
         }
@@ -170,10 +174,10 @@ public class ReviewService : IReviewService
 
     public async Task<Result> DeleteListAsync(List<Guid> ids)
     {
-        foreach(var id in ids)
+        foreach (var id in ids)
         {
             var entity = await _unitOfWork.GetRepository<Review>().GetByIdAsync(id);
-            if(entity is null)
+            if (entity is null)
             {
                 return Result.Failure("Đánh giá không tồn tại");
             }
@@ -194,7 +198,7 @@ public class ReviewService : IReviewService
         {
             "rating" => x => x.Rating,
             "createdDate" => x => x.CreatedDate,
-            _ => x => x.CreatedDate
+            _ => x => x.CreatedDate,
         };
     }
 }

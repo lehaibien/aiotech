@@ -137,7 +137,7 @@ export const CheckoutComponent = ({
             }}
           >
             <Stack>
-              <Group gap='sm'>
+              <Group gap="sm">
                 <Truck />
                 <Title order={5}>Thông tin giao hàng</Title>
               </Group>
@@ -182,7 +182,7 @@ export const CheckoutComponent = ({
                   />
                 </Grid.Col>
               </Grid>
-              <Group gap='sm'>
+              <Group gap="sm">
                 <CreditCard />
                 <Title order={5}>Phương thức thanh toán</Title>
               </Group>
@@ -222,7 +222,7 @@ export const CheckoutComponent = ({
                             key={option.value}
                             value={option.value.toString()}
                           >
-                            <Flex gap='sm' align="center" p='sm'>
+                            <Flex gap="sm" align="center" p="sm">
                               <Radio.Indicator icon={Check} />
                               <Image
                                 src={option.icon}
@@ -244,36 +244,34 @@ export const CheckoutComponent = ({
 
           <Grid.Col span={{ xs: 12, md: 5 }}>
             <Stack>
-              <Group gap='sm'>
+              <Group gap="sm">
                 <ShoppingBag />
                 <Title order={5}>Tổng quan đơn hàng</Title>
               </Group>
 
-              <Box>
-                <Stack>
-                  {cartItems.map((item) => (
-                    <Card key={item.productId}>
-                      <Group wrap="nowrap" gap='sm'>
-                        <Image
-                          src={item.productImage}
-                          alt={item.productName}
-                          width={60}
-                          height={60}
-                          style={{ borderRadius: 8, objectFit: "cover" }}
-                        />
-                        <Text>{item.productName}</Text>
-                        <Badge color="blue" miw={48}>
-                          x{item.quantity}
-                        </Badge>
-                        <Text>
-                          {formatNumberWithSeperator(item.productPrice)}
-                          {""}đ
-                        </Text>
-                      </Group>
-                    </Card>
-                  ))}
-                </Stack>
-              </Box>
+              <Stack>
+                {cartItems.map((item) => (
+                  <Card key={item.productId}>
+                    <Group wrap="nowrap" gap="sm">
+                      <Image
+                        src={item.productImage}
+                        alt={item.productName}
+                        width={60}
+                        height={60}
+                        style={{ borderRadius: 8, objectFit: "cover" }}
+                      />
+                      <Text>{item.productName}</Text>
+                      <Badge color="blue" miw={48}>
+                        x{item.quantity}
+                      </Badge>
+                      <Text>
+                        {formatNumberWithSeperator(item.productPrice)}
+                        {""}đ
+                      </Text>
+                    </Group>
+                  </Card>
+                ))}
+              </Stack>
 
               <Divider />
 

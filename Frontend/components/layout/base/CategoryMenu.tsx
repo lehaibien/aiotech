@@ -1,40 +1,39 @@
 import { ComboBoxItem } from "@/types";
-import { Button, Popover, Stack } from "@mantine/core";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Button, NavLink, Popover } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { ChevronRight, List } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 type CategoryMenuProps = {
   categories: ComboBoxItem[];
 };
 
 export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [opened, { open, close, toggle }] = useDisclosure();
   return (
     <Popover
       width="target"
       offset={0}
-      opened={menuOpen}
-      onOpen={() => setMenuOpen(true)}
-      onClose={() => setMenuOpen(false)}
-      onDismiss={() => setMenuOpen(false)}
+      opened={opened}
+      onOpen={open}
+      onClose={close}
+      onDismiss={close}
     >
       <Popover.Target>
         <Button
+          size="xs"
           variant="transparent"
-          color='var(--mantine-color-text)'
-          px={0}
-          leftSection={<GridViewOutlinedIcon />}
+          color="var(--mantine-color-text)"
+          leftSection={<List />}
           rightSection={
-            <KeyboardArrowRightIcon
-              sx={{
-                transform: menuOpen ? "rotate(90deg)" : "rotate(0deg)",
-                transition: "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+            <ChevronRight
+              style={{
+                transition: "transform 0.2s ease-in-out",
+                transform: opened ? "rotate(90deg)" : "rotate(0deg)",
               }}
             />
           }
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={toggle}
           tt="uppercase"
         >
           Danh mục sản phẩm
@@ -46,21 +45,15 @@ export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
           overflowY: "auto",
         }}
       >
-        <Stack>
-          {categories.map((category) => (
-            <Button
-              component={Link}
-              href={`/products?category=${category.text}`}
-              onClick={() => setMenuOpen(false)}
-              variant="subtle"
-              color="dark"
-              key={category.value}
-              mih={40}
-            >
-              {category.text}
-            </Button>
-          ))}
-        </Stack>
+        {categories.map((category) => (
+          <NavLink
+            component={Link}
+            href={`/products?category=${category.text}`}
+            onClick={close}
+            label={category.text}
+            key={category.value}
+          />
+        ))}
       </Popover.Dropdown>
     </Popover>
   );

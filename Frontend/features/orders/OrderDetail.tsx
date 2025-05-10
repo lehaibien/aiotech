@@ -5,7 +5,6 @@ import dayjs from "@/lib/extended-dayjs";
 import { formatNumberWithSeperator, mapOrderStatus } from "@/lib/utils";
 import { OrderResponse } from "@/types/order";
 import { Card, Grid, Group, Stack, Table, Text, Title } from "@mantine/core";
-import ReceiptIcon from "@mui/icons-material/Receipt";
 import {
   Calendar,
   CreditCard,
@@ -14,6 +13,7 @@ import {
   Map,
   Package,
   Phone,
+  Receipt,
   Truck,
 } from "lucide-react";
 
@@ -28,7 +28,7 @@ export const OrderDetail = ({ order }: OrderDetailProps) => {
       <NoItem
         title="Đơn hàng không tồn tại"
         description=""
-        icon={ReceiptIcon}
+        icon={Receipt}
       />
     );
   }

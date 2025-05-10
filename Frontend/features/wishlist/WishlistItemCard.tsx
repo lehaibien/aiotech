@@ -1,4 +1,4 @@
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import useCart from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNumberWithSeperator } from "@/lib/utils";
@@ -51,7 +51,7 @@ export const WishlistItemCard = ({
     });
   };
   return (
-    <Card component={Link} href={`/products/${productId}`} withBorder>
+    <Card component={Link} href={`/products/${productId}`}>
       <Card.Section>
         <Center>
           <Image

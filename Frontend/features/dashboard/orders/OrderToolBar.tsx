@@ -1,68 +1,37 @@
-"use client";
-
-import { DataTableRef } from "@/components/core/DataTable";
-import { ERROR_MESSAGE } from "@/constant/message";
-import { DashboardSearchBar } from "@/features/dashboard/DashboardSearchBar";
-import { VisibilityRounded } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
-import React from "react";
-import { CancelButton } from "./CancelButton";
+import { DataTableSearchInput } from "@/components/data-table/DataTableSearchInput";
+import { Button, Group } from "@mantine/core";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { useCallback } from "react";
 
 type OrderToolbarProps = {
-  dataGridRef: React.RefObject<DataTableRef>;
-  children?: React.ReactNode;
+  onSearch: (searchTerm: string) => void;
 };
-export function OrderToolbar({ dataGridRef, children }: OrderToolbarProps) {
-  const { enqueueSnackbar } = useSnackbar();
-  const router = useRouter();
-  function triggerView() {
-    const rowSelection = dataGridRef.current?.rowSelectionModel.ids;
-    if(rowSelection?.size === undefined) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size === 0) {
-      enqueueSnackbar(ERROR_MESSAGE.noRowSelected, { variant: "error" });
-      return;
-    }
-    if (rowSelection.size > 1) {
-      enqueueSnackbar(ERROR_MESSAGE.onlyOneRowSelected, {
-        variant: "error",
-      });
-      return;
-    }
-    const selectedData = rowSelection.values().next().value;
-    if (selectedData) {
-      router.push(`/dashboard/orders/${selectedData}`);
-    }
-  }
-  return (
-    <Box
-      display="flex"
-      alignItems="center"
-      gap={1}
-      paddingBottom={1}
-      flexWrap="wrap"
-    >
-      <Button
-        variant="contained"
-        color="info"
-        onClick={triggerView}
-        startIcon={<VisibilityRounded />}
-        sx={{
-          textTransform: "none",
-          ".MuiButton-startIcon": {
-            marginRight: "2px",
-          },
-        }}
-      >
-        Xem
-      </Button>
-      <CancelButton dataGridRef={dataGridRef} />
-      {children}
-      <DashboardSearchBar dataGridRef={dataGridRef} />
-    </Box>
+
+export const OrderToolbar = ({ onSearch }: OrderToolbarProps) => {
+  const handleSearchQueryChange = useCallback(
+    (searchTerm: string) => {
+      const trimmedSearch = searchTerm.trim();
+      onSearch(trimmedSearch);
+    },
+    [onSearch]
   );
-}
+
+  const debounceSearch = useDebouncedCallback(handleSearchQueryChange, 500);
+  return (
+    <Group justify="space-between">
+      <Group>
+        <Button
+          variant="filled"
+          leftSection={<Plus />}
+          component={Link}
+          href="/dashboard/orders/new"
+        >
+          Thêm mới
+        </Button>
+      </Group>
+      <DataTableSearchInput onChange={debounceSearch} />
+    </Group>
+  );
+};

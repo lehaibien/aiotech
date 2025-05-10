@@ -41,6 +41,7 @@ export default function Page() {
       <Title order={5}>Quản lý danh mục sản phẩm</Title>
       <CategoryToolbar selectedRows={selectedRecords} onSearch={handleSearch} />
       <MantineDataTable
+        minHeight={300}
         columns={categoryDataTableColumns}
         data={data?.items || []}
         totalRows={data?.totalCount || 0}

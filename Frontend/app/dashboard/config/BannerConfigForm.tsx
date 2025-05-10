@@ -5,7 +5,7 @@ import { ControlledTextarea } from "@/components/form/ControlledTextarea";
 import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/constant/common";
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO, IMAGE_PLACEHOLDER } from "@/constant/image";
 import { useGetImage } from "@/hooks/useGetImage";
 import { postApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
@@ -79,7 +79,7 @@ export const BannerConfigForm = ({
 
   const { images } = useGetImage(imageUrl);
   useEffect(() => {
-    if (images.length > 0) {
+    if (images && images.length > 0) {
       setImage(images[0]);
     }
   }, [images]);
@@ -106,7 +106,7 @@ export const BannerConfigForm = ({
           <Input.Label required>Hình ảnh</Input.Label>
           <MantineImageUploader onDrop={(files) => setImage(files[0])} />
           <Image
-            src={image ? URL.createObjectURL(image) : "/image-not-found.jpg"}
+            src={image ? URL.createObjectURL(image) : IMAGE_PLACEHOLDER.DEFAULT}
             width={1200}
             height={400}
             alt="hero banner"

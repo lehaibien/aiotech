@@ -1,39 +1,27 @@
-import ComputerIcon from '@mui/icons-material/Computer';
-import LaptopIcon from '@mui/icons-material/Laptop';
-import React from 'react';
+export const productSortData = [
+  {
+    label: "Mặc định",
+    value: "default",
+  },
+  {
+    label: "Giá: Thấp đến cao",
+    value: "price_asc",
+  },
+  {
+    label: "Giá: Cao đến thấp",
+    value: "price_desc",
+  },
+  {
+    label: "Mới nhất",
+    value: "newest",
+  },
+  {
+    label: "Cũ nhất",
+    value: "oldest",
+  },
+];
 
-interface CategoryMenuItem {
-  name: string;
-  icon: JSX.Element;
-}
-
-export const categories: CategoryMenuItem[] = [
-  {
-    name: 'Laptop',
-    icon: React.createElement(LaptopIcon),
-  },
-  {
-    name: 'PC',
-    icon: React.createElement(ComputerIcon),
-  },
-  {
-    name: 'Mainboard',
-    icon: React.createElement(ComputerIcon),
-  },
-  {
-    name: 'CPU',
-    icon: React.createElement(ComputerIcon),
-  },
-  {
-    name: 'VGA',
-    icon: React.createElement(ComputerIcon),
-  },
-  {
-    name: 'USB',
-    icon: React.createElement(ComputerIcon),
-  },
-  {
-    name: 'Ổ cứng HDD',
-    icon: React.createElement(ComputerIcon),
-  },
+export const yesNoComboboxData = [
+  { value: "true", text: "Có" },
+  { value: "false", text: "Không" },
 ];

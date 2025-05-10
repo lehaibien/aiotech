@@ -1,7 +1,7 @@
 "use client";
 
 import { baseNavItems } from "@/constant/routes";
-import { Button, Flex } from "@mantine/core";
+import { Group, NavLink } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,25 +9,20 @@ export const Navigation = () => {
   const pathName = usePathname();
 
   return (
-    <Flex gap='md' direction={{
-      xs: "column",
-      md: "row",
-    }} align="center">
+    <Group wrap="nowrap">
       {baseNavItems.map((nav) => {
         const isActive = pathName === nav.href;
         return (
-          <Button
+          <NavLink
             key={nav.title}
-            variant="subtle"
-            color="dark"
+            label={nav.title}
             component={Link}
             href={nav.href ?? "/"}
-            className={isActive? "active" : ""}
-          >
-            {nav.title}
-          </Button>
+            className={isActive ? "active" : ""}
+            ta='center'
+          />
         );
       })}
-    </Flex>
+    </Group>
   );
 };

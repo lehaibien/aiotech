@@ -5,7 +5,7 @@ import { getApi, getByIdApi } from "@/lib/apiClient";
 import dayjs from "@/lib/extended-dayjs";
 import { parseUUID } from "@/lib/utils";
 import { ComboBoxItem, SearchParams, UserResponse } from "@/types";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 
 export default async function Page({
   searchParams,
@@ -60,10 +60,10 @@ export default async function Page({
   }
 
   return (
-    <Stack spacing={2}>
-      <Typography component="h1" variant="h5">
+    <Stack>
+      <Title order={5}>
         {data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật"} tài khoản
-      </Typography>
+      </Title>
       <UserUpsertForm data={data} roleCombobox={roleCombobox} />
     </Stack>
   );

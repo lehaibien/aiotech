@@ -3,7 +3,7 @@ import { API_URL } from "@/constant/apiUrl";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { PostResponse, SearchParams, UUID } from "@/types";
-import { Stack, Typography } from "@mui/material";
+import { Stack, Title } from "@mantine/core";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -29,10 +29,8 @@ export default async function PostPreviewPage({
   }
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="h4" component="h1">
-        {post.title}
-      </Typography>
+    <Stack>
+      <Title order={2}>{post.title}</Title>
       {post.imageUrl && (
         <Image
           src={post.imageUrl}

@@ -3,7 +3,7 @@
 import { NoItem } from "@/components/core/NoItem";
 import { PostListItemResponse } from "@/types/post";
 import { Pagination, SimpleGrid } from "@mantine/core";
-import ArticleIcon from "@mui/icons-material/Article";
+import { Newspaper } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import BlogPostItem from "../home/BlogPostItem";
@@ -36,7 +36,7 @@ export default function BlogList({
       <NoItem
         title="Không có bài viết nào"
         description="Hiện tại chưa có bài viết nào được đăng. Vui lòng quay lại sau."
-        icon={ArticleIcon}
+        icon={Newspaper}
       />
     );
   }

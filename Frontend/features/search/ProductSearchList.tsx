@@ -1,15 +1,8 @@
 import Image from "next/image";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import Link from "next/link";
-import { Divider } from "@mui/material";
-import { Group, Stack, Text } from "@mantine/core";
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { Group, Stack, Text, Paper, Divider } from "@mantine/core";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 
 type ProductSearch = {
   id: string;
@@ -34,20 +27,18 @@ export const ProductSearchList = ({
     return null;
   }
   const listContent = (
-    <List>
+    <Stack gap={0}>
       {products.map((product, index) => (
         <Link
           key={product.id}
           href={`/products/${product.id}`}
           onClick={onClick}
         >
-          <ListItem
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              "&:hover": {
-                backgroundColor: "action.hover",
+          <Group
+            p="xs"
+            style={{
+              '&:hover': {
+                backgroundColor: 'var(--mantine-color-gray-0)',
               },
             }}
           >
@@ -56,43 +47,35 @@ export const ProductSearchList = ({
               alt={product.name}
               width={50}
               height={50}
-              style={{ objectFit: "cover" }}
+              style={{ 
+                objectFit: "fill", 
+                aspectRatio: IMAGE_ASPECT_RATIO.PRODUCT 
+              }}
             />
-            <ListItemText
-              primary={product.name}
-              secondary={
-                <>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    {product.brand}
-                  </Typography>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    color="error.main"
-                    sx={{ display: "block" }}
-                  >
-                    {formatNumberWithSeperator(product.price)} đ
-                  </Typography>
-                </>
-              }
-            />
-          </ListItem>
+            <Stack gap={2}>
+              <Text lineClamp={1}>{product.name}</Text>
+              <Text size="sm" c="dimmed">
+                {product.brand}
+              </Text>
+              <Text c="red">
+                {formatNumberWithSeperator(product.price)} đ
+              </Text>
+            </Stack>
+          </Group>
           {index < products.length - 1 && <Divider />}
         </Link>
       ))}
-    </List>
+    </Stack>
   );
+
   if (isDrawer) {
     return listContent;
   }
+
   return (
-    <Box
-      component={Paper}
-      sx={{
+    <Paper
+      shadow="sm"
+      style={{
         position: "absolute",
         top: "100%",
         left: 0,
@@ -101,11 +84,9 @@ export const ProductSearchList = ({
         maxHeight: "400px",
         width: "100%",
         overflowY: "auto",
-        border: "1px solid #ccc",
-        boxShadow: 3,
       }}
+      withBorder
     >
-      {/* {listContent} */}
       {products.map((product) => (
         <BaseProductSearchItem
           key={product.id}
@@ -113,7 +94,7 @@ export const ProductSearchList = ({
           onClick={onClick}
         />
       ))}
-    </Box>
+    </Paper>
   );
 };
 

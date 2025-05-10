@@ -1,6 +1,6 @@
 "use client";
 
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import { Card, Title } from "@mantine/core";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,7 +18,6 @@ export const CategoryCard = ({ name, imageUrl }: CategoryCardProps) => {
       padding="sm"
       h={150}
       radius="md"
-      withBorder
     >
       <Card.Section>
         <Image

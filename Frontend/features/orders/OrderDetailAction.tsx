@@ -1,10 +1,10 @@
 "use client";
 
-import AlertDialog from "@/components/core/AlertDialog";
 import { API_URL } from "@/constant/apiUrl";
 import { postApi, putApi } from "@/lib/apiClient";
 import { UUID } from "@/types";
 import { Button, Group } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { Ban, Check, Printer } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -52,23 +52,30 @@ export const OrderDetailAction = ({
   );
   const handlePrint = useOrderPrint(id, trackingNumber);
   const handleCancel = async () => {
-    const request = {
-      id: id,
-      reason: "Người mua hủy",
-    };
-    const response = await putApi(API_URL.orderCancel, request);
-    if (response.success) {
-      notifications.show({
-        message: "Hủy đơn hàng thành công",
-        color: "green",
-      });
-      router.push("/orders");
-    } else {
-      notifications.show({
-        message: "Hủy đơn hàng thất bại: " + response.message,
-        color: "red",
-      });
-    }
+    modals.openConfirmModal({
+      title: "Hủy đơn hàng",
+      content:
+        "Bạn có chắc chắn muốn hủy đơn hàng này không? Mọi thao tác sẽ không được hoàn lại",
+      onConfirm: async () => {
+        const request = {
+          id: id,
+          reason: "Người mua hủy",
+        };
+        const response = await putApi(API_URL.orderCancel, request);
+        if (response.success) {
+          notifications.show({
+            message: "Hủy đơn hàng thành công",
+            color: "green",
+          });
+          router.push("/orders");
+        } else {
+          notifications.show({
+            message: "Hủy đơn hàng thất bại: " + response.message,
+            color: "red",
+          });
+        }
+      },
+    });
   };
   return (
     <Group>
@@ -89,20 +96,15 @@ export const OrderDetailAction = ({
         In
       </Button>
 
-      <AlertDialog
-        title="Hủy đơn hàng"
-        content="Bạn có chắc chắn muốn hủy đơn hàng này không? Mọi thao tác sẽ không được hoàn lại"
-        onConfirm={handleCancel}
+      <Button
+        color="red"
+        leftSection={<Ban size={16} />}
+        disabled={isCancelable === false}
+        size="sm"
+        onClick={handleCancel}
       >
-        <Button
-          color="red"
-          leftSection={<Ban size={16} />}
-          disabled={isCancelable === false}
-          size="sm"
-        >
-          Hủy
-        </Button>
-      </AlertDialog>
+        Hủy
+      </Button>
     </Group>
   );
 };

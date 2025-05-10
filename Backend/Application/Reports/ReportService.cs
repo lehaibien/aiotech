@@ -73,14 +73,15 @@ public class ReportService : IReportService
         {
             new("@iStartDate", request.StartDate),
             new("@iEndDate", request.EndDate),
-            new(
-                "@iCustomerUsername",
-                (object?) request.CustomerUsername ?? DBNull.Value
-            ),
+            new("@iCustomerUsername", (object?)request.CustomerUsername ?? DBNull.Value),
         };
         var reports = await _unitOfWork
             .GetRepository<OrderReportResponse>()
-            .ExecuteStoredProcedureAsync(StoredProcedure.GetOrderReport, parameters, cancellationToken);
+            .ExecuteStoredProcedureAsync(
+                StoredProcedure.GetOrderReport,
+                parameters,
+                cancellationToken
+            );
 
         return Result<List<OrderReportResponse>>.Success(reports.ToList());
     }
@@ -245,19 +246,113 @@ public class ReportService : IReportService
         CancellationToken cancellationToken = default
     )
     {
-        var parameters = new SqlParameter[]
-        {
-            new("@iStartDate", request.StartDate),
-            new("@iEndDate", request.EndDate),
-        };
-        var reports = await _unitOfWork
-            .GetRepository<CategoryPerformanceReportResponse>()
-            .ExecuteStoredProcedureAsync(
-                StoredProcedure.GetCategoryPerformanceReport,
-                parameters,
-                cancellationToken
-            );
-        return Result<List<CategoryPerformanceReportResponse>>.Success(reports.ToList());
+        var productQuery = _unitOfWork.GetRepository<Product>().GetAll();
+        var orderItemQuery = _unitOfWork.GetRepository<OrderItem>().GetAll();
+        var orderQuery = _unitOfWork.GetRepository<Order>().GetAll();
+        var categoryOrderStats = await _unitOfWork
+            .GetRepository<Category>()
+            .GetAll()
+            .GroupJoin(
+                productQuery,
+                c => c.Id,
+                p => p.CategoryId,
+                (c, products) => new { Category = c, Products = products }
+            )
+            .SelectMany(
+                cp => cp.Products.DefaultIfEmpty(),
+                (cp, p) => new { cp.Category, Product = p }
+            )
+            .GroupJoin(
+                orderItemQuery,
+                cp => cp.Product.Id,
+                oi => oi.ProductId,
+                (cp, orderItems) =>
+                    new
+                    {
+                        cp.Category,
+                        cp.Product,
+                        OrderItems = orderItems,
+                    }
+            )
+            .SelectMany(
+                cpo => cpo.OrderItems.DefaultIfEmpty(),
+                (cpo, oi) =>
+                    new
+                    {
+                        cpo.Category,
+                        cpo.Product,
+                        OrderItem = oi,
+                    }
+            )
+            .GroupJoin(
+                orderQuery.Where(o =>
+                    o.CreatedDate >= request.StartDate
+                    && o.CreatedDate <= request.EndDate
+                    && o.Status == OrderStatus.Completed
+                ),
+                cpoi => cpoi.OrderItem.OrderId,
+                o => o.Id,
+                (cpoi, orders) =>
+                    new
+                    {
+                        cpoi.Category,
+                        cpoi.Product,
+                        cpoi.OrderItem,
+                        Orders = orders,
+                    }
+            )
+            .GroupBy(x => new { x.Category.Id, x.Category.Name })
+            .Select(g => new
+            {
+                CategoryId = g.Key.Id,
+                CategoryName = g.Key.Name,
+                TotalRevenue = g.Sum(x =>
+                    x.OrderItem != null ? x.OrderItem.Price * x.OrderItem.Quantity : 0
+                ),
+                TotalUnitsSold = g.Sum(x => x.OrderItem != null ? x.OrderItem.Quantity : 0),
+            })
+            .ToListAsync(cancellationToken);
+
+        var productCounts = await productQuery
+            .GroupBy(p => p.CategoryId)
+            .Select(g => new { CategoryId = g.Key, ProductCount = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        var categoryRatings = await productQuery
+            .Where(p => p.Reviews.Any())
+            .GroupBy(p => p.CategoryId)
+            .Select(g => new
+            {
+                CategoryId = g.Key,
+                AverageRating = g.SelectMany(p => p.Reviews).Average(r => r.Rating),
+            })
+            .ToListAsync(cancellationToken);
+
+        var result = categoryOrderStats
+            .GroupJoin(
+                productCounts,
+                cos => cos.CategoryId,
+                pc => pc.CategoryId,
+                (cos, pc) => new { cos, ProductCount = pc.FirstOrDefault()?.ProductCount ?? 0 }
+            )
+            .GroupJoin(
+                categoryRatings,
+                x => x.cos.CategoryId,
+                cr => cr.CategoryId,
+                (x, cr) =>
+                    new CategoryPerformanceReportResponse(
+                        x.cos.CategoryId,
+                        x.cos.CategoryName,
+                        x.ProductCount,
+                        x.cos.TotalRevenue,
+                        x.cos.TotalUnitsSold,
+                        cr.FirstOrDefault()?.AverageRating ?? 0
+                    )
+            )
+            .OrderByDescending(x => x.TotalRevenue)
+            .ToList();
+
+        return Result<List<CategoryPerformanceReportResponse>>.Success(result);
     }
 
     public async Task<Result<List<ProductRatingReportResponse>>> GetProductRatingReportAsync(
@@ -267,6 +362,7 @@ public class ReportService : IReportService
         var reports = await _unitOfWork
             .GetRepository<Product>()
             .GetAll(x => x.Reviews.Any())
+            .OrderByDescending(p => p.Reviews.Average(r => r.Rating))
             .Select(p => new ProductRatingReportResponse(
                 p.Id,
                 p.Name,
@@ -283,7 +379,6 @@ public class ReportService : IReportService
                 Convert.ToDouble(p.Reviews.Count(r => r.Rating >= 4) / p.Reviews.Count) * 100,
                 Convert.ToDouble(p.Reviews.Count(r => r.Rating <= 2) / p.Reviews.Count) * 100
             ))
-            .OrderByDescending(p => p.AverageRating)
             .ToListAsync(cancellationToken);
         return Result<List<ProductRatingReportResponse>>.Success(reports);
     }

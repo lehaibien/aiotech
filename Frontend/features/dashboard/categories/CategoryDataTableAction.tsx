@@ -1,7 +1,7 @@
 import { API_URL } from "@/constant/apiUrl";
 import { deleteApi } from "@/lib/apiClient";
 import { CategoryResponse } from "@/types";
-import { ActionIcon, Group } from "@mantine/core";
+import { ActionIcon, Group, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { Edit, Trash } from "lucide-react";
@@ -32,10 +32,11 @@ export const CategoryDataTableAction = (record: CategoryResponse) => {
             color: "green",
           });
           router.refresh();
-        } catch(err){
+        } catch (err) {
           notifications.show({
             title: "Thất bại",
-            message: "Xóa danh mục sản phẩm thất bại: " + (err as Error).message,
+            message:
+              "Xóa danh mục sản phẩm thất bại: " + (err as Error).message,
             color: "red",
           });
         }
@@ -45,16 +46,21 @@ export const CategoryDataTableAction = (record: CategoryResponse) => {
 
   return (
     <Group gap="xs" justify="center">
-      <ActionIcon
-        variant="subtle"
-        color="blue"
-        onClick={() => router.push(`/dashboard/categories/upsert?id=${record.id}`)}
-      >
-        <Edit size="1rem" />
-      </ActionIcon>
-      <ActionIcon variant="subtle" color="red" onClick={handleDelete}>
-        <Trash size="1rem" />
-      </ActionIcon>
+      <Tooltip label="Chỉnh sửa">
+        <ActionIcon
+          variant="subtle"
+          onClick={() =>
+            router.push(`/dashboard/categories/upsert?id=${record.id}`)
+          }
+        >
+          <Edit size="1rem" />
+        </ActionIcon>
+      </Tooltip>
+      <Tooltip label="Xóa">
+        <ActionIcon variant="subtle" color="red" onClick={handleDelete}>
+          <Trash size="1rem" />
+        </ActionIcon>
+      </Tooltip>
     </Group>
   );
 };
