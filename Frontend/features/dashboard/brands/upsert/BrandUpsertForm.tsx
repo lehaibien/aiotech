@@ -4,7 +4,7 @@ import { MantineImageUploader } from "@/components/core/MantineImageUploader";
 import { ControlledTextInput } from "@/components/form/ControlledTextField";
 import { API_URL } from "@/constant/apiUrl";
 import { EMPTY_UUID } from "@/constant/common";
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import { postApi, putApi } from "@/lib/apiClient";
 import { convertObjectToFormData } from "@/lib/utils";
 import { BrandRequestSchema } from "@/schemas/brandSchema";

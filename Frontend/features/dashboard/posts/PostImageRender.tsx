@@ -1,4 +1,4 @@
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import { PostResponse } from "@/types";
 import Image from "next/image";
 

@@ -4,7 +4,7 @@ import { getListApi } from "@/lib/apiClient";
 import { PaginatedList, SearchParams } from "@/types";
 import { PostListItemResponse } from "@/types/post";
 import { Box, Stack, Text, TextInput, Title } from "@mantine/core";
-import SearchIcon from "@mui/icons-material/Search";
+import { Search } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -54,7 +54,7 @@ export default async function BlogsPage({
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
-    <Stack gap='md'>
+    <Stack gap="md">
       <div>
         <Title order={1}>Tin tức công nghệ</Title>
         <Text>Khám phá những tin tức công nghệ mới nhất và hữu ích nhất</Text>
@@ -67,7 +67,7 @@ export default async function BlogsPage({
           placeholder="Tìm kiếm bài viết..."
           name="search"
           defaultValue={search}
-          leftSection={<SearchIcon />}
+          leftSection={<Search />}
         />
       </Box>
 

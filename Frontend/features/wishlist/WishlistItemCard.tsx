@@ -1,4 +1,4 @@
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import useCart from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatNumberWithSeperator } from "@/lib/utils";

@@ -5,3 +5,7 @@ export const IMAGE_ASPECT_RATIO = {
   BRANDING: 3 / 2,
   LOGO: 1 / 1,
 };
+
+export const IMAGE_PLACEHOLDER = {
+  DEFAULT: "/image-not-found.jpg",
+};

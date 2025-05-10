@@ -1,6 +1,6 @@
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
-import { Box, Button, Text, Stack, Title } from "@mantine/core";
-import { ArrowRight } from "@mui/icons-material";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
+import { Box, Button, Stack, Text, Title } from "@mantine/core";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -61,7 +61,7 @@ export const HeroBanner = ({
         h="100%"
         justify="flex-end"
         align="flex-start"
-        c='white'
+        c="white"
         p={16}
         style={{
           backgroundColor: "rgba(0,0,0,0.5)",
@@ -83,7 +83,7 @@ export const HeroBanner = ({
             href="/products"
             variant="filled"
             size="md"
-            rightSection={<ArrowRight height={16} />}
+            rightSection={<ChevronRight height={16} />}
           >
             Mua ngay
           </Button>

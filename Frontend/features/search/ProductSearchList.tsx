@@ -2,7 +2,7 @@ import Image from "next/image";
 import { formatNumberWithSeperator } from "@/lib/utils";
 import Link from "next/link";
 import { Group, Stack, Text, Paper, Divider } from "@mantine/core";
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 
 type ProductSearch = {
   id: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { HtmlContent } from "@/components/core/HtmlContent";
-import { IMAGE_ASPECT_RATIO } from "@/constant/imageAspectRatio";
+import { IMAGE_ASPECT_RATIO } from "@/constant/image";
 import { ProductDetailResponse } from "@/types";
 import {
   Button,

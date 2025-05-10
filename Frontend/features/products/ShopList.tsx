@@ -4,7 +4,7 @@ import { NoItem } from "@/components/core/NoItem";
 import { ProductCard } from "@/components/core/ProductCard";
 import { ProductListItemResponse } from "@/types";
 import { Center, Pagination, SimpleGrid, Stack } from "@mantine/core";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import { ShoppingBag } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -34,7 +34,7 @@ export const ShopList = ({ items, currentPage, totalPage }: ShopListProps) => {
       <NoItem
         title={"Không có sản phẩm nào"}
         description={message}
-        icon={ShoppingBagIcon}
+        icon={ShoppingBag}
       />
     );
   }

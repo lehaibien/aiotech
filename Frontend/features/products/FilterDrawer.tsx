@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import TuneIcon from "@mui/icons-material/Tune";
+import { SlidersHorizontal } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -92,7 +92,11 @@ export const FilterDrawer = ({
 
   return (
     <>
-      <Button variant="outline" onClick={open} leftSection={<TuneIcon />}>
+      <Button
+        variant="outline"
+        onClick={open}
+        leftSection={<SlidersHorizontal />}
+      >
         Lọc sản phẩm
       </Button>
 

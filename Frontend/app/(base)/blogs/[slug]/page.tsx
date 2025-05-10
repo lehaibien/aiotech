@@ -2,6 +2,7 @@ import { HtmlContent } from "@/components/core/HtmlContent";
 import { NoItem } from "@/components/core/NoItem";
 import { API_URL } from "@/constant/apiUrl";
 import { DEFAULT_TIMEZONE } from "@/constant/common";
+import { IMAGE_PLACEHOLDER } from "@/constant/image";
 import TableOfContents from "@/features/blog/TableOfContents";
 import BlogPostItem from "@/features/home/BlogPostItem";
 import { getApi } from "@/lib/apiClient";
@@ -84,7 +85,7 @@ export default async function Page({ params }: { params: Params }) {
             }}
           >
             <Image
-              src={post.imageUrl || "/image-not-found.jpg"}
+              src={post.imageUrl || IMAGE_PLACEHOLDER.DEFAULT}
               alt={post.title}
               width={1200}
               height={630}
