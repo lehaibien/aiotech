@@ -1,10 +1,8 @@
 using System.Reflection;
-using System.Threading.Channels;
 using Application.Authentication;
 using Application.Brands;
 using Application.Carts;
 using Application.Categories;
-using Application.Channels;
 using Application.Configurations;
 using Application.Dashboard;
 using Application.Discounts;
@@ -38,7 +36,6 @@ public static class DependencyInjection
         services.AddHttpClient<MomoLibrary>();
         services.AddApplicationServices();
         services.AddValidators();
-        services.AddElasticsearchSync();
         return services;
     }
 
@@ -80,13 +77,6 @@ public static class DependencyInjection
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        return services;
-    }
-
-    private static IServiceCollection AddElasticsearchSync(this IServiceCollection services)
-    {
-        services.AddSingleton(_ => Channel.CreateUnbounded<ESProductSync>());
-        services.AddHostedService<ElasticsearchSyncBackgroundService>();
         return services;
     }
 }

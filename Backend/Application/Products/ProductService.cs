@@ -1,7 +1,5 @@
 ﻿using System.Linq.Expressions;
-using System.Threading.Channels;
 using Application.Abstractions;
-using Application.Channels;
 using Application.Helpers;
 using Application.Images;
 using Application.Products.Dtos;
@@ -18,7 +16,6 @@ public class ProductService : IProductService
 {
     private const string FolderUpload = "images/products";
     private readonly ICacheService _cacheService;
-    private readonly Channel<ESProductSync> _channel;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
     private readonly ILogger<ProductService> _logger;
@@ -31,8 +28,7 @@ public class ProductService : IProductService
         IImageService imageService,
         IStorageService storageService,
         ICacheService cacheService,
-        ILogger<ProductService> logger,
-        Channel<ESProductSync> channel
+        ILogger<ProductService> logger
     )
     {
         _unitOfWork = unitOfWork;
@@ -41,7 +37,6 @@ public class ProductService : IProductService
         _storageService = storageService;
         _cacheService = cacheService;
         _logger = logger;
-        _channel = channel;
     }
 
     public async Task<Result<PaginatedList<ProductResponse>>> GetListAsync(
@@ -330,22 +325,6 @@ public class ProductService : IProductService
         await _cacheService.RemoveAsync(CacheKeys.NewestProducts);
         await _cacheService.RemoveAsync(CacheKeys.FirstPageProducts);
         var response = entity.MapToProductResponse();
-        _channel.Writer.TryWrite(
-            new ESProductSync(
-                entity.Id,
-                entity.Sku,
-                entity.Name,
-                entity.Description,
-                entity.Stock,
-                entity.Brand.Name,
-                entity.Category.Name,
-                entity.Reviews.Count > 0 ? entity.Reviews.Average(r => r.Rating) : 0,
-                entity.Price,
-                entity.DiscountPrice,
-                entity.ThumbnailUrl,
-                entity.Tags
-            )
-        );
         _logger.LogInformation("Successfully created product with ID: {ProductId}", entity.Id);
         return Result<ProductResponse>.Success(response);
     }
@@ -413,22 +392,6 @@ public class ProductService : IProductService
             .Include(x => x.Category)
             .Include(x => x.Reviews)
             .FirstOrDefaultAsync();
-        _channel.Writer.TryWrite(
-            new ESProductSync(
-                updatedEntity.Id,
-                updatedEntity.Sku,
-                updatedEntity.Name,
-                updatedEntity.Description,
-                updatedEntity.Stock,
-                updatedEntity.Brand.Name,
-                updatedEntity.Category.Name,
-                updatedEntity.Reviews.Count > 0 ? updatedEntity.Reviews.Average(r => r.Rating) : 0,
-                updatedEntity.Price,
-                updatedEntity.DiscountPrice,
-                updatedEntity.ThumbnailUrl,
-                updatedEntity.Tags
-            )
-        );
         var response = updatedEntity!.MapToProductResponse();
         _logger.LogInformation("Successfully updated product with ID: {ProductId}", request.Id);
         return Result<ProductResponse>.Success(response!);
