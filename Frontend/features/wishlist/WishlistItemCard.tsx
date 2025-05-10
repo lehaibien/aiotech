@@ -51,7 +51,7 @@ export const WishlistItemCard = ({
     });
   };
   return (
-    <Card component={Link} href={`/products/${productId}`} withBorder>
+    <Card component={Link} href={`/products/${productId}`}>
       <Card.Section>
         <Center>
           <Image

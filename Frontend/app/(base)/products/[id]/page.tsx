@@ -1,14 +1,15 @@
 import { HtmlContent } from "@/components/core/HtmlContent";
+import { NoItem } from "@/components/core/NoItem";
 import { API_URL } from "@/constant/apiUrl";
 import { ImageGallery } from "@/features/products/single/ImageGallery";
 import { ProductInfo } from "@/features/products/single/ProductInfo";
-import { ProductNotFound } from "@/features/products/single/ProductNotFound";
 import { RelatedProducts } from "@/features/products/single/RelatedProductSection";
 import { ReviewSection } from "@/features/products/single/ReviewSection";
 import { getByIdApi } from "@/lib/apiClient";
 import { parseUUID } from "@/lib/utils";
 import { ProductDetailResponse } from "@/types/product";
 import { Divider, Grid, GridCol, Stack, Title } from "@mantine/core";
+import { Package } from "lucide-react";
 import { Metadata } from "next";
 
 type Params = Promise<{
@@ -53,7 +54,13 @@ export default async function Page({ params }: { params: Params }) {
     product = response.data as ProductDetailResponse;
   }
   if (!product) {
-    return <ProductNotFound />;
+    return (
+      <NoItem
+        title="Sản phẩm không tồn tại"
+        description="Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa."
+        icon={Package}
+      />
+    );
   }
   return (
     <Stack p={4}>

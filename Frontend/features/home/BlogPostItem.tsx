@@ -25,7 +25,7 @@ export default function BlogPostItem({
   const postDate = dayjs(createdDate);
   const formattedDate = postDate.format("DD/MM/YYYY");
   return (
-    <Card padding={8} component={Link} href={`/blogs/${slug}`} withBorder>
+    <Card padding='lg' component={Link} href={`/blogs/${slug}`}>
       <Card.Section h={imgHeight}>
         <Image
           src={imageUrl}

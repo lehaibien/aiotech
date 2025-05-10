@@ -1,7 +1,6 @@
 "use client";
 
 import { MantineImageUploader } from "@/components/core/MantineImageUploader";
-import { ControlledCombobox } from "@/components/form/ControlledMantineCombobox";
 import { ControlledPillInput } from "@/components/form/ControlledPillInput";
 import { ControlledRichTextEditor } from "@/components/form/ControlledRichTextEditor";
 import { ControlledSelect } from "@/components/form/ControlledSelect";
@@ -23,17 +22,14 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
+import { ControlledCombobox } from "@/components/form/ControlledCombobox";
+import { yesNoComboboxData } from "@/constant/sysConstant";
 
 type ProductUpsertFormProps = {
   brands: ComboBoxItem[];
   categories: ComboBoxItem[];
   product: ProductUpdateResponse;
 };
-
-const featuredOptions = [
-  { value: "true", text: "Có" },
-  { value: "false", text: "Không" },
-];
 
 export const ProductUpsertForm = ({
   brands,
@@ -227,7 +223,7 @@ export const ProductUpsertForm = ({
             <ControlledSelect
               control={control}
               name="isFeatured"
-              options={featuredOptions}
+              options={yesNoComboboxData}
               required
               size="sm"
               label="Nổi bật"

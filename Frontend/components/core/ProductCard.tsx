@@ -87,7 +87,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     return "Còn hàng";
   };
   return (
-    <Card component={Link} href={`/products/${id}`} withBorder>
+    <Card component={Link} href={`/products/${id}`}>
       <Card.Section pos="relative">
         <Center>
           <Image

@@ -18,7 +18,6 @@ export const CategoryCard = ({ name, imageUrl }: CategoryCardProps) => {
       padding="sm"
       h={150}
       radius="md"
-      withBorder
     >
       <Card.Section>
         <Image

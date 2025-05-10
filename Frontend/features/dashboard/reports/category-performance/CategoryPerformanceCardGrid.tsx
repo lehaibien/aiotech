@@ -20,7 +20,7 @@ export const CategoryPerformanceCardGrid = ({
         lg: 4,
       }}
     >
-      <Card withBorder p="md" radius="md" key="highest-category">
+      <Card p="md" radius="md" key="highest-category">
         <Group justify="space-between" c="dimmed">
           <Text size="sm" tt="uppercase" fw={600}>
             Thương hiệu bán chạy nhất

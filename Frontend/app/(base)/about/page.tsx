@@ -92,7 +92,7 @@ export default function AboutPage() {
             content: "Đồng hành cùng các giải đấu và sự kiện gaming lớn",
           },
         ].map((value, index) => (
-          <Card key={index} p="lg" radius="md" withBorder>
+          <Card key={index} p="lg" radius="md">
             <Group justify="center" mb="md">
               {value.icon}
             </Group>

@@ -1,46 +1,31 @@
 "use client";
 
-import CloseIcon from "@mui/icons-material/Close";
-import MenuIcon from "@mui/icons-material/Menu";
 import {
+  ActionIcon,
   Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
+  Burger,
+  Drawer,
+  TableOfContents as MantineTableOfContents,
+  Title,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useEffect, useRef, useState } from "react";
 
 export default function TableOfContents({ html }: { html: string }) {
   const [headings, setHeadings] = useState<
-    { id: string; text: string; level: number }[]
+    { id: string; value: string; depth: number }[]
   >([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
+  const reinitializeRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const headingElements = Array.from(doc.querySelectorAll("h2, h3, h4"));
+    // Create a temporary div to parse the HTML content
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
 
-    const extractedHeadings = headingElements.map((heading) => {
-      const text = heading.textContent || "";
-      const id = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-");
-      return {
-        id,
-        text,
-        level: parseInt(heading.tagName.substring(1)),
-      };
-    });
+    // Find all heading elements in the parsed content
+    const headingElements = Array.from(tempDiv.querySelectorAll("h2, h3, h4"));
 
-    setHeadings(extractedHeadings);
-
-    // Ensure headings have IDs in the actual DOM
     const ensureHeadingIds = () => {
       extractedHeadings.forEach((heading) => {
         const element = document.getElementById(heading.id);
@@ -61,186 +46,129 @@ export default function TableOfContents({ html }: { html: string }) {
       });
     };
 
-    const handleScroll = () => {
-      ensureHeadingIds(); // Ensure all headings have IDs before checking
-      const viewportHeight = window.innerHeight;
-      const scrollPosition = window.scrollY + 130;
-      let activeHeading = null;
-      let minDistance = Infinity;
+    const extractedHeadings = headingElements.map((heading) => {
+      // Get the text content, handling nested tags
+      const text = heading.textContent || "";
+      const id = `heading-${text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")}`;
 
-      for (const heading of extractedHeadings) {
-        const element = document.getElementById(heading.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const elementTop = rect.top + window.scrollY;
-          const distance = Math.abs(elementTop - scrollPosition);
+      // Set the ID on the heading element
+      heading.id = id;
 
-          if (rect.top <= viewportHeight / 2 && rect.bottom >= 0) {
-            if (distance < minDistance) {
-              minDistance = distance;
-              activeHeading = heading.id;
-            }
-          }
-        }
-      }
+      return {
+        id,
+        value: text,
+        depth: parseInt(heading.tagName.substring(1)) - 2,
+      };
+    });
 
-      if (activeHeading && activeHeading !== activeId) {
-        setActiveId(activeHeading);
-      }
-    };
+    setHeadings(extractedHeadings);
 
-    // Throttled scroll handler
-    let ticking = false;
-    const scrollHandler = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
+    // Update the blog content container with the modified HTML
+    const container = document.querySelector("[data-blog-content]");
+    if (container) {
+      container.innerHTML = tempDiv.innerHTML;
+    }
 
     // Initial setup with timeout to ensure DOM is ready
-    const initialize = () => {
+    const timer = setTimeout(() => {
       ensureHeadingIds();
-      handleScroll();
-      window.addEventListener("scroll", scrollHandler, { passive: true });
-      window.addEventListener("resize", scrollHandler);
-    };
-
-    const timer = setTimeout(initialize, 100);
+      reinitializeRef.current(); // Initialize the scroll spy
+    }, 200); // Increased timeout for better reliability
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("scroll", scrollHandler);
-      window.removeEventListener("resize", scrollHandler);
     };
   }, [html]);
 
-  const scrollToHeading = (id: string) => {
-    // First try finding the element directly
-    let element = document.getElementById(id);
-
-    // If not found, try finding by text content (fallback)
-    if (!element) {
-      const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-      const matchingHeading = headings.find(
-        (heading) =>
-          heading.textContent
-            ?.toLowerCase()
-            .replace(/[^\w\s-]/g, "")
-            .replace(/\s+/g, "-") === id
-      );
-      if (matchingHeading) {
-        // Create an ID if it doesn't exist
-        if (!matchingHeading.id) {
-          matchingHeading.id = id;
-        }
-        element = matchingHeading as HTMLElement;
-      }
-    }
-
-    if (element) {
-      const headerOffset = 130;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      // Update the active ID immediately
-      setActiveId(id);
-    }
-  };
-
-  if (headings.length === 0) return null;
+  if (headings.length === 0) {
+    return null;
+  }
 
   return (
     <>
       {/* Mobile Toggle Button */}
-      <IconButton
-        sx={{
-          position: "fixed",
-          bottom: 16,
-          right: 16,
-          zIndex: 1000,
-          display: { xs: "flex", md: "none" },
-          bgcolor: "background.paper",
-          boxShadow: 3,
-          "&:hover": {
-            bgcolor: "background.paper",
-          },
+      <ActionIcon
+        variant="transparent"
+        pos="fixed"
+        bottom={16}
+        right={16}
+        radius="xl"
+        size="lg"
+        aria-label="Open table of contents"
+        onClick={open}
+        display={{ base: "block", md: "none" }}
+        style={{
+          zIndex: 500,
         }}
-        onClick={() => setMobileOpen(!mobileOpen)}
       >
-        <MenuIcon />
-      </IconButton>
+        <Burger opened={false} size="sm" />
+      </ActionIcon>
 
-      {/* Table of Contents */}
-      <Box
-        sx={{
-          position: { xs: "fixed", md: "sticky" },
-          top: { xs: 0, md: 130 },
-          left: 0,
-          width: { xs: "100%", md: 280 },
-          height: { xs: "100vh", md: "auto" },
-          bgcolor: "background.paper",
-          zIndex: 1100,
-          transform: {
-            xs: mobileOpen ? "translateX(0)" : "translateX(-100%)",
-            md: "none",
-          },
-          transition: "transform 0.3s ease-in-out",
-          boxShadow: { xs: 3, md: 0 },
-          p: { xs: 2, md: 0 },
-          overflowY: "auto",
-        }}
+      {/* Mobile TOC */}
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title="Nội dung"
+        position="left"
+        size="md"
+        display={{ base: "block", md: "none" }}
+        zIndex={1000}
       >
-        {mobileOpen ? (
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h6" gutterBottom>
-              Nội dung
-            </Typography>
-            <IconButton onClick={() => setMobileOpen(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Stack>
-        ) : (
-          <Typography variant="h6" gutterBottom>
-            Nội dung
-          </Typography>
-        )}
-        <List dense>
-          {headings.map((heading) => (
-            <ListItem key={heading.id} disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  scrollToHeading(heading.id);
-                  setMobileOpen(false);
-                }}
-                selected={activeId === heading.id}
-                sx={{
-                  pl: heading.level * 1.5,
-                  "&.Mui-selected": {
-                    color: "primary.main",
-                    bgcolor: "transparent",
-                  },
-                }}
-              >
-                <Typography variant="body2">{heading.text}</Typography>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        <TOC
+          initialData={headings}
+          reinitializeRef={reinitializeRef}
+          onClick={close}
+        />
+      </Drawer>
+
+      {/* Desktop TOC */}
+      <Box
+        pos="sticky"
+        top={90}
+        w={280}
+        display={{ base: "none", md: "block" }}
+      >
+        <Title order={6} mb="md">
+          Nội dung
+        </Title>
+        <TOC initialData={headings} reinitializeRef={reinitializeRef} />
       </Box>
     </>
   );
 }
+
+const TOC = ({
+  initialData,
+  reinitializeRef,
+  onClick,
+}: {
+  initialData: { id: string; value: string; depth: number }[];
+  reinitializeRef: React.RefObject<() => void>;
+  onClick?: () => void;
+}) => {
+  return (
+    <MantineTableOfContents
+      initialData={initialData}
+      reinitializeRef={reinitializeRef}
+      minDepthToOffset={0}
+      depthOffset={25}
+      size="sm"
+      scrollSpyOptions={{
+        selector: "h2, h3, h4",
+        getDepth: (element) => parseInt(element.tagName.substring(1)) - 1,
+        getValue: (element) => element.textContent || "",
+      }}
+      getControlProps={({ data }) => ({
+        onClick: () => {
+          data.getNode().scrollIntoView();
+          onClick?.();
+        },
+        "aria-label": `Đến mục ${data.value}`,
+        children: data.value,
+      })}
+    />
+  );
+};

@@ -1,56 +1,61 @@
-'use client';
+"use client";
 
-import { formatDate } from '@/lib/utils';
-import { DashboardSale } from '@/types';
-import { Box } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
+import { formatDate, formatNumberWithSeperator } from "@/lib/utils";
+import { DashboardSale } from "@/types";
+import { LineChart } from "@mantine/charts";
 
 type RevenueChartProps = {
   data: DashboardSale[];
 };
 
 export const RevenueChart = ({ data }: RevenueChartProps) => {
-  const xLabels = data.map((item) => formatDate(item.date, 'MM/YYYY'));
-  const yValues = data.map((item) => item.revenue);
-  const minPrice = Math.min(...data.map((item) => item.revenue));
-  const hasNonZeroValues = data.some((item) => item.revenue > 0);
-
+  const chartData = data.map((item) => ({
+    date: formatDate(item.date, "MM/YYYY"),
+    revenue: item.revenue,
+  }));
+  const validData = chartData.filter((item) => item.revenue > 0);
+  const averageRevenue =
+    validData.length > 0
+      ? validData.reduce((acc, item) => acc + item.revenue, 0) /
+        validData.length
+      : 0;
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      <LineChart
-        xAxis={[
-          {
-            data: xLabels,
-            scaleType: 'point',
-          },
-        ]}
-        yAxis={[
-          {
-            id: 'y-axis-revenue',
-            label: 'Doanh thu (đ)',
-            position: 'left',
-            min: 0,
-            tickMinStep: hasNonZeroValues ? Math.max(1, minPrice / 10) : 1,
-            labelStyle: {
-              transform: 'translate(30px, -190px)',
-            },
-          },
-        ]}
-        series={[
-          {
-            data: yValues,
-            area: true,
-            color: '#4caf50',
-            showMark: true,
-          },
-        ]}
-        height={400}
-        sx={{
-          '.MuiAreaElement-root': {
-            fillOpacity: 0.2,
-          },
-        }}
-      />
-    </Box>
+    <LineChart
+      h={400}
+      data={chartData}
+      dataKey="date"
+      series={[
+        {
+          name: "revenue",
+          label: "Doanh thu",
+          color: "#4caf50",
+        },
+      ]}
+      curveType="monotone"
+      withDots
+      withLegend
+      withTooltip
+      unit=" đ"
+      valueFormatter={(value) => formatNumberWithSeperator(value)}
+      yAxisProps={{
+        label: "Doanh thu (đ)",
+      }}
+      xAxisProps={{
+        label: "Tháng",
+      }}
+      connectNulls
+      referenceLines={
+        averageRevenue > 0
+          ? [
+              {
+                y: averageRevenue,
+                color: "red.5",
+                label: "Doanh thu trung bình",
+                labelPosition: "insideTopRight",
+              },
+            ]
+          : []
+      }
+    />
   );
 };

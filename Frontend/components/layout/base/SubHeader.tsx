@@ -22,7 +22,14 @@ export const SubHeader = ({ categories }: SubHeaderProps) => {
       <GridCol span={2}>
         <CategoryMenu categories={categories || []} />
       </GridCol>
-      <GridCol span={4}>
+      <GridCol
+        span={{
+          base: 10,
+          md: 6,
+          lg: 5,
+          xl: 4,
+        }}
+      >
         <Navigation />
       </GridCol>
     </Grid>

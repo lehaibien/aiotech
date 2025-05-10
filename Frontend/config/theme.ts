@@ -1,6 +1,24 @@
-import { createTheme } from "@mantine/core";
+import { createTheme, MantineThemeOverride } from "@mantine/core";
 
-export const theme = createTheme({
+export const theme: MantineThemeOverride = createTheme({
+  primaryColor: "indigo",
+  components: {
+    Paper: {
+      defaultProps: {
+        withBorder: true,
+      },
+    },
+    Card: {
+      defaultProps: {
+        withBorder: true,
+      },
+    },
+    Select: {
+      defaultProps: {
+        checkIconPosition: "right",
+      },
+    },
+  },
   fontFamily: "var(--font-beVietnamPro)",
   headings: {
     sizes: {
@@ -37,10 +55,10 @@ export const theme = createTheme({
     },
   },
   breakpoints: {
-    xs: '40em',
-    sm: '48em',
-    md: '64em',
-    lg: '80em',
-    xl: '96em',
-  }
+    xs: "40em",
+    sm: "48em",
+    md: "64em",
+    lg: "80em",
+    xl: "96em",
+  },
 });

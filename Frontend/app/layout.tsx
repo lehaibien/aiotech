@@ -20,6 +20,7 @@ import "mantine-datatable/styles.layer.css";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Be_Vietnam_Pro } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import React from "react";
 import "./globals.css";
 
@@ -74,28 +75,30 @@ export default async function RootLayout({
         /> */}
       </head>
       <body className={`${beVietnamPro.className} antialiased`}>
-        <DatesProvider
-          settings={{
-            locale: "vi",
-            firstDayOfWeek: 1,
-            timezone: "UTC",
-          }}
-        >
+        <NuqsAdapter>
           <SessionProvider>
-            <MantineProvider
-              theme={theme}
-              defaultColorScheme="auto"
-              classNamesPrefix="aiotech"
+            <DatesProvider
+              settings={{
+                locale: "vi",
+                firstDayOfWeek: 1,
+                timezone: "UTC",
+              }}
             >
-              <ModalsProvider>
-                <SignalRProvider>
-                  <JotaiProvider>{children}</JotaiProvider>
-                </SignalRProvider>
-              </ModalsProvider>
-              <Notifications limit={3} />
-            </MantineProvider>
+              <MantineProvider
+                theme={theme}
+                defaultColorScheme="auto"
+                classNamesPrefix="aiotech"
+              >
+                <ModalsProvider>
+                  <SignalRProvider>
+                    <JotaiProvider>{children}</JotaiProvider>
+                  </SignalRProvider>
+                </ModalsProvider>
+                <Notifications limit={3} />
+              </MantineProvider>
+            </DatesProvider>
           </SessionProvider>
-        </DatesProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

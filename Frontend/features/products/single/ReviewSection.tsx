@@ -124,7 +124,7 @@ export const ReviewSection = ({ productId }: ReviewSectionProps) => {
   return (
     <Stack gap="md">
       <Title order={5}>Đánh giá sản phẩm</Title>
-      <Card withBorder p="md">
+      <Card p="md">
         <Flex
           direction={{
             base: "column",

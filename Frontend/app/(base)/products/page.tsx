@@ -1,10 +1,15 @@
 import { API_URL } from "@/constant/apiUrl";
+import { productSortData } from "@/constant/sysConstant";
 import { FilterDrawer } from "@/features/products/FilterDrawer";
 import { ShopList } from "@/features/products/ShopList";
 import { ShopSort } from "@/features/products/ShopSort";
-import { getApi, getListApi } from "@/lib/apiClient";
+import { getListApi } from "@/lib/apiClient";
 import {
-  ComboBoxItem,
+  fetchBrandCombobox,
+  fetchCategoryCombobox,
+} from "@/lib/comboBoxFetching";
+import { parseAsProductSort } from "@/lib/nuqs/parseAsEnum";
+import {
   GetListFilteredProductRequest,
   PaginatedList,
   ProductListItemResponse,
@@ -12,8 +17,25 @@ import {
 } from "@/types";
 import { Group, Stack, Title } from "@mantine/core";
 import { Metadata } from "next";
+import type { SearchParams } from "nuqs/server";
+import {
+  createLoader,
+  parseAsArrayOf,
+  parseAsFloat,
+  parseAsInteger,
+  parseAsString,
+} from "nuqs/server";
 
-type SearchParams = Promise<{ [key: string]: string | undefined }>;
+const ProductSearchParams = {
+  page: parseAsInteger.withDefault(1),
+  category: parseAsArrayOf(parseAsString, ","),
+  brand: parseAsArrayOf(parseAsString, ","),
+  minPrice: parseAsFloat.withDefault(0),
+  maxPrice: parseAsFloat.withDefault(900000000),
+  sort: parseAsProductSort,
+};
+
+const loader = createLoader(ProductSearchParams);
 
 export const metadata: Metadata = {
   title: "Cửa hàng | AioTech",
@@ -38,19 +60,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function ShopPage({
+export default async function Page({
   searchParams,
 }: {
-  searchParams?: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
-  const params = await searchParams;
+  const { page, category, brand, minPrice, maxPrice, sort } = await loader(
+    searchParams
+  );
   const pageSize = 12;
-  const page = params?.page ? Number(params?.page) : 1;
-  const category = params?.category;
-  const brand = params?.brand;
-  const minPrice = params?.minPrice ? Number(params?.minPrice) : 0;
-  const maxPrice = params?.maxPrice ? Number(params?.maxPrice) : 900000000;
-  const sort = params?.sort;
 
   let dataList: PaginatedList<ProductListItemResponse> = {
     items: [],
@@ -58,44 +76,21 @@ export default async function ShopPage({
     pageSize: pageSize,
     totalCount: 0,
   };
-  let categories: ComboBoxItem[] = [];
-  let brands: ComboBoxItem[] = [];
-  const categoryPromise = getApi(API_URL.categoryComboBox);
-  const brandPromise = getApi(API_URL.brandComboBox);
-  let currentSort = ProductSort.Default;
-  switch (sort) {
-    case "price_asc":
-      currentSort = ProductSort.PriceAsc;
-      break;
-    case "price_desc":
-      currentSort = ProductSort.PriceDesc;
-      break;
-    case "newest":
-      currentSort = ProductSort.Newest;
-      break;
-    case "oldest":
-      currentSort = ProductSort.Oldest;
-      break;
-    default:
-      currentSort = ProductSort.Default;
-      break;
-  }
+  const categoryCombobox = await fetchCategoryCombobox();
+  const brandCombobox = await fetchBrandCombobox();
   const request: GetListFilteredProductRequest = {
     pageIndex: page - 1,
     pageSize: pageSize,
     textSearch: "",
-    brands: brand,
-    categories: category,
-    minPrice: Number(minPrice),
-    maxPrice: Number(maxPrice),
-    sort: currentSort,
+    brands: brand?.join(",") ?? "",
+    categories: category?.join(",") ?? "",
+    minPrice: minPrice,
+    maxPrice: maxPrice,
+    sort: sort ?? ProductSort.Default,
   };
-  const productPromise = getListApi(API_URL.productFiltered, request);
-  const [categoryResponse, brandResponse, productResponse] = await Promise.all([
-    categoryPromise,
-    brandPromise,
-    productPromise,
-  ]);
+  console.log("Requesting: ", request);
+  const productResponse = await getListApi(API_URL.productFiltered, request);
+  console.log("Response: ", productResponse);
   if (productResponse.success) {
     const data = productResponse.data as PaginatedList<ProductListItemResponse>;
     dataList = {
@@ -105,32 +100,26 @@ export default async function ShopPage({
       totalCount: data.totalCount,
     };
   }
-  if (categoryResponse.success) {
-    categories = categoryResponse.data as ComboBoxItem[];
-  }
-  if (brandResponse.success) {
-    brands = brandResponse.data as ComboBoxItem[];
-  }
   return (
-    <Stack gap="xs">
+    <Stack>
       <Title order={1}>Cửa hàng</Title>
-      <Stack gap="sm">
-        <Group justify="space-between">
-          <FilterDrawer
-            brands={brands}
-            categories={categories}
-            defaultBrands={brand?.split(",")}
-            defaultCategories={category?.split(",")}
-          />
-          <ShopSort defaultSort={sort ?? "default"} />
-        </Group>
-
-        <ShopList
-          items={dataList.items}
-          currentPage={page}
-          totalPage={Math.ceil(dataList.totalCount / pageSize)}
+      <Group justify="space-between">
+        <FilterDrawer
+          brands={brandCombobox}
+          categories={categoryCombobox}
+          defaultBrands={brand ?? []}
+          defaultCategories={category ?? []}
         />
-      </Stack>
+        <ShopSort
+          defaultSort={productSortData[Number(sort)]?.value ?? "default"}
+        />
+      </Group>
+
+      <ShopList
+        items={dataList.items}
+        currentPage={page}
+        totalPage={Math.ceil(dataList.totalCount / pageSize)}
+      />
     </Stack>
   );
 }

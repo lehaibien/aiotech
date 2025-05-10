@@ -11,10 +11,10 @@ import { BrandRequestSchema } from "@/schemas/brandSchema";
 import { BrandRequest, BrandResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Group, Input, Stack } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -23,7 +23,6 @@ type BrandUpsertFormProps = {
 };
 
 export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
-  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const [image, setImage] = useState<File | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,18 +45,24 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
       const method = data.id === EMPTY_UUID ? "Thêm mới" : "Cập nhật";
       const response = await action(API_URL.brand, formData);
       if (response.success) {
-        enqueueSnackbar(method + " thương hiệu thành công", {
-          variant: "success",
+        notifications.show({
+          title: "Hoàn tất",
+          message: method + " thương hiệu thành công!",
+          color: "green",
         });
         router.push("/dashboard/brands");
       } else {
-        enqueueSnackbar(method + " thương hiệu thất bại: " + response.message, {
-          variant: "error",
+        notifications.show({
+          title: "Lỗi " + method,
+          message: response.message,
+          color: "red",
         });
       }
     } catch (err) {
-      enqueueSnackbar("Lỗi xảy ra: " + (err as Error).message, {
-        variant: "error",
+      notifications.show({
+        title: "Lỗi xảy ra",
+        message: (err as Error).message,
+        color: "red",
       });
     }
     setIsLoading(false);
@@ -112,8 +117,8 @@ export const BrandUpsertForm = ({ defaultValue }: BrandUpsertFormProps) => {
           style={{
             marginTop: 8,
             objectFit: "fill",
-            maxWidth: '100%',
-            maxHeight: '100%',
+            maxWidth: "100%",
+            maxHeight: "100%",
             aspectRatio: IMAGE_ASPECT_RATIO.BRANDING,
           }}
         />

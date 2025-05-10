@@ -14,10 +14,10 @@ import { postRequestSchema } from "@/schemas/postSchema";
 import { PostRequest, PostUpdateResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Grid, Group, Input } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -38,7 +38,6 @@ type PostUpsertFormProps = {
 
 export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
   const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
   const { control, getValues, setValue, handleSubmit } = useForm<PostRequest>({
     defaultValues: post,
     resolver: zodResolver(postRequestSchema),
@@ -59,13 +58,17 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
     const method = postApi === postApi ? "Thêm mới" : "Cập nhật";
     const response = await action(API_URL.post, formData);
     if (response.success) {
-      enqueueSnackbar(method + " bài viết thành công", {
-        variant: "success",
+      notifications.show({
+        title: "Hoàn tất",
+        message: method + " bài viết thành công!",
+        color: "green",
       });
       router.push("/dashboard/posts");
     } else {
-      enqueueSnackbar("Lỗi xảy ra: " + response.message, {
-        variant: "error",
+      notifications.show({
+        title: "Lỗi " + method,
+        message: response.message,
+        color: "red",
       });
     }
     setIsLoading(false);
@@ -191,7 +194,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
       <Grid.Col
         span={12}
         style={{
-          position: 'sticky',
+          position: "sticky",
           bottom: 0,
           left: 0,
           zIndex: 1000,
@@ -199,6 +202,7 @@ export const PostUpsertForm = ({ post }: PostUpsertFormProps) => {
       >
         <Group justify="flex-end">
           <Button
+            variant="light"
             component={Link}
             href="/dashboard/posts"
             type="button"

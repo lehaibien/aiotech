@@ -119,8 +119,9 @@ export default async function Page({ params }: { params: Params }) {
 
               <Divider />
             </Stack>
-
-            <HtmlContent content={post.content} />
+            <div data-blog-content>
+              <HtmlContent content={post.content} />
+            </div>
           </Stack>
         </Paper>
 
